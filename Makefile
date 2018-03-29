@@ -1,6 +1,6 @@
 
 CC = g++
-CFLAGS = -Werror -std=c++11 -g
+CFLAGS = -Wall -std=c++11 -g
 
 compile: src/rcc.cc 
 	@$(CC) $(CFLAGS) -Iinclude/ -I/usr/local/include/ -o rcc src/rcc.cc
