@@ -5,6 +5,7 @@ cc_library(
 	srcs = glob(['src/*.cc']),
 	hdrs = glob(['include/*.h']),
 	visibility = ["//test:__pkg__"],
+	includes = ["include/"],
 )
 
 cc_binary(
@@ -12,6 +13,7 @@ cc_binary(
 	copts = ["-Wall -g"],
 	deps = [":ucsb-rcc-dev"],
 	srcs = glob(['src/*.cc', 'include/*.h']),
+	includes = ["include/"],
 )
 
 cc_test(

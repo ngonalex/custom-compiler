@@ -1,9 +1,9 @@
 #include <iostream>
-#include "rcc/include/rcc.h"
+#include "rcc.h"
 
 int main()
 {
-	std::cout << rcc_magic_number() << std::endl;
+	std::cout << "The magic number is: " << rcc_magic_number() << std::endl;
 	return 0;
 }
 
