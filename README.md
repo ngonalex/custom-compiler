@@ -1,4 +1,7 @@
 
+The Really Cool Compiler
+========================
+
 You've connected to CSIL or fired up your local terminal and want to start writing your own compiler? Good! This is a handout that will help you along the way.
 
 Our goal for now is to make sure that your team, your partner team and the administrative TA team are all in sync and functional. We're setting up a somewhat complex environment and making sure we start off right is very important.
@@ -76,7 +79,7 @@ Do this line by line, so that you can catch any error that happens.
 OKAY, GOING FORWARD!
 ====================
 
-Step 3: Compiling, fixing, recompiling
+Step 3: Compiling and testing locally
 ======================================
 
 You can now try compiling the project. To compile the project, we're using 
@@ -93,25 +96,24 @@ To test locally, you can run the following:
 Step 3a: Branch out
 -------------------
 
-By default, your work will always end on the master branch of the repository. The remote master branch, in the end, the only one we will care about when evaluating your work.
+By default, your work will always end on the master branch of the repository. The remote master branch is, in the end, the only one we will care about when evaluating your work.
 
-When fixing things, however, you will always be creating so-called *feature branches*: small branches that should only contain one change at a time. To create a new branch, we do:
+When fixing or implementing things, however, you will always be creating so-called *feature branches*: small branches that should only contain one change at a time. To create a new branch, we do:
 
 ```git checkout -b <branch-name>```
 
 Now whatever change you commit, it will be saved in this branch. This also means that, should we have to return to a previous point, we are somewhat safe from massive data loss. Don't be afraid of making the branch names as descriptive as possible. If you are using a nice shell or git integration software, the shell itself will tell you what branch you're on, so that you don't get lost.
 
-Step 3b: Fix the error, commit and push
----------------------------------------
+Step 3b: Implement a feature, fix an error, commit and push
+------------------------------------------------------------
 
-It's time now to fix the error that's stopping the tests from passing. In our case, this one is simple: to figure it out, open the only source file and follow the comments there. Spoiler alert: it's really simple.
-
-Once you're done, recompile the code and if compilation passes, commit by doing:
+Once you're done changing code, recompile it, test, and if compilation passes, commit by doing:
 
 ```git add --all .
 git commit -m "<very informative message here>"
 ```
-Once you're happy (this might be after the first commit, or the 10th, or the 100th), push the code to the remote branch by doing:
+
+When you're happy (this might be after the first commit, or the 10th, or the 100th), push the code to the remote branch by doing:
 
 ```git push origin <branch-name>```
 
