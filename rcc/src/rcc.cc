@@ -1,9 +1,9 @@
-#include <iostream>
 #include "rcc.h"
 
-int main()
-{
-	std::cout << "The magic number is: " << GetRCCMagicNumber() << std::endl;
-	return 0;
+namespace rcc {
+
+int GetRCCMagicNumber() {
+  return 0x12CC;
 }
 
+}  // namespace rcc
