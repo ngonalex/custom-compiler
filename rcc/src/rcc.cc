@@ -3,7 +3,7 @@
 
 int main()
 {
-	std::cout << "The magic number is: " << rcc_magic_number() << std::endl;
+	std::cout << "The magic number is: " << GetRCCMagicNumber() << std::endl;
 	return 0;
 }
 
