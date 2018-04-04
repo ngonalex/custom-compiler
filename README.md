@@ -1,6 +1,7 @@
 
-The Really Cool Compiler
-========================
+The Really Cool Compiler for INFLUX
+====================================
+
 
 You've connected to CSIL or fired up your local terminal and want to start writing your own compiler? Good! This is a handout that will help you along the way.
 
@@ -8,8 +9,7 @@ Our goal for now is to make sure that your team, your partner team and the admin
 
 At the end of this handout, you should be ready to take over and do some serious development in an organized way.
 
-Prerequisites
-=============
+## Prerequisites
 
 The following software must be installed before we can proceed with actual work:
 
@@ -21,8 +21,7 @@ The following software must be installed before we can proceed with actual work:
 
 The steps for installing all of these are easily googlable, so make sure you have that ready before proceeding.
 
-Step 1: Making a project repository
-===================================
+## Step 1: Making a project repository
 
 Go to the [UCSB Github](https://github.ucsb.edu/) website and create a private repository within the **CS160-S18** organization. Make up a team name and call the repository `team-<name>`. Be original. If your Github account isn't added to this organization, please contact any of the TAs to fix that as soon as possible. You **cannot** go on without first finishing this step. 
 
@@ -59,8 +58,7 @@ Congratulations! The next step would be to clone the new repo and settle in:
 
 ```git clone https://github.ucsb.edu/CS160-S18/team-<name>.git```
 
-WORKING ON CSIL? INSTALL BAZEL LIKE THIS!
-=========================================
+## WORKING ON CSIL? INSTALL BAZEL LIKE THIS!
 
 Go to your home directory, and then do the following:
 
@@ -76,11 +74,9 @@ echo "alias bazel=~/bazel/output/bazel" >> ~/.bashrc
 This should install it locally and get you ready to use it from now on!
 Do this line by line, so that you can catch any error that happens.
 
-OKAY, GOING FORWARD!
-====================
+## OKAY, GOING FORWARD!
 
-Step 3: Compiling and testing locally
-======================================
+## Step 3: Compiling and testing locally
 
 You can now try compiling the project. To compile the project, we're using 
 **bazel**. If you don't know how to use it, a tutorial is included [here](link). Entering the directory, we can now run:
@@ -93,8 +89,7 @@ To test locally, you can run the following:
 
 ```bazel test rcc:ucsb-rcc-test```
 
-Step 3a: Branch out
--------------------
+### Step 3a: Branch out
 
 By default, your work will always end on the master branch of the repository. The remote master branch is, in the end, the only one we will care about when evaluating your work.
 
@@ -104,8 +99,7 @@ When fixing or implementing things, however, you will always be creating so-call
 
 Now whatever change you commit, it will be saved in this branch. This also means that, should we have to return to a previous point, we are somewhat safe from massive data loss. Don't be afraid of making the branch names as descriptive as possible. If you are using a nice shell or git integration software, the shell itself will tell you what branch you're on, so that you don't get lost.
 
-Step 3b: Implement a feature, fix an error, commit and push
-------------------------------------------------------------
+### Step 3b: Implement a feature, fix an error, commit and push
 
 Once you're done changing code, recompile it, test, and if compilation passes, commit by doing:
 
@@ -119,8 +113,7 @@ When you're happy (this might be after the first commit, or the 10th, or the 100
 
 After this, if you go back to the Github page, it will show you that your code has been commited and suggest that you "Review & Pull Request". This is the second most important part of the dev cycle: in this step, you will make a request for the master branch to pull your changes and accept them in full. This process is guarded by reviews and tests.
 
-Step 3c: Sending out pull requests for review
----------------------------------------------
+### Step 3c: Sending out pull requests for review
 
 If you've never made pull requests, read about them [here](https://help.github.com/articles/creating-a-pull-request/). Basically, you'll choose several people to review your changes to the code, and if everyone agrees that the changes are fine (LGTMs them -- "Looks Good To Me"), the branch is automatically tested, and if that passes, it is merged into master. Congratulations!
 
@@ -131,3 +124,4 @@ Take the review process seriously. Your grade, and the future quality of your co
 Once you meet all of these requirements, your request will go through, and the branch will be merged with master remotely. Don't forget to return to master locally too, pull and start the next change from there!
 
 At this point, you have learned how to submit your code, and how to work with your team. This method might seem taxing and wasting time, but it is a straight-forward way of keeping a sane head once two teams of three people start simultaneously hacking away at the code. Remember, common engineering wisdom says that writing code is only 10% of the job. The rest is testing, maintaining the the codebase and communicating changes, and you will be graded in all of those actively. Practice this workflow until it gets under your skin.
+m
