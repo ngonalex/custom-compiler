@@ -4,6 +4,6 @@
 
 int main()
 {
-	std::cout << rcc::GetRCCMagicNumber() << std::endl;
-	return 0;
+  std::cout << rcc::GetRCCMagicNumber() << std::endl;
+  return 0;
 }
