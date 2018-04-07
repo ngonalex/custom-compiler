@@ -1,26 +1,16 @@
 
 cc_library(
-	name = "ucsb-rcc-dev",
+	name = "rcc",
 	copts = ["-Wall -g"],
-	srcs = glob(['src/*.cc']),
-	hdrs = glob(['include/*.h']),
-	visibility = ["//test:__pkg__"],
-	includes = ["include/"],
-)
-
-cc_binary(
-	name = "ucsb-rcc",
-	copts = ["-Wall -g"],
-	deps = [":ucsb-rcc-dev"],
-	srcs = glob(['src/*.cc', 'include/*.h']),
-	includes = ["include/"],
+	srcs = ["rcc.cc"],
+	hdrs = ["rcc.h"],
+	visibility = ["//public:__pkg__"],
 )
 
 cc_test(
-	name = "ucsb-rcc-test",
-	deps = ["@gtest//:main", ":ucsb-rcc-dev"],
-	srcs = glob(['tests/*.cc']),
-        includes = ["include/"],
+	name = "rcc_test",
+	deps = ["@gtest//:main", ":rcc"],
+	srcs = ["rcc_test.cc"],
 	timeout = "short", 
 	size = "small",
 )
