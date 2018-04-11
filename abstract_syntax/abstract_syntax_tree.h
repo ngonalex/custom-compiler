@@ -20,6 +20,9 @@ class AstVisitor {
  public:
   virtual ~AstVisitor() {}
 
+  //Not very general, this is probably a bad idea for future ASTS
+  std::stack<int> opcode;
+
   // these should be able to change members of the visitor, thus not const
   virtual void VisitIntegerExpr(const IntegerExpr& exp) = 0;
   virtual void VisitBinaryOperatorExpr(const BinaryOperatorExpr& exp) = 0;
