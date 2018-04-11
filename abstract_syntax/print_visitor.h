@@ -61,6 +61,16 @@ class PrintVisitor : public AstVisitor {
     output_ << ")";
   }
 
+  std::stack<int> opstack;
+
+  int visitInt() {
+    val;
+  }
+
+  int visitAdd(lhs, rhs) {
+    lhs.visit(this) + rhs.visit(this);
+  }
+
  private:
   std::stringstream output_;
 };
