@@ -1,9 +1,11 @@
-#include "abstract_syntax_tree.h";
+#include <stack>
+
+#include "abstract_syntax_tree.h"
 
 namespace cs160{
 namespace abstract_syntax{
 
-class InterpreterVisitor : AstVisitor{
+class InterpreterVisitor : public AstVisitor{
 public:
    InterpreterVisitor() {}
    ~InterpreterVisitor() {}
@@ -11,7 +13,7 @@ public:
   // these should be able to change members of the visitor, thus not const
    void VisitIntegerExpr(const IntegerExpr& exp){
        //push value to stack
-       opstack.push(exp.value);
+       opstack.push(exp.value());
    }
 
    void VisitBinaryOperatorExpr(const BinaryOperatorExpr& exp){
@@ -24,9 +26,9 @@ public:
    	exp.rhs().Visit(const_cast<InterpreterVisitor*>(this));
 
 	//Pop the top two (left,right), add them, and push it back on the stack
-    int l = opstack.top();
-    opstack.pop();
     int r = opstack.top();
+    opstack.pop();
+    int l = opstack.top();
     opstack.pop();
 	opstack.push(l+r);
    }
@@ -38,9 +40,9 @@ public:
 	exp.rhs().Visit(const_cast<InterpreterVisitor*>(this));
 
 	//Pop (left,right), subtract them, and push it back onto the stack
-	int l = opstack.top();
+	int r = opstack.top();
     opstack.pop();
-    int r = opstack.top();
+    int l = opstack.top();
     opstack.pop();
 	opstack.push(l-r);
   
@@ -52,9 +54,9 @@ public:
 	exp.rhs().Visit(const_cast<InterpreterVisitor*>(this));
 
 	//Pop top two, push result back in
-	int l = opstack.top();
+	int r = opstack.top();
     opstack.pop();
-    int r = opstack.top();
+    int l = opstack.top();
     opstack.pop();
 	opstack.push(l*r);
    }
@@ -66,15 +68,14 @@ public:
 
 	//Pop top two, push result back in
 	//Should we check for division by zero here?
-	int l = opstack.top();
+	int r = opstack.top();
     opstack.pop();
-    int r = opstack.top();
+    int l = opstack.top();
     opstack.pop();
 	opstack.push(l/r);
    }
 
     //Not very general, this is probably a bad idea for future ASTS
-private:
     std::stack<int> opstack;
 
 

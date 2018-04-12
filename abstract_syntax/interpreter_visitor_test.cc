@@ -19,54 +19,54 @@ using cs160::abstract_syntax::InterpreterVisitor;
 
 using cs160::make_unique;
 
-class InterprerterTest : public ::testing::Test {
+class InterpreterTest : public ::testing::Test {
  protected:
   InterpreterVisitor printer_;
 };
 
-TEST_F(InterprerterTest, IntegerExprIsVisited) {
+TEST_F(InterpreterTest, IntegerExprIsVisited) {
   auto number = make_unique<IntegerExpr>(7);
   number->Visit(&printer_);
 
-  EXPECT_EQ(printer_.opstack.top(), "7");
+  EXPECT_EQ(printer_.opstack.top(), 7);
 }
 
-TEST_F(InterprerterTest, AddExprIsVisited) {
+TEST_F(InterpreterTest, AddExprIsVisited) {
   auto expr = make_unique<AddExpr>((make_unique<IntegerExpr>(7)),
                                    make_unique<IntegerExpr>(5));
   expr->Visit(&printer_);
 
-  EXPECT_EQ(printer_.GetOutput(), "(+ 7 5)");
+  EXPECT_EQ(printer_.opstack.top(), 12);
 }
 
-TEST_F(InterprerterTest, SubtractExprIsVisited) {
+TEST_F(InterpreterTest, SubtractExprIsVisited) {
   auto expr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
                                         make_unique<IntegerExpr>(5));
 
   expr->Visit(&printer_);
 
-  EXPECT_EQ(printer_.GetOutput(), "(- 7 5)");
+  EXPECT_EQ(printer_.opstack.top(), 2);
 }
 
-TEST_F(InterprerterTest, MultiplyExprIsVisited) {
+TEST_F(InterpreterTest, MultiplyExprIsVisited) {
   auto expr = make_unique<MultiplyExpr>(make_unique<IntegerExpr>(7),
                                         make_unique<IntegerExpr>(5));
 
   expr->Visit(&printer_);
 
-  EXPECT_EQ(printer_.GetOutput(), "(* 7 5)");
+  EXPECT_EQ(printer_.opstack.top(), 35);
 }
 
-TEST_F(InterprerterTest, DivideExprIsVisited) {
+TEST_F(InterpreterTest, DivideExprIsVisited) {
   auto expr = make_unique<DivideExpr>(make_unique<IntegerExpr>(7),
                                       make_unique<IntegerExpr>(5));
 
   expr->Visit(&printer_);
 
-  EXPECT_EQ(printer_.GetOutput(), "(/ 7 5)");
+  EXPECT_EQ(printer_.opstack.top(), 1);
 }
 
-TEST_F(InterprerterTest, NestedVisitationsWorkProperly) {
+TEST_F(InterpreterTest, NestedVisitationsWorkProperly) {
   auto expr = make_unique<DivideExpr>(
       make_unique<AddExpr>(make_unique<IntegerExpr>(7),
                            make_unique<IntegerExpr>(5)),
@@ -75,5 +75,5 @@ TEST_F(InterprerterTest, NestedVisitationsWorkProperly) {
 
   expr->Visit(&printer_);
 
-  EXPECT_EQ(printer_.GetOutput(), "(/ (+ 7 5) (- 2 1))");
+  EXPECT_EQ(printer_.opstack.top(), 12);
 }
