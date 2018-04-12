@@ -1,10 +1,15 @@
 #include <utility>
-#ifndef TOKEN_H_
-#define TOKEN_H_
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <vector>
+#ifndef TOKENIZER_TOKENIZER_H_
+#define TOKENIZER_TOKENIZER_H_
 
 namespace cs160 {
 namespace tokenizer {
-enum tokenType = { NUM, PAREN, ADDSUB_OP, MULDIV_OP, NONE };
+enum tokenType = {NUM, PAREN, ADDSUB_OP, MULDIV_OP, NONE};
 
 struct Token {
   std::string char *token_val;
@@ -14,10 +19,10 @@ struct Token {
 
 // This is a class that should own a member of type Item.
 class Tokenizer {
-public:
+ public:
   explicit Tokenizer(std::string program);
 
-private:
+ private:
   std::string program;
   int pos;
   int line;
@@ -25,7 +30,7 @@ private:
   vector<Token> Tokenize();
 };
 
-} // namespace tokenizer
-} // namespace cs160
+}  // namespace tokenizer
+}  // namespace cs160
 
-#endif // TOKEN_H_
+#endif  // TOKENIZER_TOKENIZER_H_
