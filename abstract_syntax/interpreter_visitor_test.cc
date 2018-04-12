@@ -1,6 +1,4 @@
 
-#include <sstream>
-#include <string>
 #include <stack>
 
 #include "gtest/gtest.h"
@@ -21,59 +19,59 @@ using cs160::make_unique;
 
 class InterpreterTest : public ::testing::Test {
  protected:
-  InterpreterVisitor printer_;
+  InterpreterVisitor interpreter_;
 };
 
 TEST_F(InterpreterTest, IntegerExprIsVisited) {
   auto number = make_unique<IntegerExpr>(7);
-  number->Visit(&printer_);
+  number->Visit(&interpreter_);
 
-  EXPECT_EQ(printer_.opstack.top(), 7);
+  EXPECT_EQ(interpreter_.GetOutput(), 7);
 }
 
 TEST_F(InterpreterTest, AddExprIsVisited) {
-  auto expr = make_unique<AddExpr>((make_unique<IntegerExpr>(7)),
+  auto expr = cs160::make_unique<AddExpr>((make_unique<IntegerExpr>(7)),
                                    make_unique<IntegerExpr>(5));
-  expr->Visit(&printer_);
+  expr->Visit(&interpreter_);
 
-  EXPECT_EQ(printer_.opstack.top(), 12);
+  EXPECT_EQ(interpreter_.GetOutput(), 12);
 }
 
 TEST_F(InterpreterTest, SubtractExprIsVisited) {
-  auto expr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
+  auto expr = cs160::make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
                                         make_unique<IntegerExpr>(5));
 
-  expr->Visit(&printer_);
+  expr->Visit(&interpreter_);
 
-  EXPECT_EQ(printer_.opstack.top(), 2);
+  EXPECT_EQ(interpreter_.GetOutput(), 2);
 }
 
 TEST_F(InterpreterTest, MultiplyExprIsVisited) {
-  auto expr = make_unique<MultiplyExpr>(make_unique<IntegerExpr>(7),
+  auto expr = cs160::make_unique<MultiplyExpr>(make_unique<IntegerExpr>(7),
                                         make_unique<IntegerExpr>(5));
 
-  expr->Visit(&printer_);
+  expr->Visit(&interpreter_);
 
-  EXPECT_EQ(printer_.opstack.top(), 35);
+  EXPECT_EQ(interpreter_.GetOutput(), 35);
 }
 
 TEST_F(InterpreterTest, DivideExprIsVisited) {
-  auto expr = make_unique<DivideExpr>(make_unique<IntegerExpr>(7),
+  auto expr = cs160::make_unique<DivideExpr>(make_unique<IntegerExpr>(7),
                                       make_unique<IntegerExpr>(5));
 
-  expr->Visit(&printer_);
+  expr->Visit(&interpreter_);
 
-  EXPECT_EQ(printer_.opstack.top(), 1);
+  EXPECT_EQ(interpreter_.GetOutput(), 1);
 }
 
 TEST_F(InterpreterTest, NestedVisitationsWorkProperly) {
-  auto expr = make_unique<DivideExpr>(
-      make_unique<AddExpr>(make_unique<IntegerExpr>(7),
+  auto expr = cs160::make_unique<DivideExpr>(
+      cs160::make_unique<AddExpr>(make_unique<IntegerExpr>(7),
                            make_unique<IntegerExpr>(5)),
-      make_unique<SubtractExpr>(make_unique<IntegerExpr>(2),
+      cs160::make_unique<SubtractExpr>(make_unique<IntegerExpr>(2),
                                 make_unique<IntegerExpr>(1)));
 
-  expr->Visit(&printer_);
+  expr->Visit(&interpreter_);
 
-  EXPECT_EQ(printer_.opstack.top(), 12);
+  EXPECT_EQ(interpreter_.GetOutput(), 12);
 }
