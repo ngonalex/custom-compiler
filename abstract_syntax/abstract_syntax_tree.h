@@ -2,6 +2,7 @@
 #define ABSTRACT_SYNTAX_ABSTRACT_SYNTAX_TREE_H_
 
 #include <memory>
+#include <stack>
 
 namespace cs160 {
 namespace abstract_syntax {
@@ -21,7 +22,7 @@ class AstVisitor {
   virtual ~AstVisitor() {}
 
   //Not very general, this is probably a bad idea for future ASTS
-  std::stack<int> opcode;
+  std::stack<int> opstack;
 
   // these should be able to change members of the visitor, thus not const
   virtual void VisitIntegerExpr(const IntegerExpr& exp) = 0;
