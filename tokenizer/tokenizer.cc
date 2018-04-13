@@ -24,7 +24,14 @@ std::vector<Token> Tokenizer::tokenize() {
       }
       prevChar = c;
     }
+    else {
+      Token newToken = {'', 0, NONE};
+      tokens[0] = (newToken);
+      break;
+      // Return just one token that is null
+    }
   }
+  return tokens;
 }
 
 // NOTE: enum tokenType = { NUM, PAREN, ADDSUB_OP, MULDIV_OP, NONE };
