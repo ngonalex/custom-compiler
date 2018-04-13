@@ -15,16 +15,15 @@ std::vector<Token> Tokenizer::tokenize() {
   for (char &c : program) {
     tokenType = extractType(c);
     if (tokenType != NONE) {
-      if (tokenType == prevChar)
+      if (tokenType == prevChar) {
         currString.append(c);
-      else {
+      } else {
         Token newToken = {c, 0, tokenType};
         tokens.push_back(newToken);
         currString = "";
       }
       prevChar = c;
-    }
-    else {
+    } else {
       Token newToken = {'', 0, NONE};
       tokens[0] = (newToken);
       break;
