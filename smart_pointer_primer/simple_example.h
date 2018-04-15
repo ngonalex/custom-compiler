@@ -1,8 +1,7 @@
-
 #ifndef SMART_POINTER_PRIMER_SIMPLE_EXAMPLE_H_
 #define SMART_POINTER_PRIMER_SIMPLE_EXAMPLE_H_
 
-#include <memory>
+#include "utility/memory.h"
 
 // This is just an example class.
 class Item {};

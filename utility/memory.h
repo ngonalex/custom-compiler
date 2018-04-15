@@ -1,6 +1,7 @@
-
 #ifndef UTILITY_MEMORY_H_
 #define UTILITY_MEMORY_H_
+
+#include <memory>
 
 namespace cs160 {
 
