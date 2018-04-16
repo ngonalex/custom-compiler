@@ -1,8 +1,8 @@
 
 cc_library(
-	name = "token",
+	name = "tokenizer",
 	copts = ["-Wall -g"],
-	hdrs = ["token.h"],
+	hdrs = ["tokenizer.h"],
 	visibility = ["//public:__pkg__"],
 )
 

@@ -1,6 +1,8 @@
 #ifndef ABSTRACT_SYNTAX_ABSTRACT_SYNTAX_TREE_H_
 #define ABSTRACT_SYNTAX_ABSTRACT_SYNTAX_TREE_H_
 
+#include <memory>
+
 namespace cs160 {
 namespace abstract_syntax {
 
@@ -11,54 +13,56 @@ class AddExpr;
 class SubtractExpr;
 class MultiplyExpr;
 class DivideExpr;
+class BinaryOperatorExpr;
 
 // The visitor abstract base class for visiting abstract syntax trees.
 class AstVisitor {
  public:
-  virtual ~AstVisitor() = 0;
-  virtual void VisitIntegerExpr(const IntegerExpr& exp) const = 0;
-  virtual void VisitBinaryOperatorExpr(const BinaryOperatorExpr& exp) const = 0;
-  virtual void VisitAddExpr(const AddExpr& exp) const = 0;
-  virtual void VisitSubtractExpr(const SubtractExpr& exp) const = 0;
-  virtual void VisitMultiplyExpr(const MultiplyExpr& exp) const = 0;
-  virtual void VisitDivideExpr(const DivideExpr& exp) const = 0;
+  virtual ~AstVisitor() {}
+
+  // these should be able to change members of the visitor, thus not const
+  virtual void VisitIntegerExpr(const IntegerExpr& exp) = 0;
+  virtual void VisitBinaryOperatorExpr(const BinaryOperatorExpr& exp) = 0;
+  virtual void VisitAddExpr(const AddExpr& exp) = 0;
+  virtual void VisitSubtractExpr(const SubtractExpr& exp) = 0;
+  virtual void VisitMultiplyExpr(const MultiplyExpr& exp) = 0;
+  virtual void VisitDivideExpr(const DivideExpr& exp) = 0;
 };
 
 // The definition of the abstract syntax tree abstract base class.
 class AstNode {
  public:
-  virtual ~AstNode() = 0;
-  virtual void Visit(const AstVisitor* const visitor) const = 0;
+  virtual ~AstNode() {}
+
+  virtual void Visit(AstVisitor* visitor) const = 0;
 };
 
 // An abstract binary expression node.
 class BinaryOperatorExpr : public AstNode {
  public:
-  explicit BinaryOperatorExpr(const AstNode& lhs, const AstNode& rhs)
-    : lhs_(lhs), rhs_(rhs) {}
+  BinaryOperatorExpr(std::unique_ptr<const AstNode> lhs,
+                     std::unique_ptr<const AstNode> rhs)
+      : lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
 
-  void Visit(const AstVisitor* const visitor) const {
+  void Visit(AstVisitor* visitor) const {
     visitor->VisitBinaryOperatorExpr(*this);
   }
 
-  const AstNode& lhs() const { return lhs_; }
-  const AstNode& rhs() const { return rhs_; }
+  const AstNode& lhs() const { return *lhs_; }
+  const AstNode& rhs() const { return *rhs_; }
 
  protected:
   // The left-hand side and right-hand side of the expression.
-  const AstNode& lhs_;
-  const AstNode& rhs_;
+  const std::unique_ptr<const AstNode> lhs_;
+  const std::unique_ptr<const AstNode> rhs_;
 };
 
 // An integer constant expression.
 class IntegerExpr : public AstNode {
  public:
-  explicit IntegerExpr(int value)
-    : value_(value) {}
+  explicit IntegerExpr(int value) : value_(value) {}
 
-  void Visit(const AstVisitor* const visitor) const {
-    visitor->VisitIntegerExpr(*this);
-  }
+  void Visit(AstVisitor* visitor) const { visitor->VisitIntegerExpr(*this); }
 
   int value() const { return value_; }
 
@@ -70,44 +74,49 @@ class IntegerExpr : public AstNode {
 // An addition expression.
 class AddExpr : public BinaryOperatorExpr {
  public:
-  AddExpr(const AstNode& lhs, const AstNode& rhs)
-    : BinaryOperatorExpr(lhs, rhs) {}
+  AddExpr(std::unique_ptr<const AstNode> lhs,
+          std::unique_ptr<const AstNode> rhs)
+      : BinaryOperatorExpr(std::move(lhs), std::move(rhs)) {}
 
-  void Visit(const AstVisitor* const visitor) const {
-    visitor->VisitAddExpr(*this);
+  void Visit(AstVisitor* visitor) const {
+    BinaryOperatorExpr::Visit(visitor);
+    visitor->VisitAddExpr(*const_cast<AddExpr*>(this));
   }
 };
 
 // A subtraction expression.
 class SubtractExpr : public BinaryOperatorExpr {
  public:
-  SubtractExpr(const AstNode& lhs, const AstNode& rhs)
-    : BinaryOperatorExpr(lhs, rhs) {}
+  SubtractExpr(std::unique_ptr<const AstNode> lhs,
+               std::unique_ptr<const AstNode> rhs)
+      : BinaryOperatorExpr(std::move(lhs), std::move(rhs)) {}
 
-  void Visit(const AstVisitor* const visitor) const {
-    visitor->VisitSubtractExpr(*this);
+  void Visit(AstVisitor* visitor) const {
+    visitor->VisitSubtractExpr(*const_cast<SubtractExpr*>(this));
   }
 };
 
 // A multiplication expression.
 class MultiplyExpr : public BinaryOperatorExpr {
  public:
-  MultiplyExpr(const AstNode& lhs, const AstNode& rhs)
-    : BinaryOperatorExpr(lhs, rhs) {}
+  MultiplyExpr(std::unique_ptr<const AstNode> lhs,
+               std::unique_ptr<const AstNode> rhs)
+      : BinaryOperatorExpr(std::move(lhs), std::move(rhs)) {}
 
-  void Visit(const AstVisitor* const visitor) const {
-    visitor->VisitMultiplyExpr(*this);
+  void Visit(AstVisitor* visitor) const {
+    visitor->VisitMultiplyExpr(*const_cast<MultiplyExpr*>(this));
   }
 };
 
 // A division expression.
 class DivideExpr : public BinaryOperatorExpr {
  public:
-  DivideExpr(const AstNode& lhs, const AstNode& rhs)
-    : BinaryOperatorExpr(lhs, rhs) {}
+  DivideExpr(std::unique_ptr<const AstNode> lhs,
+             std::unique_ptr<const AstNode> rhs)
+      : BinaryOperatorExpr(std::move(lhs), std::move(rhs)) {}
 
-  void Visit(const AstVisitor* const visitor) const {
-    visitor->VisitDivideExpr(*this);
+  void Visit(AstVisitor* visitor) const {
+    visitor->VisitDivideExpr(*const_cast<DivideExpr*>(this));
   }
 };
 
