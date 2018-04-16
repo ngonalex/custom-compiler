@@ -1,4 +1,4 @@
-#include "tokenizer.h"
+#include "./tokenizer.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,14 +40,23 @@ tokenType extractType(char testChar) {
   case HelperIsNum(testChar): {
     return NUM;
   }
-  case HelperIsParen(testChar): {
-    return PAREN;
+  case HelperIsOpenParen(testChar): {
+    return OPEN_PAREN;
   }
-  case HelperIsAddsubOp(testChar): {
-    return ADDSUB_OP;
+  case HelperIsCloseParen(testChar): {
+    return CLOSE_PAREN;
   }
-  case HelperIsMuldivOp(testChar): {
-    return MULDIV_OP;
+  case HelperIsAddOp(testChar): {
+    return ADD_OP;
+  }
+  case HelperIsSubOp(testChar): {
+    return SUB_OP;
+  }
+  case HelperIsMulOp(testChar): {
+    return MUL_OP;
+  }
+  case HelperIsDivOp(testChar): {
+    return DIV_OP;
   }
   default: { return NONE; }
   }
@@ -57,18 +66,33 @@ bool HelperIsNum(char testChar) {
     return true;
   return false;
 }
-bool HelperIsParen(char testChar) {
-  if (testChar == ')' || testChar == '(')
+bool HelperIsOpenParen(char testChar) {
+  if (testChar == '(')
     return true;
   return false;
 }
-bool HelperIsAddsubOp(char testChar) {
-  if (testChar == '+' || testChar == '-')
+bool HelperIsCloseParen(char testChar) {
+  if (testChar == ')')
+    return true;
+  reutrn false;
+}
+bool HelperIsAddOp(char testChar) {
+  if (testChar == '+')
     return true;
   return false;
 }
-bool HelperIsMuldivOp(char testChar) {
-  if (testChar == '*' || testChar == '/')
+bool HelperIsSubOp(char testChar) {
+  if (testChar == '-')
+    return true;
+  return false;
+}
+bool HelperIsMulOp(char testChar) {
+  if (testChar == '*')
+    return true;
+  return false;
+}
+bool HelperIsDivOp(char testChar) {
+  if (testChar == '/')
     return true;
   return false;
 }
