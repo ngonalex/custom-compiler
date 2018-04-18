@@ -1,10 +1,3 @@
-<<<<<<< HEAD:abstract_syntax/abstract_syntax_tree.h
-#ifndef ABSTRACT_SYNTAX_ABSTRACT_SYNTAX_TREE_H_
-#define ABSTRACT_SYNTAX_ABSTRACT_SYNTAX_TREE_H_
-
-#include <memory>
-#include <stack>
-=======
 // This version of the abstract syntax consists of a single arithmetic
 // expression. The grammar for the abstract syntax is:
 //
@@ -20,8 +13,10 @@
 #ifndef ABSTRACT_SYNTAX_ABSTRACT_SYNTAX_TREE_V1_H_
 #define ABSTRACT_SYNTAX_ABSTRACT_SYNTAX_TREE_V1_H_
 
+#include <memory>
+#include <stack>
+
 #include "utility/memory.h"
->>>>>>> d8da0e0f00b0a5a2f16617deff3eddfafa8b6e55:abstract_syntax/abstract_syntax_tree_v1.h
 
 namespace cs160 {
 namespace abstract_syntax {
