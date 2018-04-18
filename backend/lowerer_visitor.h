@@ -4,25 +4,25 @@
 #include <string>
 #include <vector>
 
-#include "abstract_syntax/abstract_syntax_tree.h"
+#include "abstract_syntax/abstract_syntax.h"
 
-using cs160::abstract_syntax::AstVisitor;
-using cs160::abstract_syntax::IntegerExpr;
-using cs160::abstract_syntax::AddExpr;
-using cs160::abstract_syntax::SubtractExpr;
-using cs160::abstract_syntax::MultiplyExpr;
-using cs160::abstract_syntax::DivideExpr;
-using cs160::abstract_syntax::BinaryOperatorExpr;
+using cs160::abstract_syntax::backend::AstVisitor;
+using cs160::abstract_syntax::backend::IntegerExpr;
+using cs160::abstract_syntax::backend::AddExpr;
+using cs160::abstract_syntax::backend::SubtractExpr;
+using cs160::abstract_syntax::backend::MultiplyExpr;
+using cs160::abstract_syntax::backend::DivideExpr;
+using cs160::abstract_syntax::backend::BinaryOperatorExpr;
 
 
 namespace cs160{
 namespace backend{
 
 
-//Abstract .h implementations to a .cc file later
+// Abstract .h implementations to a .cc file later
 
-//Structure to hold a 3Address, Basically 1 block
-//Right now all of them are strings, but in the future I think that target should be from a symbol table
+// Structure to hold a 3Address, Basically 1 block
+// Right now all of them are strings, but in the future I think that target should be from a symbol table
 // and arg1/2 are either ints or from the symbol table
 struct ThreeAddressCode {
   std::string target;
@@ -34,7 +34,7 @@ struct ThreeAddressCode {
   struct ThreeAddressCode* prev;
 };
 
-//For ThreeAddressCodes, arg1/arg2 can be a VirtualRegister or a Int
+// For ThreeAddressCodes, arg1/arg2 can be a VirtualRegister or a Int
 class VirtualRegister {
 
   explicit VirtualRegister(std::string name) : name_(name) {}
@@ -58,7 +58,7 @@ class LowererVisitor : public AstVisitor{
   std::vector<struct ThreeAddressCode*> blocks_;
 
   const std::string GetOutput() const {
-    //Iterate through the vector and print out each basic block
+    // Iterate through the vector and print out each basic block
     std::string output = "";
     for(unsigned int i = 0; i < blocks_.size(); ++i) {
       output = output + blocks_[i]->target + " <- " + blocks_[i]->arg1;
@@ -72,16 +72,16 @@ class LowererVisitor : public AstVisitor{
   }
 
   void VisitIntegerExpr(const IntegerExpr& exp){
-    //Load value into a target (t <- value)
+    // Load value into a target (t <- value)
     ThreeAddressCode* newblock = new ThreeAddressCode();
 
     newblock->arg1 = std::to_string(exp.value()); 
     newblock->op = "load";
     
-    //This is probably wrong, look at this later, just going to do this now to test some things
+    // This is probably wrong, look at this later, just going to do this now to test some things
     newblock->target = "t_" + std::to_string(blocks_.size());
 
-    //Push into vector
+    // Push into vector
     blocks_.push_back(newblock);
 
   }
@@ -94,8 +94,8 @@ class LowererVisitor : public AstVisitor{
     int leftindex = blocks_.size();
 	  exp.rhs().Visit(const_cast<LowererVisitor*>(this));
 
-    //Load value into target (t <- prev->target + prev->prev->target)
-    //Last two elements of the vector should be the integers to load in
+    // Load value into target (t <- prev->target + prev->prev->target)
+    // Last two elements of the vector should be the integers to load in
     int size = blocks_.size();
 
     ThreeAddressCode* newblock = new ThreeAddressCode();
@@ -103,23 +103,23 @@ class LowererVisitor : public AstVisitor{
     newblock->arg1 = blocks_[leftindex-1]->target;
     newblock->arg2 = blocks_[size-1]->target; 
     newblock->op = "+";
-    //This is probably wrong, look at this later, just going to do this now to test some things
+    // This is probably wrong, look at this later, just going to do this now to test some things
     newblock->target = "t_" + std::to_string(blocks_.size());
 
-    //Push into vector
+    // Push into vector
     blocks_.push_back(newblock);
   }
 
 
   void VisitSubtractExpr(const SubtractExpr& exp) {
-   	//Visit left then right(eventually reaches the base case of Int)
+   	// Visit left then right(eventually reaches the base case of Int)
 	  exp.lhs().Visit(const_cast<LowererVisitor*>(this));
 
 	  int leftindex = blocks_.size();
 	  exp.rhs().Visit(const_cast<LowererVisitor*>(this));
 
-    //Load value into target (t <- prev->target + prev->prev->target)
-    //Last two elements of the vector should be the integers to load in
+    // Load value into target (t <- prev->target + prev->prev->target)
+    // Last two elements of the vector should be the integers to load in
     int size = blocks_.size();
 
     ThreeAddressCode* newblock = new ThreeAddressCode();
@@ -127,23 +127,23 @@ class LowererVisitor : public AstVisitor{
     newblock->arg1 = blocks_[leftindex-1]->target;
     newblock->arg2 = blocks_[size-1]->target; 
     newblock->op = "-";
-    //This is probably wrong, look at this later, just going to do this now to test some things
+    // This is probably wrong, look at this later, just going to do this now to test some things
     newblock->target = "t_" + std::to_string(blocks_.size());
 
-    //Push into vector
+    // Push into vector
     blocks_.push_back(newblock);
 
   }
 
   void VisitMultiplyExpr(const MultiplyExpr& exp) {
-   	//Visit lhs,rhs
+   	// Visit lhs,rhs
 	  exp.lhs().Visit(const_cast<LowererVisitor*>(this));
 
 	  int leftindex = blocks_.size();
 	  exp.rhs().Visit(const_cast<LowererVisitor*>(this));
 
-    //Load value into target (t <- prev->target + prev->prev->target)
-    //Last two elements of the vector should be the integers to load in
+    // Load value into target (t <- prev->target + prev->prev->target)
+    // Last two elements of the vector should be the integers to load in
     int size = blocks_.size();
 
     ThreeAddressCode* newblock = new ThreeAddressCode();
@@ -151,23 +151,23 @@ class LowererVisitor : public AstVisitor{
     newblock->arg1 = blocks_[leftindex-1]->target;
     newblock->arg2 = blocks_[size-1]->target;  
     newblock->op = "*";
-    //This is probably wrong, look at this later, just going to do this now to test some things
+    // This is probably wrong, look at this later, just going to do this now to test some things
     newblock->target = "t_" + std::to_string(blocks_.size());
 
-    //Push into vector
+    // Push into vector
     blocks_.push_back(newblock);
 
   }
 
   void VisitDivideExpr(const DivideExpr& exp) {
-	  //Visit left/right
+	  // Visit left/right
 	  exp.lhs().Visit(const_cast<LowererVisitor*>(this));
 	  
     int leftindex = blocks_.size();
 	  exp.rhs().Visit(const_cast<LowererVisitor*>(this));
 
-    //Load value into target (t <- prev->target + prev->prev->target)
-    //Last two elements of the vector should be the integers to load in
+    // Load value into target (t <- prev->target + prev->prev->target)
+    // Last two elements of the vector should be the integers to load in
     int size = blocks_.size();
 
     ThreeAddressCode* newblock = new ThreeAddressCode();
@@ -175,10 +175,10 @@ class LowererVisitor : public AstVisitor{
     newblock->arg1 = blocks_[leftindex-1]->target;
     newblock->arg2 = blocks_[size-1]->target; 
     newblock->op = "/";
-    //This is probably wrong, look at this later, just going to do this now to test some things
+    // This is probably wrong, look at this later, just going to do this now to test some things
     newblock->target = "t_" + std::to_string(blocks_.size());
 
-    //Push into vector
+    // Push into vector
     blocks_.push_back(newblock);
   }
 
@@ -186,7 +186,7 @@ class LowererVisitor : public AstVisitor{
 
 };
 
-}//namespace backend
-}//namespace cs160
+}// namespace backend
+}// namespace cs160
 
-#endif //BACKEND_LOWERER_VISITOR_H_
+#endif // BACKEND_LOWERER_VISITOR_H_

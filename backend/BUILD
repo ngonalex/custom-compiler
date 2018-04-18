@@ -11,7 +11,7 @@ cc_library(
 
 cc_test(
 	name = "backend_test",
-	deps = ["@gtest//:main", "//backend:backend", "//abstract_syntax:abstract_syntax"],
+	deps = ["@gtest//:main", ":backend", "//abstract_syntax:abstract_syntax"],
 	srcs = [
 		"lowerer_visitor_test.cc","interpreter_visitor_test.cc"
 	],

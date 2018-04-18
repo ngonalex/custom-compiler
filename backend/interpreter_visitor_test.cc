@@ -3,17 +3,18 @@
 
 #include "gtest/gtest.h"
 
-#include "abstract_syntax/abstract_syntax_tree.h"
+#include "abstract_syntax/abstract_syntax.h"
 #include "backend/interpreter_visitor.h"
 #include "utility/memory.h"
 
 
-using cs160::abstract_syntax::IntegerExpr;
-using cs160::abstract_syntax::AddExpr;
-using cs160::abstract_syntax::SubtractExpr;
-using cs160::abstract_syntax::MultiplyExpr;
-using cs160::abstract_syntax::DivideExpr;
-using cs160::abstract_syntax::AstVisitor;
+using cs160::abstract_syntax::backend::AstVisitor;
+using cs160::abstract_syntax::backend::IntegerExpr;
+using cs160::abstract_syntax::backend::AddExpr;
+using cs160::abstract_syntax::backend::SubtractExpr;
+using cs160::abstract_syntax::backend::MultiplyExpr;
+using cs160::abstract_syntax::backend::DivideExpr;
+using cs160::abstract_syntax::backend::BinaryOperatorExpr;
 using cs160::backend::InterpreterVisitor;
 
 using cs160::make_unique;
