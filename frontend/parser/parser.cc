@@ -1,5 +1,7 @@
 #include "./parser.h"
 
+using namespace cs160::frontend;
+
 namespace cs160 {
 namespace frontend {
   
@@ -11,37 +13,37 @@ namespace frontend {
   // Ecounter parenthesis and numbers
   void Parser::start() {
     ParseResult* current = new ParseResult;
-    if (program[0].getType()  == Type::NUM) {
-      program[0].print();
+    if (program[0].type()  == Type::NUM) {
+      //program[0].print();
       this->result = parseOperator(current, 1);
-      printf("Result: %i \n", this->result->left.getVal() * this->result->right.getVal());
+      printf("Result: %i \n", this->result->left.val() * this->result->right.val());
     }
   }
   
   ParseResult* Parser::parseOperator(ParseResult* p, int location) {
-    switch(program[location].getType()) {
+    switch(program[location].type()) {
       case Type::ADD_OP:
-        program[location].print();
+        //program[location].print();
         return (parseInt(p, ++location));
         break;
       case Type::SUB_OP:
-        program[location].print();
+        //program[location].print();
         return (parseInt(p, ++location));
         break;
       case Type::MUL_OP:
-        program[location].print();
+        //program[location].print();
         return (parseInt(p, ++location));
         break;
       case Type::DIV_OP:
-        program[location].print();
+        //program[location].print();
         return (parseInt(p, ++location));
         break;
     }
   }
   
   ParseResult* Parser::parseInt(ParseResult* p, int location) {
-    if (program[location].getType() == Type::NUM) {
-      program[location].print();
+    if (program[location].type() == Type::NUM) {
+      //program[location].print();
       p->left = program[0];
       p->op = program[1];
       p->right = program[2];

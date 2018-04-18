@@ -1,10 +1,8 @@
-#include "./parser.h"
-#include "../tokenizer/tokenizer.h"
+#include "parser.h"
+#include "tokenizer/tokenizer.h"
 #include "gtest/gtest.h"
 
-using cs160::frontend::Token;
-using cs160::frontend::Tokenizer;
-using cs160::frontend::Parser;
+using namespace cs160::frontend;
 
 TEST(ParserTest, CanEvaluateSimpleAdd) {
   Token firstToken(Type::NUM, 6);
