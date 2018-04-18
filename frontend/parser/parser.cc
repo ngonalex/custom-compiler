@@ -54,17 +54,17 @@ namespace frontend {
 } // namespace frontend
 } // namespace cs160
 
-int main() {
-  cs160::frontend::Token firstToken(cs160::frontend::Type::NUM, 6);
-  cs160::frontend::Token secondToken(cs160::frontend::Type::MUL_OP);
-  cs160::frontend::Token thirdToken(cs160::frontend::Type::NUM, 3);
-  std::vector<cs160::frontend::Token> test_vector;
-  test_vector.push_back(firstToken);
-  test_vector.push_back(secondToken);
-  test_vector.push_back(thirdToken);
-  
-  cs160::frontend::Parser parser(test_vector);
-  parser.start();
-  
-  return 0;
-}
+// int main() {
+//   cs160::frontend::Token firstToken(cs160::frontend::Type::NUM, 6);
+//   cs160::frontend::Token secondToken(cs160::frontend::Type::MUL_OP);
+//   cs160::frontend::Token thirdToken(cs160::frontend::Type::NUM, 3);
+//   std::vector<cs160::frontend::Token> test_vector;
+//   test_vector.push_back(firstToken);
+//   test_vector.push_back(secondToken);
+//   test_vector.push_back(thirdToken);
+// 
+//   cs160::frontend::Parser parser(test_vector);
+//   parser.start();
+// 
+//   return 0;
+// }
