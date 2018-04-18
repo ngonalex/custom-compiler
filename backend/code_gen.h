@@ -8,14 +8,17 @@
 
 #include "lowerer_visitor.h"
 
-namespace CS160 {
+namespace cs160 {
 namespace backend {
 
 
 class CodeGen {
 
-    public:
+ public:
+    explicit CodeGen(std::ofstream &filename) : outfile_(filename) {} 
     void Generate(std::vector<struct ThreeAddressCode*> blocks);
+ private:
+  std::ofstream& outfile_;
 };
 
 }  // namespace CS160
