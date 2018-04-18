@@ -13,17 +13,17 @@ TEST(TokenTest, CanCreateTokensCorrectly) {
   Token integer_token(NUM, 42);
   Token add_token(ADD_OP);
 
-  EXPECT_EQ(integer_token.type(), Token::Type::kInteger);
-  EXPECT_EQ(integer_token.Val(), 42);
-  EXPECT_EQ(add_token.type(), Token::Type::kAdd);
+  EXPECT_EQ(integer_token.type(), NUM);
+  EXPECT_EQ(integer_token.val(), 42);
+  EXPECT_EQ(add_token.type(), ADD_OP);
 }
 
 TEST(TokenDeathTest, CannotCreateNonIntegerTokensImproperly) {
-  EXPECT_DEATH(Token add_token(Token::Type::kAdd, 42), ".*");
+  EXPECT_DEATH(Token add_token(ADD_OP, 42), ".*");
 }
 
 TEST(TokenDeathTest, CannotCreateIntegerTokensImproperly) {
-  EXPECT_DEATH(Token integer_token(Token::Type::kInteger), ".*");
+  EXPECT_DEATH(Token integer_token(NUM), ".*");
 }
 /*
 TEST(Tokenizer, tokenize) {
