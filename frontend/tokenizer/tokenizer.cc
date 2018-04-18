@@ -17,17 +17,17 @@ Type extractType (const char testChar) {
   }
 }
 
-void Tokenizer::print() {
-  switch(this->type()) {
+void Token::print() {
+  switch(this->type_) {
     case NUM:
       printf("Type: NUM\n");
-      printf("\tValue: %i\n", this->val());
+      printf("\tValue: %i\n", this->val_);
       break;
     case FAILED:
       printf("Type: FAILED\n");
       break;
     default:
-      printf("Type: %d\n", this->type());
+      printf("Type: %d\n", this->type_);
       break;
   }
 }
@@ -38,30 +38,31 @@ Tokenizer::Tokenizer(std::string program) : program_(program) {
     std::string currString;
 
     for (char &c : program_) {
-    Type type = extractType(c);
-    if (type != FAILED) {
-        std::stringstream currStringStream;
-        currStringStream << currString;
-        currStringStream << c;
+        if(c == ' ') continue;
+        Type type = extractType(c);
+        if (type != FAILED) {
+            std::stringstream currStringStream;
+            currStringStream << currString;
+            currStringStream << c;
 
-        currString = currStringStream.str();
-        if (type != prevType) {
-            if (type == NUM){
-                Token newToken(type, atoi(currString.c_str()));
-                tokens_.push_back(newToken);
-            } else {
-                Token newToken(type);
-                tokens_.push_back(newToken);
+            currString = currStringStream.str();
+            if (type != prevType) {
+                if (type == NUM){
+                    Token newToken(type, atoi(currString.c_str()));
+                    tokens_.push_back(newToken);
+                } else {
+                    Token newToken(type);
+                    tokens_.push_back(newToken);
+                }
+                currString = "";
             }
-            currString = "";
+            prevChar = c;
+            prevType = type;
+        } else {
+                Token newToken(FAILED);
+                tokens_[0] = (newToken);
+                break;
+                // Return just one token that is null
         }
-        prevChar = c;
-        prevType = type;
-    } else {
-            Token newToken(FAILED);
-            tokens_[0] = (newToken);
-            break;
-            // Return just one token that is null
     }
 }
-};

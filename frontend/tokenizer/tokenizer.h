@@ -40,6 +40,18 @@ class Token {
       else return false;
     }
   }
+  bool operator !=(const Token &b) const{
+    if(this->type_ == NUM){
+      if(this->type_ == b.type_ && this->val_ == b.val_) return false;
+      else return true;
+    }
+    else{
+      if(this->type_ == b.type_) return false;
+      else return true;
+    }
+  }
+
+  void print();
 
   // Getter functions
   Type type() const { return type_; }
@@ -63,7 +75,6 @@ class Tokenizer {
 
   std::string program() const { return program_; }
   std::vector<Token> tokens() const { return tokens_; }
-  void print();
 
  private:
   std::string program_;
