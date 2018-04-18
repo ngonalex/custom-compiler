@@ -23,8 +23,8 @@ void Token::print() {
       printf("Type: NUM\n");
       printf("\tValue: %i\n", this->val());
       break;
-    case NONE:
-      printf("Type: NONE\n");
+    case FAILED:
+      printf("Type: FAILED\n");
       break;
     default:
       printf("Type: %d\n", this->type());
@@ -33,31 +33,35 @@ void Token::print() {
 }
 
 Tokenizer::Tokenizer(std::string program) : program_(program) {
-  char prevChar;
-  std::string currString;
+    char prevChar;
+    Type prevType = NONE;
+    std::string currString;
 
-  for (char &c : program_) {
+    for (char &c : program_) {
     Type type = extractType(c);
     if (type != FAILED) {
-      if (type == prevChar) {
-
         std::stringstream currStringStream;
         currStringStream << currString;
         currStringStream << c;
 
         currString = currStringStream.str();
-      } else {
-        Token newToken(type);
-        tokens_.push_back(newToken);
-        currString = "";
-      }
-      prevChar = c;
+        if (type != prevType) {
+            if (type == NUM){
+                Token newToken(type, atoi(currString.c_str()));
+                tokens_.push_back(newToken);
+            } else {
+                Token newToken(type);
+                tokens_.push_back(newToken);
+            }
+            currString = "";
+        }
+        prevChar = c;
+        prevType = type;
+    } else {
+            Token newToken(FAILED);
+            tokens_[0] = (newToken);
+            break;
+            // Return just one token that is null
     }
-    else {
-      Token newToken(FAILED);
-      tokens_[0] = (newToken);
-      break;
-      // Return just one token that is null
-    }
-  }
+}
 };
