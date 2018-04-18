@@ -1,6 +1,6 @@
 #include "./tokenizer.h"
 #include "gtest/gtest.h"
-using namespace cs160::tokenizer;
+using namespace cs160::frontend;
 
 /*
 for reference:::
@@ -25,6 +25,8 @@ TEST(TokenDeathTest, CannotCreateNonIntegerTokensImproperly) {
 TEST(TokenDeathTest, CannotCreateIntegerTokensImproperly) {
   EXPECT_DEATH(Token integer_token(NUM), ".*");
 }
+
+
 /*
 TEST(Tokenizer, tokenize) {
   Tokenizer lexer("3+3");

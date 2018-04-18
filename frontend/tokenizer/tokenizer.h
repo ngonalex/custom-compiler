@@ -10,7 +10,7 @@
 #include "utility/assert.h"
 
 namespace cs160 {
-namespace tokenizer {
+namespace frontend {
 enum Type {
   NUM, OPEN_PAREN, CLOSE_PAREN, ADD_OP, SUB_OP, MUL_OP, DIV_OP, NONE
 };

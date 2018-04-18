@@ -1,7 +1,7 @@
 #include "./tokenizer.h"
 #include <sstream>
 
-using namespace cs160::tokenizer;
+using namespace cs160::frontend;
 
 Type extractType (const char testChar) {
   if (isdigit(testChar))
