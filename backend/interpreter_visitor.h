@@ -13,8 +13,8 @@ using cs160::abstract_syntax::backend::MultiplyExpr;
 using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::BinaryOperatorExpr;
 
-namespace cs160{
-namespace backend{
+namespace cs160 {
+namespace backend {
 
 class InterpreterVisitor : public AstVisitor{
  public:
@@ -24,12 +24,12 @@ class InterpreterVisitor : public AstVisitor{
   const int GetOutput() const { return opstack_.top(); }
 
   // these should be able to change members of the visitor, thus not const
-  void VisitIntegerExpr(const IntegerExpr& exp){
+  void VisitIntegerExpr(const IntegerExpr& exp) {
     // push value to stack
     opstack_.push(exp.value());
-  } 
+  }
 
-  void VisitBinaryOperatorExpr(const BinaryOperatorExpr& exp){
+  void VisitBinaryOperatorExpr(const BinaryOperatorExpr& exp) {
   }
 
   void VisitAddExpr(const AddExpr& exp) {
@@ -48,7 +48,7 @@ class InterpreterVisitor : public AstVisitor{
 
   void VisitSubtractExpr(const SubtractExpr& exp) {
     // Visit left then right(eventually reaches the base case of Int)
-    // and that will push the two values on the stack 
+    // and that will push the two values on the stack
     exp.lhs().Visit(const_cast<InterpreterVisitor*>(this));
     exp.rhs().Visit(const_cast<InterpreterVisitor*>(this));
 
@@ -87,13 +87,12 @@ class InterpreterVisitor : public AstVisitor{
     opstack_.push(l/r);
   }
 
-  private:
-    // Not very general, this is probably a bad idea for future ASTS
-    std::stack<int> opstack_;
-
+ private:
+  // Not very general, this is probably a bad idea for future ASTS
+  std::stack<int> opstack_;
 };
 
-} // namespace backend
-} // namespace cs160
+}  // namespace backend
+}  // namespace cs160
 
-#endif // BACKEND_INTERPRETER_VISITOR_H_
+#endif  // BACKEND_INTERPRETER_VISITOR_H_

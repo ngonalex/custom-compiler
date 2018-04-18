@@ -35,7 +35,7 @@ TEST_F(LowererTest, AddExprIsVisited) {
   auto expr = cs160::make_unique<AddExpr>((make_unique<IntegerExpr>(7)),
                                    make_unique<IntegerExpr>(5));
   expr->Visit(&lowerer_);
- 
+
   // t_0 <- 7
   // t_1 <- 5
   // t_2 <- t_0 + t_1
@@ -71,7 +71,7 @@ TEST_F(LowererTest, DivideExprIsVisited) {
                                       make_unique<IntegerExpr>(5));
 
   expr->Visit(&lowerer_);
-  
+
   // t_0 <- 7
   // t_1 <- 5
   // t_2 <- t_0 / t_1
