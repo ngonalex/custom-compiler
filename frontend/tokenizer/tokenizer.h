@@ -7,15 +7,15 @@
 #include <string>
 #include <utility>
 #include <vector>
-
+#include "utility/assert.h"
 
 namespace cs160 {
 namespace tokenizer {
+enum Type {
+  NUM, OPEN_PAREN, CLOSE_PAREN, ADD_OP, SUB_OP, MUL_OP, DIV_OP, NONE
+};
 class Token {
  public:
-  enum Type = {
-    NUM, OPEN_PAREN, CLOSE_PAREN, ADD_OP, SUB_OP, MUL_OP, DIV_OP, NONE
-  };
   // Constructor for Non-NUM Tokens
   explicit Token(Type type) : type_(type), val_(0) {
     ASSERT(type != Type::NUM, "Integer tokens need a val");
@@ -26,11 +26,11 @@ class Token {
   }
 
   // Getter functions
-  Type getType() const { return type_; };
+  Type getType() const { return type_; }
   int getVal() const {
     ASSERT(type_ == Type::NUM, "Only integer tokens have value");
     return val_;
-  };
+  }
 
  private:
   Type type_;
@@ -38,17 +38,18 @@ class Token {
   int val_;
   // TODO add token position in constructor
   std::pair<int, int> tokenPos_;  // line number, character number
-}
+};
 
 class Tokenizer {
  public:
-  explicit Tokenizer(std::string program) : program_(program);
-  std::vector<Token> Tokenize();
+  explicit Tokenizer(std::string program);
+  std::vector<Token> Tokenize(std::string program);
 
  private:
   std::string program_;
-  int pos_;
-  int line_;
+  std::vector<Token> tokens_;
+  int errorPos_;
+  int errorLine_;
 };
 
 }  // namespace tokenizer
