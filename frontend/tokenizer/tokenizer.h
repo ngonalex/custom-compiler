@@ -10,7 +10,7 @@
 #include "utility/assert.h"
 
 namespace cs160 {
-namespace tokenizer {
+namespace frontend {
 enum Type {
   NUM, OPEN_PAREN, CLOSE_PAREN, ADD_OP, SUB_OP, MUL_OP, DIV_OP, NONE
 };
@@ -25,9 +25,21 @@ class Token {
     ASSERT(type == Type::NUM, "Only integers have val declared");
   }
 
+  // check if two Tokens are equal
+  bool operator ==(const Token &b) const{
+    if(this->type_ == NUM){
+      if(this->type_ == b.type_ && this->val_ == b.val_) return true;
+      else return false;
+    }
+    else{
+      if(this->type_ == b.type_) return true;
+      else return false;
+    }
+  }
+
   // Getter functions
-  Type getType() const { return type_; }
-  int getVal() const {
+  Type type() const { return type_; }
+  int val() const {
     ASSERT(type_ == Type::NUM, "Only integer tokens have value");
     return val_;
   }

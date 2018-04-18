@@ -1,30 +1,42 @@
 #include "./tokenizer.h"
 #include "gtest/gtest.h"
-using cs160::tokenizer::Token;
-using cs160::tokenizer::Tokenizer;
+using namespace cs160::frontend;
 
+/*
+for reference:::
+
+enum Type {
+  NUM, OPEN_PAREN, CLOSE_PAREN, ADD_OP, SUB_OP, MUL_OP, DIV_OP, NONE
+};
+*/
 TEST(TokenTest, CanCreateTokensCorrectly) {
-  Token integer_token(Token::Type::kInteger, 42);
-  Token add_token(Token::Type::kAdd);
+  Token integer_token(NUM, 42);
+  Token add_token(ADD_OP);
 
-  EXPECT_EQ(integer_token.type(), Token::Type::kInteger);
-  EXPECT_EQ(integer_token.value(), 42);
-  EXPECT_EQ(add_token.type(), Token::Type::kAdd);
+  EXPECT_EQ(integer_token.type(), NUM);
+  EXPECT_EQ(integer_token.val(), 42);
+  EXPECT_EQ(add_token.type(), ADD_OP);
 }
 
 TEST(TokenDeathTest, CannotCreateNonIntegerTokensImproperly) {
-  EXPECT_DEATH(Token add_token(Token::Type::kAdd, 42), ".*");
+  EXPECT_DEATH(Token add_token(ADD_OP, 42), ".*");
 }
 
 TEST(TokenDeathTest, CannotCreateIntegerTokensImproperly) {
-  EXPECT_DEATH(Token integer_token(Token::Type::kInteger), ".*");
+  EXPECT_DEATH(Token integer_token(NUM), ".*");
 }
+
+
 /*
 TEST(Tokenizer, tokenize) {
+  Tokenizer lexer("3+3");
   std::vector<Token> tokens;
-  Token newToken = {3, 0, NUM};
-  tokens.push_back(newToken);
-  EXPECT_EQ(cs160::tokenizer::tokenize("3"), newToken);
+  tokens.push_back(Token(NUM, 3));
+  tokens.push_back(Token(ADD_OP));
+  tokens.push_back(Token(NUM, 3));
+  for(Token a : lexer.tokens_){
+    EXPECT_EQ(a, tokens);
+  }
 }
 check invalid syntax if that's true
 */

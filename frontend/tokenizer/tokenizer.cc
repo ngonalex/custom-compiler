@@ -1,8 +1,9 @@
 #include "./tokenizer.h"
+#include <sstream>
 
-using namespace cs160::tokenizer;
+using namespace cs160::frontend;
 
-int extractType (const char testChar) {
+Type extractType (const char testChar) {
   if (isdigit(testChar))
     return NUM;
   switch (testChar) {
@@ -16,17 +17,22 @@ int extractType (const char testChar) {
   }
 }
 
-Tokenizer(std::string program) : program_(program) {
+Tokenizer::Tokenizer(std::string program) : program_(program) {
   char prevChar;
   std::string currString;
 
   for (char &c : program_) {
-    Type = extractType(c);
-    if (Type != NONE) {
-      if (Typ == prevChar) {
-        currString.append(c);
+    Type type = extractType(c);
+    if (type != NONE) {
+      if (type == prevChar) {
+
+        std::stringstream currStringStream;
+        currStringStream << currString;
+        currStringStream << c;
+
+        currString = currStringStream.str();
       } else {
-        Token newToken(Type);
+        Token newToken(type);
         tokens_.push_back(newToken);
         currString = "";
       }
@@ -39,4 +45,4 @@ Tokenizer(std::string program) : program_(program) {
       // Return just one token that is null
     }
   }
-}
+};
