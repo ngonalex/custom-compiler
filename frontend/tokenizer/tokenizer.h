@@ -59,6 +59,7 @@ class Tokenizer {
 
   std::string program() const { return program_; }
   std::vector<Token> tokens() const { return tokens_; }
+  void print const();
 
  private:
   std::string program_;
