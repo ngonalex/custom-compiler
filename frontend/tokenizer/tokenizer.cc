@@ -39,4 +39,4 @@ Tokenizer(std::string program) : program_(program) {
       // Return just one token that is null
     }
   }
-}
+};
