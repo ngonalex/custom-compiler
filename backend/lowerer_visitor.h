@@ -36,9 +36,8 @@ struct ThreeAddressCode {
 
 // For ThreeAddressCodes, arg1/arg2 can be a VirtualRegister or a Int
 class VirtualRegister {
-
   explicit VirtualRegister(std::string name) : name_(name) {}
-
+	
   private:
     std::string name_;
 };
@@ -60,15 +59,18 @@ class LowererVisitor : public AstVisitor{
   const std::string GetOutput() const {
     // Iterate through the vector and print out each basic block
     std::string output = "";
+    
     for(unsigned int i = 0; i < blocks_.size(); ++i) {
       output = output + blocks_[i]->target + " <- " + blocks_[i]->arg1;
 
       if(blocks_[i]->op != "load") {
         output = output + " " + blocks_[i]->op + " " + blocks_[i]->arg2;
       }
+	  
       output = output + "\n";
     }
-    return output;
+	  
+  return output;
   }
 
   void VisitIntegerExpr(const IntegerExpr& exp){
@@ -83,7 +85,6 @@ class LowererVisitor : public AstVisitor{
 
     // Push into vector
     blocks_.push_back(newblock);
-
   }
 
   void VisitBinaryOperatorExpr(const BinaryOperatorExpr& exp){
@@ -92,7 +93,7 @@ class LowererVisitor : public AstVisitor{
   void VisitAddExpr(const AddExpr& exp) {
     exp.lhs().Visit(const_cast<LowererVisitor*>(this));
     int leftindex = blocks_.size();
-	  exp.rhs().Visit(const_cast<LowererVisitor*>(this));
+    exp.rhs().Visit(const_cast<LowererVisitor*>(this));
 
     // Load value into target (t <- prev->target + prev->prev->target)
     // Last two elements of the vector should be the integers to load in
@@ -112,11 +113,11 @@ class LowererVisitor : public AstVisitor{
 
 
   void VisitSubtractExpr(const SubtractExpr& exp) {
-   	// Visit left then right(eventually reaches the base case of Int)
-	  exp.lhs().Visit(const_cast<LowererVisitor*>(this));
+    // Visit left then right(eventually reaches the base case of Int)
+    exp.lhs().Visit(const_cast<LowererVisitor*>(this));
 
-	  int leftindex = blocks_.size();
-	  exp.rhs().Visit(const_cast<LowererVisitor*>(this));
+    int leftindex = blocks_.size();
+    exp.rhs().Visit(const_cast<LowererVisitor*>(this));
 
     // Load value into target (t <- prev->target + prev->prev->target)
     // Last two elements of the vector should be the integers to load in
@@ -127,7 +128,7 @@ class LowererVisitor : public AstVisitor{
     newblock->arg1 = blocks_[leftindex-1]->target;
     newblock->arg2 = blocks_[size-1]->target; 
     newblock->op = "-";
-    // This is probably wrong, look at this later, just going to do this now to test some things
+    // look at this later, just going to do this now to test some things
     newblock->target = "t_" + std::to_string(blocks_.size());
 
     // Push into vector
@@ -136,11 +137,11 @@ class LowererVisitor : public AstVisitor{
   }
 
   void VisitMultiplyExpr(const MultiplyExpr& exp) {
-   	// Visit lhs,rhs
-	  exp.lhs().Visit(const_cast<LowererVisitor*>(this));
+    // Visit lhs,rhs
+    exp.lhs().Visit(const_cast<LowererVisitor*>(this));
 
-	  int leftindex = blocks_.size();
-	  exp.rhs().Visit(const_cast<LowererVisitor*>(this));
+    int leftindex = blocks_.size();
+    exp.rhs().Visit(const_cast<LowererVisitor*>(this));
 
     // Load value into target (t <- prev->target + prev->prev->target)
     // Last two elements of the vector should be the integers to load in
@@ -151,7 +152,7 @@ class LowererVisitor : public AstVisitor{
     newblock->arg1 = blocks_[leftindex-1]->target;
     newblock->arg2 = blocks_[size-1]->target;  
     newblock->op = "*";
-    // This is probably wrong, look at this later, just going to do this now to test some things
+    // look at this later, just going to do this now to test some things
     newblock->target = "t_" + std::to_string(blocks_.size());
 
     // Push into vector
@@ -160,11 +161,11 @@ class LowererVisitor : public AstVisitor{
   }
 
   void VisitDivideExpr(const DivideExpr& exp) {
-	  // Visit left/right
-	  exp.lhs().Visit(const_cast<LowererVisitor*>(this));
+    // Visit left/right
+    exp.lhs().Visit(const_cast<LowererVisitor*>(this));
 	  
     int leftindex = blocks_.size();
-	  exp.rhs().Visit(const_cast<LowererVisitor*>(this));
+    exp.rhs().Visit(const_cast<LowererVisitor*>(this));
 
     // Load value into target (t <- prev->target + prev->prev->target)
     // Last two elements of the vector should be the integers to load in
@@ -175,7 +176,7 @@ class LowererVisitor : public AstVisitor{
     newblock->arg1 = blocks_[leftindex-1]->target;
     newblock->arg2 = blocks_[size-1]->target; 
     newblock->op = "/";
-    // This is probably wrong, look at this later, just going to do this now to test some things
+    // look at this later, just going to do this now to test some things
     newblock->target = "t_" + std::to_string(blocks_.size());
 
     // Push into vector
