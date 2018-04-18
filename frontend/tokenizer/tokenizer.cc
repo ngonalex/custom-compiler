@@ -17,6 +17,14 @@ Type extractType (const char testChar) {
   }
 }
 
+Tokenizer::print(){
+  for(Token a : tokens_){
+    std::cout << a.type() << std::endl;
+    if(a.type() == NUM)
+      std::cout << a.val() << std::endl;
+  }
+}
+
 Tokenizer::Tokenizer(std::string program) : program_(program) {
   char prevChar;
   std::string currString;
