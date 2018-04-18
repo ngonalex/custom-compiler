@@ -35,16 +35,16 @@ TEST_F(LowererTest, AddExprIsVisited) {
   auto expr = cs160::make_unique<AddExpr>((make_unique<IntegerExpr>(7)),
                                    make_unique<IntegerExpr>(5));
   expr->Visit(&lowerer_);
-
-  //t_0 <- 7
-  //t_1 <- 5
-  //t_2 <- t_0 + t_1
+ 
+  // t_0 <- 7
+  // t_1 <- 5
+  // t_2 <- t_0 + t_1
   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 7\nt_1 <- 5\nt_2 <- t_0 + t_1\n");
 }
 
-//t_0 <- 7
-//t_1 <- 5
-//t_2 <- t_0 - t_1
+// t_0 <- 7
+// t_1 <- 5
+// t_2 <- t_0 - t_1
 TEST_F(LowererTest, SubtractExprIsVisited) {
   auto expr = cs160::make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
                                         make_unique<IntegerExpr>(5));
@@ -60,9 +60,9 @@ TEST_F(LowererTest, MultiplyExprIsVisited) {
 
   expr->Visit(&lowerer_);
 
-  //t_0 <- 7
-  //t_1 <- 5
-  //t_2 <- t_0 * t_1
+  // t_0 <- 7
+  // t_1 <- 5
+  // t_2 <- t_0 * t_1
   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 7\nt_1 <- 5\nt_2 <- t_0 * t_1\n");
 }
 
@@ -72,9 +72,9 @@ TEST_F(LowererTest, DivideExprIsVisited) {
 
   expr->Visit(&lowerer_);
   
-  //t_0 <- 7
-  //t_1 <- 5
-  //t_2 <- t_0 / t_1
+  // t_0 <- 7
+  // t_1 <- 5
+  // t_2 <- t_0 / t_1
   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 7\nt_1 <- 5\nt_2 <- t_0 / t_1\n");
 }
 
@@ -87,12 +87,12 @@ TEST_F(LowererTest, NestedVisitationsWorkProperly) {
 
   expr->Visit(&lowerer_);
 
-  //t_0 <- 7
-  //t_1 <- 5
-  //t_2 <- t_0 + t_1
-  //t_3 <- 2
-  //t_4 <- 1
-  //t_5 <- t_3 - t_4
-  //t_6 <- t_2 / t_5
+  // t_0 <- 7
+  // t_1 <- 5
+  // t_2 <- t_0 + t_1
+  // t_3 <- 2
+  // t_4 <- 1
+  // t_5 <- t_3 - t_4
+  // t_6 <- t_2 / t_5
   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 7\nt_1 <- 5\nt_2 <- t_0 + t_1\nt_3 <- 2\nt_4 <- 1\nt_5 <- t_3 - t_4\nt_6 <- t_2 / t_5\n");
 }
