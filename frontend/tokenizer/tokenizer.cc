@@ -33,17 +33,12 @@ Tokenizer::Tokenizer(std::string program) : program_(program) {
     for (char &c : program_) {
     Type type = extractType(c);
     if (type != NONE) {
-        if (type == prevType) {
-            std::stringstream currStringStream;
-            currStringStream << currString;
-            currStringStream << c;
-
-            currString = currStringStream.str();
-        } else {
-            std::stringstream currStringStream;
-            currStringStream << c;
-            currString = currStringStream.str();
-            
+        std::stringstream currStringStream;
+        currStringStream << currString;
+        currStringStream << c;
+        
+        currString = currStringStream.str();
+        if (type != prevType) {
             if (type == NUM){
                 Token newToken(type, atoi(currString.c_str()));
                 tokens_.push_back(newToken);
