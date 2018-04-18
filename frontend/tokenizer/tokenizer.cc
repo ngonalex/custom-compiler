@@ -17,7 +17,7 @@ Type extractType (const char testChar) {
   }
 }
 
-Tokenizer::print(){
+void Tokenizer::print(){
   for(Token a : tokens_){
     std::cout << a.type() << std::endl;
     if(a.type() == NUM)

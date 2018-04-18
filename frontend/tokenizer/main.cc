@@ -1,6 +1,8 @@
 #include <iostream>
 #include "tokenizer.h"
 
+using namespace cs160::frontend;
+
 int main() {
   Tokenizer lexer("3+3");
   std::vector<Token> tokens;
