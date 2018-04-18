@@ -2,12 +2,19 @@
 #include "gtest/gtest.h"
 using namespace cs160::tokenizer;
 
+/*
+for reference:::
+
+enum Type {
+  NUM, OPEN_PAREN, CLOSE_PAREN, ADD_OP, SUB_OP, MUL_OP, DIV_OP, NONE
+};
+*/
 TEST(TokenTest, CanCreateTokensCorrectly) {
-  Token integer_token(Token::Type::kInteger, 42);
-  Token add_token(Token::Type::kAdd);
+  Token integer_token(NUM, 42);
+  Token add_token(ADD_OP);
 
   EXPECT_EQ(integer_token.type(), Token::Type::kInteger);
-  EXPECT_EQ(integer_token.value(), 42);
+  EXPECT_EQ(integer_token.Val(), 42);
   EXPECT_EQ(add_token.type(), Token::Type::kAdd);
 }
 

@@ -38,8 +38,8 @@ class Token {
   }
 
   // Getter functions
-  Type getType() const { return type_; }
-  int getVal() const {
+  Type type() const { return type_; }
+  int val() const {
     ASSERT(type_ == Type::NUM, "Only integer tokens have value");
     return val_;
   }
