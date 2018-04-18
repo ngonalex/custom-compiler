@@ -41,7 +41,7 @@ namespace frontend {
       Parser(std::vector<Token> program);
       ParseResult* parseInt(ParseResult *p, int location);
       ParseResult* parseOperator(ParseResult *p, int location);
-      void start();
+      int start();
     
     private:
       ParseResult *result;

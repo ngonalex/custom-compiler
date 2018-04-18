@@ -17,11 +17,18 @@ Type extractType (const char testChar) {
   }
 }
 
-Tokenizer::print(){
-  for(Token a : tokens_){
-    std::cout << a.type() << std::endl;
-    if(a.type() == NUM)
-      std::cout << a.val() << std::endl;
+void Token::print() {
+  switch(this->type()) {
+    case NUM:
+      printf("Type: NUM\n");
+      printf("\tValue: %i\n", this->val());
+      break;
+    case NONE:
+      printf("Type: NONE\n");
+      break;
+    default:
+      printf("Type: %d\n", this->type());
+      break;
   }
 }
 

@@ -36,6 +36,8 @@ class Token {
       else return false;
     }
   }
+  // Debug function
+  void print();
 
   // Getter functions
   Type type() const { return type_; }
@@ -59,7 +61,6 @@ class Tokenizer {
 
   std::string program() const { return program_; }
   std::vector<Token> tokens() const { return tokens_; }
-  void print const();
 
  private:
   std::string program_;

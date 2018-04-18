@@ -11,12 +11,13 @@ namespace frontend {
   }
   
   // Ecounter parenthesis and numbers
-  void Parser::start() {
+  int Parser::start() {
     ParseResult* current = new ParseResult;
     if (program[0].type()  == Type::NUM) {
       //program[0].print();
       this->result = parseOperator(current, 1);
-      printf("Result: %i \n", this->result->left.val() * this->result->right.val());
+      return(this->result->left.val() * this->result->right.val());
+      //printf("Result: %i \n", this->result->left.val() * this->result->right.val());
     }
   }
   
