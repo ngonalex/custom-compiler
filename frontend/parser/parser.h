@@ -8,7 +8,6 @@ namespace cs160 {
 namespace frontend {
   // 3 + 5 -- sure
   // 3 * 5 + 8
-  // /0 = 
   /*
         +
     *        8
@@ -18,10 +17,10 @@ namespace frontend {
     T -> T * F | T / F | F
     F -> ( E ) | Num
     
-    ParseResult parseInt(ParseResult p, int current);
-    ParseResult matchChar(ParseResult, char current);
+    ParseState parseInt(ParseState p, int current);
+    ParseState matchChar(ParseState, char current);
     
-    ParseResult expect(ParseResult p) {
+    ParseState expect(ParseState p) {
       if(!p.isSuccess()) {
         throw 
       }
@@ -29,22 +28,29 @@ namespace frontend {
       
   */
   
-  class ParseResult {
+  enum State { ACCEPTING, REJECTED };
+  // Can return an error state or an accepting state for the current branch
+  // If it's an error state, then try a new branch, otherwise continue evaluation
+  class ParseState {
     public:
       Token left;
-      Token op;
+      Token middle;
       Token right;
+      State state;
   };
     
   class Parser {
     public:
       Parser(std::vector<Token> program);
-      ParseResult* parseInt(ParseResult *p, int location);
-      ParseResult* parseOperator(ParseResult *p, int location);
+      
+      // location is the current vector location
+      ParseState* parseInt(ParseState *p, int location);
+      ParseState* parseOperator(ParseState *p, int location);
+      ParseState* parseParen(ParseState *p, int location);
       int start();
-    
+      
     private:
-      ParseResult *result;
+      std::vector<ParseState> state_stack;
       std::vector<Token> program;
   };
   

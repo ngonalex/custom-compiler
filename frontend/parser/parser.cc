@@ -7,12 +7,12 @@ namespace frontend {
   
   Parser::Parser(std::vector<Token> program) {
     this->program = program;
-    this->result = new ParseResult;
+    this->result = new ParseState;
   }
   
   // Ecounter parenthesis and numbers
   int Parser::start() {
-    ParseResult* current = new ParseResult;
+    ParseState* current = new ParseState;
     if (program[0].type()  == Type::NUM) {
       //program[0].print();
       this->result = parseOperator(current, 1);
@@ -21,7 +21,7 @@ namespace frontend {
     }
   }
   
-  ParseResult* Parser::parseOperator(ParseResult* p, int location) {
+  ParseState* Parser::parseOperator(ParseState* p, int location) {
     switch(program[location].type()) {
       case Type::ADD_OP:
         //program[location].print();
@@ -42,11 +42,11 @@ namespace frontend {
     }
   }
   
-  ParseResult* Parser::parseInt(ParseResult* p, int location) {
+  ParseState* Parser::parseInt(ParseState* p, int location) {
     if (program[location].type() == Type::NUM) {
       //program[location].print();
       p->left = program[0];
-      p->op = program[1];
+      p->middle = program[1];
       p->right = program[2];
       return p;
     }
