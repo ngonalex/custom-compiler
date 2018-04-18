@@ -1,25 +1,31 @@
 #ifndef TOKENIZER_TOKENIZER_H_
 #define TOKENIZER_TOKENIZER_H_
 
+#include "utility/assert.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
 #include <utility>
 #include <vector>
-#include "utility/assert.h"
 
 namespace cs160 {
 namespace frontend {
 enum Type {
-  NUM, OPEN_PAREN, CLOSE_PAREN, ADD_OP, SUB_OP, MUL_OP, DIV_OP, FAILED, NONE
+  NUM,
+  OPEN_PAREN,
+  CLOSE_PAREN,
+  ADD_OP,
+  SUB_OP,
+  MUL_OP,
+  DIV_OP,
+  FAILED,
+  NONE
 };
 class Token {
- public:
-   // Constructor used for creating an empty Token
-   Token() {
-     this->type_ = Type::NONE;
-   }
+public:
+  // Constructor used for creating an empty Token
+  Token() { this->type_ = Type::NONE; }
   // Constructor for Non-NUM Token
   explicit Token(Type type) : type_(type), val_(0) {
     ASSERT(type != Type::NUM, "Integer tokens need a val");
@@ -30,24 +36,30 @@ class Token {
   }
 
   // check if two Tokens are equal
-  bool operator ==(const Token &b) const{
-    if(this->type_ == NUM){
-      if(this->type_ == b.type_ && this->val_ == b.val_) return true;
-      else return false;
-    }
-    else{
-      if(this->type_ == b.type_) return true;
-      else return false;
+  bool operator==(const Token &b) const {
+    if (this->type_ == NUM) {
+      if (this->type_ == b.type_ && this->val_ == b.val_)
+        return true;
+      else
+        return false;
+    } else {
+      if (this->type_ == b.type_)
+        return true;
+      else
+        return false;
     }
   }
-  bool operator !=(const Token &b) const{
-    if(this->type_ == NUM){
-      if(this->type_ == b.type_ && this->val_ == b.val_) return false;
-      else return true;
-    }
-    else{
-      if(this->type_ == b.type_) return false;
-      else return true;
+  bool operator!=(const Token &b) const {
+    if (this->type_ == NUM) {
+      if (this->type_ == b.type_ && this->val_ == b.val_)
+        return false;
+      else
+        return true;
+    } else {
+      if (this->type_ == b.type_)
+        return false;
+      else
+        return true;
     }
   }
 
@@ -60,30 +72,30 @@ class Token {
     return val_;
   }
 
- private:
+private:
   Type type_;
   // Default value is set to 0 for non-integer scores
   int val_;
   // TODO add token position in constructor
-  std::pair<int, int> tokenPos_;  // line number, character number
+  std::pair<int, int> tokenPos_; // line number, character number
 };
 
 class Tokenizer {
- public:
+public:
   explicit Tokenizer(std::string program);
   std::vector<Token> Tokenize(std::string program);
 
   std::string program() const { return program_; }
   std::vector<Token> tokens() const { return tokens_; }
 
- private:
+private:
   std::string program_;
   std::vector<Token> tokens_;
   int errorPos_;
   int errorLine_;
 };
 
-}  // namespace tokenizer
-}  // namespace cs160
+} // namespace frontend
+} // namespace cs160
 
 #endif // TOKENIZER_TOKENIZER_H_

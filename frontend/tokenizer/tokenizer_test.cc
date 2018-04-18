@@ -2,7 +2,6 @@
 #include "gtest/gtest.h"
 using namespace cs160::frontend;
 
-
 TEST(TokenTest, CanCreateTokensCorrectly) {
   Token integer_token(NUM, 42);
   Token add_token(ADD_OP);
@@ -27,12 +26,11 @@ TEST(Tokenizer, basicAddTokenizer) {
   tokens.push_back(Token(ADD_OP));
   tokens.push_back(Token(NUM, 3));
   int i = 0;
-  for(Token a : lexer.tokens()){
+  for (Token a : lexer.tokens()) {
     EXPECT_EQ(a, tokens[i]);
     i++;
   }
 }
-
 
 TEST(Tokenizer, complexExpression) {
   Tokenizer lexer("(3+3) * 4 / 2 - 1");
@@ -45,12 +43,12 @@ TEST(Tokenizer, complexExpression) {
   tokens.push_back(Token(MUL_OP));
   tokens.push_back(Token(NUM, 4));
   tokens.push_back(Token(DIV_OP));
-  tokens.push_back(Token(NUM, 2));
+  tokens.push_banack(Token(NUM, 2));
   tokens.push_back(Token(SUB_OP));
   tokens.push_back(Token(NUM, 1));
 
   int i = 0;
-  for(Token a : lexer.tokens()){
+  for (Token a : lexer.tokens()) {
     EXPECT_EQ(a, tokens[i]);
     i++;
   }
