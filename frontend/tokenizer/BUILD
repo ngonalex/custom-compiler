@@ -10,6 +10,7 @@ cc_library(
 cc_test(
 	name = "tokenizer_test",
 	srcs = ["tokenizer_test.cc"],
+	copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
 	deps = [
              "@gtest//:main",
              ":tokenizer"
