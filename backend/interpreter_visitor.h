@@ -93,7 +93,7 @@ class InterpreterVisitor : public AstVisitor{
 
 };
 
-}// namespace backend
-}// namespace cs160
+} // namespace backend
+} // namespace cs160
 
 #endif // BACKEND_INTERPRETER_VISITOR_H_
