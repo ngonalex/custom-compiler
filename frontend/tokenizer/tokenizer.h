@@ -26,13 +26,13 @@ class Token {
   }
 
   // check if two Tokens are equal
-  bool T::operator ==(const T2 &b) const{
-    if(this.type_ == NUM){
-      if(this.type_ == b.type_ && this.val_ == b.val_) return true;
+  bool operator ==(const Token &b) const{
+    if(this->type_ == NUM){
+      if(this->type_ == b.type_ && this->val_ == b.val_) return true;
       else return false;
     }
     else{
-      if(this.type_ == b.type_) return true;
+      if(this->type_ == b.type_) return true;
       else return false;
     }
   }
