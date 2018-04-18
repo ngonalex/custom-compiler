@@ -13,7 +13,7 @@ Type extractType (const char testChar) {
     case '-': { return SUB_OP; }
     case '*': { return MUL_OP; }
     case '/': { return DIV_OP; }
-    default: { return NONE; }
+    default: { return FAILED; }
   }
 }
 
@@ -31,7 +31,7 @@ Tokenizer::Tokenizer(std::string program) : program_(program) {
 
   for (char &c : program_) {
     Type type = extractType(c);
-    if (type != NONE) {
+    if (type != FAILED) {
       if (type == prevChar) {
 
         std::stringstream currStringStream;
@@ -47,7 +47,7 @@ Tokenizer::Tokenizer(std::string program) : program_(program) {
       prevChar = c;
     }
     else {
-      Token newToken(NONE);
+      Token newToken(FAILED);
       tokens_[0] = (newToken);
       break;
       // Return just one token that is null

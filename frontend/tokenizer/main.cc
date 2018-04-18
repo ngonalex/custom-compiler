@@ -8,11 +8,13 @@ int main() {
   tokens.push_back(Token(ADD_OP));
   tokens.push_back(Token(NUM, 3));
   int i = 0;
+  lexer.print();
+  /*
   for(Token a : lexer.tokens()){
     std::cout << a.type() << std::endl;
     if(a.type() == NUM)
       std::cout << a.val() << std::endl;
     i++;
-  }
+  }*/
   return 0;
 }

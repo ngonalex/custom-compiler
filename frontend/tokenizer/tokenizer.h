@@ -12,11 +12,15 @@
 namespace cs160 {
 namespace frontend {
 enum Type {
-  NUM, OPEN_PAREN, CLOSE_PAREN, ADD_OP, SUB_OP, MUL_OP, DIV_OP, NONE
+  NUM, OPEN_PAREN, CLOSE_PAREN, ADD_OP, SUB_OP, MUL_OP, DIV_OP, FAILED, NONE
 };
 class Token {
  public:
-  // Constructor for Non-NUM Tokens
+   // Constructor used for creating an empty Token
+   Token() {
+     this.type_ = Type::DEBUG;
+   }
+  // Constructor for Non-NUM Token
   explicit Token(Type type) : type_(type), val_(0) {
     ASSERT(type != Type::NUM, "Integer tokens need a val");
   }
