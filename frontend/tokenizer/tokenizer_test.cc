@@ -1,7 +1,6 @@
 #include "./tokenizer.h"
 #include "gtest/gtest.h"
-using cs160::tokenizer::Token;
-using cs160::tokenizer::Tokenizer;
+using namespace cs160::tokenizer;
 
 TEST(TokenTest, CanCreateTokensCorrectly) {
   Token integer_token(Token::Type::kInteger, 42);
@@ -21,10 +20,14 @@ TEST(TokenDeathTest, CannotCreateIntegerTokensImproperly) {
 }
 /*
 TEST(Tokenizer, tokenize) {
+  Tokenizer lexer("3+3");
   std::vector<Token> tokens;
-  Token newToken = {3, 0, NUM};
-  tokens.push_back(newToken);
-  EXPECT_EQ(cs160::tokenizer::tokenize("3"), newToken);
+  tokens.push_back(Token(NUM, 3));
+  tokens.push_back(Token(ADD_OP));
+  tokens.push_back(Token(NUM, 3));
+  for(Token a : lexer.tokens_){
+    EXPECT_EQ(a, tokens);
+  }
 }
 check invalid syntax if that's true
 */
