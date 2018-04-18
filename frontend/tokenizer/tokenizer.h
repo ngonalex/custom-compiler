@@ -18,7 +18,7 @@ class Token {
  public:
    // Constructor used for creating an empty Token
    Token() {
-     this.type_ = Type::DEBUG;
+     this->type_ = Type::NONE;
    }
   // Constructor for Non-NUM Token
   explicit Token(Type type) : type_(type), val_(0) {

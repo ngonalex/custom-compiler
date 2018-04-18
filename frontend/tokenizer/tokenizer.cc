@@ -17,7 +17,7 @@ Type extractType (const char testChar) {
   }
 }
 
-void Token::print() {
+void Tokenizer::print() {
   switch(this->type()) {
     case NUM:
       printf("Type: NUM\n");
