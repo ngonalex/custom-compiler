@@ -182,6 +182,10 @@ class LowererVisitor : public AstVisitor{
     // Push into vector
     blocks_.push_back(newblock);
   }
+
+  std::vector<struct ThreeAddressCode*> GetIR() {
+    return blocks_;
+  }
 };
 
 }  // namespace backend
