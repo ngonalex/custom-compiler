@@ -26,31 +26,40 @@ void Tokenizer::print(){
 }
 
 Tokenizer::Tokenizer(std::string program) : program_(program) {
-  char prevChar;
-  std::string currString;
+    char prevChar;
+    Type prevType = NONE;
+    std::string currString;
 
-  for (char &c : program_) {
+    for (char &c : program_) {
     Type type = extractType(c);
     if (type != NONE) {
-      if (type == prevChar) {
+        if (type == prevType) {
+            std::stringstream currStringStream;
+            currStringStream << currString;
+            currStringStream << c;
 
-        std::stringstream currStringStream;
-        currStringStream << currString;
-        currStringStream << c;
-
-        currString = currStringStream.str();
-      } else {
-        Token newToken(type);
-        tokens_.push_back(newToken);
-        currString = "";
-      }
-      prevChar = c;
+            currString = currStringStream.str();
+        } else {
+            std::stringstream currStringStream;
+            currStringStream << c;
+            currString = currStringStream.str();
+            
+            if (type == NUM){
+                Token newToken(type, atoi(currString.c_str()));
+                tokens_.push_back(newToken);
+            } else {
+                Token newToken(type);
+                tokens_.push_back(newToken);
+            }
+            currString = "";
+        }
+        prevChar = c;
+        prevType = type;
+    } else {
+            Token newToken(NONE);
+            tokens_[0] = (newToken);
+            break;
+            // Return just one token that is null
     }
-    else {
-      Token newToken(NONE);
-      tokens_[0] = (newToken);
-      break;
-      // Return just one token that is null
-    }
-  }
+}
 };
