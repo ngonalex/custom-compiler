@@ -1,8 +1,8 @@
-
 cc_library(
 	name = "smart_pointer_primer",
 	copts = ["-Wall -g"],
 	hdrs = ["simple_example.h"],
+        deps = ["//utility"],
 	visibility = ["//public:__pkg__"],
 )
 
@@ -12,6 +12,7 @@ cc_test(
 	srcs = [
 		"simple_example_test.cc"
 	],
+	copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
 	timeout = "short",
 	size = "small",
 )
