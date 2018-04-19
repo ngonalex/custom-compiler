@@ -1,10 +1,10 @@
 #include "abstract_syntax/abstract_syntax.h"
-#include "backend/lowerer_visitor.h"
-#include "utility/memory.h"
 
 #include <vector>
 
 #include "gtest/gtest.h"
+#include "backend/lowerer_visitor.h"
+#include "utility/memory.h"
 
 using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::IntegerExpr;
@@ -14,7 +14,6 @@ using cs160::abstract_syntax::backend::MultiplyExpr;
 using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::BinaryOperatorExpr;
 using cs160::backend::LowererVisitor;
-
 using cs160::make_unique;
 
 class LowererTest : public ::testing::Test {
