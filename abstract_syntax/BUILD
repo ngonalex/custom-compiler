@@ -38,12 +38,12 @@ cc_library(
 )
 
 cc_test(
-	name = "print_visitor_v1_test",
-	srcs = ["print_visitor_v1_test.cc"],
-	deps = [
-             "@gtest//:main",
-             ":print_visitor_v1"
-        ],
+	name = "abstract_syntax_test",
+	deps = ["@gtest//:main", ":abstract_syntax", ":print_visitor_v1"],
+	srcs = [
+		"print_visitor_v1_test.cc",
+	],
+	copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
 	timeout = "short",
 	size = "small",
 )
