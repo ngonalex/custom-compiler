@@ -1,11 +1,5 @@
 #include <iostream>
-#include "rcc/rcc.h"
 
-int main() {
-  std::cout
-    << "RCC magic number: "
-    << cs160::rcc::GetRCCMagicNumber()
-    << std::endl;
+#include "abstract_syntax/abstract_syntax.h"
 
-  return 0;
-}
+int main() { return 0; }

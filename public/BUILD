@@ -1,7 +1,6 @@
-
 cc_binary(
-	name = "compiler",
+	name = "main",
 	copts = ["-Wall -g"],
-	deps = ["//rcc:rcc", "//abstract_syntax:abstract_syntax"],
 	srcs = ["main.cc"],
+        deps = ["//abstract_syntax"],
 )
