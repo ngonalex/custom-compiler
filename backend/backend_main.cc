@@ -14,12 +14,13 @@ using cs160::abstract_syntax::backend::BinaryOperatorExpr;
 using cs160::backend::LowererVisitor;
 using cs160::backend::ThreeAddressCode;
 using cs160::backend::CodeGen;
+using cs160::make_unique;
 
 
 int main() {
   LowererVisitor lowerer_;
   auto expr = cs160::make_unique<SubtractExpr>(
-    cs160::make_unique<IntegerExpr>(7), cs160::make_unique<IntegerExpr>(5));
+    make_unique<IntegerExpr>(7), make_unique<IntegerExpr>(5));
 
   expr->Visit(&lowerer_);
 

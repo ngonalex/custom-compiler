@@ -5,6 +5,8 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <map>
+#include <utility>
 
 #include "backend/lowerer_visitor.h"
 
@@ -17,6 +19,7 @@ class CodeGen {
     void Generate(std::vector<struct ThreeAddressCode*> blocks);
  private:
   std::ofstream& outfile_;
+  std::map<std::string,int> memorymap_;
 };
 
 }  // namespace backend
