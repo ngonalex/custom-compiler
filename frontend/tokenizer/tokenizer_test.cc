@@ -43,7 +43,7 @@ TEST(Tokenizer, complexExpression) {
   tokens.push_back(Token(MUL_OP));
   tokens.push_back(Token(NUM, 4));
   tokens.push_back(Token(DIV_OP));
-  tokens.push_banack(Token(NUM, 2));
+  tokens.push_back(Token(NUM, 2));
   tokens.push_back(Token(SUB_OP));
   tokens.push_back(Token(NUM, 1));
 
