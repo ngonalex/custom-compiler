@@ -1,12 +1,10 @@
-
-#include <vector>
-
-#include "gtest/gtest.h"
-
 #include "abstract_syntax/abstract_syntax.h"
 #include "backend/lowerer_visitor.h"
 #include "utility/memory.h"
 
+#include <vector>
+
+#include "gtest/gtest.h"
 
 using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::IntegerExpr;
@@ -29,6 +27,13 @@ TEST_F(LowererTest, IntegerExprIsVisited) {
   number->Visit(&lowerer_);
 
   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 7\n");
+}
+
+TEST_F(LowererTest, IntegerExprIsVisited_0) {
+  auto number = make_unique<IntegerExpr>(0);
+  number->Visit(&lowerer_);
+
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 0\n");
 }
 
 TEST_F(LowererTest, AddExprIsVisited) {

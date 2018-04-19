@@ -1,9 +1,9 @@
 #ifndef BACKEND_INTERPRETER_VISITOR_H_
 #define BACKEND_INTERPRETER_VISITOR_H_
 
-#include <stack>
-
 #include "abstract_syntax/abstract_syntax.h"
+
+#include <stack>
 
 using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::IntegerExpr;
@@ -16,7 +16,7 @@ using cs160::abstract_syntax::backend::BinaryOperatorExpr;
 namespace cs160 {
 namespace backend {
 
-class InterpreterVisitor : public AstVisitor{
+class InterpreterVisitor : public AstVisitor {
  public:
   InterpreterVisitor() {}
   ~InterpreterVisitor() {}

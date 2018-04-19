@@ -1,10 +1,10 @@
 #ifndef BACKEND_LOWERER_VISITOR_H_
 #define BACKEND_LOWERER_VISITOR_H_
 
+#include "abstract_syntax/abstract_syntax.h"
+
 #include <string>
 #include <vector>
-
-#include "abstract_syntax/abstract_syntax.h"
 
 using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::IntegerExpr;
@@ -14,10 +14,8 @@ using cs160::abstract_syntax::backend::MultiplyExpr;
 using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::BinaryOperatorExpr;
 
-
 namespace cs160 {
 namespace backend {
-
 
 // Abstract .h implementations to a .cc file later
 
@@ -44,13 +42,13 @@ class VirtualRegister {
 };
 
 class Operand {
-  explicit Operand(std::string op) : opcode_(op) {}
+ explicit Operand(std::string op) : opcode_(op) {}
 
  private:
   std::string opcode_;
 };
 
-class LowererVisitor : public AstVisitor{
+class LowererVisitor : public AstVisitor {
  public:
   LowererVisitor() {}
   ~LowererVisitor() {}
@@ -63,15 +61,15 @@ class LowererVisitor : public AstVisitor{
 
     for (unsigned int i = 0; i < blocks_.size(); ++i) {
       output = output + blocks_[i]->target + " <- " + blocks_[i]->arg1;
-
+      
       if (blocks_[i]->op != "load") {
         output = output + " " + blocks_[i]->op + " " + blocks_[i]->arg2;
       }
 
       output = output + "\n";
     }
-
-  return output;
+    
+    return output;
   }
 
   void VisitIntegerExpr(const IntegerExpr& exp) {
