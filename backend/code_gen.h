@@ -2,26 +2,24 @@
 #define BACKEND_CODE_GEN_H_
 
 #include <iostream>
-#include <fstream>  
+#include <fstream>
 #include <string>
 #include <vector>
 
-#include "lowerer_visitor.h"
+#include "backend/lowerer_visitor.h"
 
 namespace cs160 {
 namespace backend {
 
-
 class CodeGen {
-
  public:
-    explicit CodeGen(std::ofstream &filename) : outfile_(filename) {} 
+    explicit CodeGen(std::ofstream &filename) : outfile_(filename) {}
     void Generate(std::vector<struct ThreeAddressCode*> blocks);
  private:
   std::ofstream& outfile_;
 };
 
-}  // namespace CS160
 }  // namespace backend
+}  // namespace cs160
 
 #endif  // BACKEND_CODE_GEN_H_
