@@ -21,6 +21,14 @@ namespace backend {
 
 // Abstract .h implementations to a .cc file later
 
+enum Type {
+  LOAD,
+  ADD,
+  SUB,
+  MULT,
+  DIV
+};
+
 // Structure to hold a 3Address, Basically 1 block
 // Right now all of them are strings,
 // but in the future I think that target should be from a symbol table
@@ -44,10 +52,10 @@ class VirtualRegister {
 };
 
 class Operand {
-  explicit Operand(std::string op) : opcode_(op) {}
+  explicit Operand(Type type) : opcode_(type) {}
 
  private:
-  std::string opcode_;
+  Type opcode_;
 };
 
 class LowererVisitor : public AstVisitor{

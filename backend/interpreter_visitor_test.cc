@@ -2,7 +2,6 @@
 #include <stack>
 
 #include "gtest/gtest.h"
-
 #include "abstract_syntax/abstract_syntax.h"
 #include "backend/interpreter_visitor.h"
 #include "utility/memory.h"
@@ -16,7 +15,6 @@ using cs160::abstract_syntax::backend::MultiplyExpr;
 using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::BinaryOperatorExpr;
 using cs160::backend::InterpreterVisitor;
-
 using cs160::make_unique;
 
 class InterpreterTest : public ::testing::Test {
