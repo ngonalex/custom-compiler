@@ -1,5 +1,5 @@
 cc_library(
-	name = "simple_example",
+	name = "smart_pointer_primer",
 	copts = ["-Wall -g"],
 	hdrs = ["simple_example.h"],
         deps = ["//utility"],
@@ -7,9 +7,12 @@ cc_library(
 )
 
 cc_test(
-	name = "simple_example_test",
-	deps = ["@gtest//:main", "//utility", ":simple_example"],
-	srcs = ["simple_example_test.cc"],
+	name = "smart_pointer_primer_test",
+	deps = ["@gtest//:main", "//utility:utility", ":smart_pointer_primer"],
+	srcs = [
+		"simple_example_test.cc"
+	],
+	copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
 	timeout = "short",
 	size = "small",
 )
