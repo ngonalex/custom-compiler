@@ -1,10 +1,14 @@
 #ifndef PARSER_PARSER_H_
 #define PARSER_PARSER_H_
 
+#include "frontend/tokenizer/token.h"
 #include "frontend/tokenizer/tokenizer.h"
 
 #include <sstream>
 #include <iostream>
+#include <stack>
+
+#include "utility/assert.h"
 
 using namespace cs160::frontend;
 
@@ -13,8 +17,9 @@ namespace frontend {
   
 class Parser {
  public:
-  Parser(std::vector<Token> program) {
-    program_ = program;
+  // Must pass tokens program into Parser, even it it is just Type::END
+  explicit Parser(std::vector<Token> program) : program_(program) {
+    ASSERT(program.size() != 0, "Program cannot be empty tokens");
   }
   
   /** Subroutines **/
@@ -56,9 +61,22 @@ class Parser {
     }
   }
   
+  mkNode(Token op, Token first_value, Token second_value) {
+    ASSERT(op.isOperator(), Error());
+    ASSERT(first_value.isNumber(), Error());
+    ASSERT(second_value.isNumber(), Error());
+  }
+
+  
 // Tokens will now be in reverse order!
  private:
+  // Output from the lexer
   std::vector<Token> program_;
+  // Operator Stack
+  std::stack<Token> operator_stack_;
+  // Operand Stack
+  std::stack<Token> operand_stack_;
+  
 };
   
   
