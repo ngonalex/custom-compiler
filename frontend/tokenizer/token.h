@@ -6,7 +6,8 @@
 namespace cs160 {
 namespace frontend {
   
-enum Type { NUM, OPEN_PAREN, CLOSE_PAREN, ADD_OP, SUB_OP, MUL_OP, DIV_OP, END, FAILED, NONE };
+enum Type { NUM, OPEN_PAREN, CLOSE_PAREN, ADD_OP, 
+  SUB_OP, MUL_OP, DIV_OP, END, FAILED, NONE };
 
 class Token {
  public:
@@ -39,7 +40,7 @@ class Token {
     return !(*this == b);
   }
   
-  void print() {
+  void Print() {
     switch (this->type_) {
     case NUM:
       printf("Type: NUM\n");
@@ -53,6 +54,7 @@ class Token {
   
   // Getter functions
   Type type() const { return type_; }
+  
   int val() const {
     ASSERT(type_ == Type::NUM, "Only integer tokens have value");
     return val_;
