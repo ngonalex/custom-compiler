@@ -4,7 +4,7 @@
 
 using namespace cs160::frontend;
 
-TEST(Tokenizer, basicAddTokenizer) {
+TEST(Tokenizer, BasicAddTokenizer) {
   Tokenizer lexer("3 + 3");
   std::vector<Token> tokens;
   tokens.push_back(Token(NUM, 3));
@@ -17,7 +17,7 @@ TEST(Tokenizer, basicAddTokenizer) {
   }
 }
 
-TEST(Tokenizer, complexExpression) {
+TEST(Tokenizer, ComplexExpression) {
   Tokenizer lexer("(3+3) * 4 / 2 - 1");
   std::vector<Token> tokens;
   tokens.push_back(Token(OPEN_PAREN));
