@@ -43,10 +43,9 @@ void CodeGen::Generate(std::vector<struct ThreeAddressCode*> blocks) {
 
     } else if (OpCode == "-") {
         // Load arg1,arg2 then add them into target
-        outfile_ << "\tpop %rbx" << std::endl; // ebx = right 
-        outfile_ << "\tpop %rax" << std::endl; // eax = left
-        ClearRegister("rcx");
-        outfile_ << "\tsub %rax, %rcx\n\tsub %rbx, %rcx" << std::endl; 
+        outfile_ << "\tpop %rax" << std::endl; // ebx = right 
+        outfile_ << "\tpop %rcx" << std::endl; // eax = left
+        outfile_ << "\tsub %rax, %rcx" << std::endl; 
         outfile_ << "\tpush %rcx" << std::endl;
     } else if (OpCode == "*") {
         outfile_ << "\tpop %rbx" << std::endl; // ebx = right 
