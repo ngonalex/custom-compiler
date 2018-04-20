@@ -4,6 +4,21 @@
 namespace cs160 {
 namespace backend {
 
+void CodeGen::GenerateEpilogue() {
+  outfile_ << "\tmov $60, %rax\n\txor %rdi, %rdi\n\tsyscall" << std::endl;
+  outfile_.close();
+}
+
+void CodeGen::GenerateBoiler() {
+  outfile_ << "\t.global _start" << std::endl;
+  outfile_ << "\t.text" << std::endl;
+    outfile_ << "_start:" << std::endl;
+}
+
+void CodeGen::ClearRegister(std::string reg) {
+  outfile_ << "\txor %" + reg + ", %" + reg << std::endl;
+}
+
 void CodeGen::Generate(std::vector<struct ThreeAddressCode*> blocks) {
   // boiler code here
 
@@ -12,52 +27,43 @@ void CodeGen::Generate(std::vector<struct ThreeAddressCode*> blocks) {
     ThreeAddressCode* code = blocks[i];
     std::string OpCode = code->op;
     if (OpCode == "load") {
-      outfile_ << "movb $" + code-> arg1 + " %ecx" << std::endl;
+      outfile_ << "\tmov $" + code-> arg1 + ", %rcx" << std::endl;
       
       // Temporary solution to limited mem locations, keep track of 
       // where we're storing
-
-      outfile_ << "movb %ecx (some memory location + i*4)" << std::endl;
-      // memorymap_.insert(std::pair<string,int>(code->target,some memory location + i*4));
+      outfile_ << "\tpush %rcx" << std::endl;
 
     } else if (OpCode == "+") {
         // Load arg1,arg2 then add them into target
-        outfile_ << "movb memory_loc_arg1 %eax" << std::endl;
-        outfile_ << "movb memory_loc_arg2 %ebx" << std::endl;
-        outfile_ << "add %eax %ecx\n add %ebx %ecx" << std::endl; 
-
-        outfile_ << "movb %ecx (some memory location + i*4)" << std::endl;
-        // memorymap_.insert(std::pair<string,int>(code->target,some memory location + i*4));
+        outfile_ << "\tpop %rbx" << std::endl; // ebx = right 
+        outfile_ << "\tpop %rax" << std::endl; // eax = left
+        ClearRegister("rcx");
+        outfile_ << "\tadd %rax, %rcx\nadd %rbx, %rcx" << std::endl; 
+        outfile_ << "\tpush %rcx" << std::endl;
 
     } else if (OpCode == "-") {
         // Load arg1,arg2 then add them into target
-        outfile_ << "movb memory_loc_arg1 %ebx" << std::endl;
-        outfile_ << "movb memory_loc_arg2 %ecx" << std::endl;
-        outfile_ << "sub %eax %ecx\nsub %ebx %ecx" << std::endl; 
-
-        outfile_ << "movb %ecx (some memory location + i*4)" << std::endl;
-        // memorymap_.insert(std::pair<string,int>(code->target,some memory location + i*4));
+        outfile_ << "\tpop %rbx" << std::endl; // ebx = right 
+        outfile_ << "\tpop %rax" << std::endl; // eax = left
+        ClearRegister("rcx");
+        outfile_ << "\tsub %rax, %rcx\n\tsub %rbx, %rcx" << std::endl; 
+        outfile_ << "\tpush %rcx" << std::endl;
     } else if (OpCode == "*") {
-
-        outfile_ << "movb memory_loc_arg1 %ebx" << std::endl;
-        outfile_ << "movb memory_loc_arg2 %ecx" << std::endl;
-        outfile_ << "imul %ebx %ecx" << std::endl; 
-
-        outfile_ << "movb %ecx (some memory location + i*4)" << std::endl;
-
-        // memorymap_.insert(std::pair<string,int>(code->target,some memory location + i*4));
+        outfile_ << "\tpop %rbx" << std::endl; // ebx = right 
+        outfile_ << "\tpop %rcx" << std::endl; // ecx = left
+        outfile_ << "\timul %rbx, %rcx" << std::endl; 
+        outfile_ << "\tpush %rcx" << std::endl;
     } else if (OpCode == "/") {
         // Load dividend (arg1) into %eax (Do we need to clear out %edx?)
-        //outfile_<< "mov $0, %edx" << endl;
-        outfile_ << "movb memory_loc_arg1 %eax" << std::endl;
-        outfile_ << "movb memory_loc_arg2 %ebx" << std::endl;
-        outfile_ << "cdq" << std::endl;
-        // Div
-        outfile_ << "idiv %ebx" << std::endl;
+        ClearRegister("rdx");
+        outfile_ << "\tpop %rbx" << std::endl;
+        outfile_ << "\tpop %rax" << std::endl;
+        outfile_ << "\tcqto" << std::endl; // indicating its a signed division 
+        outfile_ << "\tidiv %rbx" << std::endl;
+        outfile_ << "\tpush %rax" << std::endl;
     }
   }
 
-  outfile_.close();
 }
 
 }  // namespace backend

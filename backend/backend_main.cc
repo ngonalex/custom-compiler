@@ -27,6 +27,8 @@ int main() {
   std::ofstream file = std::ofstream("test.s");
   CodeGen runner = CodeGen(file);
   std::vector<ThreeAddressCode*> test = lowerer_.GetIR();
+  runner.GenerateBoiler();
   runner.Generate(test);
+  runner.GenerateEpilogue();
   return 0;
 }
