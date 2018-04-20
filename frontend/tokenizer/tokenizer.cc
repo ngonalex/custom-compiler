@@ -1,4 +1,4 @@
-#include "./tokenizer.h"
+#include "frontend/tokenizer/tokenizer.h"
 #include <sstream>
 
 using namespace cs160::frontend;
@@ -26,21 +26,6 @@ Type extractType(const char testChar) {
     return DIV_OP;
   }
   default: { return FAILED; }
-  }
-}
-
-void Token::print() {
-  switch (this->type_) {
-  case NUM:
-    printf("Type: NUM\n");
-    printf("\tValue: %i\n", this->val_);
-    break;
-  case FAILED:
-    printf("Type: FAILED\n");
-    break;
-  default:
-    printf("Type: %d\n", this->type_);
-    break;
   }
 }
 
