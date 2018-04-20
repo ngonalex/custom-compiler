@@ -29,7 +29,7 @@ TEST_F(PrinterTest, IntegerExprIsVisited) {
 }
 
 TEST_F(PrinterTest, AddExprIsVisited) {
-  auto expr = make_unique<AddExpr>((make_unique<IntegerExpr>(7)),
+  auto expr = cs160::make_unique<AddExpr>((make_unique<IntegerExpr>(7)),
                                    make_unique<IntegerExpr>(5));
   expr->Visit(&printer_);
 
@@ -37,7 +37,7 @@ TEST_F(PrinterTest, AddExprIsVisited) {
 }
 
 TEST_F(PrinterTest, SubtractExprIsVisited) {
-  auto expr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
+  auto expr = cs160::make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
                                         make_unique<IntegerExpr>(5));
 
   expr->Visit(&printer_);
@@ -46,7 +46,7 @@ TEST_F(PrinterTest, SubtractExprIsVisited) {
 }
 
 TEST_F(PrinterTest, MultiplyExprIsVisited) {
-  auto expr = make_unique<MultiplyExpr>(make_unique<IntegerExpr>(7),
+  auto expr = cs160::make_unique<MultiplyExpr>(make_unique<IntegerExpr>(7),
                                         make_unique<IntegerExpr>(5));
 
   expr->Visit(&printer_);
@@ -55,7 +55,7 @@ TEST_F(PrinterTest, MultiplyExprIsVisited) {
 }
 
 TEST_F(PrinterTest, DivideExprIsVisited) {
-  auto expr = make_unique<DivideExpr>(make_unique<IntegerExpr>(7),
+  auto expr = cs160::make_unique<DivideExpr>(make_unique<IntegerExpr>(7),
                                       make_unique<IntegerExpr>(5));
 
   expr->Visit(&printer_);
@@ -64,10 +64,10 @@ TEST_F(PrinterTest, DivideExprIsVisited) {
 }
 
 TEST_F(PrinterTest, NestedVisitationsWorkProperly) {
-  auto expr = make_unique<DivideExpr>(
-      make_unique<AddExpr>(make_unique<IntegerExpr>(7),
+  auto expr = cs160::make_unique<DivideExpr>(
+      cs160::make_unique<AddExpr>(make_unique<IntegerExpr>(7),
                            make_unique<IntegerExpr>(5)),
-      make_unique<SubtractExpr>(make_unique<IntegerExpr>(2),
+      cs160::make_unique<SubtractExpr>(make_unique<IntegerExpr>(2),
                                 make_unique<IntegerExpr>(1)));
 
   expr->Visit(&printer_);

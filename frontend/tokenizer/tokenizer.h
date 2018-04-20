@@ -1,97 +1,96 @@
 #ifndef TOKENIZER_TOKENIZER_H_
 #define TOKENIZER_TOKENIZER_H_
 
-#include "utility/assert.h"
+#include "frontend/tokenizer/token.h"
+
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
 #include <utility>
 #include <vector>
+#include <sstream>
+
+#include "utility/assert.h"
+
+using namespace cs160::frontend;
 
 namespace cs160 {
 namespace frontend {
-enum Type {
-  NUM,
-  OPEN_PAREN,
-  CLOSE_PAREN,
-  ADD_OP,
-  SUB_OP,
-  MUL_OP,
-  DIV_OP,
-  FAILED,
-  NONE
-};
-class Token {
-public:
-  // Constructor used for creating an empty Token
-  Token() { this->type_ = Type::NONE; }
-  // Constructor for Non-NUM Token
-  explicit Token(Type type) : type_(type), val_(0) {
-    ASSERT(type != Type::NUM, "Integer tokens need a val");
-  }
-  // Constructors for Integer Tokens
-  Token(Type type, int val) : type_(type), val_(val) {
-    ASSERT(type == Type::NUM, "Only integers have val declared");
-  }
 
-  // check if two Tokens are equal
-  bool operator==(const Token &b) const {
-    if (this->type_ == NUM) {
-      if (this->type_ == b.type_ && this->val_ == b.val_)
-        return true;
-      else
-        return false;
-    } else {
-      if (this->type_ == b.type_)
-        return true;
-      else
-        return false;
+class Tokenizer {
+ public:
+  explicit Tokenizer(std::string program) : input_program_(program) {
+    char prevChar;
+    Type prevType = NONE;
+    std::string currString;
+
+    for (char &c : input_program_) {
+      if (c == ' ')
+        continue;
+      Type type = ExtractType(c);
+      if (type != FAILED) {
+        std::stringstream currStringStream;
+        currStringStream << currString;
+        currStringStream << c;
+
+        currString = currStringStream.str();
+        if (type != prevType) {
+          if (type == NUM) {
+            Token newToken(type, atoi(currString.c_str()));
+            tokens_.push_back(newToken);
+          } else {
+            Token newToken(type);
+            tokens_.push_back(newToken);
+          }
+          currString = "";
+        }
+        prevChar = c;
+        prevType = type;
+      } else {
+        Token newToken(FAILED);
+        tokens_[0] = (newToken);
+        break;
+        // Return just one token that is null
+      }
     }
   }
-  bool operator!=(const Token &b) const {
-    if (this->type_ == NUM) {
-      if (this->type_ == b.type_ && this->val_ == b.val_)
-        return false;
-      else
-        return true;
-    } else {
-      if (this->type_ == b.type_)
-        return false;
-      else
-        return true;
+  
+  Type ExtractType(const char testChar) {
+    if (isdigit(testChar))
+      return NUM;
+    switch (testChar) {
+    case '(': {
+      return OPEN_PAREN;
+    }
+    case ')': {
+      return CLOSE_PAREN;
+    }
+    case '+': {
+      return ADD_OP;
+    }
+    case '-': {
+      return SUB_OP;
+    }
+    case '*': {
+      return MUL_OP;
+    }
+    case '/': {
+      return DIV_OP;
+    }
+    default: { return FAILED; }
     }
   }
   // Debug function
   void print();
 
-  void print();
-
-  // Getter functions
-  Type type() const { return type_; }
-  int val() const {
-    ASSERT(type_ == Type::NUM, "Only integer tokens have value");
-    return val_;
-  }
-
-private:
-  Type type_;
-  // Default value is set to 0 for non-integer scores
-  int val_;
-  // TODO add token position in constructor
-  std::pair<int, int> tokenPos_; // line number, character number
-};
-
-class Tokenizer {
-public:
-  explicit Tokenizer(std::string program);
-  std::vector<Token> Tokenize(std::string program);
-
-  std::string program() const { return program_; }
+  std::string program() const { return input_program_; }
   std::vector<Token> tokens() const { return tokens_; }
 
-private:
-  std::string program_;
+ private:
+  // Input to tokenizer is a file containing a program
+  std::string input_program_;
+  // Tokenizer takes the program and results in a list of Tokens
   std::vector<Token> tokens_;
   int errorPos_;
   int errorLine_;

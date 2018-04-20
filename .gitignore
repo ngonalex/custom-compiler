@@ -1,4 +1,5 @@
 bazel-*
 .DS_Store
-/team-influx
 .idea/
+.vscode
+/team-influx
