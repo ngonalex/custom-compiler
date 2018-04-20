@@ -27,42 +27,40 @@ void CodeGen::Generate(std::vector<struct ThreeAddressCode*> blocks) {
     ThreeAddressCode* code = blocks[i];
     std::string OpCode = code->op;
     if (OpCode == "load") {
+      // outfile_ << "\t#Storing " + code->arg1 + " into rcx" << std::endl;
       outfile_ << "\tmov $" + code-> arg1 + ", %rcx" << std::endl;
-      
-      // Temporary solution to limited mem locations, keep track of 
-      // where we're storing
       outfile_ << "\tpush %rcx" << std::endl;
 
     } else if (OpCode == "+") {
         // Load arg1,arg2 then add them into target
-        outfile_ << "\tpop %rbx" << std::endl; // ebx = right 
-        outfile_ << "\tpop %rax" << std::endl; // eax = left
+        // outfile_ << "\t#Adding << std::endl;
+        outfile_ << "\tpop %rbx" << std::endl;  // rbx = right
+        outfile_ << "\tpop %rax" << std::endl;  // rax = left
         ClearRegister("rcx");
-        outfile_ << "\tadd %rax, %rcx\nadd %rbx, %rcx" << std::endl; 
+        outfile_ << "\tadd %rax, %rcx\nadd %rbx, %rcx" << std::endl;
         outfile_ << "\tpush %rcx" << std::endl;
 
     } else if (OpCode == "-") {
         // Load arg1,arg2 then add them into target
-        outfile_ << "\tpop %rax" << std::endl; // ebx = right 
-        outfile_ << "\tpop %rcx" << std::endl; // eax = left
-        outfile_ << "\tsub %rax, %rcx" << std::endl; 
+        outfile_ << "\tpop %rax" << std::endl;  // rbx = right
+        outfile_ << "\tpop %rcx" << std::endl;  // rax = left
+        outfile_ << "\tsub %rax, %rcx" << std::endl;
         outfile_ << "\tpush %rcx" << std::endl;
     } else if (OpCode == "*") {
-        outfile_ << "\tpop %rbx" << std::endl; // ebx = right 
-        outfile_ << "\tpop %rcx" << std::endl; // ecx = left
-        outfile_ << "\timul %rbx, %rcx" << std::endl; 
+        outfile_ << "\tpop %rbx" << std::endl;  // rbx = right
+        outfile_ << "\tpop %rcx" << std::endl;  // rcx = left
+        outfile_ << "\timul %rbx, %rcx" << std::endl;
         outfile_ << "\tpush %rcx" << std::endl;
     } else if (OpCode == "/") {
-        // Load dividend (arg1) into %eax (Do we need to clear out %edx?)
+        // Load dividend (arg1) into %rax
         ClearRegister("rdx");
         outfile_ << "\tpop %rbx" << std::endl;
         outfile_ << "\tpop %rax" << std::endl;
-        outfile_ << "\tcqto" << std::endl; // indicating its a signed division 
+        outfile_ << "\tcqto" << std::endl;  // indicating its a signed division
         outfile_ << "\tidiv %rbx" << std::endl;
         outfile_ << "\tpush %rax" << std::endl;
     }
   }
-
 }
 
 }  // namespace backend

@@ -22,7 +22,7 @@ class CodeGen {
     void GenerateBoiler();
  private:
   std::ofstream& outfile_;
-  std::map<std::string,int> memorymap_;
+  std::map<std::string, int> memorymap_;
 };
 
 }  // namespace backend
