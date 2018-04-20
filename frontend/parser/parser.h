@@ -6,52 +6,25 @@
 
 namespace cs160 {
 namespace frontend {
-  // 3 + 5 -- sure
-  // 3 * 5 + 8
-  /*
-        +
-    *        8
-  3   5  
   
-    E -> E + T | E - T | T
-    T -> T * F | T / F | F
-    F -> ( E ) | Num
-    
-    ParseState parseInt(ParseState p, int current);
-    ParseState matchChar(ParseState, char current);
-    
-    ParseState expect(ParseState p) {
-      if(!p.isSuccess()) {
-        throw 
-      }
-    }
-      
-  */
-  
-  enum State { ACCEPTING, REJECTED };
-  // Can return an error state or an accepting state for the current branch
-  // If it's an error state, then try a new branch, otherwise continue evaluation
-  class ParseState {
-    public:
-      Token left;
-      Token middle;
-      Token right;
-      State state;
-  };
-    
   class Parser {
     public:
-      Parser(std::vector<Token> program);
+      Parser(std::vector<Token> program) {
+        program_ = program;
+      }
       
-      // location is the current vector location
-      ParseState* parseInt(ParseState *p, int location);
-      ParseState* parseOperator(ParseState *p, int location);
-      ParseState* parseParen(ParseState *p, int location);
-      int start();
+      // Subroutines
+      Type Next();
+      void Consume();
+      void Error();
+      void Expect(Token token);
+      void Erecognizer();
+      void E();
+      void P();
       
+    // Tokens will now be in reverse order!
     private:
-      std::vector<ParseState> state_stack;
-      std::vector<Token> program;
+      std::vector<Token> program_;
   };
   
   
