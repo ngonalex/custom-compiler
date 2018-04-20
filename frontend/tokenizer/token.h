@@ -23,6 +23,8 @@ class Token {
 
   // check if two Tokens are equal
   bool operator==(const Token &b) const {
+    return (*this == b);
+    /*
     if (this->type_ == NUM) {
       if (this->type_ == b.type_ && this->val_ == b.val_)
         return true;
@@ -33,7 +35,7 @@ class Token {
         return true;
       else
         return false;
-    }
+    }*/
   }
 
   // Ben's Suggestion
@@ -44,11 +46,11 @@ class Token {
   void Print() {
     switch (this->type_) {
     case NUM:
-      printf("Type: NUM\n");
-      printf("\tValue: %i\n", this->val_);
+      std::cout << "Type: NUM\n" << std::endl;
+      std::cout << "\tValue: " << this->val_ << "\n" << std::endl;
       break;
     default:
-      printf("Type: %d\n", this->type_);
+      std::cout << "Type: " << this->type_ << "\n" << std::endl;
       break;
     }
   }
@@ -62,7 +64,9 @@ class Token {
   }
 
  private:
+  // Types of token listed in the Token class
   Type type_;
+  // Only integer has value
   int val_;
   std::pair<int, int> tokenPos_;
 
