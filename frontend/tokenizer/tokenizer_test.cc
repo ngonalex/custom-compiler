@@ -65,6 +65,6 @@ TEST(Tokenizer, UnexpectedToken) {
   Tokenizer lexer("5 + x");
   std::vector<Token> tokens;
   tokens.push_back(Token(FAILED));
-  
+
   EXPECT_EQ(lexer.tokens()[0],tokens[0]);
 }
