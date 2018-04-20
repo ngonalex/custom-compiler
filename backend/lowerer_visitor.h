@@ -43,16 +43,26 @@ struct ThreeAddressCode {
   struct ThreeAddressCode* prev;
 };
 
-// For ThreeAddressCodes, arg1/arg2 can be a VirtualRegister or a Int
-class VirtualRegister {
-  explicit VirtualRegister(std::string name) : name_(name) {}
+// For ThreeAddressCodes, arg1/arg2 can be a Register or an Int
+class Register {
+ public: 
+  explicit Register(std::string name) : name_(name) {}
 
  private:
   std::string name_;
 };
 
 class Operand {
-  explicit Operand(Type type) : opcode_(type) {}
+ public:
+  explicit Operand(type) : opcode_(type) {}
+
+ private:
+  Type opcode_;
+};
+
+class Opcode {
+ public: 
+  explicit Opcode(Type type) : opcode_(type) {}
 
  private:
   Type opcode_;
