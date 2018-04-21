@@ -16,7 +16,7 @@ enum Type {
 };
 
 class Register {
- public: 
+ public:
   explicit Register(std::string name) : name_(name) {}
 
   std::string name() const {return name_;}
@@ -30,10 +30,10 @@ class Register {
 class Operand {
  public:
   explicit Operand(Register reg) : reg_(reg), value_(0) {
-    //ASSERT (Registers can't have values )
+    // ASSERT (Registers can't have values )
   }
   explicit Operand(int value) : reg_(Register("")), value_(value) {
-    //ASSERT (only ints can have values)
+    // ASSERT (only ints can have values)
   }
 
   Register reg() const {return reg_;}
@@ -45,12 +45,12 @@ class Operand {
 };
 
 class Opcode {
- public: 
+ public:
   explicit Opcode(Type type) : opcode_(type) {}
 
   Type opcode() const {return opcode_;}
 
-  bool operator !=( const Opcode &a) const {
+  bool operator !=(const Opcode &a) const {
     return !(this->opcode() == a.opcode());
   }
 
@@ -69,10 +69,12 @@ struct ThreeAddressCode {
 
   struct ThreeAddressCode* next;
   struct ThreeAddressCode* prev;
-  ThreeAddressCode() : target(Register("")), op(NONE), arg1(Operand(0)), arg2(Operand(0)) {}
+  ThreeAddressCode() : target(Register("")), op(NONE),
+    arg1(Operand(0)), arg2(Operand(0)) {}
 };
 
 }  // namespace backend
 }  // namespace cs160
 
-#endif  // BACKEND_IR_H
+#endif  // BACKEND_IR_H_
+

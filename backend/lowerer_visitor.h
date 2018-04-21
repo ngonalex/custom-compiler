@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-//#include "utility/assert.h"
+// #include "utility/assert.h"
 #include "abstract_syntax/abstract_syntax.h"
 #include "backend/ir.h"
 
@@ -28,7 +28,7 @@ class LowererVisitor : public AstVisitor {
   const std::string GetOutput() const;
   void VisitIntegerExpr(const IntegerExpr& exp);
   void VisitBinaryOperatorExpr(const BinaryOperatorExpr& exp) {}
-  void VisitAddExpr(const AddExpr& exp) ;
+  void VisitAddExpr(const AddExpr& exp);
   void VisitSubtractExpr(const SubtractExpr& exp);
   void VisitMultiplyExpr(const MultiplyExpr& exp);
   void VisitDivideExpr(const DivideExpr& exp);

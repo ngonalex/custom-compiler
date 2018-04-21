@@ -12,13 +12,16 @@ const std::string LowererVisitor::GetOutput() const {
 
   for (unsigned int i = 0; i < blocks_.size(); ++i) {
     if (blocks_[i]->arg1.reg().name() == "") {
-      output = output + blocks_[i]->target.name() + " <- " + std::to_string(blocks_[i]->arg1.value());
+      output = output + blocks_[i]->target.name()
+        + " <- " + std::to_string(blocks_[i]->arg1.value());
     } else {
-        output = output + blocks_[i]->target.name() + " <- " + blocks_[i]->arg2.reg().name();
+        output = output + blocks_[i]->target.name()
+          + " <- " + blocks_[i]->arg2.reg().name();
     }
 
     if (blocks_[i]->op != Opcode(LOAD)) {
-      output = output + " " + printhelper[blocks_[i]->op.opcode()] + " " + blocks_[i]->arg2.reg().name();
+      output = output + " " + printhelper[blocks_[i]->op.opcode()]
+        + " " + blocks_[i]->arg2.reg().name();
     }
 
     output = output + "\n";
