@@ -54,6 +54,17 @@ class Token {
       break;
     }
   }
+  
+  // Helper functions for the parser
+  bool isOperator() {
+    return (this->type() == Type::NUM);
+  }
+  
+  bool isNumber() {
+    Type current_type = this->type();
+    return (current_type == Type::MUL_OP || current_type == Type::DIV_OP || 
+      current_type == Type::ADD_OP || current_type == Type::SUB_OP);
+  }
 
   // Getter functions
   Type type() const { return type_; }
