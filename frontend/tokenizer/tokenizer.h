@@ -22,21 +22,21 @@ class Tokenizer {
  public:
   explicit Tokenizer(std::string program) : input_program_(program) {
     char prevChar;
-    Type prevType = NONE;
+    Token::Type prevType = Token::NONE;
     std::string currString;
 
     for (char &c : input_program_) {
       if (c == ' ')
         continue;
-      Type type = ExtractType(c);
-      if (type != FAILED) {
+      Token::Type type = ExtractType(c);
+      if (type != Token::FAILED) {
         std::stringstream currStringStream;
         currStringStream << currString;
         currStringStream << c;
 
         currString = currStringStream.str();
         if (type != prevType) {
-          if (type == NUM) {
+          if (type == Token::NUM) {
             Token newToken(type, atoi(currString.c_str()));
             tokens_.push_back(newToken);
           } else {
@@ -48,7 +48,7 @@ class Tokenizer {
         prevChar = c;
         prevType = type;
       } else {
-        Token newToken(FAILED);
+        Token newToken(Token::FAILED);
         tokens_[0] = (newToken);
         break;
         // Return just one token that is null
@@ -56,29 +56,29 @@ class Tokenizer {
     }
   }
 
-  Type ExtractType(const char testChar) {
+  Token::Type ExtractType(const char testChar) {
     if (isdigit(testChar))
-      return NUM;
+      return Token::NUM;
     switch (testChar) {
     case '(': {
-      return OPEN_PAREN;
+      return Token::OPEN_PAREN;
     }
     case ')': {
-      return CLOSE_PAREN;
+      return Token::CLOSE_PAREN;
     }
     case '+': {
-      return ADD_OP;
+      return Token::ADD_OP;
     }
     case '-': {
-      return SUB_OP;
+      return Token::SUB_OP;
     }
     case '*': {
-      return MUL_OP;
+      return Token::MUL_OP;
     }
     case '/': {
-      return DIV_OP;
+      return Token::DIV_OP;
     }
-    default: { return FAILED; }
+    default: { return Token::FAILED; }
     }
   }
 
@@ -90,7 +90,9 @@ class Tokenizer {
   std::string input_program_;
   // Tokenizer takes the program and results in a list of Tokens
   std::vector<Token> tokens_;
+  // Character that error occured (offset by # of characters)
   int errorPos_;
+  // Line number that error occured (offset by # of \n)
   int errorLine_;
 };
 
