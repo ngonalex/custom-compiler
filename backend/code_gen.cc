@@ -11,15 +11,14 @@ void CodeGen::GenerateDumbTest() {
 
   outfile_<< "print:" << std::endl;
   outfile_<< "\tmov $1, %rax" << std::endl;
-  outfile_<< "\tmov $1, %rdi" << std::endl; 
-  outfile_<< "\tmov $message, %rsi" << std::endl; 
+  outfile_<< "\tmov $1, %rdi" << std::endl;
+  outfile_<< "\tmov $message, %rsi" << std::endl;
   outfile_<< "\tmov $13, %rdx" << std::endl;
   outfile_<< "\tsyscall" << std::endl;
 
   outfile_ << "\tmov $60, %rax\n\txor %rdi, %rdi\n\tsyscall" << std::endl;
   outfile_<< "message:" << std::endl;
   outfile_ << "\t .ascii \"Hello, world\\n\"" << std::endl;
-
 }
 
 void CodeGen::GenerateEpilogue() {
@@ -37,7 +36,8 @@ void CodeGen::ClearRegister(std::string reg) {
   outfile_ << "\txor %" + reg + ", %" + reg << std::endl;
 }
 
-void CodeGen::Generate(std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks) {
+void CodeGen::Generate(std::vector
+  <std::unique_ptr<struct ThreeAddressCode>> blocks) {
   // boiler code here
 
   // IR to assembly inst
@@ -46,7 +46,8 @@ void CodeGen::Generate(std::vector<std::unique_ptr<struct ThreeAddressCode>> blo
     Opcode opcode = code->op;
     if (printhelper[opcode.opcode()] == "load") {
       // outfile_ << "\t#Storing " + code->arg1 + " into rcx" << std::endl;
-      outfile_ << "\tmov $" + std::to_string(code->arg1.value()) + ", %rcx" << std::endl;
+      outfile_ << "\tmov $" + std::to_string(code->arg1.value())
+        + ", %rcx" << std::endl;
       outfile_ << "\tpush %rcx" << std::endl;
 
     } else if (printhelper[opcode.opcode()] == "+") {

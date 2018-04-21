@@ -1,11 +1,10 @@
+#include "backend/interpreter_visitor.h"
 
 #include <stack>
 
-#include "gtest/gtest.h"
 #include "abstract_syntax/abstract_syntax.h"
-#include "backend/interpreter_visitor.h"
 #include "utility/memory.h"
-
+#include "gtest/gtest.h"
 
 using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::IntegerExpr;

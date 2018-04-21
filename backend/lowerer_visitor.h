@@ -7,6 +7,7 @@
 // #include "utility/assert.h"
 #include "abstract_syntax/abstract_syntax.h"
 #include "backend/ir.h"
+#include "utility/memory.h"
 
 using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::IntegerExpr;

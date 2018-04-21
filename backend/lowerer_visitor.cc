@@ -11,14 +11,17 @@ const std::string LowererVisitor::GetOutput() const {
   std::vector<std::string> printhelper = {"load", "+", "-", "*", "/"};
 
   for (unsigned int i = 0; i < blocks_.size(); ++i) {
+    // If it's a just a int (Register without a name then access it's value)
+    // Otherwise access its name
     if (blocks_[i]->arg1.reg().name() == "") {
       output = output + blocks_[i]->target.name()
         + " <- " + std::to_string(blocks_[i]->arg1.value());
     } else {
         output = output + blocks_[i]->target.name()
-          + " <- " + blocks_[i]->arg2.reg().name();
+          + " <- " + blocks_[i]->arg1.reg().name();
     }
 
+    // If it's an arithmetic expr (not a load) then get the 2nd arg as well
     if (blocks_[i]->op != Opcode(LOAD)) {
       output = output + " " + printhelper[blocks_[i]->op.opcode()]
         + " " + blocks_[i]->arg2.reg().name();
