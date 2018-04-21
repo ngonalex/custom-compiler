@@ -28,8 +28,8 @@ class Token {
 
   // Ben's Suggestion
   bool operator!=(const Token &b) const {
-    //return !(*this == b);
-    if (this->type_ == NUM) {
+    return !(*this == b);
+    /*if (this->type_ == NUM) {
       if (this->type_ == b.type_ && this->val_ == b.val_)
         return true;
       else
@@ -39,7 +39,7 @@ class Token {
         return true;
       else
         return false;
-    }
+    }*/
   }
 
   void Print() {
@@ -53,15 +53,15 @@ class Token {
       break;
     }
   }
-  
+
   // Helper functions for the parser
   bool isOperator() {
     return (this->type() == Type::NUM);
   }
-  
+
   bool isNumber() {
     Type current_type = this->type();
-    return (current_type == Type::MUL_OP || current_type == Type::DIV_OP || 
+    return (current_type == Type::MUL_OP || current_type == Type::DIV_OP ||
       current_type == Type::ADD_OP || current_type == Type::SUB_OP);
   }
 
