@@ -23,13 +23,7 @@ class Token {
 
   // check if two Tokens are equal
   bool operator==(const Token &b) const {
-    return (*this == b);
-  }
-
-  // Ben's Suggestion
-  bool operator!=(const Token &b) const {
-    return !(*this == b);
-    /*if (this->type_ == NUM) {
+    if (this->type_ == NUM) {
       if (this->type_ == b.type_ && this->val_ == b.val_)
         return true;
       else
@@ -39,7 +33,24 @@ class Token {
         return true;
       else
         return false;
-    }*/
+    }
+  }
+
+  // Ben's Suggestion
+  bool operator!=(const Token &b) const {
+    //return !(*this == b);
+    if (this->type_ == NUM) {
+      //return !(*this == b);
+      if (this->type_ == b.type_ && this->val_ == b.val_)
+        return false;
+      else
+        return true;
+    } else {
+      if (this->type_ == b.type_)
+        return false;
+      else
+        return true;
+    }
   }
 
   void Print() {
