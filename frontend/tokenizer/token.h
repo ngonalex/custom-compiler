@@ -38,9 +38,7 @@ class Token {
 
   // Ben's Suggestion
   bool operator!=(const Token &b) const {
-    //return !(*this == b);
     if (this->type_ == NUM) {
-      //return !(*this == b);
       if (this->type_ == b.type_ && this->val_ == b.val_)
         return false;
       else
