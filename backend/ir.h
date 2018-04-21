@@ -3,6 +3,9 @@
 
 #include <string>
 
+namespace cs160 {
+namespace backend {
+
 enum Type {
   LOAD,
   ADD,
@@ -67,4 +70,8 @@ struct ThreeAddressCode {
   struct ThreeAddressCode* prev;
   ThreeAddressCode() : target(Register("")), op(NONE), arg1(Operand(0)), arg2(Operand(0)) {}
 };
+
+}  // namespace backend
+}  // namespace cs160
+
 #endif  // BACKEND_IR_H
