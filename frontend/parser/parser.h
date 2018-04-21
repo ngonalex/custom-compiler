@@ -18,51 +18,51 @@ using cs160::abstract_syntax::frontend::SubtractExpr;
 using cs160::abstract_syntax::frontend::MultiplyExpr;
 using cs160::abstract_syntax::frontend::DivideExpr;
 using cs160::abstract_syntax::frontend::BinaryOperatorExpr;
-using cs160::frontend::InterpreterVisitor;
+//using cs160::abstract_syntax::frontend::InterpreterVisitor;
 using cs160::make_unique;
 
 namespace cs160 {
 namespace frontend {
-  
+
 class Parser {
  public:
   // Must pass tokens program into Parser, even it it is just Type::END
   explicit Parser(std::vector<Token> program) : program_(program) {
     ASSERT(program.size() != 0, "Program cannot be empty tokens");
   }
-  
+
   /** Subroutines **/
-  // Returns the type of the token in the 'front' of the program_ 
-  Type Next() { return program_.back().type(); }
+  // Returns the type of the token in the 'front' of the program_
+  Token::Type Next() { return program_.back().type(); }
   // Removes a token from the program_ vector
-  void Consume() { program_.pop_back() }; 
+  void Consume() { program_.pop_back(); };
   // Prints an error message with information of current token
   void Error() {
     std::cout << "Error" << std::endl;
   }
   // Consume Token if proper type, otherwise error
-  void Expect(Type type) { Next() == type ? Consume() : Error(); }
+  void Expect(Token::Type type) { Next() == type ? Consume() : Error(); }
 
-  
+
   /** Grammar stepthrough **/
   void Recognizer() {
     E();
-    Expect(Type::END);
+    Expect(Token::Type::END);
   }
-  
+
   auto mkNode(Token op, auto first_leaf, auto second_leaf) {
     ASSERT(op.isOperator(), Error());
     switch(op.type()) {
-      case Type::ADD_OP: {
+      case Token::Type::ADD_OP: {
         return make_unique<AddExpr>(first_leaf, second_leaf);
       }
-      case Type::SUB_OP: {
+      case Token::Type::SUB_OP: {
         return make_unique<SubtractExpr>(first_leaf, second_leaf);
       }
-      case Type::MUL_OP: {
+      case Token::Type::MUL_OP: {
         return make_unique<MultiplyExpr>(first_leaf, second_leaf);
       }
-      case Type::DIV_OP: {
+      case Token::Type::DIV_OP: {
         return make_unique<DivideExpr>(first_leaf, second_leaf);
       }
     }
@@ -77,13 +77,13 @@ class Parser {
   // every 't' is supposed to be a Tree
   auto Eparser() {
     auto t = E();
-    Expect(Type::END);
+    Expect(Token::Type::END);
     return t;
   }
 
   auto E() {
     auto t = T();
-    while (Next() == Type::ADD_OP || Next() == Type::SUB_OP) {
+    while (Next() == Token::Type::ADD_OP || Next() == Token::Type::SUB_OP) {
       const auto op = Next();
       Consume();
       const auto t1 = T();
@@ -94,7 +94,7 @@ class Parser {
 
   auto T() {
     auto t = P();
-    while (Next() == Type::MUL_OP || Next() == Type::DIV_OP) {
+    while (Next() == Token::Type::MUL_OP || Next() == Token::Type::DIV_OP) {
       const auto op = Next();
       Consume();
       const auto t1 = P();
@@ -104,28 +104,28 @@ class Parser {
   }
 
   auto P() {
-    if (Next() == Type::NUM) {
+    if (Next() == Token::Type::NUM) {
       auto t = mkLeaf(program_.back().val());
       Consume();
       return t;
-    } else if (Next() == Type::OPEN_PAREN) {
+    } else if (Next() == Token::Type::OPEN_PAREN) {
       Consume();
       auto t = E();
-      Expect(Type::CLOSE_PAREN)
+      Expect(Token::Type::CLOSE_PAREN);
       return t;
     } else {
       Error();
     }
   }
-  
+
 // Tokens will now be in reverse order!
  private:
   // Output from the lexer
   std::vector<Token> program_;
-  
+
 };
-  
-  
+
+
 } // namespace frontend
 } // namespace cs160
 
