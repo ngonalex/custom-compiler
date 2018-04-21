@@ -2,7 +2,7 @@ cc_library(
 	name = "token",
 	copts = ["-Wall -g"],
 	hdrs = ["token.h"],
-  srcs = ["token.cc"],
+	srcs = ["token.cc"],
 	deps = ["//utility"],
 	visibility = ["//visibility:public"],
 )
@@ -11,7 +11,7 @@ cc_library(
 	name = "tokenizer",
 	copts = ["-Wall -g"],
 	hdrs = ["tokenizer.h"],
-  srcs = ["tokenizer.cc"],
+	srcs = ["tokenizer.cc"],
 	deps = ["//utility", ":token"],
 	visibility = ["//visibility:public"],
 )

@@ -25,13 +25,9 @@ class Tokenizer {
 
   Token::Type ExtractType(const char testChar);
 
-  std::string program() const {
-    return input_program_;
-  }
+  std::string program() const { return input_program_; }
 
-  std::vector<Token> tokens() const {
-    return tokens_;
-  }
+  std::vector<Token> tokens() const { return tokens_; }
 
  private:
   // Input to tokenizer is a file containing a program
