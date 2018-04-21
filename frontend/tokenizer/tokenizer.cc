@@ -1,8 +1,9 @@
 #include "frontend/tokenizer/tokenizer.h"
+#include <sstream>
 
 using namespace cs160::frontend;
 
-explicit Tokenizer::Tokenizer(std::string program) : input_program_(program) {
+Tokenizer::Tokenizer(std::string program) : input_program_(program) {
   char prevChar;
   Token::Type prevType = Token::NONE;
   std::string currString;
@@ -35,6 +36,10 @@ explicit Tokenizer::Tokenizer(std::string program) : input_program_(program) {
       break;
       // Return just one token that is null
     }
+  }
+  if(tokens_[0].type() != Token::FAILED) {
+    Token endToken(Token::END);
+    tokens_.push_back(endToken);
   }
 }
 
