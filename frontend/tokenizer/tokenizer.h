@@ -51,9 +51,9 @@ class Tokenizer {
         Token newToken(Token::FAILED);
         tokens_[0] = (newToken);
         break;
-        // Return just one token that is null
       }
     }
+    tokens_.push_back(Token(Token::END));
   }
 
   Token::Type ExtractType(const char testChar) {
