@@ -12,15 +12,15 @@ using cs160::abstract_syntax::frontend::SubtractExpr;
 using cs160::abstract_syntax::frontend::MultiplyExpr;
 using cs160::abstract_syntax::frontend::DivideExpr;
 using cs160::abstract_syntax::frontend::BinaryOperatorExpr;
-using cs160::frontend::InterpreterVisitor;
+//using cs160::abstract_syntax::frontend::InterpreterVisitor;
 using cs160::make_unique;
 
 TEST(ParserTest, CanEvaluateSimpleAdd) {
   // program vector: END, 3, MUL_OP, 6
-  Token firstToken(Type::NUM, 6);
-  Token secondToken(Type::MUL_OP);
-  Token thirdToken(Type::NUM, 3);
-  Token fourthToken(Type::END);
+  Token firstToken(Token::Type::NUM, 6);
+  Token secondToken(Token::Type::MUL_OP);
+  Token thirdToken(Token::Type::NUM, 3);
+  Token fourthToken(Token::Type::END);
   std::vector<Token> test_vector;
   test_vector.push_back(fourthToken);
   test_vector.push_back(thirdToken);
@@ -29,7 +29,6 @@ TEST(ParserTest, CanEvaluateSimpleAdd) {
 
   Parser parser(test_vector);
   auto result = parser.Eparser();
-  
-  EXPECT_EQ(VisitMultiplyExpr(result), "(* 3 6)");
 
+  EXPECT_EQ(VisitMultiplyExpr(result), "(* 3 6)");
 }
