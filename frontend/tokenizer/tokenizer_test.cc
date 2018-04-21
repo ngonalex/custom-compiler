@@ -10,12 +10,8 @@ TEST(Tokenizer, BasicAddTokenizer) {
   tokens.push_back(Token(Token::NUM, 3));
   tokens.push_back(Token(Token::ADD_OP));
   tokens.push_back(Token(Token::NUM, 3));
-  int i = 0;
-  // TODO make this expect_eq of two vectors not in a loop
-  for (Token a : lexer.tokens()) {
-    EXPECT_EQ(a, tokens[i]);
-    i++;
-  }
+
+  EXPECT_EQ(tokens, lexer.tokens());
 }
 
 TEST(Tokenizer, ComplexExpression) {
@@ -33,11 +29,7 @@ TEST(Tokenizer, ComplexExpression) {
   tokens.push_back(Token(Token::SUB_OP));
   tokens.push_back(Token(Token::NUM, 1));
 
-  int i = 0;
-  for (Token a : lexer.tokens()) {
-    EXPECT_EQ(a, tokens[i]);
-    i++;
-  }
+  EXPECT_EQ(tokens, lexer.tokens());
 }
 
 TEST(Tokenizer, WeirdSpacing) {
@@ -55,11 +47,7 @@ TEST(Tokenizer, WeirdSpacing) {
   tokens.push_back(Token(Token::SUB_OP));
   tokens.push_back(Token(Token::NUM, 1));
 
-  int i = 0;
-  for (Token a : lexer.tokens()) {
-    EXPECT_EQ(a, tokens[i]);
-    i++;
-  }
+  EXPECT_EQ(tokens, lexer.tokens());
 }
 
 TEST(Tokenizer, UnexpectedToken) {
