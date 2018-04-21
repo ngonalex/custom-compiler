@@ -3,7 +3,7 @@ cc_library(
 	name = "backend",
 	copts = ["-Wall -g"],
 	hdrs = ["lowerer_visitor.h","interpreter_visitor.h", "code_gen.h", "ir.h"],
-  srcs = ["code_gen.cc"],
+  srcs = ["code_gen.cc","lowerer_visitor.cc"],
 	deps = ["//utility:utility",
 		"//abstract_syntax:abstract_syntax",
   ],
@@ -23,6 +23,7 @@ cc_test(
 
 cc_binary(
     name = "backend_main",
+    copts = ["-Wall -g"],
     deps = [
         ":backend"
     ],

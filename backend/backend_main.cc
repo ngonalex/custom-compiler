@@ -28,7 +28,8 @@ int main() {
   CodeGen runner = CodeGen(file);
   auto test = lowerer_.GetIR();
   runner.GenerateBoiler();
-  runner.Generate(test);
-  runner.GenerateEpilogue();
+  runner.Generate(std::move(test));
+  // CHANGE TO GENERATEEPILOGUE LATER
+  runner.GenerateDumbTest();
   return 0;
 }

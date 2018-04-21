@@ -15,7 +15,6 @@ enum Type {
   NONE
 };
 
-// For ThreeAddressCodes, arg1/arg2 can be a Register or an Int
 class Register {
  public: 
   explicit Register(std::string name) : name_(name) {}
@@ -26,6 +25,8 @@ class Register {
   std::string name_;
 };
 
+// For ThreeAddressCodes, arg1/arg2 can be a Register or an Int
+// Look at this later, this probably can be designed much better
 class Operand {
  public:
   explicit Operand(Register reg) : reg_(reg), value_(0) {

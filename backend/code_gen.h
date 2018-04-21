@@ -20,6 +20,11 @@ class CodeGen {
     void GenerateEpilogue();
     void ClearRegister(std::string reg);
     void GenerateBoiler();
+
+    // REMOVE THIS LATER
+    void GenerateDumbTest();
+    // Have used this "helper twice now think about making it apart of a class later"
+    std::vector<std::string> printhelper = {"load", "+", "-", "*", "/"};
  private:
   std::ofstream& outfile_;
 };
