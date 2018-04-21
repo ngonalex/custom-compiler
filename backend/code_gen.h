@@ -16,13 +16,12 @@ namespace backend {
 class CodeGen {
  public:
     explicit CodeGen(std::ofstream &filename) : outfile_(filename) {}
-    void Generate(std::vector<struct ThreeAddressCode*> blocks);
+    void Generate(std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks);
     void GenerateEpilogue();
     void ClearRegister(std::string reg);
     void GenerateBoiler();
  private:
   std::ofstream& outfile_;
-  std::map<std::string, int> memorymap_;
 };
 
 }  // namespace backend

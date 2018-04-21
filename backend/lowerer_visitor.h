@@ -4,7 +4,9 @@
 #include <string>
 #include <vector>
 
+//#include "utility/assert.h"
 #include "abstract_syntax/abstract_syntax.h"
+#include "backend/ir.h"
 
 using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::IntegerExpr;
@@ -14,76 +16,30 @@ using cs160::abstract_syntax::backend::MultiplyExpr;
 using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::BinaryOperatorExpr;
 
-
 namespace cs160 {
 namespace backend {
 
 
-// Abstract .h implementations to a .cc file later
-
-enum Type {
-  LOAD,
-  ADD,
-  SUB,
-  MULT,
-  DIV
-};
-
-// Structure to hold a 3Address, Basically 1 block
-// Right now all of them are strings,
-// but in the future I think that target should be from a symbol table
-// and arg1/2 are either ints or from the symbol table
-struct ThreeAddressCode {
-  std::string target;
-  std::string op;
-  std::string arg1;
-  std::string arg2;
-
-  struct ThreeAddressCode* next;
-  struct ThreeAddressCode* prev;
-};
-
-// For ThreeAddressCodes, arg1/arg2 can be a Register or an Int
-class Register {
- public: 
-  explicit Register(std::string name) : name_(name) {}
-
- private:
-  std::string name_;
-};
-
-class Operand {
- public:
-  explicit Operand(type) : opcode_(type) {}
-
- private:
-  Type opcode_;
-};
-
-class Opcode {
- public: 
-  explicit Opcode(Type type) : opcode_(type) {}
-
- private:
-  Type opcode_;
-};
-
-class LowererVisitor : public AstVisitor{
+// Abstract ->h implementations to a ->cc file later
+class LowererVisitor : public AstVisitor {
  public:
   LowererVisitor() {}
   ~LowererVisitor() {}
 
-  std::vector<struct ThreeAddressCode*> blocks_;
-
   const std::string GetOutput() const {
     // Iterate through the vector and print out each basic block
     std::string output = "";
+    std::vector<std::string> printhelper = {"load", "+", "-", "*", "/"};
 
     for (unsigned int i = 0; i < blocks_.size(); ++i) {
-      output = output + blocks_[i]->target + " <- " + blocks_[i]->arg1;
+      if (blocks_[i]->arg1.reg().name() == "") {
+        output = output + blocks_[i]->target.name() + " <- " + std::to_string(blocks_[i]->arg1.value());
+      } else {
+          output = output + blocks_[i]->target.name() + " <- " + blocks_[i]->arg2.reg().name();
+      }
 
-      if (blocks_[i]->op != "load") {
-        output = output + " " + blocks_[i]->op + " " + blocks_[i]->arg2;
+      if (blocks_[i]->op != Opcode(LOAD)) {
+        output = output + " " + printhelper[blocks_[i]->op.opcode()] + " " + blocks_[i]->arg2.reg().name();
       }
 
       output = output + "\n";
@@ -94,16 +50,16 @@ class LowererVisitor : public AstVisitor{
 
   void VisitIntegerExpr(const IntegerExpr& exp) {
     // Load value into a target (t <- value)
-    ThreeAddressCode* newblock = new ThreeAddressCode();
+    auto newblock = make_unique<struct ThreeAddressCode>();
 
-    newblock->arg1 = std::to_string(exp.value());
-    newblock->op = "load";
+    newblock->arg1 = Operand(exp.value());
+    newblock->op = Opcode(LOAD);
 
     // look at this later,just going to do this now to test some things
-    newblock->target = "t_" + std::to_string(blocks_.size());
+    newblock->target = Register("t_" + std::to_string(blocks_.size()));
 
     // Push into vector
-    blocks_.push_back(newblock);
+    blocks_.push_back(std::move(newblock));
   }
 
   void VisitBinaryOperatorExpr(const BinaryOperatorExpr& exp) {
@@ -118,19 +74,18 @@ class LowererVisitor : public AstVisitor{
     // Last two elements of the vector should be the integers to load in
     int size = blocks_.size();
 
-    ThreeAddressCode* newblock = new ThreeAddressCode();
+    auto newblock = make_unique<struct ThreeAddressCode>();
 
-    newblock->arg1 = blocks_[leftindex-1]->target;
-    newblock->arg2 = blocks_[size-1]->target;
+    newblock->arg1 = Operand(blocks_[leftindex-1]->target);
+    newblock->arg2 = Operand(blocks_[size-1]->target);
 
-    newblock->op = "+";
+    newblock->op = Opcode(ADD);
     // look at this later, just going to do this now to test some things
-    newblock->target = "t_" + std::to_string(blocks_.size());
+    newblock->target = Register("t_" + std::to_string(blocks_.size()));
 
     // Push into vector
-    blocks_.push_back(newblock);
+    blocks_.push_back(std::move(newblock));
   }
-
 
   void VisitSubtractExpr(const SubtractExpr& exp) {
     // Visit left then right(eventually reaches the base case of Int)
@@ -143,16 +98,16 @@ class LowererVisitor : public AstVisitor{
     // Last two elements of the vector should be the integers to load in
     int size = blocks_.size();
 
-    ThreeAddressCode* newblock = new ThreeAddressCode();
+    auto newblock = make_unique<struct ThreeAddressCode>();
 
-    newblock->arg1 = blocks_[leftindex-1]->target;
-    newblock->arg2 = blocks_[size-1]->target;
-    newblock->op = "-";
+    newblock->arg1 = Operand(blocks_[leftindex-1]->target);
+    newblock->arg2 = Operand(blocks_[size-1]->target);
+    newblock->op = Opcode(SUB);
     // look at this later, just going to do this now to test some things
-    newblock->target = "t_" + std::to_string(blocks_.size());
+    newblock->target = Register("t_" + std::to_string(blocks_.size()));
 
     // Push into vector
-    blocks_.push_back(newblock);
+    blocks_.push_back(std::move(newblock));
   }
 
   void VisitMultiplyExpr(const MultiplyExpr& exp) {
@@ -166,16 +121,16 @@ class LowererVisitor : public AstVisitor{
     // Last two elements of the vector should be the integers to load in
     int size = blocks_.size();
 
-    ThreeAddressCode* newblock = new ThreeAddressCode();
+    auto newblock = make_unique<struct ThreeAddressCode>();
 
-    newblock->arg1 = blocks_[leftindex-1]->target;
-    newblock->arg2 = blocks_[size-1]->target;
-    newblock->op = "*";
+    newblock->arg1 = Operand(blocks_[leftindex-1]->target);
+    newblock->arg2 = Operand(blocks_[size-1]->target);
+    newblock->op = Opcode(MULT);
     // look at this later, just going to do this now to test some things
-    newblock->target = "t_" + std::to_string(blocks_.size());
+    newblock->target = Register("t_" + std::to_string(blocks_.size()));
 
     // Push into vector
-    blocks_.push_back(newblock);
+    blocks_.push_back(std::move(newblock));
   }
 
   void VisitDivideExpr(const DivideExpr& exp) {
@@ -189,21 +144,24 @@ class LowererVisitor : public AstVisitor{
     // Last two elements of the vector should be the integers to load in
     int size = blocks_.size();
 
-    ThreeAddressCode* newblock = new ThreeAddressCode();
+    auto newblock = make_unique<struct ThreeAddressCode>();
 
-    newblock->arg1 = blocks_[leftindex-1]->target;
-    newblock->arg2 = blocks_[size-1]->target;
-    newblock->op = "/";
+    newblock->arg1 = Operand(blocks_[leftindex-1]->target);
+    newblock->arg2 = Operand(blocks_[size-1]->target);
+    newblock->op = Opcode(DIV);
     // look at this later, just going to do this now to test some things
-    newblock->target = "t_" + std::to_string(blocks_.size());
+    newblock->target = Register("t_" + std::to_string(blocks_.size()));
 
     // Push into vector
-    blocks_.push_back(newblock);
+    blocks_.push_back(std::move(newblock));
   }
 
-  std::vector<struct ThreeAddressCode*> GetIR() {
-    return blocks_;
+  std::vector<std::unique_ptr<struct ThreeAddressCode>> GetIR() {
+    return std::move(blocks_);
   }
+
+ private:
+  std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks_;
 };
 
 }  // namespace backend
