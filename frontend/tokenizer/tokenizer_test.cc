@@ -10,7 +10,8 @@ TEST(Tokenizer, BasicAddTokenizer) {
   tokens.push_back(Token(Token::NUM, 3));
   tokens.push_back(Token(Token::ADD_OP));
   tokens.push_back(Token(Token::NUM, 3));
-
+  tokens.push_back(Token(Token::END));
+    
   EXPECT_EQ(tokens, lexer.tokens());
 }
 
@@ -28,7 +29,8 @@ TEST(Tokenizer, ComplexExpression) {
   tokens.push_back(Token(Token::NUM, 2));
   tokens.push_back(Token(Token::SUB_OP));
   tokens.push_back(Token(Token::NUM, 1));
-
+  tokens.push_back(Token(Token::END));
+  
   EXPECT_EQ(tokens, lexer.tokens());
 }
 
@@ -46,6 +48,7 @@ TEST(Tokenizer, WeirdSpacing) {
   tokens.push_back(Token(Token::NUM, 2));
   tokens.push_back(Token(Token::SUB_OP));
   tokens.push_back(Token(Token::NUM, 1));
+  tokens.push_back(Token(Token::END));
 
   EXPECT_EQ(tokens, lexer.tokens());
 }
