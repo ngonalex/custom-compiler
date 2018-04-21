@@ -55,7 +55,7 @@ class Tokenizer {
       }
     }
   }
-  
+
   Type ExtractType(const char testChar) {
     if (isdigit(testChar))
       return NUM;
