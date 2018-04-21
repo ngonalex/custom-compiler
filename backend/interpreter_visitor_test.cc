@@ -1,10 +1,10 @@
-#include "abstract_syntax/abstract_syntax.h"
+#include "backend/interpreter_visitor.h"
 
 #include <stack>
 
-#include "gtest/gtest.h"
-#include "backend/interpreter_visitor.h"
+#include "abstract_syntax/abstract_syntax.h"
 #include "utility/memory.h"
+#include "gtest/gtest.h"
 
 using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::IntegerExpr;
@@ -77,8 +77,7 @@ TEST_F(InterpreterTest, NestedVisitationsWorkProperly_2) {
         cs160::make_unique<AddExpr>(make_unique<IntegerExpr>(7),
                              make_unique<IntegerExpr>(5)),
         cs160::make_unique<SubtractExpr>(make_unique<IntegerExpr>(2),
-                                  make_unique<IntegerExpr>(1)))
-  );
+                                  make_unique<IntegerExpr>(1))));
   expr->Visit(&interpreter_);
   EXPECT_EQ(interpreter_.GetOutput(), 144);
 }

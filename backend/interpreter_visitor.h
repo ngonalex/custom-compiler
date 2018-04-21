@@ -1,9 +1,9 @@
 #ifndef BACKEND_INTERPRETER_VISITOR_H_
 #define BACKEND_INTERPRETER_VISITOR_H_
 
-#include "abstract_syntax/abstract_syntax.h"
-
 #include <stack>
+
+#include "abstract_syntax/abstract_syntax.h"
 
 using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::IntegerExpr;
