@@ -2,7 +2,7 @@
 cc_library(
 	name = "backend",
 	copts = ["-Wall -g"],
-	hdrs = ["lowerer_visitor.h","interpreter_visitor.h", "code_gen.h"],
+	hdrs = ["lowerer_visitor.h","interpreter_visitor.h", "code_gen.h", "ir.h"],
   srcs = ["code_gen.cc"],
 	deps = ["//utility:utility",
 		"//abstract_syntax:abstract_syntax",
