@@ -1,6 +1,5 @@
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/parser/parser.h"
-#include "frontend/tokenizer/tokenizer.h"
 #include "frontend/tokenizer/token.h"
 
 #include "gtest/gtest.h"

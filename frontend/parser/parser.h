@@ -3,7 +3,6 @@
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/tokenizer/token.h"
-#include "frontend/tokenizer/tokenizer.h"
 
 #include <sstream>
 #include <iostream>
