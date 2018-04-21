@@ -2,7 +2,7 @@
 
 using namespace cs160::frontend;
 
-explicit Tokenizer::Tokenizer(std::string program) : input_program_(program) {
+Tokenizer::Tokenizer(std::string program) : input_program_(program) {
   char prevChar;
   Token::Type prevType = Token::NONE;
   std::string currString;
@@ -36,6 +36,7 @@ explicit Tokenizer::Tokenizer(std::string program) : input_program_(program) {
       // Return just one token that is null
     }
   }
+  tokens_.push_back(Token(Token::END));
 }
 
 Token::Type Tokenizer::ExtractType(const char testChar) {
