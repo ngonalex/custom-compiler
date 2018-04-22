@@ -1,10 +1,11 @@
-#include "abstract_syntax/abstract_syntax.h"
+#include "backend/lowerer_visitor.h"
 
 #include <vector>
+#include <string>
 
-#include "gtest/gtest.h"
-#include "backend/lowerer_visitor.h"
+#include "abstract_syntax/abstract_syntax.h"
 #include "utility/memory.h"
+#include "gtest/gtest.h"
 
 using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::IntegerExpr;
@@ -98,5 +99,7 @@ TEST_F(LowererTest, NestedVisitationsWorkProperly) {
   // t_4 <- 1
   // t_5 <- t_3 - t_4
   // t_6 <- t_2 / t_5
-  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 7\nt_1 <- 5\nt_2 <- t_0 + t_1\nt_3 <- 2\nt_4 <- 1\nt_5 <- t_3 - t_4\nt_6 <- t_2 / t_5\n");
+  std::string output = "t_0 <- 7\nt_1 <- 5\nt_2 <- t_0 + t_1\n"
+    "t_3 <- 2\nt_4 <- 1\nt_5 <- t_3 - t_4\nt_6 <- t_2 / t_5\n";
+  EXPECT_EQ(lowerer_.GetOutput(), output);
 }
