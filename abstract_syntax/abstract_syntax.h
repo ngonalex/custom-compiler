@@ -3,6 +3,7 @@
 
 #include "abstract_syntax/abstract_syntax_tree_v1.h"
 #include "abstract_syntax/abstract_syntax_tree_v2.h"
+#include "abstract_syntax/abstract_syntax_tree_v3.h"
 
 namespace cs160 {
 namespace abstract_syntax {

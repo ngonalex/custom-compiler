@@ -20,12 +20,11 @@ using cs160::abstract_syntax::backend::BinaryOperatorExpr;
 namespace cs160 {
 namespace backend {
 
-// Abstract ->h implementations to a ->cc file later
 class LowererVisitor : public AstVisitor {
  public:
   LowererVisitor() {}
   ~LowererVisitor() {}
-
+  
   const std::string GetOutput() const;
   void VisitIntegerExpr(const IntegerExpr& exp);
   void VisitBinaryOperatorExpr(const BinaryOperatorExpr& exp) {}

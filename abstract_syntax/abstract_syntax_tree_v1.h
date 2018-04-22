@@ -13,9 +13,6 @@
 #ifndef ABSTRACT_SYNTAX_ABSTRACT_SYNTAX_TREE_V1_H_
 #define ABSTRACT_SYNTAX_ABSTRACT_SYNTAX_TREE_V1_H_
 
-#include <memory>
-#include <stack>
-
 #include "utility/memory.h"
 
 namespace cs160 {
