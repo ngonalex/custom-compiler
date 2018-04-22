@@ -11,14 +11,13 @@
 #include "utility/assert.h"
 
 using namespace cs160::frontend;
-using cs160::abstract_syntax::frontend::AstVisitor;
+using cs160::abstract_syntax::frontend::AstNode;
 using cs160::abstract_syntax::frontend::IntegerExpr;
 using cs160::abstract_syntax::frontend::AddExpr;
 using cs160::abstract_syntax::frontend::SubtractExpr;
 using cs160::abstract_syntax::frontend::MultiplyExpr;
 using cs160::abstract_syntax::frontend::DivideExpr;
 using cs160::abstract_syntax::frontend::BinaryOperatorExpr;
-//using cs160::abstract_syntax::frontend::InterpreterVisitor;
 using cs160::make_unique;
 
 namespace cs160 {
@@ -42,78 +41,79 @@ class Parser {
   }
   // Consume Token if proper type, otherwise error
   void Expect(Token::Type type) { Next() == type ? Consume() : Error(); }
-
-
-  /** Grammar stepthrough **/
-  void Recognizer() {
-    E();
-    Expect(Token::Type::END);
-  }
-
-  auto mkNode(Token op, auto first_leaf, auto second_leaf) {
-    ASSERT(op.isOperator(), Error());
-    switch(op.type()) {
+  
+  // AST Expressions
+  std::unique_ptr<const AstNode> mkNode(Token::Type op, std::unique_ptr<const AstNode> first_leaf, std::unique_ptr<const AstNode> second_leaf) {
+    switch(op) {
       case Token::Type::ADD_OP: {
-        return make_unique<AddExpr>(first_leaf, second_leaf);
+       return make_unique<AddExpr>(std::move(first_leaf), std::move(second_leaf));
       }
       case Token::Type::SUB_OP: {
-        return make_unique<SubtractExpr>(first_leaf, second_leaf);
+       return make_unique<SubtractExpr>(std::move(first_leaf), std::move(second_leaf));
       }
       case Token::Type::MUL_OP: {
-        return make_unique<MultiplyExpr>(first_leaf, second_leaf);
+       return make_unique<MultiplyExpr>(std::move(first_leaf), std::move(second_leaf));
       }
       case Token::Type::DIV_OP: {
-        return make_unique<DivideExpr>(first_leaf, second_leaf);
+       return make_unique<DivideExpr>(std::move(first_leaf), std::move(second_leaf));
       }
+      default: {
+        Error();
+      }  
     }
   }
 
-  auto mkLeaf(Token num) {
-    ASSERT(num.isNumber(), Error());
+  std::unique_ptr<const AstNode> mkLeaf(Token num) {
+    ASSERT(num.isNumber(), "Error creating IntegerExpr");
     auto result = make_unique<IntegerExpr>(num.val());
     return result;
   }
 
   // every 't' is supposed to be a Tree
-  auto Eparser() {
+  std::unique_ptr<const AstNode> Eparser() {
     auto t = E();
     Expect(Token::Type::END);
     return t;
   }
 
-  auto E() {
+  std::unique_ptr<const AstNode> E() {
     auto t = T();
     while (Next() == Token::Type::ADD_OP || Next() == Token::Type::SUB_OP) {
       const auto op = Next();
       Consume();
       const auto t1 = T();
-      t = mkNode(op, t, t1);
+      t = mkNode(op, std::move(t), t1);
     }
     return t;
   }
 
-  auto T() {
+  std::unique_ptr<const AstNode> T() {
     auto t = P();
     while (Next() == Token::Type::MUL_OP || Next() == Token::Type::DIV_OP) {
       const auto op = Next();
       Consume();
       const auto t1 = P();
-      t = mkNode(op, t, t1);
+      t = mkNode(op, std::move(t), t1);
     }
     return t;
   }
 
-  auto P() {
+  std::unique_ptr<const AstNode> P() {
+    // Either returns an Int
     if (Next() == Token::Type::NUM) {
-      auto t = mkLeaf(program_.back().val());
+      auto t = mkLeaf(program_.back());
       Consume();
       return t;
-    } else if (Next() == Token::Type::OPEN_PAREN) {
+    }
+    // An Expression 
+    else if (Next() == Token::Type::OPEN_PAREN) {
       Consume();
       auto t = E();
       Expect(Token::Type::CLOSE_PAREN);
       return t;
-    } else {
+    } 
+    // Or an error
+    else {
       Error();
     }
   }

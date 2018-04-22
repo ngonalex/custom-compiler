@@ -1,6 +1,8 @@
 #include "abstract_syntax/abstract_syntax.h"
+#include "abstract_syntax/print_visitor_v1.h"
 #include "frontend/parser/parser.h"
 #include "frontend/tokenizer/token.h"
+
 
 #include "gtest/gtest.h"
 
@@ -12,10 +14,11 @@ using cs160::abstract_syntax::frontend::SubtractExpr;
 using cs160::abstract_syntax::frontend::MultiplyExpr;
 using cs160::abstract_syntax::frontend::DivideExpr;
 using cs160::abstract_syntax::frontend::BinaryOperatorExpr;
-//using cs160::abstract_syntax::frontend::InterpreterVisitor;
+using cs160::abstract_syntax::version_1::PrintVisitor;
+
 using cs160::make_unique;
 
-TEST(ParserTest, CanEvaluateSimpleAdd) {
+TEST_F(Parser, CanParseMultiplication) {
   // program vector: END, 3, MUL_OP, 6
   Token firstToken(Token::Type::NUM, 6);
   Token secondToken(Token::Type::MUL_OP);
@@ -29,6 +32,6 @@ TEST(ParserTest, CanEvaluateSimpleAdd) {
 
   Parser parser(test_vector);
   auto result = parser.Eparser();
-
-  EXPECT_EQ(VisitMultiplyExpr(result), "(* 3 6)");
+  auto output = PrintVisitor::VisitMultiplyExpr(result);
+  EXPECT_EQ(output, "(* 3 6)");
 }

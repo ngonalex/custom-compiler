@@ -22,57 +22,16 @@ class Token {
   }
 
   // check if two Tokens are equal
-  bool operator==(const Token &b) const {
-    if (this->type_ == NUM) {
-      if (this->type_ == b.type_ && this->val_ == b.val_)
-        return true;
-      else
-        return false;
-    } else {
-      if (this->type_ == b.type_)
-        return true;
-      else
-        return false;
-    }
-  }
+  bool operator==(const Token &b) const;
 
-  // Ben's Suggestion
-  bool operator!=(const Token &b) const {
-    if (this->type_ == NUM) {
-      if (this->type_ == b.type_ && this->val_ == b.val_)
-        return false;
-      else
-        return true;
-    } else {
-      if (this->type_ == b.type_)
-        return false;
-      else
-        return true;
-    }
-  }
+  bool operator!=(const Token &b) const;
 
-  void Print() {
-    switch (this->type_) {
-    case NUM:
-      std::cout << "Type: NUM\n" << std::endl;
-      std::cout << "\tValue: " << this->val_ << "\n" << std::endl;
-      break;
-    default:
-      std::cout << "Type: " << this->type_ << "\n" << std::endl;
-      break;
-    }
-  }
+  void Print();
 
   // Helper functions for the parser
-  bool isOperator() {
-    return (this->type() == Type::NUM);
-  }
+  bool isOperator() { return (this->type() == Type::NUM); }
 
-  bool isNumber() {
-    Type current_type = this->type();
-    return (current_type == Type::MUL_OP || current_type == Type::DIV_OP ||
-      current_type == Type::ADD_OP || current_type == Type::SUB_OP);
-  }
+  bool isNumber();
 
   // Getter functions
   Token::Type type() const { return type_; }
@@ -87,6 +46,7 @@ class Token {
   Token::Type type_;
   // Only integer has value
   int val_;
+  // Character number, Line Number
   std::pair<int, int> tokenPos_;
 
 };
