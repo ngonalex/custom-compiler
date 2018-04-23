@@ -11,15 +11,7 @@
 #include "utility/assert.h"
 
 using namespace cs160::abstract_syntax::frontend;
-/*
-using cs160::abstract_syntax::frontend::version_1::AstNode;
-using cs160::abstract_syntax::frontend::version_1::IntegerExpr;
-using cs160::abstract_syntax::version_1::AddExpr;
-using cs160::abstract_syntax::version_1::SubtractExpr;
-using cs160::abstract_syntax::version_1::MultiplyExpr;
-using cs160::abstract_syntax::version_1::DivideExpr;
-using cs160::abstract_syntax::version_1::BinaryOperatorExpr;
-using cs160::make_unique;*/
+using cs160::frontend::Token;
 
 namespace cs160 {
 namespace frontend {
@@ -30,6 +22,7 @@ class Parser {
   explicit Parser(std::vector<Token> program) : program_(program) {
     ASSERT(program.size() != 0, "Program cannot be empty tokens");
   }
+  Parser(){ }
 
   /** Subroutines **/
   // Returns the type of the token in the 'front' of the program_
@@ -66,13 +59,12 @@ class Parser {
 
   std::unique_ptr<const AstNode> mkLeaf(Token num) {
     ASSERT(num.isNumber(), "Error creating IntegerExpr");
-    auto result = make_unique<IntegerExpr>(num.val());
-    return result;
+    return make_unique<IntegerExpr>(num.val());
   }
 
   // every 't' is supposed to be a Tree
   std::unique_ptr<const AstNode> Eparser() {
-    auto t = E();
+    std::unique_ptr<const AstNode> t = E();
     Expect(Token::Type::END);
     return t;
   }
@@ -80,7 +72,7 @@ class Parser {
   std::unique_ptr<const AstNode> E() {
     std::unique_ptr<const AstNode> t = T();
     while (Next() == Token::Type::ADD_OP || Next() == Token::Type::SUB_OP) {
-      Token op = Next();
+      Token::Type op = Next();
       Consume();
       std::unique_ptr<const AstNode> t1 = T();
       t = mkNode(op, std::move(t), std::move(t1));
@@ -91,9 +83,9 @@ class Parser {
   std::unique_ptr<const AstNode> T() {
     std::unique_ptr<const AstNode> t = P();
     while (Next() == Token::Type::MUL_OP || Next() == Token::Type::DIV_OP) {
-      const auto op = Next();
+      Token::Type op = Next();
       Consume();
-      const auto t1 = P();
+      std::unique_ptr<const AstNode> t1 = P();
       t = mkNode(op, std::move(t), std::move(t1));
     }
     return t;
@@ -102,7 +94,7 @@ class Parser {
   std::unique_ptr<const AstNode> P() {
     // Either returns an Int
     if (Next() == Token::Type::NUM) {
-      auto t = mkLeaf(program_.back());
+      std::unique_ptr<const AstNode> t = mkLeaf(program_.back());
       Consume();
       return t;
     }

@@ -6,17 +6,8 @@
 #include "gtest/gtest.h"
 
 using namespace cs160::abstract_syntax::frontend;
-/*
-using cs160::abstract_syntax::frontend::AstVisitor;
-using cs160::abstract_syntax::frontend::IntegerExpr;
-using cs160::abstract_syntax::frontend::AddExpr;
-using cs160::abstract_syntax::frontend::SubtractExpr;
-using cs160::abstract_syntax::frontend::MultiplyExpr;
-using cs160::abstract_syntax::frontend::DivideExpr;
-using cs160::abstract_syntax::frontend::BinaryOperatorExpr;
-using cs160::abstract_syntax::version_1::PrintVisitor;
-
-using cs160::make_unique;*/
+using cs160::frontend::Parser;
+using cs160::frontend::Token;
 
 TEST_F(Parser, CanParseMultiplication) {
   // program vector: END, 3, MUL_OP, 6
