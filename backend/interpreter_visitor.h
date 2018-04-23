@@ -12,6 +12,10 @@ using cs160::abstract_syntax::backend::SubtractExpr;
 using cs160::abstract_syntax::backend::MultiplyExpr;
 using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::BinaryOperatorExpr;
+using cs160::abstract_syntax::backend::DivideExpr;
+using cs160::abstract_syntax::backend::Assignment;
+using cs160::abstract_syntax::backend::Program;
+using cs160::abstract_syntax::backend::VariableExpr;
 
 namespace cs160 {
 namespace backend {
@@ -21,7 +25,14 @@ class InterpreterVisitor : public AstVisitor {
   InterpreterVisitor() {}
   ~InterpreterVisitor() {}
 
+  // Should we check if the top of the stack is 1 here?
+  // Assert (one item in stack)
   const int GetOutput() const { return opstack_.top(); }
+
+  // Fill me in
+  void VisitAssignment(const Assignment& assignment){};
+  void VisitProgram(const Program& program) {};
+  void VisitVariableExpr(const VariableExpr& exp) {};
 
   // these should be able to change members of the visitor, thus not const
   void VisitIntegerExpr(const IntegerExpr& exp) {

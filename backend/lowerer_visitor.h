@@ -16,6 +16,10 @@ using cs160::abstract_syntax::backend::SubtractExpr;
 using cs160::abstract_syntax::backend::MultiplyExpr;
 using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::BinaryOperatorExpr;
+using cs160::abstract_syntax::backend::Assignment;
+using cs160::abstract_syntax::backend::Program;
+using cs160::abstract_syntax::backend::VariableExpr;
+
 
 namespace cs160 {
 namespace backend {
@@ -26,6 +30,12 @@ class LowererVisitor : public AstVisitor {
   ~LowererVisitor() {}
   
   const std::string GetOutput() const;
+
+  // Fill me in
+  void VisitAssignment(const Assignment& assignment){};
+  void VisitProgram(const Program& program) {};
+  void VisitVariableExpr(const VariableExpr& exp) {};
+
   void VisitIntegerExpr(const IntegerExpr& exp);
   void VisitBinaryOperatorExpr(const BinaryOperatorExpr& exp) {}
   void VisitAddExpr(const AddExpr& exp);
