@@ -1,6 +1,8 @@
 #include "backend/interpreter_visitor.h"
 
 #include <stack>
+#include <math.h>
+#include <iostream>
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "utility/memory.h"
@@ -32,6 +34,20 @@ TEST_F(InterpreterTest, AddExprIsVisited) {
                                    make_unique<IntegerExpr>(5));
   expr->Visit(&interpreter_);
   EXPECT_EQ(interpreter_.GetOutput(), 12);
+}
+
+TEST_F(InterpreterTest, AddLargeNum){
+  auto expr = cs160::make_unique<AddExpr>((make_unique<IntegerExpr>(pow(2,30))),make_unique<IntegerExpr>(pow(2,30)));
+  expr->Visit(&interpreter_);
+
+  EXPECT_EQ(interpreter_.GetOutput(), -pow(2,31));
+}
+
+TEST_F(InterpreterTest, MultLargeNum){
+  auto expr = cs160::make_unique<MultiplyExpr>((make_unique<IntegerExpr>(pow(2,30))),make_unique<IntegerExpr>(pow(2,30)));
+  expr->Visit(&interpreter_);
+  std::cout<<"result is "<< interpreter_.GetOutput()<<std::endl;
+  EXPECT_EQ(interpreter_.GetOutput(), 0);
 }
 
 TEST_F(InterpreterTest, SubtractExprIsVisited) {

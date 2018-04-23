@@ -2,6 +2,7 @@
 #define BACKEND_INTERPRETER_VISITOR_H_
 
 #include <stack>
+#include <iostream>
 
 #include "abstract_syntax/abstract_syntax.h"
 
@@ -81,6 +82,10 @@ class InterpreterVisitor : public AstVisitor {
     opstack_.pop();
     int l = opstack_.top();
     opstack_.pop();
+    std::cout<<"l is: "<<l<<std::endl;
+    std::cout<<"r is: "<<r<<std::endl;
+    int mul = r*l;
+    std::cout<<"printing before pushing"<<mul<<std::endl;
     opstack_.push(l*r);
   }
 
