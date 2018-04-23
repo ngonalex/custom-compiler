@@ -2,6 +2,7 @@
 #include "abstract_syntax/print_visitor_v1.h"
 #include "frontend/parser/parser.h"
 #include "frontend/tokenizer/token.h"
+#include "frontend/tokenizer/tokenizer.h"
 
 #include "gtest/gtest.h"
 
@@ -9,7 +10,7 @@ using namespace cs160::abstract_syntax::frontend;
 using cs160::frontend::Parser;
 using cs160::frontend::Token;
 
-TEST_F(Parser, CanParseMultiplication) {
+TEST(Parser, CanParseMultiplication) {
   // program vector: END, 3, MUL_OP, 6
   Token firstToken(Token::Type::NUM, 6);
   Token secondToken(Token::Type::MUL_OP);
@@ -22,7 +23,9 @@ TEST_F(Parser, CanParseMultiplication) {
   test_vector.push_back(firstToken);
 
   Parser parser(test_vector);
-  auto result = parser.Eparser();
-  auto output = PrintVisitor::VisitMultiplyExpr(result);
+  std::unique_ptr<const AstNode> result = parser.Eparser();
+  PrintVisitor::VisitMultiplyExpr(result);
+  std::string output = PrintVisitor::GetOutput();
+  //Call the tokenizer here to return std::vector<Token>
   EXPECT_EQ(output, "(* 3 6)");
 }
