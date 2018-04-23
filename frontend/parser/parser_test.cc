@@ -3,10 +3,10 @@
 #include "frontend/parser/parser.h"
 #include "frontend/tokenizer/token.h"
 
-
 #include "gtest/gtest.h"
 
-using namespace cs160::frontend;
+using namespace cs160::abstract_syntax::frontend;
+/*
 using cs160::abstract_syntax::frontend::AstVisitor;
 using cs160::abstract_syntax::frontend::IntegerExpr;
 using cs160::abstract_syntax::frontend::AddExpr;
@@ -16,7 +16,7 @@ using cs160::abstract_syntax::frontend::DivideExpr;
 using cs160::abstract_syntax::frontend::BinaryOperatorExpr;
 using cs160::abstract_syntax::version_1::PrintVisitor;
 
-using cs160::make_unique;
+using cs160::make_unique;*/
 
 TEST_F(Parser, CanParseMultiplication) {
   // program vector: END, 3, MUL_OP, 6

@@ -10,15 +10,16 @@
 
 #include "utility/assert.h"
 
-using namespace cs160::frontend;
-using cs160::abstract_syntax::frontend::AstNode;
-using cs160::abstract_syntax::frontend::IntegerExpr;
-using cs160::abstract_syntax::frontend::AddExpr;
-using cs160::abstract_syntax::frontend::SubtractExpr;
-using cs160::abstract_syntax::frontend::MultiplyExpr;
-using cs160::abstract_syntax::frontend::DivideExpr;
-using cs160::abstract_syntax::frontend::BinaryOperatorExpr;
-using cs160::make_unique;
+using namespace cs160::abstract_syntax::frontend;
+/*
+using cs160::abstract_syntax::frontend::version_1::AstNode;
+using cs160::abstract_syntax::frontend::version_1::IntegerExpr;
+using cs160::abstract_syntax::version_1::AddExpr;
+using cs160::abstract_syntax::version_1::SubtractExpr;
+using cs160::abstract_syntax::version_1::MultiplyExpr;
+using cs160::abstract_syntax::version_1::DivideExpr;
+using cs160::abstract_syntax::version_1::BinaryOperatorExpr;
+using cs160::make_unique;*/
 
 namespace cs160 {
 namespace frontend {
@@ -41,7 +42,7 @@ class Parser {
   }
   // Consume Token if proper type, otherwise error
   void Expect(Token::Type type) { Next() == type ? Consume() : Error(); }
-  
+
   // AST Expressions
   std::unique_ptr<const AstNode> mkNode(Token::Type op, std::unique_ptr<const AstNode> first_leaf, std::unique_ptr<const AstNode> second_leaf) {
     switch(op) {
@@ -59,7 +60,7 @@ class Parser {
       }
       default: {
         Error();
-      }  
+      }
     }
   }
 
@@ -77,12 +78,12 @@ class Parser {
   }
 
   std::unique_ptr<const AstNode> E() {
-    auto t = T();
+    std::unique_ptr<const AstNode> t = T();
     while (Next() == Token::Type::ADD_OP || Next() == Token::Type::SUB_OP) {
-      const auto op = Next();
+      Token op = Next();
       Consume();
-      const auto t1 = T();
-      t = mkNode(op, std::move(t), t1);
+      std::unique_ptr<const AstNode> t1 = T();
+      t = mkNode(op, std::move(t), std::move(t1));
     }
     return t;
   }
@@ -105,13 +106,13 @@ class Parser {
       Consume();
       return t;
     }
-    // An Expression 
+    // An Expression
     else if (Next() == Token::Type::OPEN_PAREN) {
       Consume();
       auto t = E();
       Expect(Token::Type::CLOSE_PAREN);
       return t;
-    } 
+    }
     // Or an error
     else {
       Error();
