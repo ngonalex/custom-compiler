@@ -89,12 +89,12 @@ class Parser {
   }
 
   std::unique_ptr<const AstNode> T() {
-    auto t = P();
+    std::unique_ptr<const AstNode> t = P();
     while (Next() == Token::Type::MUL_OP || Next() == Token::Type::DIV_OP) {
       const auto op = Next();
       Consume();
       const auto t1 = P();
-      t = mkNode(op, std::move(t), t1);
+      t = mkNode(op, std::move(t), std::move(t1));
     }
     return t;
   }
@@ -109,7 +109,7 @@ class Parser {
     // An Expression
     else if (Next() == Token::Type::OPEN_PAREN) {
       Consume();
-      auto t = E();
+      std::unique_ptr<const AstNode> t = E();
       Expect(Token::Type::CLOSE_PAREN);
       return t;
     }
