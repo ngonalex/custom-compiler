@@ -14,7 +14,7 @@ const std::string LowererVisitor::GetOutput() const {
     // If it's a just a int (Register without a name then access it's value)
     // Otherwise access its name
     if (blocks_[i]->op.opcode() == LOAD) {
-      if (blocks_[i]->arg1.reg().name() == "") {
+      if (blocks_[i]->arg1.optype() == INT) {
         output = output + blocks_[i]->target.name()
           + " <- " + std::to_string(blocks_[i]->arg1.value());
       } else {
