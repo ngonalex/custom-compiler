@@ -28,13 +28,13 @@ class LowererVisitor : public AstVisitor {
  public:
   LowererVisitor() {}
   ~LowererVisitor() {}
-  
+
   const std::string GetOutput() const;
 
   // Fill me in
-  void VisitAssignment(const Assignment& assignment){};
-  void VisitProgram(const Program& program) {};
-  void VisitVariableExpr(const VariableExpr& exp) {};
+  void VisitAssignment(const Assignment& assignment) {}
+  void VisitProgram(const Program& program) {}
+  void VisitVariableExpr(const VariableExpr& exp) {}
 
   void VisitIntegerExpr(const IntegerExpr& exp);
   void VisitBinaryOperatorExpr(const BinaryOperatorExpr& exp) {}

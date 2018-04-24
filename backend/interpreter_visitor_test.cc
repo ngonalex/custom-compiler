@@ -1,8 +1,8 @@
 #include "backend/interpreter_visitor.h"
 
-#include <stack>
 #include <math.h>
 #include <iostream>
+#include <stack>
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "utility/memory.h"
@@ -37,24 +37,28 @@ TEST_F(InterpreterTest, AddExprIsVisited) {
   EXPECT_EQ(interpreter_.GetOutput(), 12);
 }
 
-TEST_F(InterpreterTest, AddLargeNum){
-  auto expr = cs160::make_unique<AddExpr>((make_unique<IntegerExpr>(pow(2,30))),make_unique<IntegerExpr>(pow(2,30)));
+TEST_F(InterpreterTest, AddLargeNum) {
+  auto expr = cs160::make_unique<AddExpr>(
+    (make_unique<IntegerExpr>(pow(2, 30))),
+    make_unique<IntegerExpr>(pow(2, 30)));
   expr->Visit(&interpreter_);
 
-  EXPECT_EQ(interpreter_.GetOutput(), -pow(2,31));
+  EXPECT_EQ(interpreter_.GetOutput(), -pow(2, 31));
 }
 
 // not working for now, need to figure out mult overflow later
 // TEST_F(InterpreterTest, MultLargeNum){
-//   auto expr = cs160::make_unique<MultiplyExpr>((make_unique<IntegerExpr>(pow(2,30))),make_unique<IntegerExpr>(pow(2,30)));
+//   auto expr = cs160::make_unique<MultiplyExpr>((
+//   make_unique<IntegerExpr>(pow(2,30))),make_unique<IntegerExpr>(pow(2,30)));
 //   expr->Visit(&interpreter_);
 //   std::cout<<"result is "<< interpreter_.GetOutput()<<std::endl;
 //   EXPECT_EQ(interpreter_.GetOutput(), 0);
 // }
 
-TEST_F(InterpreterTest, DivisionByZero){
-  auto expr = cs160::make_unique<DivideExpr>((make_unique<IntegerExpr>(1)),make_unique<IntegerExpr>(0));
-  
+TEST_F(InterpreterTest, DivisionByZero) {
+  auto expr = cs160::make_unique<DivideExpr>(
+    (make_unique<IntegerExpr>(1)), make_unique<IntegerExpr>(0));
+
   EXPECT_THROW(expr->Visit(&interpreter_), DivisorIsZeroException);
 }
 

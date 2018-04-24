@@ -32,9 +32,9 @@ class InterpreterVisitor : public AstVisitor {
   const int GetOutput() const { return opstack_.top(); }
 
   // Fill me in
-  void VisitAssignment(const Assignment& assignment){};
-  void VisitProgram(const Program& program) {};
-  void VisitVariableExpr(const VariableExpr& exp) {};
+  void VisitAssignment(const Assignment& assignment) {}
+  void VisitProgram(const Program& program) {}
+  void VisitVariableExpr(const VariableExpr& exp) {}
 
   // these should be able to change members of the visitor, thus not const
   void VisitIntegerExpr(const IntegerExpr& exp) {
@@ -95,11 +95,11 @@ class InterpreterVisitor : public AstVisitor {
     int r = opstack_.top();
 
     // Check if divisor is zero
-    if(r == 0){
+    if (r == 0) {
       DivisorIsZeroException ex;
       throw ex;
     }
-    
+
     opstack_.pop();
     int l = opstack_.top();
     opstack_.pop();
