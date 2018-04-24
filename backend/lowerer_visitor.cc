@@ -19,7 +19,7 @@ const std::string LowererVisitor::GetOutput() const {
           + " <- " + std::to_string(blocks_[i]->arg1.value());
       } else {
         output = output + blocks_[i]->target.name()
-          + " <- " + blocks_[i]->arg1.reg().name(); 
+          + " <- " + blocks_[i]->arg1.reg().name();
       }
     } else {
         output = output + blocks_[i]->target.name()
@@ -39,7 +39,6 @@ const std::string LowererVisitor::GetOutput() const {
 }
 
 void LowererVisitor::VisitAssignment(const Assignment& assignment) {
-
   auto newblock = make_unique<struct ThreeAddressCode>();
 
   // Visit the left which will add its variable name to the stack
@@ -48,8 +47,8 @@ void LowererVisitor::VisitAssignment(const Assignment& assignment) {
   variablestack_.pop();
 
   // assign the right hand side to be equal to the left hand side
-  // The latest vector addition is the final register to be set to the 
-  // string name 
+  // The latest vector addition is the final register to be set to the
+  // string name
   assignment.rhs().Visit(const_cast<LowererVisitor*>(this));
 
   newblock->target = Register(varname);
@@ -57,28 +56,48 @@ void LowererVisitor::VisitAssignment(const Assignment& assignment) {
   newblock->arg1 = Operand(blocks_[blocks_.size()-1]->target);
 
   blocks_.push_back(std::move(newblock));
-
 }
 
 void LowererVisitor::VisitProgram(const Program& program) {
   // Do all the Assignments, then eval the AE?
 
-  LowererVisitor lowerer_;
-
-  for (int i = 0; i < program.assignments().size(); ++i) {
-
-    VisitAssignment( *(program.assignments()[i]) );
+  for (auto& assignment : program.assignments()) {
+      assignment->Visit(this);
   }
 
-  // auto arithexpr = std::move(program.arithmetic_exp());
-  // (&arithexpr)->Visit(&lowerer_);
-
+  program.arithmetic_exp().Visit(this);
 }
-  
+
 void LowererVisitor::VisitVariableExpr(const VariableExpr& exp) {
-  // Just get the string stored in VariableExpr and push it to 
+  // Just get the string stored in VariableExpr and push it to
   // the stack
   variablestack_.push(exp.name());
+}
+
+// General comment, Lots of reused code, Think about abstracting out to helper
+// functions as the only difference between add/sub/mult/div is their "sign"
+// (Also some additional error handling for div req)
+
+void LowererVisitor::BinaryOperatorHelper(Type type, int leftindex) {
+  // Load value into target (t <- prev->target + prev->prev->target)
+  // Last two elements of the vector should be the integers to load in
+  int size = blocks_.size();
+
+  auto newblock = make_unique<struct ThreeAddressCode>();
+
+  newblock->arg1 = Operand(blocks_[leftindex-1]->target);
+  newblock->arg2 = Operand(blocks_[size-1]->target);
+
+  // if (type == DIV) {check for div zero?}
+
+  newblock->op = Opcode(type);
+  // look at this later, just going to do this now to test some things
+  newblock->target = Register("t_" + std::to_string(variablecounter_));
+
+  // Push into vector
+  blocks_.push_back(std::move(newblock));
+
+  ++variablecounter_;
 }
 
 void LowererVisitor::VisitIntegerExpr(const IntegerExpr& exp) {
@@ -89,10 +108,12 @@ void LowererVisitor::VisitIntegerExpr(const IntegerExpr& exp) {
   newblock->op = Opcode(LOAD);
 
   // look at this later,just going to do this now to test some things
-  newblock->target = Register("t_" + std::to_string(blocks_.size()));
+  newblock->target = Register("t_" + std::to_string(variablecounter_));
 
   // Push into vector
   blocks_.push_back(std::move(newblock));
+
+  ++variablecounter_;
 }
 
 void LowererVisitor::VisitAddExpr(const AddExpr& exp) {
@@ -100,21 +121,7 @@ void LowererVisitor::VisitAddExpr(const AddExpr& exp) {
   int leftindex = blocks_.size();
   exp.rhs().Visit(const_cast<LowererVisitor*>(this));
 
-  // Load value into target (t <- prev->target + prev->prev->target)
-  // Last two elements of the vector should be the integers to load in
-  int size = blocks_.size();
-
-  auto newblock = make_unique<struct ThreeAddressCode>();
-
-  newblock->arg1 = Operand(blocks_[leftindex-1]->target);
-  newblock->arg2 = Operand(blocks_[size-1]->target);
-
-  newblock->op = Opcode(ADD);
-  // look at this later, just going to do this now to test some things
-  newblock->target = Register("t_" + std::to_string(blocks_.size()));
-
-  // Push into vector
-  blocks_.push_back(std::move(newblock));
+  BinaryOperatorHelper(ADD, leftindex);
 }
 
 void LowererVisitor::VisitSubtractExpr(const SubtractExpr& exp) {
@@ -124,20 +131,7 @@ void LowererVisitor::VisitSubtractExpr(const SubtractExpr& exp) {
   int leftindex = blocks_.size();
   exp.rhs().Visit(const_cast<LowererVisitor*>(this));
 
-  // Load value into target (t <- prev->target + prev->prev->target)
-  // Last two elements of the vector should be the integers to load in
-  int size = blocks_.size();
-
-  auto newblock = make_unique<struct ThreeAddressCode>();
-
-  newblock->arg1 = Operand(blocks_[leftindex-1]->target);
-  newblock->arg2 = Operand(blocks_[size-1]->target);
-  newblock->op = Opcode(SUB);
-  // look at this later, just going to do this now to test some things
-  newblock->target = Register("t_" + std::to_string(blocks_.size()));
-
-  // Push into vector
-  blocks_.push_back(std::move(newblock));
+  BinaryOperatorHelper(SUB, leftindex);
 }
 
 void LowererVisitor::VisitMultiplyExpr(const MultiplyExpr& exp) {
@@ -147,20 +141,7 @@ void LowererVisitor::VisitMultiplyExpr(const MultiplyExpr& exp) {
   int leftindex = blocks_.size();
   exp.rhs().Visit(const_cast<LowererVisitor*>(this));
 
-  // Load value into target (t <- prev->target + prev->prev->target)
-  // Last two elements of the vector should be the integers to load in
-  int size = blocks_.size();
-
-  auto newblock = make_unique<struct ThreeAddressCode>();
-
-  newblock->arg1 = Operand(blocks_[leftindex-1]->target);
-  newblock->arg2 = Operand(blocks_[size-1]->target);
-  newblock->op = Opcode(MULT);
-  // look at this later, just going to do this now to test some things
-  newblock->target = Register("t_" + std::to_string(blocks_.size()));
-
-  // Push into vector
-  blocks_.push_back(std::move(newblock));
+  BinaryOperatorHelper(MULT, leftindex);
 }
 
 void LowererVisitor::VisitDivideExpr(const DivideExpr& exp) {
@@ -170,23 +151,8 @@ void LowererVisitor::VisitDivideExpr(const DivideExpr& exp) {
   int leftindex = blocks_.size();
   exp.rhs().Visit(const_cast<LowererVisitor*>(this));
 
-  // Load value into target (t <- prev->target + prev->prev->target)
-  // Last two elements of the vector should be the integers to load in
-  int size = blocks_.size();
-
-  auto newblock = make_unique<struct ThreeAddressCode>();
-
-  newblock->arg1 = Operand(blocks_[leftindex-1]->target);
-  newblock->arg2 = Operand(blocks_[size-1]->target);
-  newblock->op = Opcode(DIV);
-  // look at this later, just going to do this now to test some things
-  newblock->target = Register("t_" + std::to_string(blocks_.size()));
-
-  // Push into vector
-  blocks_.push_back(std::move(newblock));
+  BinaryOperatorHelper(DIV, leftindex);
 }
 
 }  // namespace backend
 }  // namespace cs160
-
-

@@ -102,14 +102,12 @@ TEST_F(LowererTest, NestedVisitationsWorkProperly) {
 TEST_F(LowererTest, SimpleAssignmentTest) {
   auto expr = cs160::make_unique<Assignment>(
     cs160::make_unique<VariableExpr>("x"),
-    cs160::make_unique<IntegerExpr>(5)
-  );
+    cs160::make_unique<IntegerExpr>(5));
 
   expr->Visit(&lowerer_);
   // t_0 <- 5
   // hello <- t_0
   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nx <- t_0\n");
-
 }
 
 TEST_F(LowererTest, MoreComplexAssignment) {
@@ -118,7 +116,7 @@ TEST_F(LowererTest, MoreComplexAssignment) {
     cs160::make_unique<AddExpr>(
       cs160::make_unique<IntegerExpr>(5),
       cs160::make_unique<IntegerExpr>(10)));
-  
+
   expr->Visit(&lowerer_);
 
   // t_0 <- 5
@@ -128,3 +126,35 @@ TEST_F(LowererTest, MoreComplexAssignment) {
   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\n"
     "t_2 <- t_0 + t_1\nx <- t_2\n");
 }
+
+TEST_F(LowererTest, SanityCheckProg) {
+  auto assignment = cs160::make_unique<Assignment>(
+    cs160::make_unique<VariableExpr>("x"),
+    cs160::make_unique<AddExpr>(
+      cs160::make_unique<IntegerExpr>(5),
+      cs160::make_unique<IntegerExpr>(10)));
+
+  std::vector<std::unique_ptr<const Assignment>> assignmentvector;
+  assignmentvector.push_back(std::move(assignment));
+
+  auto arithexpr = cs160::make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
+    make_unique<IntegerExpr>(5));
+
+  auto expr = cs160::make_unique<Program>(std::move(assignmentvector),
+    std::move(arithexpr));
+
+  expr->Visit(&lowerer_);
+
+  // t_0 <- 5
+  // t_1 <- 10
+  // t_2 <- t_0 + t_1
+  // x <- t_2
+  // t_3 <- 7
+  // t_4 <- 5
+  // t_5 <- t_3 - t_4
+
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
+    "x <- t_2\nt_3 <- 7\nt_4 <- 5\nt_5 <- t_3 - t_4\n");
+}
+
+

@@ -27,7 +27,7 @@ namespace backend {
 
 class LowererVisitor : public AstVisitor {
  public:
-  LowererVisitor() {}
+  LowererVisitor() : variablecounter_(0) {}
   ~LowererVisitor() {}
 
   const std::string GetOutput() const;
@@ -43,6 +43,7 @@ class LowererVisitor : public AstVisitor {
   void VisitSubtractExpr(const SubtractExpr& exp);
   void VisitMultiplyExpr(const MultiplyExpr& exp);
   void VisitDivideExpr(const DivideExpr& exp);
+  void BinaryOperatorHelper(Type type, int leftindex);
 
   std::vector<std::unique_ptr<struct ThreeAddressCode>> GetIR() {
     return std::move(blocks_);
@@ -52,9 +53,12 @@ class LowererVisitor : public AstVisitor {
     return variablestack_;
   }
 
+  int variablecounter() const {variablecounter_;}
+
  private:
   std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks_;
   std::stack<std::string> variablestack_;
+  int variablecounter_;
 };
 
 }  // namespace backend
