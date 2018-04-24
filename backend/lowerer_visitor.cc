@@ -13,9 +13,14 @@ const std::string LowererVisitor::GetOutput() const {
   for (unsigned int i = 0; i < blocks_.size(); ++i) {
     // If it's a just a int (Register without a name then access it's value)
     // Otherwise access its name
-    if (blocks_[i]->arg1.reg().name() == "") {
-      output = output + blocks_[i]->target.name()
-        + " <- " + std::to_string(blocks_[i]->arg1.value());
+    if (blocks_[i]->op.opcode() == LOAD) {
+      if (blocks_[i]->arg1.reg().name() == "") {
+        output = output + blocks_[i]->target.name()
+          + " <- " + std::to_string(blocks_[i]->arg1.value());
+      } else {
+        output = output + blocks_[i]->target.name()
+          + " <- " + blocks_[i]->arg1.reg().name(); 
+      }
     } else {
         output = output + blocks_[i]->target.name()
           + " <- " + blocks_[i]->arg1.reg().name();
@@ -31,6 +36,49 @@ const std::string LowererVisitor::GetOutput() const {
   }
 
   return output;
+}
+
+void LowererVisitor::VisitAssignment(const Assignment& assignment) {
+
+  auto newblock = make_unique<struct ThreeAddressCode>();
+
+  // Visit the left which will add its variable name to the stack
+  assignment.lhs().Visit(const_cast<LowererVisitor*>(this));
+  std::string varname = variablestack_.top();
+  variablestack_.pop();
+
+  // assign the right hand side to be equal to the left hand side
+  // The latest vector addition is the final register to be set to the 
+  // string name 
+  assignment.rhs().Visit(const_cast<LowererVisitor*>(this));
+
+  newblock->target = Register(varname);
+  newblock->op = Opcode(LOAD);
+  newblock->arg1 = Operand(blocks_[blocks_.size()-1]->target);
+
+  blocks_.push_back(std::move(newblock));
+
+}
+
+void LowererVisitor::VisitProgram(const Program& program) {
+  // Do all the Assignments, then eval the AE?
+
+  LowererVisitor lowerer_;
+
+  for (int i = 0; i < program.assignments().size(); ++i) {
+
+    VisitAssignment( *(program.assignments()[i]) );
+  }
+
+  // auto arithexpr = std::move(program.arithmetic_exp());
+  // (&arithexpr)->Visit(&lowerer_);
+
+}
+  
+void LowererVisitor::VisitVariableExpr(const VariableExpr& exp) {
+  // Just get the string stored in VariableExpr and push it to 
+  // the stack
+  variablestack_.push(exp.name());
 }
 
 void LowererVisitor::VisitIntegerExpr(const IntegerExpr& exp) {
