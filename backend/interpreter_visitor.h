@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "abstract_syntax/abstract_syntax.h"
+#include "backend/exceptions.h"
 
 using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::IntegerExpr;
@@ -78,14 +79,10 @@ class InterpreterVisitor : public AstVisitor {
     exp.rhs().Visit(const_cast<InterpreterVisitor*>(this));
 
     // Pop top two, push result back in
-    int r = opstack_.top();
+    unsigned int r = opstack_.top();
     opstack_.pop();
-    int l = opstack_.top();
+    unsigned int l = opstack_.top();
     opstack_.pop();
-    std::cout<<"l is: "<<l<<std::endl;
-    std::cout<<"r is: "<<r<<std::endl;
-    int mul = r*l;
-    std::cout<<"printing before pushing"<<mul<<std::endl;
     opstack_.push(l*r);
   }
 
@@ -95,8 +92,14 @@ class InterpreterVisitor : public AstVisitor {
     exp.rhs().Visit(const_cast<InterpreterVisitor*>(this));
 
     // Pop top two, push result back in
-    // Should we check for division by zero here?
     int r = opstack_.top();
+
+    // Check if divisor is zero
+    if(r == 0){
+      DivisorIsZeroException ex;
+      throw ex;
+    }
+    
     opstack_.pop();
     int l = opstack_.top();
     opstack_.pop();
