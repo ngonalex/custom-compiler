@@ -3,6 +3,7 @@
 
 #include <stack>
 #include <iostream>
+#include <stdio.h>
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "backend/exceptions.h"
@@ -96,8 +97,8 @@ class InterpreterVisitor : public AstVisitor {
 
     // Check if divisor is zero
     if (r == 0) {
-      DivisorIsZeroException ex;
-      throw ex;
+      perror ("Dividing zero");
+      exit(1);
     }
 
     opstack_.pop();

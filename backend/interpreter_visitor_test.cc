@@ -59,7 +59,7 @@ TEST_F(InterpreterTest, DivisionByZero) {
   auto expr = cs160::make_unique<DivideExpr>(
     (make_unique<IntegerExpr>(1)), make_unique<IntegerExpr>(0));
 
-  EXPECT_THROW(expr->Visit(&interpreter_), DivisorIsZeroException);
+  EXPECT_EXIT(expr->Visit(&interpreter_), ::testing::ExitedWithCode(1), "Dividing zero");
 }
 
 TEST_F(InterpreterTest, SubtractExprIsVisited) {
