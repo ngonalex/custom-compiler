@@ -73,8 +73,8 @@ class Parser {
 
   std::unique_ptr<const AstNode> E() {
     std::unique_ptr<const AstNode> t = T();
-    while (Next() == Token::Type::ADD_OP || Next() == Token::Type::SUB_OP) {
-      Token::Type op = Next();
+    Token::Type op = Next();
+    while (op == Token::Type::ADD_OP || op == Token::Type::SUB_OP) {
       Consume();
       std::unique_ptr<const AstNode> t1 = T();
       t = mkNode(op, std::move(t), std::move(t1));
@@ -84,8 +84,8 @@ class Parser {
 
   std::unique_ptr<const AstNode> T() {
     std::unique_ptr<const AstNode> t = P();
-    while (Next() == Token::Type::MUL_OP || Next() == Token::Type::DIV_OP) {
-      Token::Type op = Next();
+    Token::Type op = Next();
+    while (op == Token::Type::MUL_OP || op == Token::Type::DIV_OP) {
       Consume();
       std::unique_ptr<const AstNode> t1 = P();
       t = mkNode(op, std::move(t), std::move(t1));
@@ -95,13 +95,14 @@ class Parser {
 
   std::unique_ptr<const AstNode> P() {
     // Either returns an Int
-    if (Next() == Token::Type::NUM) {
+      Token::Type type = Next();
+    if (type == Token::Type::NUM) {
       std::unique_ptr<const AstNode> t = mkLeaf(program_.back());
       Consume();
       return t;
     }
     // An Expression
-    else if (Next() == Token::Type::OPEN_PAREN) {
+    else if (type == Token::Type::OPEN_PAREN) {
       Consume();
       std::unique_ptr<const AstNode> t = E();
       Expect(Token::Type::CLOSE_PAREN);
