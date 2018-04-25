@@ -44,16 +44,16 @@ void CodeGen::Generate(std::vector
     auto code = std::move(blocks[i]);
     Opcode opcode = code->op;
 
-    // Two different loads now, one for reg <- int, another variable <- arithmetic
+    // Two different loads now, one for reg <- int, 
+    // another variable <- arithmetic
     if (opcode.opcode() == LOAD) {
       // outfile_ << "\t#Storing " + code->arg1 + " into rcx" << std::endl;
       if (code->arg1.optype() == INT) {
         outfile_ << "\tmov $" + std::to_string(code->arg1.value())
           + ", %rcx" << std::endl;
         outfile_ << "\tpush %rcx" << std::endl;
-      } else {  
+      } else {
           // To Do:
-
       }
 
     } else if (opcode.opcode() == ADD) {

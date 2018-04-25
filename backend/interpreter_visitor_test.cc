@@ -59,7 +59,8 @@ TEST_F(InterpreterTest, DivisionByZero) {
   auto expr = cs160::make_unique<DivideExpr>(
     (make_unique<IntegerExpr>(1)), make_unique<IntegerExpr>(0));
 
-  EXPECT_EXIT(expr->Visit(&interpreter_), ::testing::ExitedWithCode(1), "Dividing zero");
+  EXPECT_EXIT(expr->Visit(&interpreter_),
+    ::testing::ExitedWithCode(1), "Dividing zero");
 }
 
 TEST_F(InterpreterTest, SubtractExprIsVisited) {
@@ -150,7 +151,7 @@ TEST_F(InterpreterTest, SanityCheckProg) {
 
   expr->Visit(&interpreter_);
 
-  for (auto& assignment: assignmentvector) {
+  for (auto& assignment : assignmentvector) {
     EXPECT_EQ(interpreter_.GetVariable((assignment)->lhs().name()), 15);
   }
 

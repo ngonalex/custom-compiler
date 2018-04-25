@@ -34,11 +34,11 @@ class Register {
 // Look at this later, this probably can be designed much better
 class Operand {
  public:
-  explicit Operand(Register reg) : reg_(reg), 
+  explicit Operand(Register reg) : reg_(reg),
     value_(0), optype_(REGISTER) {
     // ASSERT (Registers can't have values )
   }
-  explicit Operand(int value) : reg_(Register("")), 
+  explicit Operand(int value) : reg_(Register("")),
     value_(value), optype_(INT) {
     // ASSERT (only ints can have values)
   }

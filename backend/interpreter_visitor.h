@@ -32,8 +32,8 @@ class InterpreterVisitor : public AstVisitor {
 
   // Should we check if the top of the stack is 1 here?
   // Assert (one item in stack)
-  const int GetOutput(){ 
-    int result = opstack_.top(); 
+  const int GetOutput() {
+    int result = opstack_.top();
     opstack_.pop();
     return result;
   }
@@ -41,7 +41,7 @@ class InterpreterVisitor : public AstVisitor {
   const int GetVariable(std::string variable) const {
     return variablemap_.find(variable)->second;
   }
-  
+
   // these should be able to change members of the visitor, thus not const
   void VisitIntegerExpr(const IntegerExpr& exp) {
     // push value to stack
@@ -102,7 +102,7 @@ class InterpreterVisitor : public AstVisitor {
 
     // Check if divisor is zero
     if (r == 0) {
-      perror ("Dividing zero");
+      perror("Dividing zero");
       exit(1);
     }
 
@@ -112,7 +112,7 @@ class InterpreterVisitor : public AstVisitor {
     opstack_.push(l/r);
   }
 
-  void VisitVariableExpr(const VariableExpr& exp){
+  void VisitVariableExpr(const VariableExpr& exp) {
     variablestack_.push(exp.name());
   }
 
@@ -144,7 +144,6 @@ class InterpreterVisitor : public AstVisitor {
   std::stack<int> opstack_;
   std::stack<std::string> variablestack_;
   std::map<std::string, int> variablemap_;
-
 };
 
 }  // namespace backend
