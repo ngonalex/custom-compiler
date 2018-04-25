@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <stack>
 
 // #include "utility/assert.h"
 #include "abstract_syntax/abstract_syntax.h"
@@ -26,15 +27,15 @@ namespace backend {
 
 class LowererVisitor : public AstVisitor {
  public:
-  LowererVisitor() {}
+  LowererVisitor() : variablecounter_(0) {}
   ~LowererVisitor() {}
 
   const std::string GetOutput() const;
 
   // Fill me in
-  void VisitAssignment(const Assignment& assignment) {}
-  void VisitProgram(const Program& program) {}
-  void VisitVariableExpr(const VariableExpr& exp) {}
+  void VisitAssignment(const Assignment& assignment);
+  void VisitProgram(const Program& program);
+  void VisitVariableExpr(const VariableExpr& exp);
 
   void VisitIntegerExpr(const IntegerExpr& exp);
   void VisitBinaryOperatorExpr(const BinaryOperatorExpr& exp) {}
@@ -42,13 +43,22 @@ class LowererVisitor : public AstVisitor {
   void VisitSubtractExpr(const SubtractExpr& exp);
   void VisitMultiplyExpr(const MultiplyExpr& exp);
   void VisitDivideExpr(const DivideExpr& exp);
+  void BinaryOperatorHelper(Type type, int leftindex);
 
   std::vector<std::unique_ptr<struct ThreeAddressCode>> GetIR() {
     return std::move(blocks_);
   }
 
+  std::stack<std::string> variablestack() {
+    return variablestack_;
+  }
+
+  int variablecounter() const {variablecounter_;}
+
  private:
   std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks_;
+  std::stack<std::string> variablestack_;
+  int variablecounter_;
 };
 
 }  // namespace backend

@@ -1,4 +1,3 @@
-
 #include "backend/code_gen.h"
 
 namespace cs160 {
@@ -44,13 +43,20 @@ void CodeGen::Generate(std::vector
   for (unsigned int i = 0; i < blocks.size(); ++i) {
     auto code = std::move(blocks[i]);
     Opcode opcode = code->op;
-    if (printhelper[opcode.opcode()] == "load") {
-      // outfile_ << "\t#Storing " + code->arg1 + " into rcx" << std::endl;
-      outfile_ << "\tmov $" + std::to_string(code->arg1.value())
-        + ", %rcx" << std::endl;
-      outfile_ << "\tpush %rcx" << std::endl;
 
-    } else if (printhelper[opcode.opcode()] == "+") {
+    // Two different loads now, one for reg <- int, another variable <- arithmetic
+    if (opcode.opcode() == LOAD) {
+      // outfile_ << "\t#Storing " + code->arg1 + " into rcx" << std::endl;
+      if (code->arg1.optype() == INT) {
+        outfile_ << "\tmov $" + std::to_string(code->arg1.value())
+          + ", %rcx" << std::endl;
+        outfile_ << "\tpush %rcx" << std::endl;
+      } else {  
+          // To Do:
+
+      }
+
+    } else if (opcode.opcode() == ADD) {
         // Load arg1,arg2 then add them into target
         // outfile_ << "\t#Adding << std::endl;
         outfile_ << "\tpop %rbx" << std::endl;  // rbx = right
@@ -59,18 +65,18 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tadd %rax, %rcx\nadd %rbx, %rcx" << std::endl;
         outfile_ << "\tpush %rcx" << std::endl;
 
-    } else if (printhelper[opcode.opcode()] == "-") {
+    } else if (opcode.opcode() == SUB) {
         // Load arg1,arg2 then add them into target
         outfile_ << "\tpop %rax" << std::endl;  // rbx = right
         outfile_ << "\tpop %rcx" << std::endl;  // rax = left
         outfile_ << "\tsub %rax, %rcx" << std::endl;
         outfile_ << "\tpush %rcx" << std::endl;
-    } else if (printhelper[opcode.opcode()] == "*") {
+    } else if (opcode.opcode() == MULT) {
         outfile_ << "\tpop %rbx" << std::endl;  // rbx = right
         outfile_ << "\tpop %rcx" << std::endl;  // rcx = left
         outfile_ << "\timul %rbx, %rcx" << std::endl;
         outfile_ << "\tpush %rcx" << std::endl;
-    } else if (printhelper[opcode.opcode()] == "/") {
+    } else if (opcode.opcode() == DIV) {
         // Load dividend (arg1) into %rax
         ClearRegister("rdx");
         outfile_ << "\tpop %rbx" << std::endl;

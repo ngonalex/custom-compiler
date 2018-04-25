@@ -15,6 +15,11 @@ enum Type {
   NONE
 };
 
+enum OperandType {
+  REGISTER,
+  INT
+};
+
 class Register {
  public:
   explicit Register(std::string name) : name_(name) {}
@@ -29,19 +34,23 @@ class Register {
 // Look at this later, this probably can be designed much better
 class Operand {
  public:
-  explicit Operand(Register reg) : reg_(reg), value_(0) {
+  explicit Operand(Register reg) : reg_(reg), 
+    value_(0), optype_(REGISTER) {
     // ASSERT (Registers can't have values )
   }
-  explicit Operand(int value) : reg_(Register("")), value_(value) {
+  explicit Operand(int value) : reg_(Register("")), 
+    value_(value), optype_(INT) {
     // ASSERT (only ints can have values)
   }
 
   Register reg() const {return reg_;}
   int value() const {return value_;}
+  OperandType optype() const {return optype_;}
 
  private:
   Register reg_;
   int value_;
+  OperandType optype_;
 };
 
 class Opcode {
