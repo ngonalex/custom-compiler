@@ -53,7 +53,7 @@ class LowererVisitor : public AstVisitor {
     return variablestack_;
   }
 
-  int variablecounter() const {variablecounter_;}
+  int variablecounter() const { return variablecounter_; }
 
  private:
   std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks_;

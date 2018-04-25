@@ -110,4 +110,54 @@ TEST_F(InterpreterTest, NestedVisitationsWorkProperly_2) {
   EXPECT_EQ(interpreter_.GetOutput(), 144);
 }
 
+TEST_F(InterpreterTest, SimpleAssignmentTest) {
+  auto expr = cs160::make_unique<Assignment>(
+    cs160::make_unique<VariableExpr>("x"),
+    cs160::make_unique<IntegerExpr>(5));
+
+  expr->Visit(&interpreter_);
+
+  EXPECT_EQ(interpreter_.GetVariable("x"), 5);
+}
+
+TEST_F(InterpreterTest, MoreComplexAssignment) {
+  auto expr = cs160::make_unique<Assignment>(
+    cs160::make_unique<VariableExpr>("x"),
+    cs160::make_unique<AddExpr>(
+      cs160::make_unique<IntegerExpr>(5),
+      cs160::make_unique<IntegerExpr>(10)));
+
+  expr->Visit(&interpreter_);
+
+  EXPECT_EQ(interpreter_.GetVariable("x"), 15);
+}
+
+TEST_F(InterpreterTest, SanityCheckProg) {
+  auto assignment = cs160::make_unique<Assignment>(
+    cs160::make_unique<VariableExpr>("x"),
+    cs160::make_unique<AddExpr>(
+      cs160::make_unique<IntegerExpr>(5),
+      cs160::make_unique<IntegerExpr>(10)));
+
+  std::vector<std::unique_ptr<const Assignment>> assignmentvector;
+  assignmentvector.push_back(std::move(assignment));
+
+  auto arithexpr = cs160::make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
+    make_unique<IntegerExpr>(5));
+
+  auto expr = cs160::make_unique<Program>(std::move(assignmentvector),
+    std::move(arithexpr));
+
+  expr->Visit(&interpreter_);
+
+  for (auto& assignment: assignmentvector) {
+    EXPECT_EQ(interpreter_.GetVariable((assignment)->lhs().name()), 15);
+  }
+
+  EXPECT_EQ(interpreter_.GetOutput(), 2);
+}
+
+
+
+
 
