@@ -2,3 +2,7 @@ bazel-*
 .vscode
 .s
 .cfg
+.DS_Store
+.idea/
+/team-influx
+
