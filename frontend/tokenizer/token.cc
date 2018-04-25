@@ -42,7 +42,7 @@ void Token::Print(){
   }
 }
 
-bool Token::isNumber() {
+bool Token::isOperator() {
   Type current_type = this->type();
   return (current_type == Type::MUL_OP || current_type == Type::DIV_OP ||
     current_type == Type::ADD_OP || current_type == Type::SUB_OP);
