@@ -22,11 +22,24 @@ TEST(Parser, CanParseMultiplication) {
   test_vector.push_back(secondToken);
   test_vector.push_back(firstToken);
 
-  Parser parser(test_vector);
-  std::unique_ptr<const AstNode> result = parser.Eparser();
+  // program vector: END, 1
+  Token fifthToken(Token::Type::NUM, 1);
+  std::vector<Token> test_vector_one;
+  test_vector_one.push_back(fifthToken);
+  test_vector_one.push_back(fourthToken);
+
+  Parser parser_l(test_vector);
+  std::unique_ptr<const AstNode> result_l = parser_l.Eparser();
+
+  Parser parser_r(test_vector_one);
+  std::unique_ptr<const AstNode> result_r = parser_r.Eparser();
+
+  std::unique_ptr<MultiplyExpr> expr = cs160::make_unique<MultiplyExpr>(std::move(result_l), std::move(result_r));
+  
   PrintVisitor *a = new PrintVisitor();
-  a->VisitMultiplyExpr(result);
+
+  a->VisitMultiplyExpr(*expr);
   std::string output = a->GetOutput();
-  //Call the tokenizer here to return std::vector<Token>
+  // Call the tokenizer here to return std::vector<Token>
   EXPECT_EQ(output, "(* 3 6)");
 }
