@@ -33,7 +33,8 @@ class Parser {
   void Consume() { program_.pop_back(); };
   // Prints an error message with information of current token
   void Error() {
-    std::cout << "Error" << std::endl;
+    std::cerr << "Error!" << std::endl;
+    exit(-1);
   }
   // Consume Token if proper type, otherwise error
   void Expect(Token::Type type) { Next() == type ? Consume() : Error(); }
