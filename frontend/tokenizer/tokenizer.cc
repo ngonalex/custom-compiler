@@ -65,6 +65,9 @@ Token::Type Tokenizer::ExtractType(const char testChar) {
   case '/': {
     return Token::DIV_OP;
   }
+  case '=': {
+    return Token::EQUAL_SIGN;
+  }
   default: { return Token::FAILED; }
   }
 }

@@ -16,7 +16,7 @@ TEST(Tokenizer, BasicAddTokenizer) {
 }
 
 TEST(Tokenizer, ComplexExpression) {
-  Tokenizer lexer("(3+3) * 4 / 2 - 1");
+  Tokenizer lexer("(3+3) * 4 / 2 - 1 =");
   std::vector<Token> tokens;
   tokens.push_back(Token(Token::OPEN_PAREN));
   tokens.push_back(Token(Token::NUM, 3));
@@ -29,6 +29,7 @@ TEST(Tokenizer, ComplexExpression) {
   tokens.push_back(Token(Token::NUM, 2));
   tokens.push_back(Token(Token::SUB_OP));
   tokens.push_back(Token(Token::NUM, 1));
+  tokens.push_back(Token(Token::EQUAL_SIGN));
   tokens.push_back(Token(Token::END));
 
   EXPECT_EQ(tokens, lexer.tokens());
