@@ -1,9 +1,9 @@
 #ifndef UTILITY_MEMORY_H_
 #define UTILITY_MEMORY_H_
 
-#if __cplusplus < 201402L
-
 #include <memory>
+
+#if __cplusplus < 201402L
 
 namespace cs160 {
 
