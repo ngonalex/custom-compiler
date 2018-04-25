@@ -73,3 +73,7 @@ Token::Type Tokenizer::ExtractType(const char testChar) {
   default: { return Token::FAILED; }
   }
 }
+
+bool Tokenizer::validVariableName(std::stringstream variableName) {
+
+}
