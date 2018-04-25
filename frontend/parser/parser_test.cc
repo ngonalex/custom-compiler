@@ -17,10 +17,10 @@ TEST(Parser, CanParseMultiplication) {
   Token thirdToken(Token::Type::NUM, 3);
   Token fourthToken(Token::Type::END);
   std::vector<Token> test_vector;
-  test_vector.push_back(fourthToken);
-  test_vector.push_back(thirdToken);
-  test_vector.push_back(secondToken);
   test_vector.push_back(firstToken);
+  test_vector.push_back(secondToken);
+  test_vector.push_back(thirdToken);
+  test_vector.push_back(fourthToken);
 
   // program vector: END, 1
   Token fifthToken(Token::Type::NUM, 1);
