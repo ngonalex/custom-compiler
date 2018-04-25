@@ -5,4 +5,4 @@ bazel-*
 .DS_Store
 .idea/
 /team-influx
-
+.xcodeproj
