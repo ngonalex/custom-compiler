@@ -3,6 +3,8 @@
 
 #include <memory>
 
+#if __cplusplus < 201402L
+
 namespace cs160 {
 
 // this is missing from the C++11 library, so we implement it here
@@ -13,4 +15,5 @@ std::unique_ptr<T> make_unique(Args&&... args) {
 
 }  // cs160
 
+#endif
 #endif  // UTILITY_MEMORY_H_
