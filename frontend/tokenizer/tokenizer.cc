@@ -1,4 +1,5 @@
 #include "frontend/tokenizer/tokenizer.h"
+
 #include <sstream>
 
 using namespace cs160::frontend;
@@ -8,6 +9,7 @@ Tokenizer::Tokenizer(std::string program) : input_program_(program) {
   Token::Type prevType = Token::NONE;
   std::string currString;
 
+  //Looping through all characters of program and tokenize
   for (char &c : input_program_) {
     if (c == ' ')
       continue;
@@ -64,6 +66,9 @@ Token::Type Tokenizer::ExtractType(const char testChar) {
   }
   case '/': {
     return Token::DIV_OP;
+  }
+  case '=': {
+    return Token::EQUAL_SIGN;
   }
   default: { return Token::FAILED; }
   }

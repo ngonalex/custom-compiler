@@ -30,7 +30,7 @@ bool Token::operator!=(const Token &b) const {
   }
 }
 
-void Token::Print(){
+void Token::Print() {
   switch (this->type_) {
   case NUM:
     std::cout << "Type: NUM\n" << std::endl;

@@ -9,7 +9,7 @@ namespace frontend {
 class Token {
  public:
   enum Type { NUM, OPEN_PAREN, CLOSE_PAREN, ADD_OP,
-   SUB_OP, MUL_OP, DIV_OP, END, FAILED, NONE };
+   SUB_OP, MUL_OP, DIV_OP, EQUAL_SIGN, END, FAILED, NONE };
   // Constructor for Non-NUM Tokens
   explicit Token(Token::Type type) : type_(type), val_(0) {
     ASSERT(type != Token::Type::NUM, "Integer tokens need a val");
@@ -29,9 +29,9 @@ class Token {
   void Print();
 
   // Helper functions for the parser
-  bool isNumber() { return (this->type() == Type::NUM); }
-
   bool isOperator();
+
+  bool isNumber () { return (this->type() == Type::NUM); };
 
   // Getter functions
   Token::Type type() const { return type_; }
