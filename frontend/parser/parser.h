@@ -22,6 +22,7 @@ class Parser {
   // Must pass tokens program into Parser, even it it is just Type::END
   explicit Parser(std::vector<Token> program) : program_(program) {
     ASSERT(program.size() != 0, "Program cannot be empty tokens");
+    std::reverse(this->program_.begin(), this->program_.end());
   }
   Parser(){ }
 
@@ -66,34 +67,36 @@ class Parser {
 
   // every 't' is supposed to be a Tree
   std::unique_ptr<const AstNode> Eparser() {
-    std::unique_ptr<const AstNode> t = E();
+    std::unique_ptr<const AstNode> t = ParseAddSub();
     Expect(Token::Type::END);
     return t;
   }
 
-  std::unique_ptr<const AstNode> E() {
-    std::unique_ptr<const AstNode> t = T();
+  std::unique_ptr<const AstNode> ParseAddSub() {
+    std::unique_ptr<const AstNode> t = ParseMulDiv();
     Token::Type op = Next();
     while (op == Token::Type::ADD_OP || op == Token::Type::SUB_OP) {
       Consume();
-      std::unique_ptr<const AstNode> t1 = T();
+      std::unique_ptr<const AstNode> t1 = ParseMulDiv();
       t = mkNode(op, std::move(t), std::move(t1));
+      op = Next();
     }
     return t;
   }
 
-  std::unique_ptr<const AstNode> T() {
-    std::unique_ptr<const AstNode> t = P();
+  std::unique_ptr<const AstNode> ParseMulDiv() {
+    std::unique_ptr<const AstNode> t = ParseExpression();
     Token::Type op = Next();
     while (op == Token::Type::MUL_OP || op == Token::Type::DIV_OP) {
       Consume();
-      std::unique_ptr<const AstNode> t1 = P();
+      std::unique_ptr<const AstNode> t1 = ParseExpression();
       t = mkNode(op, std::move(t), std::move(t1));
+      op = Next();
     }
     return t;
   }
 
-  std::unique_ptr<const AstNode> P() {
+  std::unique_ptr<const AstNode> ParseExpression() {
     // Either returns an Int
       Token::Type type = Next();
     if (type == Token::Type::NUM) {
@@ -104,7 +107,7 @@ class Parser {
     // An Expression
     else if (type == Token::Type::OPEN_PAREN) {
       Consume();
-      std::unique_ptr<const AstNode> t = E();
+      std::unique_ptr<const AstNode> t = ParseAddSub();
       Expect(Token::Type::CLOSE_PAREN);
       return t;
     }
