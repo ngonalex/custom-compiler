@@ -12,6 +12,7 @@
 
 using namespace cs160::abstract_syntax::frontend;
 using cs160::frontend::Token;
+using namespace std;
 
 namespace cs160 {
 namespace frontend {
@@ -53,6 +54,7 @@ class Parser {
       }
       default: {
         Error();
+        return nullptr;
       }
     }
   }
@@ -108,6 +110,7 @@ class Parser {
     // Or an error
     else {
       Error();
+      return NULL;
     }
   }
 

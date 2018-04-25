@@ -1,6 +1,8 @@
 #ifndef UTILITY_MEMORY_H_
 #define UTILITY_MEMORY_H_
 
+#if __cplusplus < 201402L
+
 #include <memory>
 
 namespace cs160 {
@@ -13,4 +15,5 @@ std::unique_ptr<T> make_unique(Args&&... args) {
 
 }  // cs160
 
+#endif
 #endif  // UTILITY_MEMORY_H_
