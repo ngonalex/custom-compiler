@@ -22,23 +22,23 @@ class PrinterTest : public ::testing::Test {
 };
 
 TEST_F(PrinterTest, IntegerExprIsVisited) {
-  auto number = make_unique<IntegerExpr>(7);
+  auto number = make_unique<const IntegerExpr>(7);
   number->Visit(&printer_);
 
   EXPECT_EQ(printer_.GetOutput(), "7");
 }
 
 TEST_F(PrinterTest, AddExprIsVisited) {
-  auto expr = cs160::make_unique<AddExpr>((make_unique<IntegerExpr>(7)),
-                                   make_unique<IntegerExpr>(5));
+  auto expr = make_unique<const AddExpr>((make_unique<const IntegerExpr>(7)),
+                                         make_unique<const IntegerExpr>(5));
   expr->Visit(&printer_);
 
   EXPECT_EQ(printer_.GetOutput(), "(+ 7 5)");
 }
 
 TEST_F(PrinterTest, SubtractExprIsVisited) {
-  auto expr = cs160::make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
-                                        make_unique<IntegerExpr>(5));
+  auto expr = make_unique<const SubtractExpr>(
+      make_unique<const IntegerExpr>(7), make_unique<const IntegerExpr>(5));
 
   expr->Visit(&printer_);
 
@@ -46,8 +46,8 @@ TEST_F(PrinterTest, SubtractExprIsVisited) {
 }
 
 TEST_F(PrinterTest, MultiplyExprIsVisited) {
-  auto expr = cs160::make_unique<MultiplyExpr>(make_unique<IntegerExpr>(7),
-                                        make_unique<IntegerExpr>(5));
+  auto expr = make_unique<const MultiplyExpr>(
+      make_unique<const IntegerExpr>(7), make_unique<const IntegerExpr>(5));
 
   expr->Visit(&printer_);
 
@@ -55,8 +55,8 @@ TEST_F(PrinterTest, MultiplyExprIsVisited) {
 }
 
 TEST_F(PrinterTest, DivideExprIsVisited) {
-  auto expr = cs160::make_unique<DivideExpr>(make_unique<IntegerExpr>(7),
-                                      make_unique<IntegerExpr>(5));
+  auto expr = make_unique<const DivideExpr>(make_unique<const IntegerExpr>(7),
+                                            make_unique<const IntegerExpr>(5));
 
   expr->Visit(&printer_);
 
@@ -64,11 +64,11 @@ TEST_F(PrinterTest, DivideExprIsVisited) {
 }
 
 TEST_F(PrinterTest, NestedVisitationsWorkProperly) {
-  auto expr = cs160::make_unique<DivideExpr>(
-      cs160::make_unique<AddExpr>(make_unique<IntegerExpr>(7),
-                           make_unique<IntegerExpr>(5)),
-      cs160::make_unique<SubtractExpr>(make_unique<IntegerExpr>(2),
-                                make_unique<IntegerExpr>(1)));
+  auto expr = make_unique<const DivideExpr>(
+      make_unique<const AddExpr>(make_unique<const IntegerExpr>(7),
+                                 make_unique<const IntegerExpr>(5)),
+      make_unique<const SubtractExpr>(make_unique<const IntegerExpr>(2),
+                                      make_unique<const IntegerExpr>(1)));
 
   expr->Visit(&printer_);
 

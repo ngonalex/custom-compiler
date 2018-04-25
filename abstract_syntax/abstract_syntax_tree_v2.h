@@ -36,8 +36,8 @@ class AddExpr;
 class SubtractExpr;
 class MultiplyExpr;
 class DivideExpr;
-class AssignmentExpr;
-class ProgramExpr;
+class Assignment;
+class Program;
 
 // The visitor abstract base class for visiting abstract syntax trees.
 class AstVisitor {
@@ -51,8 +51,8 @@ class AstVisitor {
   virtual void VisitSubtractExpr(const SubtractExpr& exp) = 0;
   virtual void VisitMultiplyExpr(const MultiplyExpr& exp) = 0;
   virtual void VisitDivideExpr(const DivideExpr& exp) = 0;
-  virtual void VisitAssignmentExpr(const AssignmentExpr& exp) = 0;
-  virtual void VisitProgramExpr(const ProgramExpr& exp) = 0;
+  virtual void VisitAssignment(const Assignment& assignment) = 0;
+  virtual void VisitProgram(const Program& program) = 0;
 };
 
 // The definition of the abstract syntax tree abstract base class.
@@ -152,13 +152,13 @@ class DivideExpr : public BinaryOperatorExpr {
 };
 
 // An assignment v := ae.
-class AssignmentExpr : public AstNode {
+class Assignment : public AstNode {
  public:
-  AssignmentExpr(std::unique_ptr<const VariableExpr> lhs,
-                 std::unique_ptr<const ArithmeticExpr> rhs)
+  Assignment(std::unique_ptr<const VariableExpr> lhs,
+             std::unique_ptr<const ArithmeticExpr> rhs)
       : lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
 
-  void Visit(AstVisitor* visitor) const { visitor->VisitAssignmentExpr(*this); }
+  void Visit(AstVisitor* visitor) const { visitor->VisitAssignment(*this); }
 
   const VariableExpr& lhs() const { return *lhs_; }
   const ArithmeticExpr& rhs() const { return *rhs_; }
@@ -171,23 +171,23 @@ class AssignmentExpr : public AstNode {
 
 // A program, consisting of a (possibly empty) sequence of assignments followed
 // by an arithmetic expression.
-class ProgramExpr : public AstNode {
+class Program : public AstNode {
  public:
-  ProgramExpr(std::vector<std::unique_ptr<const AssignmentExpr>> assignments,
-              std::unique_ptr<const ArithmeticExpr> arithmetic_exp)
+  Program(std::vector<std::unique_ptr<const Assignment>> assignments,
+          std::unique_ptr<const ArithmeticExpr> arithmetic_exp)
       : assignments_(std::move(assignments)),
         arithmetic_exp_(std::move(arithmetic_exp)) {}
 
-  void Visit(AstVisitor* visitor) const { visitor->VisitProgramExpr(*this); }
+  void Visit(AstVisitor* visitor) const { visitor->VisitProgram(*this); }
 
-  const std::vector<std::unique_ptr<const AssignmentExpr>>& assignments() {
+  const std::vector<std::unique_ptr<const Assignment>>& assignments() const {
     return assignments_;
   }
 
   const ArithmeticExpr& arithmetic_exp() const { return *arithmetic_exp_; }
 
  private:
-  std::vector<std::unique_ptr<const AssignmentExpr>> assignments_;
+  std::vector<std::unique_ptr<const Assignment>> assignments_;
   std::unique_ptr<const ArithmeticExpr> arithmetic_exp_;
 };
 
