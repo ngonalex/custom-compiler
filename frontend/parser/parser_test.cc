@@ -24,8 +24,9 @@ TEST(Parser, CanParseMultiplication) {
 
   Parser parser(test_vector);
   std::unique_ptr<const AstNode> result = parser.Eparser();
-  PrintVisitor::VisitMultiplyExpr(result);
-  std::string output = PrintVisitor::GetOutput();
+  PrintVisitor *a = new PrintVisitor();
+  a->VisitMultiplyExpr(result);
+  std::string output = a->GetOutput();
   //Call the tokenizer here to return std::vector<Token>
   EXPECT_EQ(output, "(* 3 6)");
 }
