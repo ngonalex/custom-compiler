@@ -29,9 +29,9 @@ class Token {
   void Print();
 
   // Helper functions for the parser
-  bool isOperator() { return (this->type() == Type::NUM); }
+  bool isOperator();
 
-  bool isNumber();
+  bool isNumber( return (this->type() == Type::NUM); );
 
   // Getter functions
   Token::Type type() const { return type_; }
