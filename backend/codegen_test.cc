@@ -10,6 +10,7 @@
 #include "abstract_syntax/abstract_syntax.h"
 #include "backend/lowerer_visitor.h"
 #include "utility/memory.h"
+#include "gtest/gtest.h"
 
 using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::IntegerExpr;
@@ -22,6 +23,11 @@ using cs160::backend::LowererVisitor;
 using cs160::backend::ThreeAddressCode;
 using cs160::backend::CodeGen;
 using cs160::make_unique;
+
+class CodeGenTest : public ::testing::Test {
+ protected:
+  LowererVisitor lowerer_;
+};
 
 // this piece of code is from stackoverflow 
 // link: https://stackoverflow.com/questions/478898/how-to-execute-a-command-and-get-output-of-command-within-c-using-posix
@@ -37,8 +43,7 @@ std::string exec(const char* cmd) {
     return result;
 }
 
-int main() {
-  LowererVisitor lowerer_;
+TEST_F(CodeGenTest, IntegerExprIsVisited) {
   auto expr = cs160::make_unique<DivideExpr>(
     make_unique<IntegerExpr>(7), make_unique<IntegerExpr>(5));
 
@@ -52,7 +57,6 @@ int main() {
   // CHANGE TO GENERATEEPILOGUE LATER
   runner.GenerateDumbTest();
   std::string result = exec("gcc -c test.s && ld test.o && ./a.out");
-  std::cout <<result<<std::endl;
-  return 0;
+  EXPECT_EQ(result, "Hello, world\n");
 }
 

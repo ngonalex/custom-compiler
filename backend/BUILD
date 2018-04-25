@@ -14,7 +14,7 @@ cc_test(
 	name = "backend_test",
 	deps = ["@gtest//:main", ":backend"],
 	srcs = [
-		"lowerer_visitor_test.cc","interpreter_visitor_test.cc"
+		"lowerer_visitor_test.cc","interpreter_visitor_test.cc", "codegen_test.cc"
 	],
 	copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
 	timeout = "short",
