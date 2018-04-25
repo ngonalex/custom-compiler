@@ -17,11 +17,11 @@ class PrintVisitor : public AstVisitor {
 
   const std::string GetOutput() const { return output_.str(); }
 
-  void VisitIntegerExpr(const IntegerExpr& exp) { output_ << exp.value(); }
+  void VisitIntegerExpr(const IntegerExpr& exp) override {
+    output_ << exp.value();
+  }
 
-  void VisitBinaryOperatorExpr(const BinaryOperatorExpr& exp) {}
-
-  void VisitAddExpr(const AddExpr& exp) {
+  void VisitAddExpr(const AddExpr& exp) override {
     output_ << "(+ ";
     exp.lhs().Visit(this);
     output_ << " ";
@@ -29,7 +29,7 @@ class PrintVisitor : public AstVisitor {
     output_ << ")";
   }
 
-  void VisitSubtractExpr(const SubtractExpr& exp) {
+  void VisitSubtractExpr(const SubtractExpr& exp) override {
     output_ << "(- ";
     exp.lhs().Visit(this);
     output_ << " ";
@@ -37,7 +37,7 @@ class PrintVisitor : public AstVisitor {
     output_ << ")";
   }
 
-  void VisitMultiplyExpr(const MultiplyExpr& exp) {
+  void VisitMultiplyExpr(const MultiplyExpr& exp) override {
     output_ << "(* ";
     exp.lhs().Visit(this);
     output_ << " ";
@@ -45,7 +45,7 @@ class PrintVisitor : public AstVisitor {
     output_ << ")";
   }
 
-  void VisitDivideExpr(const DivideExpr& exp) {
+  void VisitDivideExpr(const DivideExpr& exp) override {
     output_ << "(/ ";
     exp.lhs().Visit(this);
     output_ << " ";
