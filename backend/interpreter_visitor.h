@@ -5,9 +5,10 @@
 #include <map>
 #include <stack>
 #include <iostream>
+#include <utility>
+#include <string>
 
 #include "abstract_syntax/abstract_syntax.h"
-#include "backend/exceptions.h"
 
 using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::IntegerExpr;

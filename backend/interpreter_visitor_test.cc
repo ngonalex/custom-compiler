@@ -3,6 +3,7 @@
 #include <math.h>
 #include <iostream>
 #include <stack>
+#include <vector>
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "utility/memory.h"
@@ -17,7 +18,6 @@ using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::BinaryOperatorExpr;
 using cs160::backend::InterpreterVisitor;
 using cs160::make_unique;
-using cs160::backend::DivisorIsZeroException;
 
 class InterpreterTest : public ::testing::Test {
  protected:
