@@ -67,9 +67,9 @@ TEST(Tokenizer, SingleLetterVariableName) {
 TEST(Tokenizer, MuliLetterVariableName) {
   Tokenizer lexer("5 + victor");
   std::vector<Token> tokens;
-  tokens.push_back(Token::NUM, 5);
-  tokens.push_back(Token::ADD_OP);
-  tokens.push_back(Token::ADD_OP);
+  tokens.push_back(Token(Token::NUM, 5));
+  tokens.push_back(Token(Token::ADD_OP));
+  tokens.push_back(Token(Token::ADD_OP));
 
   EXPECT_EQ(lexer.tokens()[0],tokens[0]);
 }

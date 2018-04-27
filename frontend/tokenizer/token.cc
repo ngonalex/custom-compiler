@@ -4,7 +4,12 @@ using namespace cs160::frontend;
 
 bool Token::operator==(const Token &b) const {
   if (this->type_ == NUM) {
-    if (this->type_ == b.type_ && this->val_ == b.val_)
+    if (this->type_ == b.type_ && this->numVal_ == b.numVal_)
+      return true;
+    else
+      return false;
+  } else if (this->type_ == IDENTIFIER || this->type_ == VAR_NAME){
+    if (this->type_ == b.type_ && this->stringVal_ == b.stringVal_)
       return true;
     else
       return false;
@@ -18,7 +23,12 @@ bool Token::operator==(const Token &b) const {
 
 bool Token::operator!=(const Token &b) const {
   if (this->type_ == NUM) {
-    if (this->type_ == b.type_ && this->val_ == b.val_)
+    if (this->type_ == b.type_ && this->numVal_ == b.numVal_)
+      return false;
+    else
+      return true;
+  } else if (this->type_ == IDENTIFIER || this->type_ == VAR_NAME){
+    if (this->type_ == b.type_ && this->stringVal_ == b.stringVal_)
       return false;
     else
       return true;
@@ -34,7 +44,7 @@ void Token::Print() {
   switch (this->type_) {
   case NUM:
     std::cout << "Type: NUM\n" << std::endl;
-    std::cout << "\tValue: " << this->val_ << "\n" << std::endl;
+    std::cout << "\tValue: " << this->numVal_ << "\n" << std::endl;
     break;
   default:
     std::cout << "Type: " << this->type_ << "\n" << std::endl;
