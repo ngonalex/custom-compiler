@@ -3,26 +3,166 @@
 namespace cs160 {
 namespace backend {
 
-// REMEMBER TO TAKE THIS OUT
-void CodeGen::GenerateDumbTest() {
-  outfile_ << "\tcmp $1, %rax" << std::endl;
-  outfile_ << "\tje print" << std::endl;
+// For V2 We want to print out in 2 places
+// With an assignment instruction e.g. string <- register
+// Or At the end when it's an arithmetic instruction
 
-  outfile_<< "print:" << std::endl;
-  outfile_<< "\tmov $1, %rax" << std::endl;
-  outfile_<< "\tmov $1, %rdi" << std::endl;
-  outfile_<< "\tmov $message, %rsi" << std::endl;
-  outfile_<< "\tmov $13, %rdx" << std::endl;
-  outfile_<< "\tsyscall" << std::endl;
+// High level wise the way this SHOULD work in the future when Generate
+// Assignment is implemented is that
+// GeneratePrinter, GeneratePrintHeader are unique
+// There will be subfunctions later for each assignment though
+// e.g x= 2+5, y = 2-10 should create 4 subfunctions
+// xascii: .ascii "Variable x is equal to"
+// yascii: .ascii "Variable y is equal to"
+// printx: (assembly code to print xascii here)
+// printy: (assembly code to print yascii here)
+// printy/x should contain a jmp/call instruction to "printstart"
+// defined in GeneratePrintHeader
+// so it just does it's job of printing INTs normally
 
-  outfile_ << "\tmov $60, %rax\n\txor %rdi, %rdi\n\tsyscall" << std::endl;
-  outfile_<< "message:" << std::endl;
-  outfile_ << "\t .ascii \"Hello, world\\n\"" << std::endl;
+// How it all links together (Unique printer described above) ->
+// call printstart: -> call intloop -> (Potentiall a jump to printnegative:)
+// call printloop: -> call printnewline ->ret printloop: ... ret uniqueprinter
+// -> ret original place that called it (_start)
+// Basically this print routine should NOT affect the regular 
+// assembly in anyway and is ONLY really meant for making 
+// unit testing our assembly easier. Also Very crude implementation, 
+// doesn't follow calling conventions at all , Refactor later
+// Note to self each function requires that rax has the value to be printed
+// It cannot be at the top of the stack until after the call to printstart
+
+void CodeGen::GeneratePrinter() {
+  // ASSUME RESULT IS IN RAX
+
+
+  GeneratePrintHeader();
+
+  // intloop divides the int in rax by 10
+  // and converts the remainder into a char
+  // for printing
+  // E.g 12345 -> rax: 1234, rdx: 5 -> convert + push 5 to stack
+  outfile_ << "intloop:" << std::endl;
+  outfile_ << "\tmov $10, %rcx" << std::endl;
+  outfile_ << "\txor %rdx, %rdx" << std::endl;
+
+  outfile_ << "\tdiv %rcx" << std::endl;
+  outfile_ << "\tadd $'0', %rdx" << std::endl;
+  outfile_ << "\tinc %rsi" << std::endl;
+  outfile_ << "\tpush %rdx" << std::endl;
+  outfile_ << "\tcmp $0, %rax" << std::endl;
+  outfile_ << "\tjnz intloop" << std::endl;
+
+  outfile_ << "\tmov %rsi, %rbx" << std::endl;
+  outfile_ << "\tcmp $1, %rdi" << std::endl;
+  outfile_ << "\tje printnegative" << std::endl;
+  outfile_ << "\tjmp printloop" << std::endl;
+
+  // Printloop
+  outfile_ << "printloop:" << std::endl;
+  outfile_ << "\tmov $1, %rax" << std::endl;
+  outfile_ << "\tmov $1, %rdi" << std::endl;
+  outfile_ << "\tmov %rsp, %rsi" << std::endl;
+  outfile_ << "\tmov $1, %rdx" << std::endl;
+  outfile_ << "\tsyscall" << std::endl;
+
+  outfile_ << "\tpop %rdx" << std::endl;
+  outfile_ << "\tdec %rbx" << std::endl;
+  outfile_ << "\tcmp $0, %rbx" << std::endl;
+  outfile_ << "\tjnz printloop" << std::endl;
+
+  outfile_ << "\tmov $1, %rax" << std::endl;
+  outfile_ << "\tmov $1, %rdi" << std::endl;
+  outfile_ << "\tmov $printnewline, %rsi" << std::endl;
+  outfile_ << "\tmov $1, %rdx" << std::endl;
+  outfile_ << "\tsyscall" << std::endl;
+
+  outfile_ << "\tret" << std::endl;
+
+  // printnegative:
+  outfile_ << "printnegative:" << std::endl;
+  outfile_ << "\tmov $1, %rax" << std::endl;
+  outfile_ << "\tmov $1, %rdi" << std::endl;
+  outfile_ << "\tmov $negative, %rsi" << std::endl;
+  outfile_ << "\tmov $1, %rdx" << std::endl;
+  outfile_ << "\tsyscall" << std::endl;
+  outfile_ << "\tjmp printloop" << std::endl;
+
+  // negative:
+  outfile_ << "negative:" << std::endl;
+  outfile_ << "\t.ascii \"-\"" << std::endl;
+
+  // printresult
+  outfile_ << "printresult:" << std::endl;
+  outfile_ << "\t.ascii \"The result is equal to: \"" << std::endl;
+  
+  // printnewline
+  outfile_ << "printnewline:" << std::endl;
+  outfile_ << "\t.ascii \"\\n\""  << std::endl;
+
+  GenerateResult();
+
+  //Generate Unique Printers here
+  // for (map? ) {
+  //   GenerateAssignment(varname)
+  // }
+}
+
+void CodeGen::GeneratePrintHeader() {
+  outfile_ << "printstart:" << std::endl;
+
+  // Handle negative number here (If the number
+  // were printing out is negative then note it
+  // otherwise print normally)
+  
+  // Why do we need these  2 lines, Look into later?
+  outfile_ << "\txor %rsi, %rsi" << std::endl;
+  outfile_ << "\txor %rdi, %rdi" << std::endl;
+
+  // outfile_ << "\tpop %rax" << std::endl;
+
+  outfile_ << "\tcmp $0, %rax" << std::endl;
+  outfile_ << "\tjge intloop" << std::endl;
+  outfile_ << "\tneg %rax" << std::endl;
+  outfile_ << "\tmov $1, %rdi" << std::endl;
+  outfile_ << "\tjmp intloop" << std::endl;
+}
+
+void CodeGen::GenerateAssignment(std::string variablename) {
+
+  outfile_ << "print" + variablename + ":" << std::endl;
+  outfile_ << "\tmov $1, %rax" << std::endl;
+  outfile_ << "\tmov $1, %rdi" << std::endl;
+  outfile_ << "\tmov $" + variablename +"ascii, %rsi" << std::endl;
+  outfile_ << "\tmov $1, %rdx" << std::endl;
+  outfile_ << "\tsyscall" << std::endl;
+
+  outfile_ << "\txor %rsi, %rsi" << std::endl;
+  outfile_ << "\tcall printstart" << std::endl;
+
+  outfile_ << "\tret" << std::endl;
+
+}
+
+void CodeGen::GenerateResult() {
+  outfile_ << "printarith:" << std::endl;
+
+  outfile_ << "\tpush %rax" << std::endl;
+  
+  outfile_ << "\tmov $1, %rax" << std::endl;
+  outfile_ << "\tmov $1, %rdi" << std::endl;
+  outfile_ << "\tmov $printresult, %rsi" << std::endl;
+  outfile_ << "\tmov $24, %rdx" << std::endl;
+  outfile_ << "\tsyscall" << std::endl;
+
+  outfile_ << "\tpop %rax" << std::endl;
+
+  outfile_ << "\tjmp printstart" << std::endl;
+
+  outfile_ << "\tret" << std::endl;
 }
 
 void CodeGen::GenerateEpilogue() {
   outfile_ << "\tmov $60, %rax\n\txor %rdi, %rdi\n\tsyscall" << std::endl;
-  outfile_.close();
 }
 
 void CodeGen::GenerateBoiler() {
@@ -38,6 +178,7 @@ void CodeGen::ClearRegister(std::string reg) {
 void CodeGen::Generate(std::vector
   <std::unique_ptr<struct ThreeAddressCode>> blocks) {
   // boiler code here
+  GenerateBoiler();
 
   // IR to assembly inst
   for (unsigned int i = 0; i < blocks.size(); ++i) {
@@ -86,6 +227,14 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tpush %rax" << std::endl;
     }
   }
+  //This will probably change later, call on the print function for the
+  // Arith Expr
+  outfile_ << "\tpop %rax" << std::endl;
+  outfile_ << "\tcall printarith" << std::endl;
+
+  GenerateEpilogue();
+  GeneratePrinter();
+  outfile_.close();
 }
 
 }  // namespace backend
