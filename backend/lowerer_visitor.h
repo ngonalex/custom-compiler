@@ -16,10 +16,21 @@ using cs160::abstract_syntax::backend::AddExpr;
 using cs160::abstract_syntax::backend::SubtractExpr;
 using cs160::abstract_syntax::backend::MultiplyExpr;
 using cs160::abstract_syntax::backend::DivideExpr;
-using cs160::abstract_syntax::backend::BinaryOperatorExpr;
 using cs160::abstract_syntax::backend::Assignment;
 using cs160::abstract_syntax::backend::Program;
 using cs160::abstract_syntax::backend::VariableExpr;
+using cs160::abstract_syntax::backend::LessThanExpr;
+using cs160::abstract_syntax::backend::LessThanEqualToExpr;
+using cs160::abstract_syntax::backend::GreaterThanExpr;
+using cs160::abstract_syntax::backend::GreaterThanEqualToExpr;
+using cs160::abstract_syntax::backend::EqualToExpr;
+using cs160::abstract_syntax::backend::LogicalAndExpr;
+using cs160::abstract_syntax::backend::LogicalBinaryOperator;
+using cs160::abstract_syntax::backend::LogicalNotExpr;
+using cs160::abstract_syntax::backend::LogicalOrExpr;
+using cs160::abstract_syntax::backend::Loop;
+using cs160::abstract_syntax::backend::Conditional;
+
 
 
 namespace cs160 {
@@ -32,13 +43,26 @@ class LowererVisitor : public AstVisitor {
 
   const std::string GetOutput() const;
 
-  // Fill me in
+  // V3 (Assignment + Program updated) Fill 
+  void VisitLessThanExpr(const LessThanExpr& exp) {}
+  void VisitLessThanEqualToExpr(const LessThanEqualToExpr& exp) {}
+  void VisitGreaterThanExpr(const GreaterThanExpr& exp) {}
+  void VisitGreaterThanEqualToExpr(
+      const GreaterThanEqualToExpr& exp) {}
+  void VisitEqualToExpr(const EqualToExpr& exp) {}
+  void VisitLogicalAndExpr(const LogicalAndExpr& exp) {}
+  void VisitLogicalOrExpr(const LogicalOrExpr& exp) {}
+  void VisitLogicalNotExpr(const LogicalNotExpr& exp) {}
+  void VisitConditional(const Conditional& conditional) {}
+  void VisitLoop(const Loop& loop) {}
+
+
+  // V2
   void VisitAssignment(const Assignment& assignment);
   void VisitProgram(const Program& program);
   void VisitVariableExpr(const VariableExpr& exp);
 
   void VisitIntegerExpr(const IntegerExpr& exp);
-  void VisitBinaryOperatorExpr(const BinaryOperatorExpr& exp) {}
   void VisitAddExpr(const AddExpr& exp);
   void VisitSubtractExpr(const SubtractExpr& exp);
   void VisitMultiplyExpr(const MultiplyExpr& exp);

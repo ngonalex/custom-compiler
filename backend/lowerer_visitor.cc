@@ -61,8 +61,8 @@ void LowererVisitor::VisitAssignment(const Assignment& assignment) {
 void LowererVisitor::VisitProgram(const Program& program) {
   // Do all the Assignments, then eval the AE?
 
-  for (auto& assignment : program.assignments()) {
-      assignment->Visit(this);
+  for (auto& statement : program.statements()) {
+      statement->Visit(this);
   }
 
   program.arithmetic_exp().Visit(this);
