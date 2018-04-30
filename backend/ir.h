@@ -2,6 +2,7 @@
 #define BACKEND_IR_H_
 
 #include <string>
+#include "utility/assert.h"
 
 namespace cs160 {
 namespace backend {
