@@ -28,7 +28,7 @@ std::unique_ptr<const AstNode> Parser::mkNode(Token::Type op,
 
 std::unique_ptr<const AstNode> Parser::mkLeaf(Token num) {
   ASSERT(num.isNumber(), "Error creating IntegerExpr");
-  return make_unique<IntegerExpr>(num.val());
+  return make_unique<IntegerExpr>(num.numVal());
 }
 
 std::unique_ptr<const AstNode> Parser::Eparser() {
@@ -61,6 +61,11 @@ std::unique_ptr<const AstNode> Parser::ParseMulDiv() {
   return t;
 }
 
+std::unique_ptr<const AstNode> Parser::mkVar(Token varName) {
+  ASSERT(varName.isVar(), "Error creating VariableExpr");
+  return make_unique<VariableExpr>(varName.stringVal());
+}
+
 std::unique_ptr<const AstNode> Parser::ParseExpression() {
   // Either returns an Int
     Token::Type type = Next();
@@ -75,6 +80,24 @@ std::unique_ptr<const AstNode> Parser::ParseExpression() {
     std::unique_ptr<const AstNode> t = ParseAddSub();
     Expect(Token::Type::CLOSE_PAREN);
     return t;
+  }
+  // An assignment
+  else if (type == Token::Type::IDENTIFIER) {
+    // Could possibly have
+    // int x = 5
+    // int y = x <-- NOT IMPLEMENTED RIGHT NOW
+    // int z;
+    // if (type.stringVal() != "int") {
+    //   Error();
+    // }
+    Consume();
+    Expect(Token::Type::VAR_NAME);
+    std::unique_ptr<const AstNode> var = mkVar(program_.back());
+    Consume();
+    Expect(Token::Type::EQUAL_SIGN);
+    Consume();
+    std::unique_ptr<const AstNode> expr = ParseAddSub();
+    return make_unique<Assignment>(std::move(var), std::move(expr));
   }
   // Or an error
   else {

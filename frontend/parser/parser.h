@@ -9,6 +9,7 @@
 #include <stack>
 
 #include "utility/assert.h"
+#include "utility/memory.h"
 
 using namespace cs160::abstract_syntax::frontend;
 using cs160::frontend::Token;
@@ -16,6 +17,19 @@ using namespace std;
 
 namespace cs160 {
 namespace frontend {
+
+
+// Var -> Id VarName = Expr | Id VarName = VarName | Id VarName
+// Id -> 'int'
+// VarName -> String
+// Expr -> Expr + Expr | Expr - Expr | Fact
+// Fact -> Fact * Fact | Fact / Fact | Term
+// Term -> ( Expr ) | Num
+// Num -> [0, 9]+
+
+// int x = 5
+// int y;
+// y = x
 
 class Parser {
  public:
@@ -47,6 +61,8 @@ class Parser {
   std::unique_ptr<const AstNode> mkNode(Token::Type op, 
     std::unique_ptr<const AstNode> first_leaf,
     std::unique_ptr<const AstNode> second_leaf);
+    
+  std::unique_ptr<const AstNode> mkVar(Token varName);
     
   std::unique_ptr<const AstNode> mkLeaf(Token num);
 

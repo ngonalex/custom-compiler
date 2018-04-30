@@ -1,5 +1,4 @@
 #include "abstract_syntax/abstract_syntax.h"
-#include "abstract_syntax/print_visitor_v1.h"
 #include "frontend/parser/parser.h"
 #include "frontend/tokenizer/token.h"
 #include "frontend/tokenizer/tokenizer.h"
@@ -305,3 +304,24 @@ TEST(Parse, SingleParen) {
   EXPECT_EQ(output, "5");
 }
 
+// int x = 5
+Test(parser, Assignment) {
+  Token int_type(Token:Type::IDENTIFIER, "int");
+  Token var_name(Token::Type::VAR_NAME, "x");
+  Token equals(Token::Type::EQUAL_SIGN);
+  Token five(Token::Type::NUM, 5);
+  Token end(Token::Type::END);
+  std::vector<Token> test_vector;
+  test_vector.push_back(int_type);
+  test_vector.push_back(var_name);
+  test_vector.push_back(equals);
+  test_vector.push_back(five);
+  test_vector.push_back(end);
+  
+  Parser parser(test_vector);
+  std::unique_ptr<const AstNode> result = parser.Esparser();
+  
+  // PrintVisitor *a = new PrintVisitor();
+  // result->visit(a);
+  // std::string output = a->GetOutput();
+}
