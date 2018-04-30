@@ -38,7 +38,7 @@ void CodeGen::ClearRegister(std::string reg) {
 void CodeGen::Generate(std::vector
   <std::unique_ptr<struct ThreeAddressCode>> blocks) {
   // boiler code here
-
+  
   // IR to assembly inst
   for (unsigned int i = 0; i < blocks.size(); ++i) {
     auto code = std::move(blocks[i]);
@@ -54,6 +54,13 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tpush %rcx" << std::endl;
       } else {
           // To Do:
+          outfile_ << "\t#block values: " << std::to_string(code->arg1.value()) <<
+          " " << std::to_string(code->arg2.value()) << " " 
+          << std::to_string(code->arg1.optype()) << std::endl;
+          outfile_ << "\tpush rbp" << std::endl;
+          outfile_ << "\tmov rbp, rsp" << std::endl;
+          outfile_ << "\tsub " << std::to_string(4) << ", rsp" << std::endl;
+          outfile_ << "\tpush rsp" << std::endl;//<< std::to_string(prev) << std::endl;
       }
 
     } else if (opcode.opcode() == ADD) {
