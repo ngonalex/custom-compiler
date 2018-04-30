@@ -75,5 +75,5 @@ Token::Type Tokenizer::ExtractType(const char testChar) {
 }
 
 bool Tokenizer::validVariableName(std::stringstream variableName) {
-
+    return false;
 }

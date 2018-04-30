@@ -14,11 +14,11 @@ class Token {
   // Constructor for Non-NUM Tokens
   explicit Token(Token::Type type) : type_(type), val_(0) {
     ASSERT(type != Token::Type::NUM, "Integer tokens need an integer val");
-    ASSERT(type != Token::Type::IDENTIFIER, "Identifier tokens need a string identifierVal")
+    ASSERT(type != Token::Type::IDENTIFIER, "Identifier tokens need a string identifierVal");
   }
   Token() { type_ = Token::Type::NONE; }
 
-  Token(TokenType type, std::string identifierVal) : type_(type), identifierVal_(identifierVal) {
+    Token(Token::Type type, std::string identifierVal) : type_(type), identifierVal_(identifierVal) {
     ASSERT(type == Token::Type::IDENTIFIER, "Only identifier tokens have identifierVal declared");
   }
 
