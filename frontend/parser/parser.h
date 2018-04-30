@@ -18,18 +18,20 @@ using namespace std;
 namespace cs160 {
 namespace frontend {
 
+// Program -> Assignmens* Expr
+// Assignment -> Id VarName = Expr
+// Expr -> Expr + Expr | Expr - Expr | Fact GOOD
+// Fact -> Fact * Fact | Fact / Fact | Term GOOD
+// Term -> ( Expr ) | Num | VarName GOOD
 
-// Var -> Id VarName = Expr | Id VarName = VarName | Id VarName
-// Id -> 'int'
+// Num  -> [0, 9]+
 // VarName -> String
-// Expr -> Expr + Expr | Expr - Expr | Fact
-// Fact -> Fact * Fact | Fact / Fact | Term
-// Term -> ( Expr ) | Num
-// Num -> [0, 9]+
+// Id -> "int"
 
 // int x = 5
-// int y;
+// int y
 // y = x
+
 
 class Parser {
  public:
@@ -56,23 +58,29 @@ class Parser {
 
   // Consume Token if proper type, otherwise error
   void Expect(Token::Type type) { Next() == type ? Consume() : Error(); }
+  
+  void ExpectID(std::string id) { 
+    Next().stringVal() == type ? Consume() : Error(); 
+  }
 
   // AST Expressions
-  std::unique_ptr<const AstNode> mkNode(Token::Type op, 
-    std::unique_ptr<const AstNode> first_leaf,
-    std::unique_ptr<const AstNode> second_leaf);
+  std::unique_ptr<const ArithmeticExpr> mkNode(Token::Type op, 
+    std::unique_ptr<const ArithmeticExpr> first_leaf,
+    std::unique_ptr<const ArithmeticExpr> second_leaf);
     
   std::unique_ptr<const AstNode> mkVar(Token varName);
     
-  std::unique_ptr<const AstNode> mkLeaf(Token num);
+  std::unique_ptr<const ArithmeticExpr> mkLeaf(Token num);
 
-  std::unique_ptr<const AstNode> Eparser();
+  std::unique_ptr<const ArithmeticExpr> ParserProgram();
+  
+  std::unique_ptr<const Assignment> ParserAssignment()
 
-  std::unique_ptr<const AstNode> ParseAddSub();
+  std::unique_ptr<const ArithmeticExpr> ParseAddSub();
 
-  std::unique_ptr<const AstNode> ParseMulDiv();
+  std::unique_ptr<const ArithmeticExpr> ParseMulDiv();
 
-  std::unique_ptr<const AstNode> ParseExpression();
+  std::unique_ptr<const ArithmeticExpr> ParseExpression();
 
 // Tokens will now be in reverse order!
  private:
