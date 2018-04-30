@@ -26,7 +26,6 @@ class Tokenizer {
   Token::Type ExtractType(const char testChar);
 
   /*
-    Rules for ValidVariableName
     1) start with lowercase or uppercase letter or underscore
     2) can have lowercase, uppercase, underscore, or numbers
   */

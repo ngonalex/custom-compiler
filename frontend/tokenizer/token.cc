@@ -8,7 +8,7 @@ bool Token::operator==(const Token &b) const {
       return true;
     else
       return false;
-  } else if (this->type_ == IDENTIFIER || this->type_ == VAR_NAME) {
+  } else if (this->type_ == IDENTIFIER || this->type_ == VAR_NAME){
     if (this->type_ == b.type_ && this->stringVal_ == b.stringVal_)
       return true;
     else
@@ -27,7 +27,7 @@ bool Token::operator!=(const Token &b) const {
       return false;
     else
       return true;
-  } else if (this->type_ == IDENTIFIER || this->type_ == VAR_NAME) {
+  } else if (this->type_ == IDENTIFIER || this->type_ == VAR_NAME){
     if (this->type_ == b.type_ && this->stringVal_ == b.stringVal_)
       return false;
     else
@@ -45,10 +45,6 @@ void Token::Print() {
   case NUM:
     std::cout << "Type: NUM\n" << std::endl;
     std::cout << "\tValue: " << this->numVal_ << "\n" << std::endl;
-    break;
-  case IDENTIFIER || VAR_NAME:
-    std::cout << "Type: IDENTIFIER or VAR_NAME\n" << std::endl;
-    std::cout << "\tValue: " << this->stringVal_ << "\n" << std::endl;
     break;
   default:
     std::cout << "Type: " << this->type_ << "\n" << std::endl;
