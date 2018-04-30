@@ -8,6 +8,11 @@ bool Token::operator==(const Token &b) const {
       return true;
     else
       return false;
+  } else if (this->type_ == IDENTIFIER){
+      if (this->type_ == b.type_ && this->identifierVal_ == b.identifierVal_)
+          return true;
+      else
+          return false;
   } else {
     if (this->type_ == b.type_)
       return true;
@@ -17,17 +22,7 @@ bool Token::operator==(const Token &b) const {
 }
 
 bool Token::operator!=(const Token &b) const {
-  if (this->type_ == NUM) {
-    if (this->type_ == b.type_ && this->val_ == b.val_)
-      return false;
-    else
-      return true;
-  } else {
-    if (this->type_ == b.type_)
-      return false;
-    else
-      return true;
-  }
+    return !operator==(b);
 }
 
 void Token::Print() {
