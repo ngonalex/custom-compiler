@@ -9,7 +9,7 @@ TEST(TokenTest, CanCreateTokensCorrectly) {
   Token add_token(Token::ADD_OP);
 
   EXPECT_EQ(integer_token.type(), Token::NUM);
-  EXPECT_EQ(integer_token.numVal(), 42);
+  EXPECT_EQ(integer_token.val(), 42);
   EXPECT_EQ(add_token.type(), Token::ADD_OP);
 }
 
