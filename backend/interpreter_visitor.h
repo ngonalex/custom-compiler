@@ -52,8 +52,25 @@ class InterpreterVisitor : public AstVisitor {
     return variablemap_.find(variable)->second;
   }
 
+  const bool GetBoolOutput(){
+    bool result = conditionalstack_.top();
+    conditionalstack_.pop();
+    return result;
+  }
+
   // V3 (Assignment + Program updated) Fill 
-  void VisitLessThanExpr(const LessThanExpr& exp) {}
+  void VisitLessThanExpr(const LessThanExpr& exp) {
+    exp.lhs().Visit(const_cast<InterpreterVisitor*>(this));
+    exp.rhs().Visit(const_cast<InterpreterVisitor*>(this));
+
+    int r = opstack_.top();
+    opstack_.pop();
+    int l = opstack_.top();
+    opstack_.pop();
+    bool result = l < r ;
+    conditionalstack_.push(result);
+
+  }
   void VisitLessThanEqualToExpr(const LessThanEqualToExpr& exp) {}
   void VisitGreaterThanExpr(const GreaterThanExpr& exp) {}
   void VisitGreaterThanEqualToExpr(
@@ -158,11 +175,11 @@ class InterpreterVisitor : public AstVisitor {
     program.arithmetic_exp().Visit(this);
   }
 
-
  private:
   // Not very general, this is probably a bad idea for future ASTS
   std::stack<int> opstack_;
   std::stack<std::string> variablestack_;
+  std::stack<bool> conditionalstack_;
   std::map<std::string, int> variablemap_;
 };
 
