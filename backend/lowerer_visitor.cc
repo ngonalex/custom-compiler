@@ -125,9 +125,59 @@ void LowererVisitor::VisitLogicalNotExpr(const LogicalNotExpr& exp) {
   
 }
 void LowererVisitor::VisitConditional(const Conditional& conditional) {
+  // Make the IR of the guard first
+  // We don't "evaluate" the conditional until the boolean
+  // value of the guard has been reached
+  conditional.guard().Visit(const_cast<LowererVisitor*>(this));
+  
+  // So at this point the last statement should be something of the form
+  // t_a <- t_b re t_c
+  // How should we structure the if TAC
+  // Ideas: 1) Structure it like the assembly instructions
+  // If/Else branches in assembly are done with cmp, j[re] chains
+  // Algorithm would be
+  // 1) Look at the previous instructions opcode
+  // 2) represent the "if" as a condition jump statement
+  // Ex. if(x>5) translates to
+  // t0 <- 5, t1 <- x > 5, block1 <- t1 jge/jmp (Basically if t1 is true
+  // jump to block 1
+
+  // Code to create if TAC here
+  // Two notes: I looked at the gcc compiler and it'll reverse the conditional
+  // e.x. x == 5 is represented as a jne
+  // We need a way to keep track if x has been assigned (map of strings -> bools) maybe?
+
+  // Check if the 2nd block is not empty (does it matter?)
+  int oldindex = blocks_.size();
+  for (auto& statement : conditional.false_branch()) {
+    statement->Visit(this);
+  }
+  if (oldindex != blocks_.size()) {
+    // TAC to jump to continue
+  }
+
+  for (auto& statement : conditional.true_branch()) {
+    statement->Visit(this);
+  }
+
+  // TAC to jump to continue here
+
 
 }
 void LowererVisitor::VisitLoop(const Loop& loop) {
+
+  // Similar to branching (Again flip conditionals + eval variables)
+  // from main check the guard
+  loop.guard().Visit(const_cast<LowererVisitor*>(this));
+
+  // Probably have a TAC to create a new label here
+
+  // First evaluate the guard
+  loop.guard().Visit(const_cast<LowererVisitor*>(this));
+
+  // if true, run the code 
+  // otherwise jump to continue
+
 
 }
 
