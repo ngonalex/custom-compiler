@@ -120,6 +120,28 @@ TEST_F(InterpreterTest, LessThanExprIsVisited) {
   EXPECT_EQ(interpreter_.GetBoolOutput(), true);
 }
 
+TEST_F(InterpreterTest, NestedLogicals) {
+
+  auto expr = cs160::make_unique<const LogicalOrExpr>(
+    cs160::make_unique<const LogicalAndExpr>(
+      cs160::make_unique<const LessThanExpr>(
+        cs160::make_unique<const IntegerExpr>(50),
+        cs160::make_unique<const IntegerExpr>(100)),
+      cs160::make_unique<const GreaterThanExpr>(
+        cs160::make_unique<const IntegerExpr>(50),
+        cs160::make_unique<const IntegerExpr>(0))),
+    cs160::make_unique<const LogicalAndExpr>(
+      cs160::make_unique<const LessThanEqualToExpr>(
+        cs160::make_unique<const IntegerExpr>(50),
+        cs160::make_unique<const IntegerExpr>(100)),
+      cs160::make_unique<const GreaterThanEqualToExpr>(
+        cs160::make_unique<const IntegerExpr>(50),
+        cs160::make_unique<const IntegerExpr>(0))));
+
+  expr->Visit(&interpreter_);
+  EXPECT_EQ(interpreter_.GetBoolOutput(), true);
+}
+
 TEST_F(InterpreterTest, SimpleAssignmentTest) {
   auto expr = cs160::make_unique<Assignment>(
     cs160::make_unique<VariableExpr>("x"),

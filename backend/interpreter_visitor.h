@@ -71,14 +71,86 @@ class InterpreterVisitor : public AstVisitor {
     conditionalstack_.push(result);
 
   }
-  void VisitLessThanEqualToExpr(const LessThanEqualToExpr& exp) {}
-  void VisitGreaterThanExpr(const GreaterThanExpr& exp) {}
-  void VisitGreaterThanEqualToExpr(
-      const GreaterThanEqualToExpr& exp) {}
-  void VisitEqualToExpr(const EqualToExpr& exp) {}
-  void VisitLogicalAndExpr(const LogicalAndExpr& exp) {}
-  void VisitLogicalOrExpr(const LogicalOrExpr& exp) {}
-  void VisitLogicalNotExpr(const LogicalNotExpr& exp) {}
+
+  void VisitLessThanEqualToExpr(const LessThanEqualToExpr& exp) {
+    exp.lhs().Visit(const_cast<InterpreterVisitor*>(this));
+    exp.rhs().Visit(const_cast<InterpreterVisitor*>(this));
+
+    int r = opstack_.top();
+    opstack_.pop();
+    int l = opstack_.top();
+    opstack_.pop();
+    bool result = l <= r ;
+    conditionalstack_.push(result);
+  }
+
+  void VisitGreaterThanExpr(const GreaterThanExpr& exp) {
+    exp.lhs().Visit(const_cast<InterpreterVisitor*>(this));
+    exp.rhs().Visit(const_cast<InterpreterVisitor*>(this));
+
+    int r = opstack_.top();
+    opstack_.pop();
+    int l = opstack_.top();
+    opstack_.pop();
+    bool result = l > r ;
+    conditionalstack_.push(result);
+  }
+
+  void VisitGreaterThanEqualToExpr(const GreaterThanEqualToExpr& exp) {
+    exp.lhs().Visit(const_cast<InterpreterVisitor*>(this));
+    exp.rhs().Visit(const_cast<InterpreterVisitor*>(this));
+
+    int r = opstack_.top();
+    opstack_.pop();
+    int l = opstack_.top();
+    opstack_.pop();
+    bool result = l >= r ;
+    conditionalstack_.push(result);
+  }
+
+  void VisitEqualToExpr(const EqualToExpr& exp) {
+    exp.lhs().Visit(const_cast<InterpreterVisitor*>(this));
+    exp.rhs().Visit(const_cast<InterpreterVisitor*>(this));
+
+    int r = opstack_.top();
+    opstack_.pop();
+    int l = opstack_.top();
+    opstack_.pop();
+    bool result = l == r ;
+    conditionalstack_.push(result);
+  }
+
+  void VisitLogicalAndExpr(const LogicalAndExpr& exp) {
+    exp.lhs().Visit(const_cast<InterpreterVisitor*>(this));
+    exp.rhs().Visit(const_cast<InterpreterVisitor*>(this));
+
+    bool r = conditionalstack_.top();
+    conditionalstack_.pop();
+    int l = conditionalstack_.top();
+    conditionalstack_.pop();
+    bool result = l & r ;
+    conditionalstack_.push(result);
+  }
+
+  void VisitLogicalOrExpr(const LogicalOrExpr& exp) {
+    exp.lhs().Visit(const_cast<InterpreterVisitor*>(this));
+    exp.rhs().Visit(const_cast<InterpreterVisitor*>(this));
+
+    bool r = conditionalstack_.top();
+    conditionalstack_.pop();
+    int l = conditionalstack_.top();
+    conditionalstack_.pop();
+    bool result = l | r ;
+    conditionalstack_.push(result);
+  }
+
+  void VisitLogicalNotExpr(const LogicalNotExpr& exp) {
+    bool result = conditionalstack_.top();
+    conditionalstack_.pop();
+    result = !result;
+    conditionalstack_.push(result);
+  }
+
   void VisitConditional(const Conditional& conditional) {}
   void VisitLoop(const Loop& loop) {}
 
