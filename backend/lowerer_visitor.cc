@@ -167,9 +167,6 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
 void LowererVisitor::VisitLoop(const Loop& loop) {
 
   // Similar to branching (Again flip conditionals + eval variables)
-  // from main check the guard
-  loop.guard().Visit(const_cast<LowererVisitor*>(this));
-
   // Probably have a TAC to create a new label here
 
   // First evaluate the guard
