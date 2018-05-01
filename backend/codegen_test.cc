@@ -18,7 +18,6 @@ using cs160::abstract_syntax::backend::AddExpr;
 using cs160::abstract_syntax::backend::SubtractExpr;
 using cs160::abstract_syntax::backend::MultiplyExpr;
 using cs160::abstract_syntax::backend::DivideExpr;
-using cs160::abstract_syntax::backend::BinaryOperatorExpr;
 using cs160::backend::LowererVisitor;
 using cs160::backend::ThreeAddressCode;
 using cs160::backend::CodeGen;

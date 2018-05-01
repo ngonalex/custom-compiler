@@ -8,7 +8,8 @@ namespace backend {
 const std::string LowererVisitor::GetOutput() const {
   // Iterate through the vector and print out each basic block
   std::string output = "";
-  std::vector<std::string> printhelper = {"load", "+", "-", "*", "/"};
+  std::vector<std::string> printhelper = {"load", "+", "-", "*", "/", "<", "<=",
+    ">", ">=", "==", "&&", "||", "!"};
 
   for (unsigned int i = 0; i < blocks_.size(); ++i) {
     // If it's a just a int (Register without a name then access it's value)
@@ -36,6 +37,98 @@ const std::string LowererVisitor::GetOutput() const {
   }
 
   return output;
+}
+
+void LowererVisitor::VisitLessThanExpr(const LessThanExpr& exp) {
+  // Visit left hand side (Last thing should be the target where it stores it)  
+  exp.lhs().Visit(const_cast<LowererVisitor*>(this));
+  int leftindex = blocks_.size();
+
+  exp.rhs().Visit(const_cast<LowererVisitor*>(this));
+
+  BinaryOperatorHelper(LESSTHAN, leftindex);
+
+
+}
+void LowererVisitor::VisitLessThanEqualToExpr(const LessThanEqualToExpr& exp) {
+  // Visit left hand side (Last thing should be the target where it stores it)  
+  exp.lhs().Visit(const_cast<LowererVisitor*>(this));
+  int leftindex = blocks_.size();
+
+  exp.rhs().Visit(const_cast<LowererVisitor*>(this));
+
+  BinaryOperatorHelper(LESSTHANEQ, leftindex);
+}
+void LowererVisitor::VisitGreaterThanExpr(const GreaterThanExpr& exp) {
+  // Visit left hand side (Last thing should be the target where it stores it)  
+  exp.lhs().Visit(const_cast<LowererVisitor*>(this));
+  int leftindex = blocks_.size();
+
+  exp.rhs().Visit(const_cast<LowererVisitor*>(this));
+
+  BinaryOperatorHelper(GREATERTHAN, leftindex);
+}
+void LowererVisitor::VisitGreaterThanEqualToExpr(const GreaterThanEqualToExpr& exp) {
+    // Visit left hand side (Last thing should be the target where it stores it)  
+  exp.lhs().Visit(const_cast<LowererVisitor*>(this));
+  int leftindex = blocks_.size();
+
+  exp.rhs().Visit(const_cast<LowererVisitor*>(this));
+
+  BinaryOperatorHelper(GREATERTHANEQ, leftindex);
+}
+void LowererVisitor::VisitEqualToExpr(const EqualToExpr& exp) {
+  // Visit left hand side (Last thing should be the target where it stores it)  
+  exp.lhs().Visit(const_cast<LowererVisitor*>(this));
+  int leftindex = blocks_.size();
+
+  exp.rhs().Visit(const_cast<LowererVisitor*>(this));
+
+  BinaryOperatorHelper(EQUAL, leftindex);
+}
+void LowererVisitor::VisitLogicalAndExpr(const LogicalAndExpr& exp) {
+  // Visit left hand side (Last thing should be the target where it stores it)  
+  exp.lhs().Visit(const_cast<LowererVisitor*>(this));
+  int leftindex = blocks_.size();
+
+  exp.rhs().Visit(const_cast<LowererVisitor*>(this));
+
+  BinaryOperatorHelper(LOGAND, leftindex);
+}
+void LowererVisitor::VisitLogicalOrExpr(const LogicalOrExpr& exp) {
+  // Visit left hand side (Last thing should be the target where it stores it)  
+  exp.lhs().Visit(const_cast<LowererVisitor*>(this));
+  int leftindex = blocks_.size();
+
+  exp.rhs().Visit(const_cast<LowererVisitor*>(this));
+
+  BinaryOperatorHelper(LOGOR, leftindex);
+}
+void LowererVisitor::VisitLogicalNotExpr(const LogicalNotExpr& exp) {
+  // Visit left hand side (Last thing should be the target where it stores it)  
+  exp.operand().Visit(const_cast<LowererVisitor*>(this));
+
+  int size = blocks_.size();
+
+  auto newblock = make_unique<struct ThreeAddressCode>();
+
+  newblock->arg1 = Operand(blocks_[size-1]->target);
+
+  newblock->op = Opcode(LOGNOT);
+  // look at this later, just going to do this now to test some things
+  newblock->target = Register("t_" + std::to_string(variablecounter_));
+
+  // Push into vector
+  blocks_.push_back(std::move(newblock));
+
+  ++variablecounter_;
+  
+}
+void LowererVisitor::VisitConditional(const Conditional& conditional) {
+
+}
+void LowererVisitor::VisitLoop(const Loop& loop) {
+
 }
 
 void LowererVisitor::VisitAssignment(const Assignment& assignment) {

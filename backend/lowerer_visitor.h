@@ -44,18 +44,17 @@ class LowererVisitor : public AstVisitor {
   const std::string GetOutput() const;
 
   // V3 (Assignment + Program updated) Fill 
-  void VisitLessThanExpr(const LessThanExpr& exp) {}
-  void VisitLessThanEqualToExpr(const LessThanEqualToExpr& exp) {}
-  void VisitGreaterThanExpr(const GreaterThanExpr& exp) {}
+  void VisitLessThanExpr(const LessThanExpr& exp);
+  void VisitLessThanEqualToExpr(const LessThanEqualToExpr& exp);
+  void VisitGreaterThanExpr(const GreaterThanExpr& exp);
   void VisitGreaterThanEqualToExpr(
-      const GreaterThanEqualToExpr& exp) {}
-  void VisitEqualToExpr(const EqualToExpr& exp) {}
-  void VisitLogicalAndExpr(const LogicalAndExpr& exp) {}
-  void VisitLogicalOrExpr(const LogicalOrExpr& exp) {}
-  void VisitLogicalNotExpr(const LogicalNotExpr& exp) {}
-  void VisitConditional(const Conditional& conditional) {}
-  void VisitLoop(const Loop& loop) {}
-
+      const GreaterThanEqualToExpr& exp);
+  void VisitEqualToExpr(const EqualToExpr& exp);
+  void VisitLogicalAndExpr(const LogicalAndExpr& exp);
+  void VisitLogicalOrExpr(const LogicalOrExpr& exp);
+  void VisitLogicalNotExpr(const LogicalNotExpr& exp);
+  void VisitConditional(const Conditional& conditional);
+  void VisitLoop(const Loop& loop);
 
   // V2
   void VisitAssignment(const Assignment& assignment);

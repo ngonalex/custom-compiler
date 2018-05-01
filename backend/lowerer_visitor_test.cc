@@ -12,7 +12,18 @@ using cs160::abstract_syntax::backend::AddExpr;
 using cs160::abstract_syntax::backend::SubtractExpr;
 using cs160::abstract_syntax::backend::MultiplyExpr;
 using cs160::abstract_syntax::backend::DivideExpr;
-using cs160::abstract_syntax::backend::BinaryOperatorExpr;
+using cs160::abstract_syntax::backend::LessThanExpr;
+using cs160::abstract_syntax::backend::LessThanEqualToExpr;
+using cs160::abstract_syntax::backend::GreaterThanExpr;
+using cs160::abstract_syntax::backend::GreaterThanEqualToExpr;
+using cs160::abstract_syntax::backend::EqualToExpr;
+using cs160::abstract_syntax::backend::LogicalAndExpr;
+using cs160::abstract_syntax::backend::LogicalBinaryOperator;
+using cs160::abstract_syntax::backend::LogicalNotExpr;
+using cs160::abstract_syntax::backend::LogicalOrExpr;
+using cs160::abstract_syntax::backend::Loop;
+using cs160::abstract_syntax::backend::Conditional;
+using cs160::abstract_syntax::backend::Statement;
 using cs160::backend::LowererVisitor;
 using cs160::make_unique;
 
@@ -128,19 +139,19 @@ TEST_F(LowererTest, MoreComplexAssignment) {
 }
 
 TEST_F(LowererTest, SanityCheckProg) {
-  auto assignment = cs160::make_unique<Assignment>(
+
+  Statement::Block statements;
+
+  statements.push_back(std::move(cs160::make_unique<Assignment>(
     cs160::make_unique<VariableExpr>("x"),
     cs160::make_unique<AddExpr>(
       cs160::make_unique<IntegerExpr>(5),
-      cs160::make_unique<IntegerExpr>(10)));
-
-  std::vector<std::unique_ptr<const Assignment>> assignmentvector;
-  assignmentvector.push_back(std::move(assignment));
+      cs160::make_unique<IntegerExpr>(10)))));
 
   auto arithexpr = cs160::make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
     make_unique<IntegerExpr>(5));
 
-  auto expr = cs160::make_unique<Program>(std::move(assignmentvector),
+  auto expr = cs160::make_unique<Program>(std::move(statements),
     std::move(arithexpr));
 
   expr->Visit(&lowerer_);
@@ -157,4 +168,42 @@ TEST_F(LowererTest, SanityCheckProg) {
     "x <- t_2\nt_3 <- 7\nt_4 <- 5\nt_5 <- t_3 - t_4\n");
 }
 
+TEST_F(LowererTest, NestedLogicals) {
 
+  auto expr = cs160::make_unique<const LogicalOrExpr>(
+    cs160::make_unique<const LogicalAndExpr>(
+      cs160::make_unique<const LessThanExpr>(
+        cs160::make_unique<const IntegerExpr>(50),
+        cs160::make_unique<const IntegerExpr>(100)),
+      cs160::make_unique<const GreaterThanExpr>(
+        cs160::make_unique<const IntegerExpr>(50),
+        cs160::make_unique<const IntegerExpr>(0))),
+    cs160::make_unique<const LogicalAndExpr>(
+      cs160::make_unique<const LessThanEqualToExpr>(
+        cs160::make_unique<const IntegerExpr>(50),
+        cs160::make_unique<const IntegerExpr>(100)),
+      cs160::make_unique<const GreaterThanEqualToExpr>(
+        cs160::make_unique<const IntegerExpr>(50),
+        cs160::make_unique<const IntegerExpr>(0))));
+
+  expr->Visit(&lowerer_);
+  // t_0 <- 50
+  // t_1 <- 100
+  // t_2 <- t_0 < t_1
+  // t_3 <- 50
+  // t_4 <- 0
+  // t_5 <- t_3 > t_4
+  // t_6 <- t_2 && t_5
+  // t_7 <- 50
+  // t_8 <- 100
+  // t_9 <- t_7 <= t_8
+  // t_10 <- 50
+  // t_11 <- 0
+  // t_12 <- t_10 >= t_11
+  // t_13 <- t_9 && t_12
+  // t_14 <- t_6 || t_13
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 50\nt_1 <- 100\nt_2 <- t_0 < t_1\n"
+    "t_3 <- 50\nt_4 <- 0\nt_5 <- t_3 > t_4\nt_6 <- t_2 && t_5\n"
+    "t_7 <- 50\nt_8 <- 100\nt_9 <- t_7 <= t_8\nt_10 <- 50\nt_11 <- 0\n"
+    "t_12 <- t_10 >= t_11\nt_13 <- t_9 && t_12\nt_14 <- t_6 || t_13\n");
+}
