@@ -32,9 +32,15 @@ std::unique_ptr<const AstNode> Parser::mkLeaf(Token num) {
 }
 
 std::unique_ptr<const AstNode> Parser::Eparser() {
-  std::unique_ptr<const AstNode> t = ParseAddSub();
-  Expect(Token::Type::END);
+  std::unique_ptr<const AstNode> t = ParseLine();
+  Expect(Token::Type::ENDOFFILE);
   return t;
+}
+
+std::unique_ptr<const AstNode> Parser::ParseLine(){
+    std::unique_ptr<const AstNode> t = ParseAddSub();
+    Expect(Token::Type::END);
+    return t;
 }
 
 std::unique_ptr<const AstNode> Parser::ParseAddSub() {

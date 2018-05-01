@@ -51,7 +51,9 @@ class Parser {
   std::unique_ptr<const AstNode> mkLeaf(Token num);
 
   std::unique_ptr<const AstNode> Eparser();
-
+    
+    std::unique_ptr<const AstNode> ParseLine();
+    
   std::unique_ptr<const AstNode> ParseAddSub();
 
   std::unique_ptr<const AstNode> ParseMulDiv();
