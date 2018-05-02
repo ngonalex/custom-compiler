@@ -39,25 +39,14 @@ class Parser {
     ASSERT(program.size() != 0, "Program cannot be empty tokens");
     std::reverse(this->program_.begin(), this->program_.end());
   }
-
-  Parser(){ }
-
-  /** Subroutines **/
-  // Returns the type of the token in the 'front' of the program_
+  Parser(){}
   Token::Type Next() { return program_.back().type(); }
-
-  // Removes a token from the program_ vector
   void Consume() { program_.pop_back(); };
-
-  // Prints an error message with information of current token
   void Error() {
     std::cerr << "Error!" << std::endl;
     exit(-1);
   }
-
-  // Consume Token if proper type, otherwise error
   void Expect(Token::Type type) { Next() == type ? Consume() : Error(); }
-  
   bool ExpectVar() { 
     if (Next() == Token::Type::VAR_NAME) {
       Consume(); 
@@ -65,7 +54,6 @@ class Parser {
     } 
     return false; 
   }
-  
   void ExpectID(std::string id) { 
     program_.back().idVal() == id ? Consume() : Error(); 
   }
