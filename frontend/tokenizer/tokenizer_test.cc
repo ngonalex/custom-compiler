@@ -4,18 +4,19 @@
 using namespace cs160::frontend;
 
 TEST(Tokenizer, BasicAddTokenizer) {
-  Tokenizer lexer("3 + 3");
+  Tokenizer lexer("3 + 3;");
   std::vector<Token> tokens;
   tokens.push_back(Token(Token::NUM, 3));
   tokens.push_back(Token(Token::ADD_OP));
   tokens.push_back(Token(Token::NUM, 3));
   tokens.push_back(Token(Token::END));
+  tokens.push_back(Token(Token::ENDOFFILE));
 
   EXPECT_EQ(tokens, lexer.tokens());
 }
 
 TEST(Tokenizer, ComplexExpression) {
-  Tokenizer lexer("(3+3) * 4 / 2 - 1 =");
+  Tokenizer lexer("(3+3) * 4 / 2 - 1 =;");
   std::vector<Token> tokens;
   tokens.push_back(Token(Token::OPEN_PAREN));
   tokens.push_back(Token(Token::NUM, 3));
@@ -30,12 +31,13 @@ TEST(Tokenizer, ComplexExpression) {
   tokens.push_back(Token(Token::NUM, 1));
   tokens.push_back(Token(Token::EQUAL_SIGN));
   tokens.push_back(Token(Token::END));
+  tokens.push_back(Token(Token::ENDOFFILE));
 
   EXPECT_EQ(tokens, lexer.tokens());
 }
 
 TEST(Tokenizer, WeirdSpacing) {
-  Tokenizer lexer("  (  3  +  3  )   *  4/2   -1 ");
+  Tokenizer lexer("  (  3  +  3  )   *  4/2   -1 ;");
   std::vector<Token> tokens;
   tokens.push_back(Token(Token::OPEN_PAREN));
   tokens.push_back(Token(Token::NUM, 3));
@@ -49,26 +51,33 @@ TEST(Tokenizer, WeirdSpacing) {
   tokens.push_back(Token(Token::SUB_OP));
   tokens.push_back(Token(Token::NUM, 1));
   tokens.push_back(Token(Token::END));
+  tokens.push_back(Token(Token::ENDOFFILE));
 
   EXPECT_EQ(tokens, lexer.tokens());
 }
 
 //TODO Change
 TEST(Tokenizer, SingleLetterVariableName) {
-  Tokenizer lexer("5 + x");
+  Tokenizer lexer("5 + x;");
   std::vector<Token> tokens;
-  tokens.push_back(Token(Token::FAILED));
+  tokens.push_back(Token(Token::NUM, 5));
+  tokens.push_back(Token(Token::ADD_OP));
+  tokens.push_back(Token(Token::IDENTIFIER, "x"));
+  tokens.push_back(Token(Token::END));
+  tokens.push_back(Token(Token::ENDOFFILE));
 
   EXPECT_EQ(lexer.tokens()[0],tokens[0]);
 }
 
 //TODO change
 TEST(Tokenizer, MuliLetterVariableName) {
-  Tokenizer lexer("5 + victor");
+  Tokenizer lexer("5 + victor;");
   std::vector<Token> tokens;
   tokens.push_back(Token(Token::NUM, 5));
   tokens.push_back(Token(Token::ADD_OP));
-  tokens.push_back(Token(Token::ADD_OP));
+  tokens.push_back(Token(Token::IDENTIFIER, "victor"));
+  tokens.push_back(Token(Token::END));
+  tokens.push_back(Token(Token::ENDOFFILE));
 
   EXPECT_EQ(lexer.tokens()[0],tokens[0]);
 }
