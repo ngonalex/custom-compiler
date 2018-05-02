@@ -47,30 +47,32 @@ class Parser {
     exit(-1);
   }
   void Expect(Token::Type type) { Next() == type ? Consume() : Error(); }
-  bool ExpectVar() { 
+
+  bool ExpectVar() {
     if (Next() == Token::Type::VAR_NAME) {
-      Consume(); 
+      Consume();
       return true;
-    } 
-    return false; 
-  }
-  void ExpectID(std::string id) { 
-    program_.back().idVal() == id ? Consume() : Error(); 
+    }
+    return false;
   }
 
-  // AST Expressions  
-  std::unique_ptr<const ArithmeticExpr> MakeArithmeticExpr(Token::Type op, 
+  void ExpectID(std::string id) {
+    program_.back().idVal() == id ? Consume() : Error();
+  }
+
+  // AST Expressions
+  std::unique_ptr<const ArithmeticExpr> MakeArithmeticExpr(Token::Type op,
     std::unique_ptr<const ArithmeticExpr> first_leaf,
     std::unique_ptr<const ArithmeticExpr> second_leaf);
     
   std::unique_ptr<const ArithmeticExpr> MakeInteger(Token num);
-  
+
   std::unique_ptr<const VariableExpr> ParseVariable(Token curr);
 
   std::unique_ptr<const ArithmeticExpr> Eparser();
-    
+
   std::unique_ptr<const Program> ParseProgram();
-  
+
   std::unique_ptr<const Assignment> ParseAssignment();
 
   std::unique_ptr<const ArithmeticExpr> ParseAddSub();
