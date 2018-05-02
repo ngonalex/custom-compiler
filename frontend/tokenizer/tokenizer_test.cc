@@ -56,7 +56,6 @@ TEST(Tokenizer, WeirdSpacing) {
   EXPECT_EQ(tokens, lexer.tokens());
 }
 
-//TODO Change
 TEST(Tokenizer, SingleLetterVariableName) {
   Tokenizer lexer("5 + x;");
   std::vector<Token> tokens;
@@ -66,10 +65,9 @@ TEST(Tokenizer, SingleLetterVariableName) {
   tokens.push_back(Token(Token::END));
   tokens.push_back(Token(Token::ENDOFFILE));
 
-  EXPECT_EQ(lexer.tokens()[0],tokens[0]);
+  EXPECT_EQ(lexer.tokens(),tokens);
 }
 
-//TODO change
 TEST(Tokenizer, MuliLetterVariableName) {
   Tokenizer lexer("5 + victor;");
   std::vector<Token> tokens;
@@ -79,5 +77,16 @@ TEST(Tokenizer, MuliLetterVariableName) {
   tokens.push_back(Token(Token::END));
   tokens.push_back(Token(Token::ENDOFFILE));
 
-  EXPECT_EQ(lexer.tokens()[0],tokens[0]);
+  EXPECT_EQ(lexer.tokens(),tokens);
+}
+
+TEST(Tokenizer, MultiSemiColons) {
+  Tokenizer lexer(";;;");
+  std::vector<Token> tokens;
+  tokens.push_back(Token(Token::END));
+  tokens.push_back(Token(Token::END));
+  tokens.push_back(Token(Token::END));
+  tokens.push_back(Token(Token::ENDOFFILE));
+
+  EXPECT_EQ(lexer.tokens(),tokens);
 }
