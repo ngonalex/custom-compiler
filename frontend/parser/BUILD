@@ -3,8 +3,7 @@ cc_library(
 	copts = ["-Wall -g"],
 	hdrs = ["parser.h"],
 	srcs = ["parser.cc"],
-	deps = ["//utility", "//frontend/tokenizer", "//abstract_syntax:abstract_syntax", 
-	"//abstract_syntax:print_visitor_v1"],
+	deps = ["//utility", "//frontend/tokenizer", "//abstract_syntax:abstract_syntax"],
 	visibility = ["//visibility:public"],
 )
 

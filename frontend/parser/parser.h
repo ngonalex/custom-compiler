@@ -32,7 +32,6 @@ namespace frontend {
 // int y
 // y = x
 
-
 class Parser {
  public:
   // Must pass tokens program into Parser, even it it is just Type::END
@@ -59,22 +58,32 @@ class Parser {
   // Consume Token if proper type, otherwise error
   void Expect(Token::Type type) { Next() == type ? Consume() : Error(); }
   
+  bool ExpectVar() { 
+    if (Next() == Token::Type::VAR_NAME) {
+      Consume(); 
+      return true;
+    } 
+    return false; 
+  }
+  
   void ExpectID(std::string id) { 
-    Next().stringVal() == type ? Consume() : Error(); 
+    program_.back().idVal() == id ? Consume() : Error(); 
   }
 
-  // AST Expressions
-  std::unique_ptr<const ArithmeticExpr> mkNode(Token::Type op, 
+  // AST Expressions  
+  std::unique_ptr<const ArithmeticExpr> MakeArithmeticExpr(Token::Type op, 
     std::unique_ptr<const ArithmeticExpr> first_leaf,
     std::unique_ptr<const ArithmeticExpr> second_leaf);
     
-  std::unique_ptr<const AstNode> mkVar(Token varName);
-    
-  std::unique_ptr<const ArithmeticExpr> mkLeaf(Token num);
-
-  std::unique_ptr<const ArithmeticExpr> ParserProgram();
+  std::unique_ptr<const ArithmeticExpr> MakeInteger(Token num);
   
-  std::unique_ptr<const Assignment> ParserAssignment()
+  std::unique_ptr<const VariableExpr> ParseVariable(Token curr);
+
+  std::unique_ptr<const ArithmeticExpr> Eparser();
+    
+  std::unique_ptr<const Program> ParseProgram();
+  
+  std::unique_ptr<const Assignment> ParseAssignment();
 
   std::unique_ptr<const ArithmeticExpr> ParseAddSub();
 
