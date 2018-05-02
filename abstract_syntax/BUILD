@@ -6,6 +6,8 @@ cc_library(
              ":abstract_syntax_tree_v1",
              ":abstract_syntax_tree_v2",
              ":abstract_syntax_tree_v3",
+             ":abstract_syntax_tree_v4",
+             ":abstract_syntax_tree_v5",
              "//utility"
         ],
 	visibility = ["//visibility:public"],
@@ -31,6 +33,22 @@ cc_library(
 	name = "abstract_syntax_tree_v3",
 	copts = ["-Wall -g"],
 	hdrs = ["abstract_syntax_tree_v3.h"],
+	deps = ["//utility"],
+	visibility = ["//visibility:public"],
+)
+
+cc_library(
+	name = "abstract_syntax_tree_v4",
+	copts = ["-Wall -g"],
+	hdrs = ["abstract_syntax_tree_v4.h"],
+	deps = ["//utility"],
+	visibility = ["//visibility:public"],
+)
+
+cc_library(
+	name = "abstract_syntax_tree_v5",
+	copts = ["-Wall -g"],
+	hdrs = ["abstract_syntax_tree_v5.h"],
 	deps = ["//utility"],
 	visibility = ["//visibility:public"],
 )
@@ -86,6 +104,30 @@ cc_test(
         srcs = ["abstract_syntax_tree_v3_test.cc"],
         deps = [
              ":abstract_syntax_tree_v3",
+             "//utility",
+             "@gtest//:main",
+        ],
+        timeout = "short",
+        size = "small",
+)
+
+cc_test(
+        name = "abstract_syntax_tree_v4_test",
+        srcs = ["abstract_syntax_tree_v4_test.cc"],
+        deps = [
+             ":abstract_syntax_tree_v4",
+             "//utility",
+             "@gtest//:main",
+        ],
+        timeout = "short",
+        size = "small",
+)
+
+cc_test(
+        name = "abstract_syntax_tree_v5_test",
+        srcs = ["abstract_syntax_tree_v5_test.cc"],
+        deps = [
+             ":abstract_syntax_tree_v5",
              "//utility",
              "@gtest//:main",
         ],

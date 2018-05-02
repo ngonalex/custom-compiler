@@ -13,6 +13,7 @@ std::unique_ptr<const ArithmeticExpr> Parser::ParserProgram() {
   return make_unique<Program>(std::move(assignments), std::move(t));
 }
 
+<<<<<<< HEAD
 std::unique_ptr<const Assignment> Parser::ParserAssignment() {
   ExpectId('int');
   std::unique_ptr<const AstNode> var;
@@ -29,6 +30,22 @@ std::unique_ptr<const Assignment> Parser::ParserAssignment() {
 
 std::unique_ptr<const ArithmeticExpr> Parser::ParseAddSub() {
   std::unique_ptr<const ArithmeticExpr> t = ParseMulDiv();
+=======
+std::unique_ptr<const AstNode> Parser::Eparser() {
+  std::unique_ptr<const AstNode> t = ParseLine();
+  Expect(Token::Type::ENDOFFILE);
+  return t;
+}
+
+std::unique_ptr<const AstNode> Parser::ParseLine(){
+    std::unique_ptr<const AstNode> t = ParseAddSub();
+    Expect(Token::Type::END);
+    return t;
+}
+
+std::unique_ptr<const AstNode> Parser::ParseAddSub() {
+  std::unique_ptr<const AstNode> t = ParseMulDiv();
+>>>>>>> frontend_tokenizer_variableName_v2
   Token::Type op = Next();
   while (op == Token::Type::ADD_OP || op == Token::Type::SUB_OP) {
     Consume();
@@ -81,6 +98,7 @@ std::unique_ptr<const ArithmeticExpr> Parser::ParseExpression() {
     return NULL;
   }
 }
+<<<<<<< HEAD
 
 
 // AST Expressions
@@ -117,3 +135,5 @@ std::unique_ptr<const ArithmeticExpr> Parser::mkVar(Token varName) {
   ASSERT(varName.isVar(), "Error creating VariableExpr");
   return make_unique<VariableExpr>(varName.stringVal());
 }
+=======
+>>>>>>> frontend_tokenizer_variableName_v2

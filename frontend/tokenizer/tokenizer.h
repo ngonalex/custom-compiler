@@ -23,7 +23,8 @@ class Tokenizer {
 
   explicit Tokenizer(std::string program);
 
-  Token::Type ExtractType(const char testChar);
+    Token::Type ExtractType(std::string expression);
+  Token::Type ExtractSeparator(const char testChar);
 
   // TODO include negative numbers
   /*
