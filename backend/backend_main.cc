@@ -44,9 +44,9 @@ int main() {
   std::ofstream file = std::ofstream("test.s");
   CodeGen runner = CodeGen(file);
   auto test = lowerer_.GetIR();
-  runner.GenerateBoiler();
+  runner.GenerateData(lowerer_.variableset());
   runner.Generate(std::move(test));
+  //std::string result = exec("gcc -c test.s && ld test.o && ./a.out");
   // CHANGE TO GENERATEEPILOGUE LATER
-  runner.GenerateDumbTest();
   return 0;
 }

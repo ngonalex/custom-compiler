@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <stack>
+#include <set>
 
 // #include "utility/assert.h"
 #include "abstract_syntax/abstract_syntax.h"
@@ -55,9 +56,12 @@ class LowererVisitor : public AstVisitor {
 
   int variablecounter() const { return variablecounter_; }
 
+  std::set<std::string> variableset() const { return variableset_; }
+
  private:
   std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks_;
   std::stack<std::string> variablestack_;
+  std::set<std::string> variableset_;
   int variablecounter_;
 };
 

@@ -161,6 +161,14 @@ void CodeGen::GenerateResult() {
   outfile_ << "\tret" << std::endl;
 }
 
+void CodeGen::GenerateData(std::set<std::string> variableset) { 
+  outfile_ << ".data " << std::endl;
+  for ( auto iter = variableset.begin(); iter!=variableset.end(); ++iter) {
+    outfile_ << "\t" << *iter << " : .quad " << std::endl;
+  }
+  
+}
+
 void CodeGen::GenerateEpilogue() {
   outfile_ << "\tmov $60, %rax\n\txor %rdi, %rdi\n\tsyscall" << std::endl;
 }
@@ -178,12 +186,8 @@ void CodeGen::ClearRegister(std::string reg) {
 void CodeGen::Generate(std::vector
   <std::unique_ptr<struct ThreeAddressCode>> blocks) {
   // boiler code here
-<<<<<<< HEAD
-  
-=======
   GenerateBoiler();
 
->>>>>>> 3d3ea216f10c4db0f38fe7ff2bbd9f075b5c6e2c
   // IR to assembly inst
   for (unsigned int i = 0; i < blocks.size(); ++i) {
     auto code = std::move(blocks[i]);
@@ -198,14 +202,12 @@ void CodeGen::Generate(std::vector
           + ", %rcx" << std::endl;
         outfile_ << "\tpush %rcx" << std::endl;
       } else {
-          // To Do:
-          outfile_ << "\t#block values: " << std::to_string(code->arg1.value()) <<
-          " " << std::to_string(code->arg2.value()) << " " 
-          << std::to_string(code->arg1.optype()) << std::endl;
-          outfile_ << "\tpush rbp" << std::endl;
-          outfile_ << "\tmov rbp, rsp" << std::endl;
-          outfile_ << "\tsub " << std::to_string(4) << ", rsp" << std::endl;
-          outfile_ << "\tpush rsp" << std::endl;//<< std::to_string(prev) << std::endl;
+          // To Do
+          outfile_ << "\txor %rbx, %rbx" <<std::endl;
+          outfile_ << "\tpop %rbx" << std::endl;
+          outfile_ << "\tmov %rbx, " << code->target.name() << "" << std::endl;
+          //outfile_ << "\tsub " << std::to_string(4) << ", rsp" << std::endl;
+          outfile_ << "\tpush %rbx" << std::endl;
       }
 
     } else if (opcode.opcode() == ADD) {

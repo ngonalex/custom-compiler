@@ -44,6 +44,7 @@ void LowererVisitor::VisitAssignment(const Assignment& assignment) {
   // Visit the left which will add its variable name to the stack
   assignment.lhs().Visit(const_cast<LowererVisitor*>(this));
   std::string varname = variablestack_.top();
+  variableset_.insert(varname);
   variablestack_.pop();
 
   // assign the right hand side to be equal to the left hand side

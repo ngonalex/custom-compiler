@@ -25,6 +25,8 @@ class CodeGen {
     void GeneratePrintHeader();
     void GenerateAssignment(std::string);
     void GenerateResult();
+    void GenerateData(std::set<std::string>);
+
  private:
   std::ofstream& outfile_;
   int printercount_;
