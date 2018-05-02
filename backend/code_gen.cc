@@ -102,9 +102,10 @@ void CodeGen::GeneratePrinter() {
   GenerateResult();
 
   //Generate Unique Printers here
-  // for (map? ) {
-  //   GenerateAssignment(varname)
-  // }
+  std::set<std::string>::iterator it;
+  for (it = variableset_.begin(); it != variableset_.end(); ++it) {
+    GenerateAssignment(*it);
+  }
 }
 
 void CodeGen::GeneratePrintHeader() {
@@ -130,16 +131,23 @@ void CodeGen::GeneratePrintHeader() {
 void CodeGen::GenerateAssignment(std::string variablename) {
 
   outfile_ << "print" + variablename + ":" << std::endl;
+  outfile_ << "\tpush %rax" << std::endl;
   outfile_ << "\tmov $1, %rax" << std::endl;
   outfile_ << "\tmov $1, %rdi" << std::endl;
   outfile_ << "\tmov $" + variablename +"ascii, %rsi" << std::endl;
-  outfile_ << "\tmov $1, %rdx" << std::endl;
+  outfile_ << "\tmov $" + std::to_string(23+variablename.length()) +  +", %rdx" << std::endl;
   outfile_ << "\tsyscall" << std::endl;
 
   outfile_ << "\txor %rsi, %rsi" << std::endl;
-  outfile_ << "\tcall printstart" << std::endl;
+  outfile_ << "\tpop %rax" << std::endl;
+
+  outfile_ << "\tjmp printstart" << std::endl;
 
   outfile_ << "\tret" << std::endl;
+
+  outfile_ << variablename + "ascii:" << std::endl;
+  outfile_ << "\t.ascii \"Variable " + variablename + " is equal to: \""
+    << std::endl;  
 
 }
 
@@ -164,9 +172,8 @@ void CodeGen::GenerateResult() {
 void CodeGen::GenerateData(std::set<std::string> variableset) { 
   outfile_ << ".data " << std::endl;
   for ( auto iter = variableset.begin(); iter!=variableset.end(); ++iter) {
-    outfile_ << "\t" << *iter << " : .quad " << std::endl;
+    outfile_ << "\t" << *iter << ":\n\t\t.quad 1" << std::endl;
   }
-  
 }
 
 void CodeGen::GenerateEpilogue() {
@@ -203,11 +210,16 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tpush %rcx" << std::endl;
       } else {
           // To Do
-          outfile_ << "\txor %rbx, %rbx" <<std::endl;
+          outfile_ << "\txor %rbx, %rbx" << std::endl;
           outfile_ << "\tpop %rbx" << std::endl;
           outfile_ << "\tmov %rbx, " << code->target.name() << "" << std::endl;
-          //outfile_ << "\tsub " << std::to_string(4) << ", rsp" << std::endl;
           outfile_ << "\tpush %rbx" << std::endl;
+          
+          // Add it to the set, then call the print function
+          variableset_.insert(code->target.name());
+          outfile_ << "\tmov %rbx, %rax" << std::endl;
+          // Call on correct print function
+          outfile_ << "\tcall print" + code->target.name() << std::endl;
       }
 
     } else if (opcode.opcode() == ADD) {
@@ -216,7 +228,7 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tpop %rbx" << std::endl;  // rbx = right
         outfile_ << "\tpop %rax" << std::endl;  // rax = left
         ClearRegister("rcx");
-        outfile_ << "\tadd %rax, %rcx\nadd %rbx, %rcx" << std::endl;
+        outfile_ << "\tadd %rax, %rcx\n\tadd %rbx, %rcx" << std::endl;
         outfile_ << "\tpush %rcx" << std::endl;
 
     } else if (opcode.opcode() == SUB) {

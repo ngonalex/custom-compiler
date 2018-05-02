@@ -7,6 +7,7 @@
 #include <vector>
 #include <map>
 #include <utility>
+#include <set>
 
 #include "backend/lowerer_visitor.h"
 
@@ -30,6 +31,7 @@ class CodeGen {
  private:
   std::ofstream& outfile_;
   int printercount_;
+  std::set<std::string> variableset_;
 };
 
 }  // namespace backend
