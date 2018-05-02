@@ -49,7 +49,7 @@ Tokenizer::Tokenizer(std::string program) : input_program_(program) {
 
 Token::Type Tokenizer::ExtractType(std::string expression){
     if (expression == "var"){
-        
+        return Token::VAR_NAME;
     } else if (expression == "func"){
         
     }
@@ -89,6 +89,9 @@ Token::Type Tokenizer::ExtractSeparator(const char testChar) {
         }
         case ';': {
             return Token::END;
+        }
+        case ':': {
+            return Token::FIELD;
         }
         case ' ': {
             return Token::WHITESPACE;
