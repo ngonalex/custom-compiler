@@ -90,3 +90,22 @@ TEST(Tokenizer, MultiSemiColons) {
 
   EXPECT_EQ(lexer.tokens(),tokens);
 }
+
+TEST(Tokenizer, VariableExpression) {
+  Tokenizer lexer("var test : int = 5; test = 4;");
+  std::vector<Token> tokens;
+  tokens.push_back(Token(Token::VAR_NAME));
+  tokens.push_back(Token(Token::IDENTIFIER, "test"));
+  tokens.push_back(Token(Token::FIELD));
+  tokens.push_back(Token(Token::IDENTIFIER, "int"));
+  tokens.push_back(Token(Token::EQUAL_SIGN));
+  tokens.push_back(Token(Token::NUM, 5));
+  tokens.push_back(Token(Token::END));
+  tokens.push_back(Token(Token::IDENTIFIER, "test"));
+  tokens.push_back(Token(Token::EQUAL_SIGN));
+  tokens.push_back(Token(Token::NUM, 4));
+  tokens.push_back(Token(Token::END));
+  tokens.push_back(Token(Token::ENDOFFILE));
+
+  EXPECT_EQ(lexer.tokens(),tokens);
+}
