@@ -18,19 +18,28 @@ using namespace std;
 namespace cs160 {
 namespace frontend {
 
-// Program -> Assignmens* Expr
-// Assignment -> Id VarName = Expr
-// Expr -> Expr + Expr | Expr - Expr | Fact GOOD
-// Fact -> Fact * Fact | Fact / Fact | Term GOOD
-// Term -> ( Expr ) | Num | VarName GOOD
+// Program -> Block* Expr
 
+// Block -> Statment*
+
+// Statement -> Assignment | Cond | Loop (should be fine given that the three are fine)
+
+// Cond -> if Logic Block Block
+// Loop -> while Logic Block
+
+// Logic - > Rel and Rel | Rel or Rel | not Rel | Rel --> NOT is tricky for parsing....
+// Rel -> Expr < Expr | Expr <= Expr | Expr > Expr | Expr >= Expr | Expr == Expr (these should all terminate)
+
+// Assignment -> Id VarName = Expr (fine)
+// Expr -> Expr + Expr | Expr - Expr | Fact (fine)
+// Fact -> Fact * Fact | Fact / Fact | Term (fine)
+// Term -> ( Expr ) | Num | VarName (fine)
+
+// (fine)
 // Num  -> [0, 9]+
 // VarName -> String
-// Id -> "int"
+// Id -> "int" 
 
-// int x = 5
-// int y
-// y = x
 
 class Parser {
  public:

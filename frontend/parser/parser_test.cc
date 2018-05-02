@@ -12,12 +12,12 @@ using cs160::frontend::Token;
 
 TEST(Parser, CanParseInt) {
   // Initialize the vector
-  Token firstToken(Token::Type::NUM, 10);
-  Token fourthToken(Token::Type::END);
+  Token ten(Token::Type::NUM, 10);
+  Token end(Token::Type::END);
   Token endfile(Token::Type::ENDOFFILE);
   std::vector<Token> test_vector;
-  test_vector.push_back(firstToken);
-  test_vector.push_back(fourthToken);
+  test_vector.push_back(ten);
+  test_vector.push_back(end);
   test_vector.push_back(endfile);
 
   // Push it through the parser

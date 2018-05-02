@@ -2,6 +2,39 @@
 
 using namespace cs160::frontend;
 
+// ParserBlock() {
+//   std::vector<std::unique_ptr<const Statements>> assignments;
+//   while(true) {
+//     std::unique_ptr<const Statement> a = ParserStatement();
+//     if (a == NULL) {
+//       break;
+//     } else {
+//       statements.push_back(a);
+//     }
+//   }
+// }
+
+// std::unique_ptr<const Statement> ParseStatement() {
+//   std::unique_ptr<const Statement> t;
+//   if (ExpectVar()) {
+//     t = ParseAssignment();
+//   } else if (ExpectIf()) {f
+//     t = ParseConditional();
+//   } else if (ExpectWhile()) {
+//     t = ParseLoop();
+//   } else {
+//     Error();
+//   }
+//   return t;
+// }
+// 
+// std::unique_ptr<const RelationalBinaryOperator> ParseRelational() {
+//   // Check NOT
+// }
+
+// LVM error handeling
+// Boost for higher order combinators
+
 std::unique_ptr<const Program> Parser::ParseProgram() {
   std::vector<std::unique_ptr<const Assignment>> assignments;
   while (true) {
@@ -9,7 +42,7 @@ std::unique_ptr<const Program> Parser::ParseProgram() {
     if (a == NULL) {
       break;
     } else {
-      assignments.push_back(a);
+      assignments.push_back(std::move(a));
     }
   }
   std::unique_ptr<const ArithmeticExpr> expression = Eparser();
