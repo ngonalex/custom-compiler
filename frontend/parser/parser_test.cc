@@ -23,10 +23,10 @@ TEST(Parser, CanParseInt) {
   std::unique_ptr<const AstNode> result = parser.Eparser();
   
   // Read output
-  // PrintVisitor *a = new PrintVisitor();
-  // result->Visit(a);
-  // std::string output = a->GetOutput();
-  // EXPECT_EQ(output, "10");
+  PrintVisitor *a = new PrintVisitor();
+  result->Visit(a);
+  std::string output = a->GetOutput();
+  EXPECT_EQ(output, "10");
 }
 
 TEST(Parser, CanParseAddition) {

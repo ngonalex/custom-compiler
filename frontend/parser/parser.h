@@ -72,19 +72,11 @@ class Parser {
     
   std::unique_ptr<const ArithmeticExpr> mkLeaf(Token num);
 
-<<<<<<< HEAD
   std::unique_ptr<const ArithmeticExpr> ParserProgram();
   
   std::unique_ptr<const Assignment> ParserAssignment()
 
   std::unique_ptr<const ArithmeticExpr> ParseAddSub();
-=======
-  std::unique_ptr<const AstNode> Eparser();
-    
-    std::unique_ptr<const AstNode> ParseLine();
-    
-  std::unique_ptr<const AstNode> ParseAddSub();
->>>>>>> frontend_tokenizer_variableName_v2
 
   std::unique_ptr<const ArithmeticExpr> ParseMulDiv();
 
