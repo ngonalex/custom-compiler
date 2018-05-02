@@ -4,6 +4,8 @@
 #include "abstract_syntax/abstract_syntax_tree_v1.h"
 #include "abstract_syntax/abstract_syntax_tree_v2.h"
 #include "abstract_syntax/abstract_syntax_tree_v3.h"
+#include "abstract_syntax/abstract_syntax_tree_v4.h"
+#include "abstract_syntax/abstract_syntax_tree_v5.h"
 
 namespace cs160 {
 namespace abstract_syntax {
