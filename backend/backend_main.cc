@@ -30,6 +30,9 @@ int main() {
   assignments.push_back(std::move(
       make_unique<const Assignment>(make_unique<const VariableExpr>("bob"),
                                     make_unique<const IntegerExpr>(42))));
+  assignments.push_back(std::move(
+      make_unique<const Assignment>(make_unique<const VariableExpr>("joe"),
+                                    make_unique<const IntegerExpr>(24))));
   auto ae = make_unique<const AddExpr>(
       make_unique<const SubtractExpr>(
           make_unique<const DivideExpr>(make_unique<const IntegerExpr>(12),
