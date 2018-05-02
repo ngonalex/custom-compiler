@@ -9,6 +9,7 @@
 #include <string>
 
 #include "abstract_syntax/abstract_syntax.h"
+#include "backend/interpreter_stack.h"
 
 using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::IntegerExpr;
@@ -62,6 +63,8 @@ class InterpreterVisitor : public AstVisitor {
   void VisitLessThanExpr(const LessThanExpr& exp) {
     exp.lhs().Visit(const_cast<InterpreterVisitor*>(this));
     exp.rhs().Visit(const_cast<InterpreterVisitor*>(this));
+
+
 
     int r = opstack_.top();
     opstack_.pop();
@@ -145,13 +148,18 @@ class InterpreterVisitor : public AstVisitor {
   }
 
   void VisitLogicalNotExpr(const LogicalNotExpr& exp) {
-    bool result = conditionalstack_.top();
-    conditionalstack_.pop();
-    result = !result;
-    conditionalstack_.push(result);
+    // bool result = conditionalstack_.top();
+    // conditionalstack_.pop();
+    // result = !result;
+    // conditionalstack_.push(result);
   }
 
-  void VisitConditional(const Conditional& conditional) {}
+  void VisitConditional(const Conditional& conditional) {
+    conditional.guard()
+
+  
+
+  }
   void VisitLoop(const Loop& loop) {}
 
   // these should be able to change members of the visitor, thus not const
@@ -181,11 +189,15 @@ class InterpreterVisitor : public AstVisitor {
     exp.rhs().Visit(const_cast<InterpreterVisitor*>(this));
 
     // Pop (left,right), subtract them, and push it back onto the stack
-    int r = opstack_.top();
-    opstack_.pop();
-    int l = opstack_.top();
-    opstack_.pop();
-    opstack_.push(l-r);
+    // int r = opstack_.top();
+    // opstack_.pop();
+    // int l = opstack_.top();
+    // opstack_.pop();
+    // opstack_.push(l-r);
+    auto value = stack_.top();
+
+
+
   }
 
   void VisitMultiplyExpr(const MultiplyExpr& exp) {
@@ -253,6 +265,8 @@ class InterpreterVisitor : public AstVisitor {
   std::stack<std::string> variablestack_;
   std::stack<bool> conditionalstack_;
   std::map<std::string, int> variablemap_;
+
+  std::stack<StackValue> stack_;
 };
 
 }  // namespace backend

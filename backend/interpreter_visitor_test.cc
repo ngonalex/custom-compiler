@@ -115,7 +115,7 @@ TEST_F(InterpreterTest, NestedVisitationsWorkProperly_2) {
 TEST_F(InterpreterTest, LessThanExprIsVisited) {
   auto expr = cs160::make_unique<const LessThanExpr>(
                   make_unique<const IntegerExpr>(50),
-                  make_unique<const IntegerExpr>(100));
+                  make_unique<const VariableExpr>('x'));
   expr->Visit(&interpreter_);
   EXPECT_EQ(interpreter_.GetBoolOutput(), true);
 }
