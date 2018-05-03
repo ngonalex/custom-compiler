@@ -209,7 +209,6 @@ void CodeGen::Generate(std::vector
           + ", %rcx" << std::endl;
         outfile_ << "\tpush %rcx" << std::endl;
       } else {
-          // To Do
           outfile_ << "\txor %rbx, %rbx" << std::endl;
           outfile_ << "\tpop %rbx" << std::endl;
           outfile_ << "\tmov %rbx, " << code->target.name() << "" << std::endl;

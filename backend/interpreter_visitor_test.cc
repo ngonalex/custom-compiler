@@ -15,9 +15,10 @@ using cs160::abstract_syntax::backend::AddExpr;
 using cs160::abstract_syntax::backend::SubtractExpr;
 using cs160::abstract_syntax::backend::MultiplyExpr;
 using cs160::abstract_syntax::backend::DivideExpr;
-using cs160::abstract_syntax::backend::BinaryOperatorExpr;
 using cs160::backend::InterpreterVisitor;
 using cs160::make_unique;
+using cs160::abstract_syntax::backend::Statement;
+using cs160::abstract_syntax::backend::Assignment;
 
 class InterpreterTest : public ::testing::Test {
  protected:
@@ -134,26 +135,32 @@ TEST_F(InterpreterTest, MoreComplexAssignment) {
 }
 
 TEST_F(InterpreterTest, SanityCheckProg) {
-  auto assignment = cs160::make_unique<Assignment>(
+  
+  Statement::Block statements;
+
+  auto state1 = cs160::make_unique<Assignment>(
     cs160::make_unique<VariableExpr>("x"),
     cs160::make_unique<AddExpr>(
       cs160::make_unique<IntegerExpr>(5),
       cs160::make_unique<IntegerExpr>(10)));
 
-  std::vector<std::unique_ptr<const Assignment>> assignmentvector;
-  assignmentvector.push_back(std::move(assignment));
+  statements.push_back(std::move(state1));
 
   auto arithexpr = cs160::make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
     make_unique<IntegerExpr>(5));
 
-  auto expr = cs160::make_unique<Program>(std::move(assignmentvector),
+  auto expr = cs160::make_unique<Program>(std::move(statements),
     std::move(arithexpr));
 
   expr->Visit(&interpreter_);
 
-  for (auto& assignment : assignmentvector) {
-    EXPECT_EQ(interpreter_.GetVariable((assignment)->lhs().name()), 15);
-  }
+
+
+  // Idk how this works lol
+  // for (auto& statement : statements) {
+    //std::string lol = dynamic_cast<Assignment*>(statement)->lhs().name();
+    EXPECT_EQ(interpreter_.GetVariable("x"), 15);
+  // }
 
   EXPECT_EQ(interpreter_.GetOutput(), 2);
 }
