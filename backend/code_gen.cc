@@ -298,12 +298,33 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tpush %rax" << std:: endl;
     } else if (opcode.opcode() == LOGNOT) { 
         outfile_ << "\tpop %rbx" << std::endl;
-        outfile_ << "\tnot %rbx" << std:: endl;
-        outfile_ << "\tpush %rbx" << std:: endl;
+        outfile_ << "\tnot %rbx" << std::endl;
+        outfile_ << "\tpush %rbx" << std::endl;
     } else if (opcode.opcode() == LOOP) {  
-        
+        outfile_ << "#LOOP" << std::endl;
+        outfile_ << code->target.name() << ":" << std::endl;
     } else if (opcode.opcode() == CONDITIONAL) { 
-    } else if (opcode.opcode() == JUMP) {  
+        outfile_ << "\tpop %rax" << std::endl;  
+        outfile_ << "\tcmp %rax, " << std::to_string(code->arg2.value())
+          << std::endl;
+    } else if (opcode.opcode() == JUMP) { 
+        outfile_ << "\tjmp " << code->target.name() << std::endl;
+    } else if (opcode.opcode() == JEQUAL) {
+        outfile_ << "\tje " << code->target.name() << std::endl;
+    } else if (opcode.opcode() == JNOTEQUAL) {
+        outfile_ << "\tjne " << code->target.name() << std::endl;
+    } else if (opcode.opcode() == JGREATER) {
+        outfile_ << "\tjg " << code->target.name() << std::endl;
+    } else if (opcode.opcode() == JGREATEREQ) {
+        outfile_ << "\tjge " << code->target.name() << std::endl;
+    } else if (opcode.opcode() == JLESS) {
+        outfile_ << "\tjl " << code->target.name() << std::endl;
+    } else if (opcode.opcode() == JLESSEQ) {
+        outfile_ << "\tjle " << code->target.name() << std::endl;
+    } else if (opcode.opcode() == LABEL) {
+        outfile_ << code->target.name() << ":"   << std::endl;
+    } else if (opcode.opcode() == NOTYPE) {
+        outfile_ << "\t#Something really bad happened" << std::endl;
     }
   }
   //This will probably change later, call on the print function for the

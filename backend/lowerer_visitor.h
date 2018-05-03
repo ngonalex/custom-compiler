@@ -5,10 +5,7 @@
 #include <vector>
 #include <stack>
 #include <set>
-<<<<<<< HEAD
-=======
 #include <iostream>
->>>>>>> 21efe5382f95791a27e960b25de4f1ed61ea0c5a
 
 // #include "utility/assert.h"
 #include "abstract_syntax/abstract_syntax.h"
@@ -99,24 +96,17 @@ class LowererVisitor : public AstVisitor {
     return variablestack_;
   }
 
-<<<<<<< HEAD
-  int variablecounter() const { return variablecounter_; }
+  std::set<std::string> variableset() {
+    return variableset_;
+  }
 
-  std::set<std::string> variableset() const { return variableset_; }
-
-=======
->>>>>>> 21efe5382f95791a27e960b25de4f1ed61ea0c5a
  private:
   std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks_;
   std::stack<std::string> variablestack_;
   std::set<std::string> variableset_;
-<<<<<<< HEAD
-  int variablecounter_;
-=======
   ChildType lastchildtype_;
   struct Counter counter_;
 
->>>>>>> 21efe5382f95791a27e960b25de4f1ed61ea0c5a
 };
 
 }  // namespace backend
