@@ -43,12 +43,12 @@ namespace frontend {
 
 class Parser {
  public:
-  // Must pass tokens program into Parser, even it it is just Type::END
+   
   explicit Parser(std::vector<Token> program) : program_(program) {
     ASSERT(program.size() != 0, "Program cannot be empty tokens");
     std::reverse(this->program_.begin(), this->program_.end());
   }
-  Parser(){}
+  Parser() { }
   Token::Type Next() { return program_.back().type(); }
   void Consume() { program_.pop_back(); };
   void Error() {

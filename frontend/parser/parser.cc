@@ -1,39 +1,7 @@
 #include "frontend/parser/parser.h"
+#include "frontend/parser/parse_result.h"
 
 using namespace cs160::frontend;
-
-// ParserBlock() {
-//   std::vector<std::unique_ptr<const Statements>> assignments;
-//   while(true) {
-//     std::unique_ptr<const Statement> a = ParserStatement();
-//     if (a == NULL) {
-//       break;
-//     } else {
-//       statements.push_back(a);
-//     }
-//   }
-// }
-
-// std::unique_ptr<const Statement> ParseStatement() {
-//   std::unique_ptr<const Statement> t;
-//   if (ExpectVar()) {
-//     t = ParseAssignment();
-//   } else if (ExpectIf()) {f
-//     t = ParseConditional();
-//   } else if (ExpectWhile()) {
-//     t = ParseLoop();
-//   } else {
-//     Error();
-//   }
-//   return t;
-// }
-// 
-// std::unique_ptr<const RelationalBinaryOperator> ParseRelational() {
-//   // Check NOT
-// }
-
-// LVM error handeling
-// Boost for higher order combinators
 
 std::unique_ptr<const Program> Parser::ParseProgram() {
   std::vector<std::unique_ptr<const Assignment>> assignments;
@@ -88,10 +56,15 @@ std::unique_ptr<const ArithmeticExpr> Parser::ParseAddSub() {
 
 std::unique_ptr<const ArithmeticExpr> Parser::ParseMulDiv() {
   std::unique_ptr<const ArithmeticExpr> t = ParseExpression();
+  // auto r1 = ParseExpression()
+  // if (!r1.success) return Result::failure("asdasd", tok)
+  
   Token::Type op = Next();
   while (op == Token::Type::MUL_OP || op == Token::Type::DIV_OP) {
     Consume();
     std::unique_ptr<const ArithmeticExpr> t1 = ParseExpression();
+    // auto r2 = ParseExpr()
+    // t = MakeArightExpr(op, std::move(r1.result), std::move(r2.result));
     t = MakeArithmeticExpr(op, std::move(t), std::move(t1));
     op = Next();
   }

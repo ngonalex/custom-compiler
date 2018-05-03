@@ -2,6 +2,7 @@
 #include "frontend/parser/parser.h"
 #include "frontend/tokenizer/token.h"
 #include "frontend/tokenizer/tokenizer.h"
+#include "abstract_syntax/print_visitor_v2.h"
 
 #include "gtest/gtest.h"
 
@@ -23,36 +24,37 @@ TEST(Parser, CanParseInt) {
   // Push it through the parser
   Parser parser(test_vector);
   std::unique_ptr<const Program> result = parser.ParseProgram();
-  
-  // Read output
-  // PrintVisitor *a = new PrintVisitor();
-  // result->Visit(a);
-  // std::string output = a->GetOutput();
-  // EXPECT_EQ(output, "10");
+
+  PrintVisitor *a = new PrintVisitor();
+  result->Visit(a);
+  std::string output = a->GetOutput();
+  EXPECT_EQ(output, "10");
 }
-// 
-// TEST(Parser, CanParseAddition) {
-//   // Initialize the vector
-//   Token firstToken(Token::Type::NUM, 10);
-//   Token secondToken(Token::Type::ADD_OP);
-//   Token thirdToken(Token::Type::NUM, 5);
-//   Token fourthToken(Token::Type::END);
-//   std::vector<Token> test_vector;
-//   test_vector.push_back(firstToken);
-//   test_vector.push_back(secondToken);
-//   test_vector.push_back(thirdToken);
-//   test_vector.push_back(fourthToken);
-// 
-//   // Push it through the parser
-//   Parser parser(test_vector);
-//   std::unique_ptr<const AstNode> result = parser.Eparser();
-// 
-//   // Read output
-//   // PrintVisitor *a = new PrintVisitor();
-//   // result->Visit(a);
-//   // std::string output = a->GetOutput();
-//   // EXPECT_EQ(output, "(+ 10 5)");
-// }
+
+TEST(Parser, CanParseAddition) {
+  // Initialize the vector
+  Token firstToken(Token::Type::NUM, 10);
+  Token secondToken(Token::Type::ADD_OP);
+  Token thirdToken(Token::Type::NUM, 5);
+  Token fourthToken(Token::Type::END);
+  Token endfile(Token::Type::ENDOFFILE);
+  std::vector<Token> test_vector;
+  test_vector.push_back(firstToken);
+  test_vector.push_back(secondToken);
+  test_vector.push_back(thirdToken);
+  test_vector.push_back(fourthToken);
+  test_vector.push_back(endfile);
+
+  // Push it through the parser
+  Parser parser(test_vector);
+  std::unique_ptr<const AstNode> result = parser.Eparser();
+
+  // Read output
+  PrintVisitor *a = new PrintVisitor();
+  result->Visit(a);
+  std::string output = a->GetOutput();
+  EXPECT_EQ(output, "(+ 10 5)");
+}
 // 
 // TEST(Parser, CanParseSubtraction) {
 //   // Initialize the vector
