@@ -233,7 +233,7 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tpush %rcx" << std::endl;
 
     } else if (opcode.opcode() == SUB) {
-        // Load arg1,arg2 then add them into target
+        // Load arg1,arg2 then sub them into target
         outfile_ << "\tpop %rax" << std::endl;  // rbx = right
         outfile_ << "\tpop %rcx" << std::endl;  // rax = left
         outfile_ << "\tsub %rax, %rcx" << std::endl;
@@ -252,8 +252,6 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tidiv %rbx" << std::endl;
         outfile_ << "\tpush %rax" << std::endl;
     } else if (opcode.opcode() == LESSTHAN) {
-        // TO DO
-        outfile_ << "\t#LESSTHAN" << std::endl;
         outfile_ << "\tpop %rbx" << std::endl;
         outfile_ << "\tpop %rax" << std::endl; 
         outfile_ << "\tcmp %rbx, %rax" << std:: endl;
@@ -261,8 +259,6 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tmovzx %dl, %rcx" << std::endl;
         outfile_ << "\tpush %rcx" << std:: endl;
     } else if (opcode.opcode() == LESSTHANEQ) {
-        // TO DO
-        outfile_ << "\t#LESSTHANEQ" << std::endl;
         outfile_ << "\tpop %rbx" << std::endl;
         outfile_ << "\tpop %rax" << std::endl; 
         outfile_ << "\tcmp %rbx, %rax" << std:: endl;
@@ -270,8 +266,6 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tmovzx %dl, %rcx" << std::endl;
         outfile_ << "\tpush %rcx" << std:: endl;
     } else if (opcode.opcode() == GREATERTHAN) {
-        // TO DO
-        outfile_ << "\t#GREATERTHAN" << std::endl;
         outfile_ << "\tpop %rbx" << std::endl;
         outfile_ << "\tpop %rax" << std::endl; 
         outfile_ << "\tcmp %rbx, %rax" << std:: endl;
@@ -279,8 +273,6 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tmovzx %dl, %rcx" << std::endl;
         outfile_ << "\tpush %rcx" << std:: endl;
     } else if (opcode.opcode() == GREATERTHANEQ) {
-        // TO DO
-        outfile_ << "\t#GREATERTHANEQ" << std::endl;
         outfile_ << "\tpop %rbx" << std::endl;
         outfile_ << "\tpop %rax" << std::endl; 
         outfile_ << "\tcmp %rbx, %rax" << std:: endl;
@@ -288,8 +280,6 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tmovzx %dl, %rcx" << std::endl;
         outfile_ << "\tpush %rcx" << std:: endl;
     } else if (opcode.opcode() == EQUAL) { 
-        // TO DO
-        outfile_ << "\t#EQUAL" << std::endl;
         outfile_ << "\tpop %rbx" << std::endl;
         outfile_ << "\tpop %rax" << std::endl; 
         outfile_ << "\tcmp %rbx, %rax" << std:: endl;
@@ -297,28 +287,23 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tmovzx %dl, %rcx" << std::endl;
         outfile_ << "\tpush %rcx" << std:: endl;
     } else if (opcode.opcode() == LOGAND) { 
-        // TO DO
         outfile_ << "\tpop %rbx" << std::endl;
         outfile_ << "\tpop %rax" << std::endl; 
         outfile_ << "\tand %rbx, %rax" << std:: endl;
         outfile_ << "\tpush %rax" << std:: endl;
-    } else if (opcode.opcode() == LOGOR) { 
-        // TO DO 
+    } else if (opcode.opcode() == LOGOR) {  
         outfile_ << "\tpop %rbx" << std::endl;
         outfile_ << "\tpop %rax" << std::endl; 
         outfile_ << "\tor %rbx, %rax" << std:: endl;
         outfile_ << "\tpush %rax" << std:: endl;
     } else if (opcode.opcode() == LOGNOT) { 
-        // TO DO
         outfile_ << "\tpop %rbx" << std::endl;
         outfile_ << "\tnot %rbx" << std:: endl;
         outfile_ << "\tpush %rbx" << std:: endl;
-    } else if (opcode.opcode() == LOOP) { 
-        // TO DO 
-    } else if (opcode.opcode() == CONDITIONAL) {
-        // TO DO 
-    } else if (opcode.opcode() == JUMP) { 
-        // TO DO 
+    } else if (opcode.opcode() == LOOP) {  
+        
+    } else if (opcode.opcode() == CONDITIONAL) { 
+    } else if (opcode.opcode() == JUMP) {  
     }
   }
   //This will probably change later, call on the print function for the
