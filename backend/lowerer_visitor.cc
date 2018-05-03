@@ -4,36 +4,93 @@
 namespace cs160 {
 namespace backend {
 
-// Abstract ->h implementations to a ->cc file later
-const std::string LowererVisitor::GetOutput() const {
+void LowererVisitor::GetOutputArithmeticHelper(std::string &output, int index,
+  std::vector<std::string> printhelper) {
+  output = output + blocks_[index]->target.name()
+    + " <- " + blocks_[index]->arg1.reg().name();
+
+  output = output + " " + printhelper[blocks_[index]->op.opcode()]
+    + " " + blocks_[index]->arg2.reg().name();
+}
+
+std::string LowererVisitor::GetOutput() {
   // Iterate through the vector and print out each basic block
   std::string output = "";
+
+  // Probably make this a private variable or something?
   std::vector<std::string> printhelper = {"load", "+", "-", "*", "/", "<", "<=",
-    ">", ">=", "==", "&&", "||", "¬"};
+    ">", ">=", "==", "&&", "||", "¬", "while", "if",
+    "jmp", "je", "jne", "jg", "jge", "jl", "jle","MkLabel"};
 
   for (unsigned int i = 0; i < blocks_.size(); ++i) {
     // If it's a just a int (Register without a name then access it's value)
     // Otherwise access its name
-    if (blocks_[i]->op.opcode() == LOAD) {
-      if (blocks_[i]->arg1.optype() == INT) {
+    Type opcodetype = blocks_[i]->op.opcode();
+    switch(opcodetype) {
+      case LOAD: 
+        if (blocks_[i]->arg1.optype() == INT) {
         output = output + blocks_[i]->target.name()
           + " <- " + std::to_string(blocks_[i]->arg1.value());
-      } else {
+        } else {
+          output = output + blocks_[i]->target.name()
+            + " <- " + blocks_[i]->arg1.reg().name();
+        }
+        break;
+      // case ADD:
+      //   GetOutputArithmeticHelper(output, i, printhelper);
+      //   break;
+      // case SUB:
+      //   GetOutputArithmeticHelper(output, i, printhelper);
+      //   break;
+      // case MULT: 
+      //   GetOutputArithmeticHelper(output, i, printhelper);
+      //   break;
+      // case DIV:
+      //   GetOutputArithmeticHelper(output, i, printhelper);
+      //   break;
+      // case LESSTHAN:
+      //   GetOutputArithmeticHelper(output, i, printhelper);
+      //   break;
+      // case LESSTHANEQ:
+      case LOGNOT:
         output = output + blocks_[i]->target.name()
-          + " <- " + blocks_[i]->arg1.reg().name();
-      }
-    } else if (blocks_[i]->op.opcode() == LOGNOT) {
-        output = output + blocks_[i]->target.name()
-          + " <- " + printhelper[LOGNOT] +blocks_[i]->arg1.reg().name();
-    } else {
-        output = output + blocks_[i]->target.name()
-          + " <- " + blocks_[i]->arg1.reg().name();
-    }
-
-    // If it's an arithmetic expr (not a load) then get the 2nd arg as well
-    if (blocks_[i]->op != Opcode(LOAD) && blocks_[i]->op != Opcode(LOGNOT)) {
-      output = output + " " + printhelper[blocks_[i]->op.opcode()]
-        + " " + blocks_[i]->arg2.reg().name();
+          + " <- " + printhelper[LOGNOT] + blocks_[i]->arg1.reg().name();
+        break;
+      case LOOP:
+        output = output + printhelper[LOOP] + " " + blocks_[i]->arg1.reg().name() +
+          " == 0";
+        break;
+      case CONDITIONAL:
+        output = output + printhelper[CONDITIONAL] + " " + blocks_[i]->arg1.reg().name() +
+          " == 0";
+        break;
+      case JUMP:
+        output = output + printhelper[JUMP] + " " +  blocks_[i]->target.name();
+        break;
+      case JEQUAL:
+        output = output + printhelper[JEQUAL] + " " +  blocks_[i]->target.name();
+        break;
+      case JNOTEQUAL:
+        output = output + printhelper[JNOTEQUAL] + " " +  blocks_[i]->target.name();
+        break;
+      case JGREATER:
+        output = output + printhelper[JGREATER] + " " +  blocks_[i]->target.name();
+        break;
+      case JGREATEREQ:
+        output = output + printhelper[JGREATEREQ] + " " +  blocks_[i]->target.name();
+        break;
+      case JLESS:
+        output = output + printhelper[JEQUAL] + " " +  blocks_[i]->target.name();
+        break;
+      case JLESSEQ:
+        output = output + printhelper[JEQUAL] + " " +  blocks_[i]->target.name();
+        break;
+      case LABEL:
+        output = output + printhelper[LABEL] + " " +  blocks_[i]->target.name();
+        break;
+      default:
+        GetOutputArithmeticHelper(output, i, printhelper);
+        break;
     }
 
     output = output + "\n";
@@ -203,7 +260,7 @@ void LowererVisitor::VisitLoop(const Loop& loop) {
   looplabelblock->op = Opcode(LABEL);
   looplabelblock->target = Register(looplabel);
 
-  //Create a loop to let codegen know it's a branch coming
+  //Create a loop to let codegen know it's a loop coming
   auto loopblock = make_unique<struct ThreeAddressCode>();
   loopblock->arg1 = Operand(blocks_[blocks_.size()-2]->target);
   // Flip the comparision so it jumps if it's negative

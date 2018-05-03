@@ -51,7 +51,7 @@ class LowererVisitor : public AstVisitor {
   LowererVisitor() : counter_() {}
   ~LowererVisitor() {}
 
-  const std::string GetOutput() const;
+  std::string GetOutput();
 
   // V3 (Assignment + Program updated) Fill 
   void VisitLessThanExpr(const LessThanExpr& exp);
@@ -79,6 +79,8 @@ class LowererVisitor : public AstVisitor {
   void VisitDivideExpr(const DivideExpr& exp);
 
   // Helpers
+  void GetOutputArithmeticHelper(std::string &output, int index,
+    std::vector<std::string> printhelper);
   void BinaryOperatorHelper(Type type, Register arg1, Register arg2);
   std::string JumpLabelHelper();
   std::string ContinueLabelHelper();
