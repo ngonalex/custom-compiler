@@ -252,6 +252,7 @@ void LowererVisitor::BinaryOperatorHelper(Type type, Register arg1, Register arg
   blocks_.push_back(std::move(newblock));
 
   ++counter_.variablecount;
+  lastchildtype_ = INTCHILD;
 }
 
 void LowererVisitor::VisitIntegerExpr(const IntegerExpr& exp) {
@@ -335,7 +336,7 @@ Type LowererVisitor::JumpConditionalHelper(Type type) {
 
 Register LowererVisitor::GetArgument(ChildType type) {
   Register arg;
-  switch(lastchildtype_) {
+  switch(type) {
     case INTCHILD:
       arg = blocks_[blocks_.size()-1]->target;
       break;
