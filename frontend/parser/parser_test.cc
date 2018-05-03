@@ -47,7 +47,7 @@ TEST(Parser, CanParseAddition) {
 
   // Push it through the parser
   Parser parser(test_vector);
-  std::unique_ptr<const AstNode> result = parser.Eparser();
+  std::unique_ptr<const AstNode> result = parser.ParseProgram();
 
   // Read output
   PrintVisitor *a = new PrintVisitor();
@@ -72,7 +72,7 @@ TEST(Parser, CanParseSubtraction) {
 
   // Push it through the parser
   Parser parser(test_vector);
-  std::unique_ptr<const AstNode> result = parser.Eparser();
+  std::unique_ptr<const AstNode> result = parser.ParseProgram();
 
   // Read output
   PrintVisitor *a = new PrintVisitor();
@@ -96,7 +96,7 @@ TEST(Parser, CanParseMultiplication) {
   test_vector.push_back(endfile);
   // Push it through the parser
   Parser parser(test_vector);
-  std::unique_ptr<const AstNode> result = parser.Eparser();
+  std::unique_ptr<const AstNode> result = parser.ParseProgram();
 
   // Read output
   PrintVisitor *a = new PrintVisitor();
@@ -122,7 +122,7 @@ TEST(Parser, CanParseDivision) {
 
   // Push it through the parser
   Parser parser(test_vector);
-  std::unique_ptr<const AstNode> result = parser.Eparser();
+  std::unique_ptr<const AstNode> result = parser.ParseProgram();
 
   // Read output
   PrintVisitor *a = new PrintVisitor();
@@ -159,7 +159,7 @@ TEST(Parser, CanDoPemdas) {
   test_vector.push_back(endfile);
   // Push it through the parser
   Parser parser(test_vector);
-  std::unique_ptr<const AstNode> result = parser.Eparser();
+  std::unique_ptr<const AstNode> result = parser.ParseProgram();
 
   // Read output
   PrintVisitor *a = new PrintVisitor();
@@ -198,7 +198,7 @@ TEST(Parser, CanDoParens) {
   test_vector.push_back(endfile);
   // Push it through the parser
   Parser parser(test_vector);
-  std::unique_ptr<const AstNode> result = parser.Eparser();
+  std::unique_ptr<const AstNode> result = parser.ParseProgram();
 
   // Read output
   PrintVisitor *a = new PrintVisitor();
@@ -253,7 +253,7 @@ TEST(Parse, StressTest) {
   test_vector.push_back(endfile);
   // Push it through the parser
   Parser parser(test_vector);
-  std::unique_ptr<const AstNode> result = parser.Eparser();
+  std::unique_ptr<const AstNode> result = parser.ParseProgram();
 
   // Read output
   PrintVisitor *a = new PrintVisitor();
@@ -305,7 +305,7 @@ TEST(Parse, SingleParen) {
   test_vector.push_back(endfile);
   // Push it through the parser
   Parser parser(test_vector);
-  std::unique_ptr<const AstNode> result = parser.Eparser();
+  std::unique_ptr<const AstNode> result = parser.ParseProgram();
 
   // Read output
   PrintVisitor *a = new PrintVisitor();
@@ -314,25 +314,3 @@ TEST(Parse, SingleParen) {
   
   EXPECT_EQ(output, "5");
 }
-
-// TEST(Parser, Assignment) {
-//   Token int_type(Token::Type::IDENTIFIER, "int");
-//   Token var_name(Token::Type::VAR_NAME, "x");
-//   Token equals(Token::Type::EQUAL_SIGN);
-//   Token five(Token::Type::NUM, 5);
-//   Token end(Token::Type::END);
-//   Token endfile(Token::Type::ENDOFFILE);  
-//   std::vector<Token> test_vector;
-//   test_vector.push_back(int_type);
-//   test_vector.push_back(var_name);
-//   test_vector.push_back(equals);
-//   test_vector.push_back(five);
-//   test_vector.push_back(end);
-//   test_vector.push_back(endfile);
-//   Parser parser(test_vector);
-//   std::unique_ptr<const AstNode> result = parser.Eparser();
-// 
-//   // PrintVisitor *a = new PrintVisitor();
-//   // result->visit(a);
-//   // std::string output = a->GetOutput();
-// }

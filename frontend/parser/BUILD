@@ -10,7 +10,7 @@ cc_library(
 cc_test(
 	name = "parser_test",
 	deps = ["@gtest//:main", ":parser", "//abstract_syntax:abstract_syntax"],
-	srcs = ["parser_test.cc"],
+	srcs = ["parser_test.cc", "parser_test_v2.cc"],
 	copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
 	timeout = "short",
 	size = "small",

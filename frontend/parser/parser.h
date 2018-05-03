@@ -56,15 +56,7 @@ class Parser {
     exit(-1);
   }
   void Expect(Token::Type type) { Next() == type ? Consume() : Error(); }
-
-  bool ExpectVar() {
-    if (Next() == Token::Type::VAR_NAME) {
-      Consume();
-      return true;
-    }
-    return false;
-  }
-
+  
   void ExpectID(std::string id) {
     program_.back().idVal() == id ? Consume() : Error();
   }

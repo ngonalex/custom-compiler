@@ -20,6 +20,10 @@ class PrintVisitor : public AstVisitor {
   void VisitIntegerExpr(const IntegerExpr& exp) override {
     output_ << exp.value();
   }
+  
+  void VisitVariableExpr(const VariableExpr& exp) override { 
+    output_ << exp.name(); 
+  }
 
   void VisitAddExpr(const AddExpr& exp) override {
     output_ << "(+ ";
@@ -58,8 +62,14 @@ class PrintVisitor : public AstVisitor {
     assignment.rhs().Visit(this);
     output_ << ")";
   }
-
   
+  void VisitProgram(const Program& program) override {
+    for (auto& assignment : program.assignments()) {
+      assignment->Visit(this);
+      output_ << "; ";
+    }
+    program.arithmetic_exp().Visit(this);
+  }
 
  private:
   std::stringstream output_;

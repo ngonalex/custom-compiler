@@ -3,6 +3,7 @@
 
 using namespace cs160::frontend;
 
+// Program is just a series of Assignments folowed be an Expr
 std::unique_ptr<const Program> Parser::ParseProgram() {
   std::vector<std::unique_ptr<const Assignment>> assignments;
   while (true) {
@@ -18,8 +19,14 @@ std::unique_ptr<const Program> Parser::ParseProgram() {
   return (make_unique<const Program>(std::move(assignments), std::move(expression)));
 }
 
+// Assignment should follow the structure of
+// VAR_NAME, (ID, $name), FIELD, (ID, "int"), EQUALS, EXPR
 std::unique_ptr<const Assignment> Parser::ParseAssignment() {
-  if (!ExpectVar()) { return NULL; }
+  if (Next() == Token::Type::VAR_NAME) {
+    Consume();
+  } else {
+    return NULL;
+  }
   std::unique_ptr<const VariableExpr> var = ParseVariable(program_.back());
   Expect(Token::Type::FIELD);
   ExpectID("int");
