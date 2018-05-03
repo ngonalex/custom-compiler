@@ -7,6 +7,7 @@
 namespace cs160 {
 namespace backend {
 
+// Somewhat unwieldy and long is there a better way to do this?
 enum Type {
   LOAD,
   ADD,
@@ -24,7 +25,14 @@ enum Type {
   LOOP,
   CONDITIONAL,
   JUMP,
-  NONE
+  JEQUAL,
+  JNOTEQUAL,
+  JGREATER,
+  JGREATEREQ,
+  JLESS,
+  JLESSEQ,
+  LABEL,
+  NOTYPE
 };
 
 enum OperandType {
@@ -35,9 +43,9 @@ enum OperandType {
 class Register {
  public:
   explicit Register(std::string name) : name_(name) {}
-
+  Register() : name_("") {}
   std::string name() const {return name_;}
-
+  
  private:
   std::string name_;
 };
@@ -69,6 +77,7 @@ class Opcode {
  public:
   explicit Opcode(Type type) : opcode_(type) {}
 
+  void ChangeOpCode(Type type) {opcode_ = type;}
   Type opcode() const {return opcode_;}
 
   bool operator !=(const Opcode &a) const {
@@ -90,7 +99,7 @@ struct ThreeAddressCode {
 
   struct ThreeAddressCode* next;
   struct ThreeAddressCode* prev;
-  ThreeAddressCode() : target(Register("")), op(NONE),
+  ThreeAddressCode() : target(Register("")), op(NOTYPE),
     arg1(Operand(0)), arg2(Operand(0)) {}
 };
 
@@ -98,4 +107,3 @@ struct ThreeAddressCode {
 }  // namespace cs160
 
 #endif  // BACKEND_IR_H_
-

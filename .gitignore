@@ -5,4 +5,8 @@ bazel-*
 .DS_Store
 .idea/
 /team-influx
+<<<<<<< HEAD
 .xcodeproj
+=======
+.code-workspace
+>>>>>>> 21efe5382f95791a27e960b25de4f1ed61ea0c5a

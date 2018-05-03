@@ -5,11 +5,17 @@
 #include <vector>
 #include <stack>
 #include <set>
+<<<<<<< HEAD
+=======
+#include <iostream>
+>>>>>>> 21efe5382f95791a27e960b25de4f1ed61ea0c5a
 
 // #include "utility/assert.h"
 #include "abstract_syntax/abstract_syntax.h"
 #include "backend/ir.h"
 #include "utility/memory.h"
+#include "utility/assert.h"
+#include "backend/helper_struct.h"
 
 using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::IntegerExpr;
@@ -37,9 +43,15 @@ using cs160::abstract_syntax::backend::Conditional;
 namespace cs160 {
 namespace backend {
 
+enum ChildType {
+  INTCHILD,
+  VARCHILD,
+  NOCHILD
+};
+
 class LowererVisitor : public AstVisitor {
  public:
-  LowererVisitor() : variablecounter_(0) {}
+  LowererVisitor() : counter_() {}
   ~LowererVisitor() {}
 
   const std::string GetOutput() const;
@@ -62,14 +74,24 @@ class LowererVisitor : public AstVisitor {
   void VisitProgram(const Program& program);
   void VisitVariableExpr(const VariableExpr& exp);
 
+  // V1
   void VisitIntegerExpr(const IntegerExpr& exp);
   void VisitAddExpr(const AddExpr& exp);
   void VisitSubtractExpr(const SubtractExpr& exp);
   void VisitMultiplyExpr(const MultiplyExpr& exp);
   void VisitDivideExpr(const DivideExpr& exp);
-  void BinaryOperatorHelper(Type type, int leftindex);
 
-  std::vector<std::unique_ptr<struct ThreeAddressCode>> GetIR() {
+  // Helpers
+  void BinaryOperatorHelper(Type type, Register arg1, Register arg2);
+  std::string JumpLabelHelper();
+  std::string ContinueLabelHelper();
+  std::string LoopLabelHelper();
+  // bool CheckVarFlag() {return variableflag_;}
+  // void ClearVarFlag() {variableflag_ = false;}
+  Register GetArgument(ChildType type);
+  
+
+  std::vector<std::unique_ptr<ThreeAddressCode>> GetIR() {
     return std::move(blocks_);
   }
 
@@ -77,15 +99,24 @@ class LowererVisitor : public AstVisitor {
     return variablestack_;
   }
 
+<<<<<<< HEAD
   int variablecounter() const { return variablecounter_; }
 
   std::set<std::string> variableset() const { return variableset_; }
 
+=======
+>>>>>>> 21efe5382f95791a27e960b25de4f1ed61ea0c5a
  private:
   std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks_;
   std::stack<std::string> variablestack_;
   std::set<std::string> variableset_;
+<<<<<<< HEAD
   int variablecounter_;
+=======
+  ChildType lastchildtype_;
+  struct Counter counter_;
+
+>>>>>>> 21efe5382f95791a27e960b25de4f1ed61ea0c5a
 };
 
 }  // namespace backend
