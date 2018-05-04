@@ -6,9 +6,7 @@ namespace backend {
 
 void LowererVisitor::GetOutputArithmeticHelper(std::string &output, int index,
   std::vector<std::string> printhelper) {
-  if (blocks_[index]->target.targettype()) {
 
-  }
   output = output + blocks_[index]->target.reg().name()
     + " <- " + blocks_[index]->arg1.reg().name();
 

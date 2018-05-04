@@ -117,17 +117,19 @@ class Opcode {
 
 class Target {
  public:
-  explicit Target(Register reg) : reg_(reg), label_(Label(""), type_(TARGETREGISTER) {}
-  explicit Target(Label label) : register_(Register("")), label_(label), type_(TARGETLABEL) {}
+  explicit Target(Register reg) : reg_(reg), 
+    label_(Label("")), type_(TARGETREGISTER) {}
+  explicit Target(Label label) : reg_(Register()), 
+    label_(label), type_(TARGETLABEL) {}
 
   Register reg() const {return reg_;}
   Label label() const {return label_;}
-  TargetType type() const {return type;}
+  TargetType type() const {return type_;}
 
  private:
-  TargetType type_;
-  Label label_;
   Register reg_;
+  Label label_;
+  TargetType type_;
 };
 
 
@@ -141,7 +143,7 @@ struct ThreeAddressCode {
 
   struct ThreeAddressCode* next;
   struct ThreeAddressCode* prev;
-  ThreeAddressCode() : target(Register("")), op(NOTYPE),
+  ThreeAddressCode() : target(Register()), op(NOTYPE),
     arg1(Operand(0)), arg2(Operand(0)) {}
 };
 
