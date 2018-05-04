@@ -34,6 +34,7 @@ using cs160::abstract_syntax::backend::LogicalNotExpr;
 using cs160::abstract_syntax::backend::LogicalOrExpr;
 using cs160::abstract_syntax::backend::Loop;
 using cs160::abstract_syntax::backend::Conditional;
+using cs160::make_unique;
 
 
 

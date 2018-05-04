@@ -302,11 +302,12 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tnot %rbx" << std::endl;
         outfile_ << "\tpush %rbx" << std::endl;
     } else if (opcode.opcode() == LOOP) {  
-        outfile_ << "#LOOP" << std::endl;
-        outfile_ << code->target.name() << ":" << std::endl;
+        outfile_ << "\tpop %rax" << std::endl;  
+        outfile_ << "\tcmp $" << std::to_string(code->arg1.value()) << ", %rax"
+          << std::endl;
     } else if (opcode.opcode() == CONDITIONAL) { 
         outfile_ << "\tpop %rax" << std::endl;  
-        outfile_ << "\tcmp %rax, " << std::to_string(code->arg2.value())
+        outfile_ << "\tcmp $" << std::to_string(code->arg1.value()) << ", %rax"
           << std::endl;
     } else if (opcode.opcode() == JUMP) { 
         outfile_ << "\tjmp " << code->target.name() << std::endl;

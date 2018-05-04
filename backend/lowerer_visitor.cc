@@ -197,13 +197,15 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
 
   //Create a cmp to let codegen know it's a branch coming
   auto branchcmpblock = make_unique<struct ThreeAddressCode>();
-  branchcmpblock->arg1 = Operand(blocks_[blocks_.size()-1]->target);
+  branchcmpblock->arg2 = Operand(blocks_[blocks_.size()-1]->target);
   // Flip the comparision so it jumps if it's negative
-  branchcmpblock->arg2 = Operand(0);
+  branchcmpblock->arg1 = Operand(0);
 
   branchcmpblock->op = Opcode(CONDITIONAL);
   branchcmpblock->target = Register("t_" + std::to_string(counter_.variablecount));
   ++counter_.variablecount;
+
+  blocks_.push_back(std::move(branchcmpblock));
 
   // Jump conditional to the false branch here
   auto jumpblock = make_unique<struct ThreeAddressCode>();
@@ -212,6 +214,8 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
   std::string falselabel = JumpLabelHelper();
   jumpblock->target = Register(falselabel);
   jumpblock->op = Opcode(JEQUAL);
+
+  blocks_.push_back(std::move(jumpblock));
 
   // Do this normally
   for (auto& statement : conditional.true_branch()) {
@@ -223,11 +227,15 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
   auto jumpcontinueblock = make_unique<struct ThreeAddressCode>();
   jumpcontinueblock->target = Register(continuelabel);
   jumpcontinueblock->op = Opcode(JUMP);
+  blocks_.push_back(std::move(jumpcontinueblock));
+
 
   // Create a false label
   auto falselabelblock  = make_unique<struct ThreeAddressCode>();
   falselabelblock->target = Register(falselabel);
   falselabelblock->op = Opcode(LABEL);
+  blocks_.push_back(std::move(falselabelblock));
+
 
   // This should be inside the false label also
   // is it worth it to check if this branch is empty
@@ -240,35 +248,43 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
   auto jumpblock2 = make_unique<struct ThreeAddressCode>();
   jumpblock2->target = Register(continuelabel);
   jumpblock2->op = Opcode(JUMP);
+  blocks_.push_back(std::move(jumpblock2));
+
 
   // Create continue label
   auto jumpcontinueblock2 = make_unique<struct ThreeAddressCode>();
   jumpcontinueblock->target = Register(continuelabel);
   jumpcontinueblock->op = Opcode(JUMP);
+  blocks_.push_back(std::move(jumpcontinueblock2));
+
 }
 void LowererVisitor::VisitLoop(const Loop& loop) {
 
   // Similar to branching (Again flip conditionals + eval variables)
   // Probably have a TAC to create a new label here
 
-  // First evaluate the guard
-  loop.guard().Visit(const_cast<LowererVisitor*>(this));
-
   // create a looplabel
   std::string looplabel = LoopLabelHelper();
   auto looplabelblock = make_unique<struct ThreeAddressCode>();
   looplabelblock->op = Opcode(LABEL);
   looplabelblock->target = Register(looplabel);
+  blocks_.push_back(std::move(looplabelblock));
+
+  // Eval guard
+  loop.guard().Visit(const_cast<LowererVisitor*>(this));
+
 
   //Create a loop to let codegen know it's a loop coming
   auto loopblock = make_unique<struct ThreeAddressCode>();
-  loopblock->arg1 = Operand(blocks_[blocks_.size()-2]->target);
+  loopblock->arg2 = Operand(blocks_[blocks_.size()-2]->target);
   // Flip the comparision so it jumps if it's negative
-  loopblock->arg2 = Operand(0);
+  loopblock->arg1 = Operand(0);
 
   loopblock->op = Opcode(LOOP);
   loopblock->target = Register("t_" + std::to_string(counter_.variablecount));
   ++counter_.variablecount;
+  blocks_.push_back(std::move(loopblock));
+
 
   // Jump conditional to the continue here
   auto jumpblock = make_unique<struct ThreeAddressCode>();
@@ -277,6 +293,8 @@ void LowererVisitor::VisitLoop(const Loop& loop) {
   std::string continuelabel = ContinueLabelHelper();
   jumpblock->target = Register(continuelabel);
   jumpblock->op = Opcode(JEQUAL);
+  blocks_.push_back(std::move(jumpblock));
+
 
    // Do this normally
   for (auto& statement : loop.body()) {
@@ -287,12 +305,14 @@ void LowererVisitor::VisitLoop(const Loop& loop) {
   auto jumploop = make_unique<struct ThreeAddressCode>();
   jumploop->target = Register(looplabel);
   jumploop->op = Opcode(JUMP);
+  blocks_.push_back(std::move(jumploop));
+
 
   // Create a continue label
   auto jumpcontinueblock = make_unique<struct ThreeAddressCode>();
   jumpcontinueblock->target = Register(continuelabel);
-  jumpcontinueblock->op = Opcode(JUMP);
-
+  jumpcontinueblock->op = Opcode(LABEL);
+  blocks_.push_back(std::move(jumpcontinueblock));
 }
 
 void LowererVisitor::VisitAssignment(const Assignment& assignment) {

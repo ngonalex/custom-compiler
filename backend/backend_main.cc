@@ -45,39 +45,45 @@ std::string exec(const char* cmd) {
 int main() {
   LowererVisitor lowerer_;
   Statement::Block statements;
-  //auto expr = cs160::make_unique<DivideExpr>(
-  //  make_unique<IntegerExpr>(7), make_unique<IntegerExpr>(5));
+  auto expr = cs160::make_unique<DivideExpr>(
+   make_unique<IntegerExpr>(7), make_unique<IntegerExpr>(5));
+
   statements.push_back(std::move(
       make_unique<const Assignment>(make_unique<const VariableExpr>("bob"),
                                     make_unique<const IntegerExpr>(42))));
 
-  statements.push_back(std::move(make_unique<const Conditional>(
-      make_unique<const LogicalOrExpr>(
-          make_unique<const LogicalAndExpr>(
-              make_unique<const LessThanExpr>(
-                  make_unique<const IntegerExpr>(42),
-                  make_unique<const IntegerExpr>(100)),
-              make_unique<const GreaterThanExpr>(
-                  make_unique<const IntegerExpr>(42),
-                  make_unique<const IntegerExpr>(0))),
-          make_unique<const LogicalAndExpr>(
-              make_unique<const LessThanEqualToExpr>(
-                  make_unique<const IntegerExpr>(42),
-                  make_unique<const IntegerExpr>(100)),
-              make_unique<const GreaterThanEqualToExpr>(
-                  make_unique<const IntegerExpr>(42),
-                  make_unique<const IntegerExpr>(0)))),
-      Statement::Block(), Statement::Block())));
+  Statement::Block assignmenttest; 
+  assignmenttest.push_back(std::move(
+    make_unique<const Assignment>(make_unique<const VariableExpr>("bob"),
+      make_unique<const IntegerExpr>(100))));
+
+  // statements.push_back(std::move(make_unique<const Conditional>(
+  //     make_unique<const LogicalOrExpr>(
+  //         make_unique<const LogicalAndExpr>(
+  //             make_unique<const LessThanExpr>(
+  //                 make_unique<const VariableExpr>("bob"),
+  //                 make_unique<const IntegerExpr>(100)),
+  //             make_unique<const GreaterThanExpr>(
+  //                 make_unique<const VariableExpr>("bob"),
+  //                 make_unique<const IntegerExpr>(0))),
+  //         make_unique<const LogicalAndExpr>(
+  //             make_unique<const LessThanEqualToExpr>(
+  //                 make_unique<const VariableExpr>("bob"),
+  //                 make_unique<const IntegerExpr>(100)),
+  //             make_unique<const GreaterThanEqualToExpr>(
+  //                 make_unique<const VariableExpr>("bob"),
+  //                 make_unique<const IntegerExpr>(0)))),
+  //     std::move(assignmenttest), Statement::Block())));
 
   Statement::Block body;
   body.push_back(std::move(make_unique<const Assignment>(
       make_unique<const VariableExpr>("bob"),
-      make_unique<const SubtractExpr>(make_unique<const IntegerExpr>(42),
+      make_unique<const SubtractExpr>(make_unique<const VariableExpr>("bob"),
                                       make_unique<const IntegerExpr>(1)))));
 
   statements.push_back(std::move(make_unique<const Loop>(
       make_unique<const LogicalNotExpr>(
-          make_unique<const EqualToExpr>(make_unique<const IntegerExpr>(42),
+          make_unique<const EqualToExpr>(make_unique<const VariableExpr>("bob"),
                                          make_unique<const IntegerExpr>(0))),
       std::move(body))));
 
@@ -100,8 +106,8 @@ int main() {
   auto test = lowerer_.GetIR();
   runner.GenerateData(lowerer_.variableset());
   runner.Generate(std::move(test));
-  std::string result = exec("gcc -g -c test.s && ld test.o && ./a.out");
-  std::cout << result << std::endl;
+  //std::string result = exec("gcc -g -c test.s && ld test.o && ./a.out");
+  //std::cout << result << std::endl;
   // CHANGE TO GENERATEEPILOGUE LATER
   return 0;
 }
