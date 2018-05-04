@@ -5,12 +5,12 @@
 namespace cs160 {
 namespace backend {
 
-  struct Counter {
-    int variablecount;
-    int branchcount;
-    int continuecount;
-    Counter() : variablecount(0), branchcount(0), continuecount(0) {}
-  };
+struct Counter {
+  int variablecount;
+  int branchcount;
+  int continuecount;
+  Counter() : variablecount(0), branchcount(0), continuecount(0) {}
+};
 
 }  // namespace backend
 }  // namespace cs160

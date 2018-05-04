@@ -5,13 +5,14 @@
 #include <vector>
 #include <stack>
 #include <set>
+#include <iostream>
 
 // #include "utility/assert.h"
 #include "abstract_syntax/abstract_syntax.h"
 #include "backend/ir.h"
 #include "utility/memory.h"
 #include "utility/assert.h"
-#include "helper_struct.h"
+#include "backend/helper_struct.h"
 
 using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::IntegerExpr;
@@ -79,7 +80,8 @@ class LowererVisitor : public AstVisitor {
 
   // Helpers
   void BinaryOperatorHelper(Type type, Register arg1, Register arg2);
-  Type JumpConditionalHelper(Type type);
+  std::string JumpLabelHelper();
+  std::string ContinueLabelHelper();
   // bool CheckVarFlag() {return variableflag_;}
   // void ClearVarFlag() {variableflag_ = false;}
   Register GetArgument(ChildType type);

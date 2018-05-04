@@ -9,7 +9,7 @@ const std::string LowererVisitor::GetOutput() const {
   // Iterate through the vector and print out each basic block
   std::string output = "";
   std::vector<std::string> printhelper = {"load", "+", "-", "*", "/", "<", "<=",
-    ">", ">=", "==", "&&", "||", "!"};
+    ">", ">=", "==", "&&", "||", "¬"};
 
   for (unsigned int i = 0; i < blocks_.size(); ++i) {
     // If it's a just a int (Register without a name then access it's value)
@@ -22,13 +22,16 @@ const std::string LowererVisitor::GetOutput() const {
         output = output + blocks_[i]->target.name()
           + " <- " + blocks_[i]->arg1.reg().name();
       }
+    } else if (blocks_[i]->op.opcode() == LOGNOT) {
+        output = output + blocks_[i]->target.name()
+          + " <- " + printhelper[LOGNOT] +blocks_[i]->arg1.reg().name();
     } else {
         output = output + blocks_[i]->target.name()
           + " <- " + blocks_[i]->arg1.reg().name();
     }
 
     // If it's an arithmetic expr (not a load) then get the 2nd arg as well
-    if (blocks_[i]->op != Opcode(LOAD)) {
+    if (blocks_[i]->op != Opcode(LOAD) && blocks_[i]->op != Opcode(LOGNOT)) {
       output = output + " " + printhelper[blocks_[i]->op.opcode()]
         + " " + blocks_[i]->arg2.reg().name();
     }
@@ -135,15 +138,22 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
   // e.x. x == 5 is represented as a jne
   // We need a way to keep track if x has been assigned (map of strings -> bools) maybe?
 
-  // Check the previous statement and reverse it
-  blocks_[blocks_.size()-1]->op.ChangeOpCode(
-    JumpConditionalHelper(blocks_[blocks_.size()-1]->op.opcode()));
+  //Create a cmp to let codegen know it's a branch coming
+  auto branchcmpblock = make_unique<struct ThreeAddressCode>();
+  branchcmpblock->arg1 = Operand(blocks_[blocks_.size()-1]->target);
+  // Flip the comparision so it jumps if it's negative
+  branchcmpblock->arg2 = Operand(0);
 
-  // Jump conditional to the false branch here or if the false branch is empty
-  // then just jump to the continue branch
-  // Create a temp jump TAC + note the index return to this later
+  branchcmpblock->op = Opcode(CONDITIONAL);
+  branchcmpblock->target = Register("t_" + std::to_string(counter_.variablecount));
+  ++counter_.variablecount;
+
+  // Jump conditional to the false branch here
   auto jumpblock = make_unique<struct ThreeAddressCode>();
-  int oldindex = blocks_.size()-1;
+  // Is it okay to make a "label" a register or should we make
+  // a target class that can either be a label or a register?
+  jumpblock->target = Register(JumpLabelHelper());
+  jumpblock->op = Opcode(JEQUAL);
 
   // Do this normally
   for (auto& statement : conditional.true_branch()) {
@@ -151,23 +161,20 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
   }
 
   //Create a jump to the continue
+  std::string continuelabel = ContinueLabelHelper();
+  auto jumpcontinueblock = make_unique<struct ThreeAddressCode>();
+  jumpcontinueblock->target = Register(continuelabel);
+  jumpcontinueblock->op = Opcode(JUMP);
 
-
-  // This should be in a false_branch label
-  // jump instruction
+  // This should be inside the false label also
+  // is it worth it to check if this branch is empty
+  // (if it's empty you don't even need to create a label)
   for (auto& statement : conditional.false_branch()) {
-    statement->Visit(this);
-  }
-  if (oldindex != blocks_.size()) {
-    // TAC to jump to continue
-  }
-
-  for (auto& statement : conditional.true_branch()) {
     statement->Visit(this);
   }
 
   // TAC to jump to continue here
-
+  auto jumpblock2 = make_unique<struct ThreeAddressCode>();
 
 }
 void LowererVisitor::VisitLoop(const Loop& loop) {
@@ -310,28 +317,16 @@ void LowererVisitor::VisitDivideExpr(const DivideExpr& exp) {
   BinaryOperatorHelper(DIV, arg1, arg2);
 }
 
-Type LowererVisitor::JumpConditionalHelper(Type type) {
-  // Return the opposite of what was given
-  switch(type) {
-    case JEQUAL:
-      return JNOTEQUAL;
-    case JNOTEQUAL:
-      return JEQUAL;
-    case JGREATER:
-      return JLESS;
-    case JGREATEREQ:
-      return JLESSEQ;
-    case JLESS:
-      return JGREATER;
-    case JLESSEQ:
-      return JGREATEREQ;
-    default:
-      // Should I use a perror or ASSERT here
-      // perror("Expected a Jump Type");
-      ASSERT(true == false, "Must be a jump type");
-      return NOTYPE;
-      break;
-  }
+std::string LowererVisitor::JumpLabelHelper() {
+  std::string newlabel = "falsebranch" + counter_.branchcount;
+  ++counter_.branchcount;
+  return newlabel;
+}
+
+std::string LowererVisitor::ContinueLabelHelper() {
+  std::string newcontinue = "continue" + counter_.continuecount;
+  ++counter_.continuecount;
+  return newcontinue;
 }
 
 Register LowererVisitor::GetArgument(ChildType type) {
@@ -344,6 +339,11 @@ Register LowererVisitor::GetArgument(ChildType type) {
       // Check if variable has been assigned here?
       arg = Register(variablestack_.top());
       variablestack_.pop();
+
+      if(variableset_.count(arg.name()) == 0 ) {
+        std::cerr << "Variable "+ arg.name() +" not assigned";
+        exit(1);
+      }
       break;
     default:
       // There should be type throw error?

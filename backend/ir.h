@@ -24,6 +24,7 @@ enum Type {
   LOGNOT,
   LOOP,
   CONDITIONAL,
+  JUMP,
   JEQUAL,
   JNOTEQUAL,
   JGREATER,
