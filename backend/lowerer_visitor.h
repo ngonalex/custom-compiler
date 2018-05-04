@@ -82,6 +82,7 @@ class LowererVisitor : public AstVisitor {
   void BinaryOperatorHelper(Type type, Register arg1, Register arg2);
   std::string JumpLabelHelper();
   std::string ContinueLabelHelper();
+  std::string LoopLabelHelper();
   // bool CheckVarFlag() {return variableflag_;}
   // void ClearVarFlag() {variableflag_ = false;}
   Register GetArgument(ChildType type);

@@ -31,6 +31,7 @@ enum Type {
   JGREATEREQ,
   JLESS,
   JLESSEQ,
+  LABEL,
   NOTYPE
 };
 

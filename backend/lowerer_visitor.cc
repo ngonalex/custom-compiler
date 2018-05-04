@@ -152,7 +152,8 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
   auto jumpblock = make_unique<struct ThreeAddressCode>();
   // Is it okay to make a "label" a register or should we make
   // a target class that can either be a label or a register?
-  jumpblock->target = Register(JumpLabelHelper());
+  std::string falselabel = JumpLabelHelper();
+  jumpblock->target = Register(falselabel);
   jumpblock->op = Opcode(JEQUAL);
 
   // Do this normally
@@ -166,6 +167,11 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
   jumpcontinueblock->target = Register(continuelabel);
   jumpcontinueblock->op = Opcode(JUMP);
 
+  // Create a false label
+  auto falselabelblock  = make_unique<struct ThreeAddressCode>();
+  falselabelblock->target = Register(falselabel);
+  falselabelblock->op = Opcode(LABEL);
+
   // This should be inside the false label also
   // is it worth it to check if this branch is empty
   // (if it's empty you don't even need to create a label)
@@ -175,7 +181,13 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
 
   // TAC to jump to continue here
   auto jumpblock2 = make_unique<struct ThreeAddressCode>();
+  jumpblock2->target = Register(continuelabel);
+  jumpblock2->op = Opcode(JUMP);
 
+  // Create continue label
+  auto jumpcontinueblock2 = make_unique<struct ThreeAddressCode>();
+  jumpcontinueblock->target = Register(continuelabel);
+  jumpcontinueblock->op = Opcode(JUMP);
 }
 void LowererVisitor::VisitLoop(const Loop& loop) {
 
@@ -185,9 +197,44 @@ void LowererVisitor::VisitLoop(const Loop& loop) {
   // First evaluate the guard
   loop.guard().Visit(const_cast<LowererVisitor*>(this));
 
-  // if true, run the code 
-  // otherwise jump to continue
+  // create a looplabel
+  std::string looplabel = LoopLabelHelper();
+  auto looplabelblock = make_unique<struct ThreeAddressCode>();
+  looplabelblock->op = Opcode(LABEL);
+  looplabelblock->target = Register(looplabel);
 
+  //Create a loop to let codegen know it's a branch coming
+  auto loopblock = make_unique<struct ThreeAddressCode>();
+  loopblock->arg1 = Operand(blocks_[blocks_.size()-2]->target);
+  // Flip the comparision so it jumps if it's negative
+  loopblock->arg2 = Operand(0);
+
+  loopblock->op = Opcode(LOOP);
+  loopblock->target = Register("t_" + std::to_string(counter_.variablecount));
+  ++counter_.variablecount;
+
+  // Jump conditional to the continue here
+  auto jumpblock = make_unique<struct ThreeAddressCode>();
+  // Is it okay to make a "label" a register or should we make
+  // a target class that can either be a label or a register?
+  std::string continuelabel = ContinueLabelHelper();
+  jumpblock->target = Register(continuelabel);
+  jumpblock->op = Opcode(JEQUAL);
+
+   // Do this normally
+  for (auto& statement : loop.body()) {
+    statement->Visit(this);
+  }
+
+  // Jump to the loop again
+  auto jumploop = make_unique<struct ThreeAddressCode>();
+  jumploop->target = Register(looplabel);
+  jumploop->op = Opcode(JUMP);
+
+  // Create a continue label
+  auto jumpcontinueblock = make_unique<struct ThreeAddressCode>();
+  jumpcontinueblock->target = Register(continuelabel);
+  jumpcontinueblock->op = Opcode(JUMP);
 
 }
 
@@ -321,6 +368,12 @@ std::string LowererVisitor::JumpLabelHelper() {
   std::string newlabel = "falsebranch" + counter_.branchcount;
   ++counter_.branchcount;
   return newlabel;
+}
+
+std::string LowererVisitor::LoopLabelHelper() {
+  std::string newloop = "loop" + counter_.loopcount;
+  ++counter_.loopcount;
+  return newloop;
 }
 
 std::string LowererVisitor::ContinueLabelHelper() {
