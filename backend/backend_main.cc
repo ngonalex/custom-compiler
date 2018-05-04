@@ -50,7 +50,7 @@ int main() {
 
   statements.push_back(std::move(
       make_unique<const Assignment>(make_unique<const VariableExpr>("bob"),
-                                    make_unique<const IntegerExpr>(42))));
+                                    make_unique<const IntegerExpr>(50))));
 
   Statement::Block assignmenttest; 
   assignmenttest.push_back(std::move(
@@ -106,8 +106,8 @@ int main() {
   auto test = lowerer_.GetIR();
   runner.GenerateData(lowerer_.variableset());
   runner.Generate(std::move(test),lowerer_.variableset());
-  //std::string result = exec("gcc -g -c test.s && ld test.o && ./a.out");
-  //std::cout << result << std::endl;
+  std::string result = exec("gcc -g -c test.s && ld test.o && ./a.out");
+  std::cout << result << std::endl;
   // CHANGE TO GENERATEEPILOGUE LATER
   return 0;
 }

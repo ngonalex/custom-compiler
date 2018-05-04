@@ -250,15 +250,15 @@ void CodeGen::Generate(std::vector
             outfile_ << "\tpush %rbx" << std::endl;
         } else if (TestInSet(variableset, code->arg1.reg().name()) && 
           !TestInSet(variableset, code->arg2.reg().name())) {
-            outfile_ << "\tmov $" << code->arg1.reg().name() << ", %rax" << std::endl;
+            outfile_ << "\tmov " << code->arg1.reg().name() << ", %rax" << std::endl;
             outfile_ << "\tpop %rbx" << std::endl;
-            outfile_ << "\tsub %rax, %rbx" << std::endl;
-            outfile_ << "\tpush %rbx" << std::endl;
+            outfile_ << "\tsub %rbx, %rax" << std::endl;
+            outfile_ << "\tpush %rax" << std::endl;
         } else if (!TestInSet(variableset, code->arg1.reg().name()) && 
           TestInSet(variableset, code->arg2.reg().name())) {
-            outfile_ << "\tmov $" << code->arg2.reg().name() << ", %rbx" << std::endl;
+            outfile_ << "\tmov " << code->arg2.reg().name() << ", %rbx" << std::endl;
             outfile_ << "\tpop %rax" << std::endl;
-            outfile_ << "\tsub %rax, %rbx" << std::endl;
+            outfile_ << "\tsub %rbx, %rax" << std::endl;
             outfile_ << "\tpush %rbx" << std::endl;
         } else {
           outfile_ << "\tpop %rax" << std::endl;  // rbx = right
@@ -282,7 +282,7 @@ void CodeGen::Generate(std::vector
     } else if (opcode.opcode() == LESSTHAN) {
         // Compares less than
         if(TestInSet(variableset, code->arg1.reg().name())) {
-          outfile_ << "\tmov $" << code->arg1.reg().name() << ", %rbx" << std::endl;
+          outfile_ << "\tmov " << code->arg1.reg().name() << ", %rbx" << std::endl;
           outfile_ << "\tpop %rax" << std::endl; 
           outfile_ << "\tcmp %rbx, %rax" << std:: endl;
           outfile_ << "\tsetl %dl" << std::endl;
