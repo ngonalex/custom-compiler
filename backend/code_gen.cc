@@ -252,6 +252,7 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tidiv %rbx" << std::endl;
         outfile_ << "\tpush %rax" << std::endl;
     } else if (opcode.opcode() == LESSTHAN) {
+        // Compares less than
         outfile_ << "\tpop %rbx" << std::endl;
         outfile_ << "\tpop %rax" << std::endl; 
         outfile_ << "\tcmp %rbx, %rax" << std:: endl;
