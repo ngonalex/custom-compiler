@@ -6,7 +6,10 @@ namespace backend {
 
 void LowererVisitor::GetOutputArithmeticHelper(std::string &output, int index,
   std::vector<std::string> printhelper) {
-  output = output + blocks_[index]->target.name()
+  if (blocks_[index]->target.targettype()) {
+
+  }
+  output = output + blocks_[index]->target.reg().name()
     + " <- " + blocks_[index]->arg1.reg().name();
 
   output = output + " " + printhelper[blocks_[index]->op.opcode()]
@@ -20,20 +23,20 @@ std::string LowererVisitor::GetOutput() {
   // Probably make this a private variable or something?
   std::vector<std::string> printhelper = {"load", "+", "-", "*", "/", "<", "<=",
     ">", ">=", "==", "&&", "||", "¬", "while", "if",
-    "jmp", "je", "jne", "jg", "jge", "jl", "jle","MkLabel"};
+    "jmp", "je", "jne", "jg", "jge", "jl", "jle", "MkLabel"};
 
   for (unsigned int i = 0; i < blocks_.size(); ++i) {
     // If it's a just a int (Register without a name then access it's value)
     // Otherwise access its name
     Type opcodetype = blocks_[i]->op.opcode();
-    switch(opcodetype) {
-      case LOAD: 
+    switch (opcodetype) {
+      case LOAD:
         if (blocks_[i]->arg1.optype() == INT) {
-        output = output + blocks_[i]->target.name()
-          + " <- " + std::to_string(blocks_[i]->arg1.value());
+          output = output + blocks_[i]->target.reg().name()
+            + " <- " + std::to_string(blocks_[i]->arg1.value());
         } else {
-          output = output + blocks_[i]->target.name()
-            + " <- " + blocks_[i]->arg1.reg().name();
+            output = output + blocks_[i]->target.reg().name()
+              + " <- " + blocks_[i]->arg1.reg().name();
         }
         break;
       // case ADD:
@@ -42,7 +45,7 @@ std::string LowererVisitor::GetOutput() {
       // case SUB:
       //   GetOutputArithmeticHelper(output, i, printhelper);
       //   break;
-      // case MULT: 
+      // case MULT:
       //   GetOutputArithmeticHelper(output, i, printhelper);
       //   break;
       // case DIV:
@@ -53,46 +56,53 @@ std::string LowererVisitor::GetOutput() {
       //   break;
       // case LESSTHANEQ:
       case LOGNOT:
-        output = output + blocks_[i]->target.name()
+        output = output + blocks_[i]->target.reg().name()
           + " <- " + printhelper[LOGNOT] + blocks_[i]->arg1.reg().name();
         break;
       case LOOP:
-        output = output + printhelper[LOOP] + " " + blocks_[i]->arg1.reg().name() +
-          " == 0";
+        output = output + printhelper[LOOP] + " " +
+          blocks_[i]->arg1.reg().name() + " == 0";
         break;
       case CONDITIONAL:
-        output = output + printhelper[CONDITIONAL] + " " + blocks_[i]->arg1.reg().name() +
-          " == 0";
+        output = output + printhelper[CONDITIONAL] + " " +
+          blocks_[i]->arg1.reg().name() + " == 0";
         break;
       case JUMP:
-        output = output + printhelper[JUMP] + " " +  blocks_[i]->target.name();
+        output = output + printhelper[JUMP] + " " +
+          blocks_[i]->target.label().name();
         break;
       case JEQUAL:
-        output = output + printhelper[JEQUAL] + " " +  blocks_[i]->target.name();
+        output = output + printhelper[JEQUAL] + " " +
+          blocks_[i]->target.reg().name();
         break;
       case JNOTEQUAL:
-        output = output + printhelper[JNOTEQUAL] + " " +  blocks_[i]->target.name();
+        output = output + printhelper[JNOTEQUAL] + " " +
+          blocks_[i]->target.reg().name();
         break;
       case JGREATER:
-        output = output + printhelper[JGREATER] + " " +  blocks_[i]->target.name();
+        output = output + printhelper[JGREATER] + " " +
+          blocks_[i]->target.reg().name();
         break;
       case JGREATEREQ:
-        output = output + printhelper[JGREATEREQ] + " " +  blocks_[i]->target.name();
+        output = output + printhelper[JGREATEREQ] + " " +
+          blocks_[i]->target.reg().name();
         break;
       case JLESS:
-        output = output + printhelper[JEQUAL] + " " +  blocks_[i]->target.name();
+        output = output + printhelper[JEQUAL] + " " +
+          blocks_[i]->target.reg().name();
         break;
       case JLESSEQ:
-        output = output + printhelper[JEQUAL] + " " +  blocks_[i]->target.name();
+        output = output + printhelper[JEQUAL] + " " +
+          blocks_[i]->target.reg().name();
         break;
       case LABEL:
-        output = output + printhelper[LABEL] + " " +  blocks_[i]->target.name();
+        output = output + printhelper[LABEL] + " " +
+          blocks_[i]->target.label().name();
         break;
       default:
         GetOutputArithmeticHelper(output, i, printhelper);
         break;
     }
-
     output = output + "\n";
   }
 
@@ -100,18 +110,16 @@ std::string LowererVisitor::GetOutput() {
 }
 
 void LowererVisitor::VisitLessThanExpr(const LessThanExpr& exp) {
-  // Visit left hand side (Last thing should be the target where it stores it)  
+  // Visit left hand side (Last thing should be the target where it stores it)
   exp.lhs().Visit(const_cast<LowererVisitor*>(this));
   Register arg1 = GetArgument(lastchildtype_);
   exp.rhs().Visit(const_cast<LowererVisitor*>(this));
   Register arg2 = GetArgument(lastchildtype_);
 
   BinaryOperatorHelper(LESSTHAN, arg1, arg2);
-
-
 }
 void LowererVisitor::VisitLessThanEqualToExpr(const LessThanEqualToExpr& exp) {
-  // Visit left hand side (Last thing should be the target where it stores it)  
+  // Visit left hand side (Last thing should be the target where it stores it)
   exp.lhs().Visit(const_cast<LowererVisitor*>(this));
   Register arg1 = GetArgument(lastchildtype_);
   exp.rhs().Visit(const_cast<LowererVisitor*>(this));
@@ -120,7 +128,7 @@ void LowererVisitor::VisitLessThanEqualToExpr(const LessThanEqualToExpr& exp) {
   BinaryOperatorHelper(LESSTHANEQ, arg1, arg2);
 }
 void LowererVisitor::VisitGreaterThanExpr(const GreaterThanExpr& exp) {
-  // Visit left hand side (Last thing should be the target where it stores it)  
+  // Visit left hand side (Last thing should be the target where it stores it)
   exp.lhs().Visit(const_cast<LowererVisitor*>(this));
   Register arg1 = GetArgument(lastchildtype_);
   exp.rhs().Visit(const_cast<LowererVisitor*>(this));
@@ -128,8 +136,9 @@ void LowererVisitor::VisitGreaterThanExpr(const GreaterThanExpr& exp) {
 
   BinaryOperatorHelper(GREATERTHAN, arg1, arg2);
 }
-void LowererVisitor::VisitGreaterThanEqualToExpr(const GreaterThanEqualToExpr& exp) {
-    // Visit left hand side (Last thing should be the target where it stores it)  
+void LowererVisitor::VisitGreaterThanEqualToExpr(
+  const GreaterThanEqualToExpr& exp) {
+    // Visit left hand side (Last thing should be the target where it stores it)
   exp.lhs().Visit(const_cast<LowererVisitor*>(this));
   Register arg1 = GetArgument(lastchildtype_);
   exp.rhs().Visit(const_cast<LowererVisitor*>(this));
@@ -138,7 +147,7 @@ void LowererVisitor::VisitGreaterThanEqualToExpr(const GreaterThanEqualToExpr& e
   BinaryOperatorHelper(GREATERTHANEQ, arg1, arg2);
 }
 void LowererVisitor::VisitEqualToExpr(const EqualToExpr& exp) {
-  // Visit left hand side (Last thing should be the target where it stores it)  
+  // Visit left hand side (Last thing should be the target where it stores it)
   exp.lhs().Visit(const_cast<LowererVisitor*>(this));
   Register arg1 = GetArgument(lastchildtype_);
   exp.rhs().Visit(const_cast<LowererVisitor*>(this));
@@ -147,7 +156,7 @@ void LowererVisitor::VisitEqualToExpr(const EqualToExpr& exp) {
   BinaryOperatorHelper(EQUAL, arg1, arg2);
 }
 void LowererVisitor::VisitLogicalAndExpr(const LogicalAndExpr& exp) {
-  // Visit left hand side (Last thing should be the target where it stores it)  
+  // Visit left hand side (Last thing should be the target where it stores it)
   exp.lhs().Visit(const_cast<LowererVisitor*>(this));
   Register arg1 = GetArgument(lastchildtype_);
   exp.rhs().Visit(const_cast<LowererVisitor*>(this));
@@ -156,7 +165,7 @@ void LowererVisitor::VisitLogicalAndExpr(const LogicalAndExpr& exp) {
   BinaryOperatorHelper(LOGAND, arg1, arg2);
 }
 void LowererVisitor::VisitLogicalOrExpr(const LogicalOrExpr& exp) {
-  // Visit left hand side (Last thing should be the target where it stores it)  
+  // Visit left hand side (Last thing should be the target where it stores it)
   exp.lhs().Visit(const_cast<LowererVisitor*>(this));
   Register arg1 = GetArgument(lastchildtype_);
   exp.rhs().Visit(const_cast<LowererVisitor*>(this));
@@ -165,19 +174,18 @@ void LowererVisitor::VisitLogicalOrExpr(const LogicalOrExpr& exp) {
   BinaryOperatorHelper(LOGOR, arg1, arg2);
 }
 void LowererVisitor::VisitLogicalNotExpr(const LogicalNotExpr& exp) {
-  // Visit left hand side (Last thing should be the target where it stores it)  
+  // Visit left hand side (Last thing should be the target where it stores it)
   exp.operand().Visit(const_cast<LowererVisitor*>(this));
   Register arg1 = GetArgument(lastchildtype_);
 
   BinaryOperatorHelper(LOGNOT, arg1, Register());
-  
 }
 void LowererVisitor::VisitConditional(const Conditional& conditional) {
   // Make the IR of the guard first
   // We don't "evaluate" the conditional until the boolean
   // value of the guard has been reached
   conditional.guard().Visit(const_cast<LowererVisitor*>(this));
-  
+
   // So at this point the last statement should be something of the form
   // t_a <- t_b re t_c
   // How should we structure the if TAC
@@ -193,16 +201,16 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
   // Code to create if TAC here
   // Two notes: I looked at the gcc compiler and it'll reverse the conditional
   // e.x. x == 5 is represented as a jne
-  // We need a way to keep track if x has been assigned (map of strings -> bools) maybe?
 
-  //Create a cmp to let codegen know it's a branch coming
+  // Create a cmp to let codegen know it's a branch coming
   auto branchcmpblock = make_unique<struct ThreeAddressCode>();
-  branchcmpblock->arg2 = Operand(blocks_[blocks_.size()-1]->target);
+  branchcmpblock->arg2 = Operand(blocks_[blocks_.size()-1]->target.reg());
   // Flip the comparision so it jumps if it's negative
   branchcmpblock->arg1 = Operand(0);
 
   branchcmpblock->op = Opcode(CONDITIONAL);
-  branchcmpblock->target = Register("t_" + std::to_string(counter_.variablecount));
+  branchcmpblock->target = Target(Register("t_" +
+    std::to_string(counter_.variablecount), VIRTUALREG));
   ++counter_.variablecount;
 
   blocks_.push_back(std::move(branchcmpblock));
@@ -212,7 +220,7 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
   // Is it okay to make a "label" a register or should we make
   // a target class that can either be a label or a register?
   std::string falselabel = JumpLabelHelper();
-  jumpblock->target = Register(falselabel);
+  jumpblock->target = Target(Label(falselabel));
   jumpblock->op = Opcode(JEQUAL);
 
   blocks_.push_back(std::move(jumpblock));
@@ -222,17 +230,17 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
     statement->Visit(this);
   }
 
-  //Create a jump to the continue
+  // Create a jump to the continue
   std::string continuelabel = ContinueLabelHelper();
   auto jumpcontinueblock = make_unique<struct ThreeAddressCode>();
-  jumpcontinueblock->target = Register(continuelabel);
+  jumpcontinueblock->target = Target(Label(continuelabel));
   jumpcontinueblock->op = Opcode(JUMP);
   blocks_.push_back(std::move(jumpcontinueblock));
 
 
   // Create a false label
   auto falselabelblock  = make_unique<struct ThreeAddressCode>();
-  falselabelblock->target = Register(falselabel);
+  falselabelblock->target = Target(Label(falselabel));
   falselabelblock->op = Opcode(LABEL);
   blocks_.push_back(std::move(falselabelblock));
 
@@ -246,14 +254,14 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
 
   // TAC to jump to continue here
   auto jumpblock2 = make_unique<struct ThreeAddressCode>();
-  jumpblock2->target = Register(continuelabel);
+  jumpblock2->target = Target(Label(continuelabel));
   jumpblock2->op = Opcode(JUMP);
   blocks_.push_back(std::move(jumpblock2));
 
 
   // Create continue label
   auto jumpcontinueblock2 = make_unique<struct ThreeAddressCode>();
-  jumpcontinueblock->target = Register(continuelabel);
+  jumpcontinueblock->target = Target(Label(continuelabel));
   jumpcontinueblock->op = Opcode(JUMP);
   blocks_.push_back(std::move(jumpcontinueblock2));
 
@@ -267,50 +275,49 @@ void LowererVisitor::VisitLoop(const Loop& loop) {
   std::string looplabel = LoopLabelHelper();
   auto looplabelblock = make_unique<struct ThreeAddressCode>();
   looplabelblock->op = Opcode(LABEL);
-  looplabelblock->target = Register(looplabel);
+  looplabelblock->target = Target(Label(looplabel);
   blocks_.push_back(std::move(looplabelblock));
 
   // Eval guard
   loop.guard().Visit(const_cast<LowererVisitor*>(this));
 
 
-  //Create a loop to let codegen know it's a loop coming
+  // Create a loop to let codegen know it's a loop coming
   auto loopblock = make_unique<struct ThreeAddressCode>();
-  loopblock->arg2 = Operand(blocks_[blocks_.size()-2]->target);
+  loopblock->arg2 = Operand(blocks_[blocks_.size()-2]->target.reg());
   // Flip the comparision so it jumps if it's negative
   loopblock->arg1 = Operand(0);
 
   loopblock->op = Opcode(LOOP);
-  loopblock->target = Register("t_" + std::to_string(counter_.variablecount));
+  loopblock->target = Target(Register("t_" +
+    std::to_string(counter_.variablecount), VIRTUALREG));
   ++counter_.variablecount;
   blocks_.push_back(std::move(loopblock));
 
 
   // Jump conditional to the continue here
   auto jumpblock = make_unique<struct ThreeAddressCode>();
-  // Is it okay to make a "label" a register or should we make
-  // a target class that can either be a label or a register?
   std::string continuelabel = ContinueLabelHelper();
-  jumpblock->target = Register(continuelabel);
+  jumpblock->target = Target(Label(continuelabel));
   jumpblock->op = Opcode(JEQUAL);
   blocks_.push_back(std::move(jumpblock));
 
 
-   // Do this normally
+  // Do this normally
   for (auto& statement : loop.body()) {
     statement->Visit(this);
   }
 
   // Jump to the loop again
   auto jumploop = make_unique<struct ThreeAddressCode>();
-  jumploop->target = Register(looplabel);
+  jumploop->target = Target(Label(looplabel));
   jumploop->op = Opcode(JUMP);
   blocks_.push_back(std::move(jumploop));
 
 
   // Create a continue label
   auto jumpcontinueblock = make_unique<struct ThreeAddressCode>();
-  jumpcontinueblock->target = Register(continuelabel);
+  jumpcontinueblock->target = Target(Label(continuelabel));
   jumpcontinueblock->op = Opcode(LABEL);
   blocks_.push_back(std::move(jumpcontinueblock));
 }
@@ -332,9 +339,9 @@ void LowererVisitor::VisitAssignment(const Assignment& assignment) {
   // string name
   assignment.rhs().Visit(const_cast<LowererVisitor*>(this));
 
-  newblock->target = Register(varname);
+  newblock->target = Target(Register(varname, VARIABLEREG));
   newblock->op = Opcode(LOAD);
-  newblock->arg1 = Operand(blocks_[blocks_.size()-1]->target);
+  newblock->arg1 = Operand(blocks_[blocks_.size()-1]->target.reg());
 
   blocks_.push_back(std::move(newblock));
 }
@@ -360,7 +367,8 @@ void LowererVisitor::VisitVariableExpr(const VariableExpr& exp) {
 // functions as the only difference between add/sub/mult/div is their "sign"
 // (Also some additional error handling for div req)
 
-void LowererVisitor::BinaryOperatorHelper(Type type, Register arg1, Register arg2) {
+void LowererVisitor::BinaryOperatorHelper(Type type,
+  Register arg1, Register arg2) {
   // Load value into target (t <- prev->target + prev->prev->target)
   // Last two elements of the vector should be the integers to load in
   int size = blocks_.size();
@@ -378,7 +386,8 @@ void LowererVisitor::BinaryOperatorHelper(Type type, Register arg1, Register arg
 
   newblock->op = Opcode(type);
   // look at this later, just going to do this now to test some things
-  newblock->target = Register("t_" + std::to_string(counter_.variablecount));
+  newblock->target = Target(Target(Register("t_" +
+    std::to_string(counter_.variablecount), VIRTUALREG)));
 
   // Push into vector
   blocks_.push_back(std::move(newblock));
@@ -395,7 +404,8 @@ void LowererVisitor::VisitIntegerExpr(const IntegerExpr& exp) {
   newblock->op = Opcode(LOAD);
 
   // look at this later,just going to do this now to test some things
-  newblock->target = Register("t_" + std::to_string(counter_.variablecount));
+  newblock->target = Target(Register("t_" +
+    std::to_string(counter_.variablecount), VIRTUALREG));
 
   // Push into vector
   blocks_.push_back(std::move(newblock));
@@ -462,16 +472,16 @@ std::string LowererVisitor::ContinueLabelHelper() {
 
 Register LowererVisitor::GetArgument(ChildType type) {
   Register arg;
-  switch(type) {
+  switch (type) {
     case INTCHILD:
-      arg = blocks_[blocks_.size()-1]->target;
+      arg = blocks_[blocks_.size()-1]->target.reg();
       break;
     case VARCHILD:
       // Check if variable has been assigned here?
       arg = Register(variablestack_.top());
       variablestack_.pop();
 
-      if(variableset_.count(arg.name()) == 0 ) {
+      if ( variableset_.count(arg.name()) == 0 ) {
         std::cerr << "Variable "+ arg.name() +" not assigned";
         exit(1);
       }

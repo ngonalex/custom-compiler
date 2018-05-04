@@ -54,7 +54,7 @@ class LowererVisitor : public AstVisitor {
 
   std::string GetOutput();
 
-  // V3 (Assignment + Program updated) Fill 
+  // V3 (Assignment + Program updated) Fill
   void VisitLessThanExpr(const LessThanExpr& exp);
   void VisitLessThanEqualToExpr(const LessThanEqualToExpr& exp);
   void VisitGreaterThanExpr(const GreaterThanExpr& exp);
@@ -89,7 +89,6 @@ class LowererVisitor : public AstVisitor {
   // bool CheckVarFlag() {return variableflag_;}
   // void ClearVarFlag() {variableflag_ = false;}
   Register GetArgument(ChildType type);
-  
 
   std::vector<std::unique_ptr<ThreeAddressCode>> GetIR() {
     return std::move(blocks_);

@@ -52,7 +52,7 @@ class InterpreterVisitor : public AstVisitor {
     return variablemap_.find(variable)->second;
   }
 
-  // V3 (Assignment + Program updated) Fill 
+  // V3 (Assignment + Program updated) Fill
   void VisitLessThanExpr(const LessThanExpr& exp) {}
   void VisitLessThanEqualToExpr(const LessThanEqualToExpr& exp) {}
   void VisitGreaterThanExpr(const GreaterThanExpr& exp) {}
