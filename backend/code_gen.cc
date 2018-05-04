@@ -170,6 +170,7 @@ void CodeGen::GenerateResult() {
 }
 
 void CodeGen::GenerateData(std::set<std::string> variableset) { 
+  //Creates a .data section for variables
   outfile_ << ".data " << std::endl;
   for ( auto iter = variableset.begin(); iter!=variableset.end(); ++iter) {
     outfile_ << "\t" << *iter << ":\n\t\t.quad 1" << std::endl;
@@ -209,11 +210,12 @@ void CodeGen::Generate(std::vector
           + ", %rcx" << std::endl;
         outfile_ << "\tpush %rcx" << std::endl;
       } else {
-          outfile_ << "\txor %rbx, %rbx" << std::endl;
+
+          ClearRegister("rbx");
           outfile_ << "\tpop %rbx" << std::endl;
           outfile_ << "\tmov %rbx, " << code->target.name() << "" << std::endl;
           outfile_ << "\tpush %rbx" << std::endl;
-          
+    
           // Add it to the set, then call the print function
           variableset_.insert(code->target.name());
           outfile_ << "\tmov %rbx, %rax" << std::endl;
@@ -249,6 +251,74 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tcqto" << std::endl;  // indicating its a signed division
         outfile_ << "\tidiv %rbx" << std::endl;
         outfile_ << "\tpush %rax" << std::endl;
+    } else if (opcode.opcode() == LESSTHAN) {
+        // TO DO
+        outfile_ << "\t#LESSTHAN" << std::endl;
+        outfile_ << "\tpop %rbx" << std::endl;
+        outfile_ << "\tpop %rax" << std::endl; 
+        outfile_ << "\tcmp %rbx, %rax" << std:: endl;
+        outfile_ << "\tsetl %dl" << std::endl;
+        outfile_ << "\tmovzx %dl, %rcx" << std::endl;
+        outfile_ << "\tpush %rcx" << std:: endl;
+    } else if (opcode.opcode() == LESSTHANEQ) {
+        // TO DO
+        outfile_ << "\t#LESSTHANEQ" << std::endl;
+        outfile_ << "\tpop %rbx" << std::endl;
+        outfile_ << "\tpop %rax" << std::endl; 
+        outfile_ << "\tcmp %rbx, %rax" << std:: endl;
+        outfile_ << "\tsetle %dl" << std::endl;
+        outfile_ << "\tmovzx %dl, %rcx" << std::endl;
+        outfile_ << "\tpush %rcx" << std:: endl;
+    } else if (opcode.opcode() == GREATERTHAN) {
+        // TO DO
+        outfile_ << "\t#GREATERTHAN" << std::endl;
+        outfile_ << "\tpop %rbx" << std::endl;
+        outfile_ << "\tpop %rax" << std::endl; 
+        outfile_ << "\tcmp %rbx, %rax" << std:: endl;
+        outfile_ << "\tsetg %dl" << std::endl;
+        outfile_ << "\tmovzx %dl, %rcx" << std::endl;
+        outfile_ << "\tpush %rcx" << std:: endl;
+    } else if (opcode.opcode() == GREATERTHANEQ) {
+        // TO DO
+        outfile_ << "\t#GREATERTHANEQ" << std::endl;
+        outfile_ << "\tpop %rbx" << std::endl;
+        outfile_ << "\tpop %rax" << std::endl; 
+        outfile_ << "\tcmp %rbx, %rax" << std:: endl;
+        outfile_ << "\tsetge %dl" << std::endl;
+        outfile_ << "\tmovzx %dl, %rcx" << std::endl;
+        outfile_ << "\tpush %rcx" << std:: endl;
+    } else if (opcode.opcode() == EQUAL) { 
+        // TO DO
+        outfile_ << "\t#EQUAL" << std::endl;
+        outfile_ << "\tpop %rbx" << std::endl;
+        outfile_ << "\tpop %rax" << std::endl; 
+        outfile_ << "\tcmp %rbx, %rax" << std:: endl;
+        outfile_ << "\tsete %bl" << std:: endl;
+        outfile_ << "\tmovzx %dl, %rcx" << std::endl;
+        outfile_ << "\tpush %rcx" << std:: endl;
+    } else if (opcode.opcode() == LOGAND) { 
+        // TO DO
+        outfile_ << "\tpop %rbx" << std::endl;
+        outfile_ << "\tpop %rax" << std::endl; 
+        outfile_ << "\tand %rbx, %rax" << std:: endl;
+        outfile_ << "\tpush %rax" << std:: endl;
+    } else if (opcode.opcode() == LOGOR) { 
+        // TO DO 
+        outfile_ << "\tpop %rbx" << std::endl;
+        outfile_ << "\tpop %rax" << std::endl; 
+        outfile_ << "\tor %rbx, %rax" << std:: endl;
+        outfile_ << "\tpush %rax" << std:: endl;
+    } else if (opcode.opcode() == LOGNOT) { 
+        // TO DO
+        outfile_ << "\tpop %rbx" << std::endl;
+        outfile_ << "\tnot %rbx" << std:: endl;
+        outfile_ << "\tpush %rbx" << std:: endl;
+    } else if (opcode.opcode() == LOOP) { 
+        // TO DO 
+    } else if (opcode.opcode() == CONDITIONAL) {
+        // TO DO 
+    } else if (opcode.opcode() == JUMP) { 
+        // TO DO 
     }
   }
   //This will probably change later, call on the print function for the

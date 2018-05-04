@@ -11,7 +11,19 @@ using cs160::abstract_syntax::backend::SubtractExpr;
 using cs160::abstract_syntax::backend::MultiplyExpr;
 using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::Assignment;
-using cs160::abstract_syntax::backend::VariableExpr;
+using cs160::abstract_syntax::backend::IntegerExpr;
+using cs160::abstract_syntax::backend::LessThanExpr;
+using cs160::abstract_syntax::backend::LessThanEqualToExpr;
+using cs160::abstract_syntax::backend::GreaterThanExpr;
+using cs160::abstract_syntax::backend::GreaterThanEqualToExpr;
+using cs160::abstract_syntax::backend::EqualToExpr;
+using cs160::abstract_syntax::backend::LogicalAndExpr;
+using cs160::abstract_syntax::backend::LogicalOrExpr;
+using cs160::abstract_syntax::backend::LogicalNotExpr;
+using cs160::abstract_syntax::backend::Statement;
+using cs160::abstract_syntax::backend::Assignment;
+using cs160::abstract_syntax::backend::Conditional;
+using cs160::abstract_syntax::backend::Loop;
 using cs160::abstract_syntax::backend::Program;
 using cs160::backend::LowererVisitor;
 using cs160::backend::ThreeAddressCode;
@@ -32,17 +44,63 @@ std::string exec(const char* cmd) {
 
 int main() {
   LowererVisitor lowerer_;
-  auto expr = cs160::make_unique<DivideExpr>(
-    make_unique<IntegerExpr>(7), make_unique<IntegerExpr>(5));
+  Statement::Block statements;
+  //auto expr = cs160::make_unique<DivideExpr>(
+  //  make_unique<IntegerExpr>(7), make_unique<IntegerExpr>(5));
+  statements.push_back(std::move(
+      make_unique<const Assignment>(make_unique<const VariableExpr>("bob"),
+                                    make_unique<const IntegerExpr>(42))));
 
-  expr->Visit(&lowerer_);
+  statements.push_back(std::move(make_unique<const Conditional>(
+      make_unique<const LogicalOrExpr>(
+          make_unique<const LogicalAndExpr>(
+              make_unique<const LessThanExpr>(
+                  make_unique<const IntegerExpr>(42),
+                  make_unique<const IntegerExpr>(100)),
+              make_unique<const GreaterThanExpr>(
+                  make_unique<const IntegerExpr>(42),
+                  make_unique<const IntegerExpr>(0))),
+          make_unique<const LogicalAndExpr>(
+              make_unique<const LessThanEqualToExpr>(
+                  make_unique<const IntegerExpr>(42),
+                  make_unique<const IntegerExpr>(100)),
+              make_unique<const GreaterThanEqualToExpr>(
+                  make_unique<const IntegerExpr>(42),
+                  make_unique<const IntegerExpr>(0)))),
+      Statement::Block(), Statement::Block())));
+
+  Statement::Block body;
+  body.push_back(std::move(make_unique<const Assignment>(
+      make_unique<const VariableExpr>("bob"),
+      make_unique<const SubtractExpr>(make_unique<const IntegerExpr>(42),
+                                      make_unique<const IntegerExpr>(1)))));
+
+  statements.push_back(std::move(make_unique<const Loop>(
+      make_unique<const LogicalNotExpr>(
+          make_unique<const EqualToExpr>(make_unique<const IntegerExpr>(42),
+                                         make_unique<const IntegerExpr>(0))),
+      std::move(body))));
+
+  auto ae = make_unique<const AddExpr>(
+      make_unique<const SubtractExpr>(
+          make_unique<const DivideExpr>(make_unique<const IntegerExpr>(12),
+                                        make_unique<const IntegerExpr>(3)),
+          make_unique<const IntegerExpr>(4)),
+      make_unique<const MultiplyExpr>(make_unique<const IntegerExpr>(3),
+                                      make_unique<const IntegerExpr>(2)));
+
+  auto ast = make_unique<const Program>(std::move(statements), std::move(ae));
+
+  //CountVisitor counter;
+  ast->Visit(&lowerer_);
+  //expr->Visit(&lowerer_);
 
   std::ofstream file = std::ofstream("test.s");
   CodeGen runner = CodeGen(file);
   auto test = lowerer_.GetIR();
   runner.GenerateData(lowerer_.variableset());
   runner.Generate(std::move(test));
-  std::string result = exec("gcc -c test.s && ld test.o && ./a.out");
+  std::string result = exec("gcc -g -c test.s && ld test.o && ./a.out");
   std::cout << result << std::endl;
   // CHANGE TO GENERATEEPILOGUE LATER
   return 0;
