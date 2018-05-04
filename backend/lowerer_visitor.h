@@ -7,12 +7,11 @@
 #include <set>
 #include <iostream>
 
-// #include "utility/assert.h"
 #include "abstract_syntax/abstract_syntax.h"
 #include "backend/ir.h"
+#include "backend/helper_struct.h"
 #include "utility/memory.h"
 #include "utility/assert.h"
-#include "backend/helper_struct.h"
 
 using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::IntegerExpr;
@@ -80,7 +79,7 @@ class LowererVisitor : public AstVisitor {
   void VisitDivideExpr(const DivideExpr& exp);
 
   // Helpers
-  void GetOutputArithmeticHelper(std::string const &output, int index,
+  std::string GetOutputArithmeticHelper(std::string output, int index,
     std::vector<std::string> printhelper);
   void BinaryOperatorHelper(Type type, Register arg1, Register arg2);
   std::string JumpLabelHelper();

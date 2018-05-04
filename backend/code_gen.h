@@ -17,23 +17,31 @@ namespace backend {
 class CodeGen {
  public:
     explicit CodeGen(std::ofstream &filename) : outfile_(filename) {}
-    void Generate(std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks,
-      std::set<std::string> variableset);
+    void Generate(std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks);
     void GenerateEpilogue();
     void ClearRegister(std::string reg);
     void GenerateBoiler();
 
+    // Printing functions
     void GeneratePrinter();
     void GeneratePrintHeader();
     void GenerateAssignment(std::string);
     void GenerateResult();
     void GenerateData(std::set<std::string>);
-    bool TestInSet(std::set<std::string> variableset, std::string findstring);
+    // Different nodes + helpers
+    void GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac);
+    void GenerateArithmeticExpr(std::unique_ptr<ThreeAddressCode> tac,
+      Type type);
+    void GenerateBinaryExprHelper(std::unique_ptr<ThreeAddressCode> tac);
+    void GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
+      Type type);
+    void GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
+      Type type);
 
  private:
   std::ofstream& outfile_;
   int printercount_;
-  std::set<std::string> variableset_;
+  std::set<std::string> assignmentset_;
 };
 
 }  // namespace backend

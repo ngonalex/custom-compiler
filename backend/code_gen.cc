@@ -103,7 +103,7 @@ void CodeGen::GeneratePrinter() {
 
   // Generate Unique Printers here
   std::set<std::string>::iterator it;
-  for (it = variableset_.begin(); it != variableset_.end(); ++it) {
+  for (it = assignmentset_.begin(); it != assignmentset_.end(); ++it) {
     GenerateAssignment(*it);
   }
 }
@@ -190,186 +190,281 @@ void CodeGen::ClearRegister(std::string reg) {
   outfile_ << "\txor %" + reg + ", %" + reg << std::endl;
 }
 
-bool CodeGen::TestInSet(std::set<std::string> variableset,
-  std::string findstring) {
-  if (variableset.count(findstring)) {
-    return true;
+void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
+  if (tac->arg1.optype() == INT) {
+        outfile_ << "\t# Loading in an integer" << std::endl;
+        outfile_ << "\tmov $" + std::to_string(tac->arg1.value())
+          + ", %rcx" << std::endl;
+        outfile_ << "\tpush %rcx\n" << std::endl;
+  } else {
+      outfile_ << "\t# Loading a value into variable "
+        + tac->target.reg().name() << std::endl;
+      ClearRegister("rbx");
+      outfile_ << "\tpop %rbx" << std::endl;
+      outfile_ << "\tmov %rbx, " << tac->target.reg().name()
+        << "" << std::endl;
+      outfile_ << "\tpush %rbx" << std::endl;
+
+      // Add it to the set, then call the print function
+      assignmentset_.insert(tac->target.reg().name());
+      outfile_ << "\tmov %rbx, %rax\n" << std::endl;
+      // Call on correct print function
+      outfile_ << "\t# Going to print " << tac->target.reg().name() << "\n"
+        << std::endl;
+      outfile_ << "\tcall print" + tac->target.reg().name() << std::endl;
+      outfile_ << "\n\t# Returning from printing "
+        << tac->target.reg().name() << "\n" << std::endl;
   }
-  return false;
+}
+
+void CodeGen::GenerateArithmeticExpr(
+  std::unique_ptr<ThreeAddressCode> tac, Type type) {
+  switch (type) {
+    case ADD:
+      outfile_ << "\t# Addition";
+      GenerateBinaryExprHelper(std::move(tac));
+      ClearRegister("rcx");
+      outfile_ << "\tadd %rax, %rcx\n\tadd %rbx, %rcx" << std::endl;
+      outfile_ << "\tpush %rcx\n" << std::endl;
+      break;
+    case SUB:
+      outfile_ << "\t# Subtraction";
+      GenerateBinaryExprHelper(std::move(tac));
+      outfile_ << "\tsub %rbx, %rax" << std::endl;
+      outfile_ << "\tpush %rax\n" << std::endl;
+      break;
+    case MULT:
+      outfile_ << "\t# Multiplication";
+      GenerateBinaryExprHelper(std::move(tac));
+      outfile_ << "\timul %rax, %rbx" << std::endl;
+      outfile_ << "\tpush %rbx\n" << std::endl;
+      break;
+    case DIV:
+      ClearRegister("rdx");
+      outfile_ << "\t# Division";
+      GenerateBinaryExprHelper(std::move(tac));
+      outfile_ << "\tcqto" << std::endl;  // indicating its a signed division
+      outfile_ << "\tidiv %rbx" << std::endl;
+      outfile_ << "\tpush %rax\n" << std::endl;
+      break;
+    default:
+      std::cerr << "Inside GenerateArithmeticExpr, something went"
+        << "went very wrong\n";
+      exit(1);
+  }
+}
+
+void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
+  Type type) {
+  // Note to self you can abstract this out even more
+  switch (type) {
+    case LESSTHAN:
+      outfile_ << "\t# LessThan Comparision";
+      GenerateBinaryExprHelper(std::move(tac));
+      outfile_ << "\tcmp %rbx, %rax" << std:: endl;
+      outfile_ << "\tsetl %dl" << std::endl;
+      outfile_ << "\tmovzx %dl, %rcx" << std::endl;
+      outfile_ << "\tpush %rcx\n" << std:: endl;
+      break;
+    case LESSTHANEQ:
+      outfile_ << "\t# LessThanEq Comparision";
+      GenerateBinaryExprHelper(std::move(tac));
+      outfile_ << "\tcmp %rbx, %rax" << std:: endl;
+      outfile_ << "\tsetle %dl" << std::endl;
+      outfile_ << "\tmovzx %dl, %rcx" << std::endl;
+      outfile_ << "\tpush %rcx\n" << std:: endl;
+      break;
+    case GREATERTHAN:
+      outfile_ << "\t# GreaterThan Comparision";
+      GenerateBinaryExprHelper(std::move(tac));
+      outfile_ << "\tcmp %rbx, %rax" << std:: endl;
+      outfile_ << "\tsetg %dl" << std::endl;
+      outfile_ << "\tmovzx %dl, %rcx" << std::endl;
+      outfile_ << "\tpush %rcx\n" << std:: endl;
+      break;
+    case GREATERTHANEQ:
+      outfile_ << "\t# GreaterThanEq Comparision";
+      GenerateBinaryExprHelper(std::move(tac));
+      outfile_ << "\tcmp %rbx, %rax" << std:: endl;
+      outfile_ << "\tsetge %dl" << std::endl;
+      outfile_ << "\tmovzx %dl, %rcx" << std::endl;
+      outfile_ << "\tpush %rcx\n" << std:: endl;
+      break;
+    case EQUAL:
+      outfile_ << "\t# Equals Comparision";
+      GenerateBinaryExprHelper(std::move(tac));
+      outfile_ << "\tcmp %rbx, %rax" << std:: endl;
+      outfile_ << "\tsete %dl" << std::endl;
+      outfile_ << "\tmovzx %dl, %rcx" << std::endl;
+      outfile_ << "\tpush %rcx\n" << std:: endl;
+      break;
+    default:
+      std::cerr << "Inside GenerateRelationalExpr, something went"
+        << "went very wrong\n";
+      exit(1);
+  }
+}
+
+void CodeGen::GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
+  Type type) {
+  switch (type) {
+    case LOGAND:
+      outfile_ << "\t# LogicalAnd\n";
+      outfile_ << "\tpop %rbx" << std::endl;
+      outfile_ << "\tpop %rax" << std::endl;
+      outfile_ << "\tand %rbx, %rax" << std:: endl;
+      outfile_ << "\tpush %rax\n" << std:: endl;
+      break;
+    case LOGOR:
+      outfile_ << "\t# LogicalOr\n";
+      outfile_ << "\tpop %rbx" << std::endl;
+      outfile_ << "\tpop %rax" << std::endl;
+      outfile_ << "\tor %rbx, %rax" << std:: endl;
+      outfile_ << "\tpush %rax\n" << std:: endl;
+      break;
+    case LOGNOT:
+      outfile_ << "\t# LogicalNot\n";
+      outfile_ << "\tpop %rbx" << std::endl;
+      outfile_ << "\tnot %rbx" << std::endl;
+      outfile_ << "\tpush %rbx\n" << std::endl;
+      break;
+    default:
+      std::cerr << "Inside GenerateLogicalExpr, something went"
+        << "went very wrong\n";
+      exit(1);
+  }
+}
+
+void CodeGen::GenerateBinaryExprHelper(
+  std::unique_ptr<ThreeAddressCode> tac) {
+  // Shouldn't have to check it it's been assigned yet
+  // Lowerer should have done that
+  RegisterType arg1type = tac->arg1.reg().type();
+  RegisterType arg2type = tac->arg2.reg().type();
+
+  if ( arg1type == VARIABLEREG && arg2type == VARIABLEREG ) {
+    // Do a double load from the variable names
+    outfile_ << " btwn two variables\n";
+    outfile_ << "\tmov " << tac->arg1.reg().name()
+      << ", %rax" << std::endl;
+    outfile_ << "\tmov " << tac->arg2.reg().name() << ", %rbx"
+      << std::endl;
+  } else if ( arg1type == VARIABLEREG && arg2type == VIRTUALREG ) {
+      // Load from the first variable
+      outfile_ << " btwn var,int\n";
+      outfile_ << "\tmov " << tac->arg1.reg().name()
+        << ", %rax" << std::endl;
+      outfile_ << "\tpop %rbx" << std::endl;
+  } else if ( arg1type == VIRTUALREG && arg2type == VARIABLEREG ) {
+      // Load from the second variable
+      outfile_ << " btwn int, var\n";
+      outfile_ << "\tmov " << tac->arg2.reg().name()
+        << ", %rbx" << std::endl;
+      outfile_ << "\tpop %rax" << std::endl;
+  } else {
+      // double pop from stack
+      outfile_ << " btwn int, int\n";
+      outfile_ << "\tpop %rbx" << std::endl;  // rbx = right
+      outfile_ << "\tpop %rax" << std::endl;  // rax = left
+  }
 }
 
 void CodeGen::Generate(std::vector
-  <std::unique_ptr<struct ThreeAddressCode>> blocks,
-    std::set<std::string> variableset) {
+  <std::unique_ptr<struct ThreeAddressCode>> blocks) {
   // boiler code here
   GenerateBoiler();
 
   // IR to assembly inst
   for (unsigned int i = 0; i < blocks.size(); ++i) {
     auto code = std::move(blocks[i]);
-    Opcode opcode = code->op;
+    Type opcode = code->op.opcode();
 
-    // Two different loads now, one for reg <- int,
-    // another variable <- arithmetic
-    if (opcode.opcode() == LOAD) {
-      // outfile_ << "\t#Storing " + code->arg1 + " into rcx" << std::endl;
-      if (code->arg1.optype() == INT) {
-        outfile_ << "\tmov $" + std::to_string(code->arg1.value())
-          + ", %rcx" << std::endl;
-        outfile_ << "\tpush %rcx" << std::endl;
-      } else {
-          ClearRegister("rbx");
-          outfile_ << "\tpop %rbx" << std::endl;
-          outfile_ << "\tmov %rbx, " << code->target.reg().name()
-            << "" << std::endl;
-          outfile_ << "\tpush %rbx" << std::endl;
-
-          // Add it to the set, then call the print function
-          variableset_.insert(code->target.reg().name());
-          outfile_ << "\tmov %rbx, %rax" << std::endl;
-          // Call on correct print function
-          outfile_ << "\tcall print" + code->target.reg().name() << std::endl;
-      }
-
-    } else if (opcode.opcode() == ADD) {
-        // Load arg1,arg2 then add them into target
-        // outfile_ << "\t#Adding << std::endl;
-
-        outfile_ << "\tpop %rbx" << std::endl;  // rbx = right
-        outfile_ << "\tpop %rax" << std::endl;  // rax = left
-        ClearRegister("rcx");
-        outfile_ << "\tadd %rax, %rcx\n\tadd %rbx, %rcx" << std::endl;
-        outfile_ << "\tpush %rcx" << std::endl;
-
-    } else if (opcode.opcode() == SUB) {
-        // Load arg1,arg2 then sub them into target
-        if (TestInSet(variableset, code->arg1.reg().name()) &&
-          TestInSet(variableset, code->arg2.reg().name())) {
-            outfile_ << "\tmov " << code->arg1.reg().name()
-              << ", %rax" << std::endl;
-            outfile_ << "\tmov " << code->arg2.reg().name() << ", %rbx"
-              << std::endl;
-            outfile_ << "\tsub %rax, %rbx" << std::endl;
-            outfile_ << "\tpush %rbx" << std::endl;
-        } else if (TestInSet(variableset, code->arg1.reg().name()) &&
-          !TestInSet(variableset, code->arg2.reg().name())) {
-            outfile_ << "\tmov " << code->arg1.reg().name()
-              << ", %rax" << std::endl;
-            outfile_ << "\tpop %rbx" << std::endl;
-            outfile_ << "\tsub %rbx, %rax" << std::endl;
-            outfile_ << "\tpush %rax" << std::endl;
-        } else if (!TestInSet(variableset, code->arg1.reg().name()) &&
-          TestInSet(variableset, code->arg2.reg().name())) {
-            outfile_ << "\tmov " << code->arg2.reg().name()
-              << ", %rbx" << std::endl;
-            outfile_ << "\tpop %rax" << std::endl;
-            outfile_ << "\tsub %rbx, %rax" << std::endl;
-            outfile_ << "\tpush %rbx" << std::endl;
-        } else {
-          outfile_ << "\tpop %rax" << std::endl;  // rbx = right
-          outfile_ << "\tpop %rcx" << std::endl;  // rax = left
-          outfile_ << "\tsub %rax, %rcx" << std::endl;
-          outfile_ << "\tpush %rcx" << std::endl;
-        }
-    } else if (opcode.opcode() == MULT) {
-        outfile_ << "\tpop %rbx" << std::endl;  // rbx = right
-        outfile_ << "\tpop %rcx" << std::endl;  // rcx = left
-        outfile_ << "\timul %rbx, %rcx" << std::endl;
-        outfile_ << "\tpush %rcx" << std::endl;
-    } else if (opcode.opcode() == DIV) {
-        // Load dividend (arg1) into %rax
-        ClearRegister("rdx");
-        outfile_ << "\tpop %rbx" << std::endl;
+    switch (opcode) {
+      case LOAD:
+        GenerateLoadInstructions(std::move(code));
+        break;
+      case ADD:
+        GenerateArithmeticExpr(std::move(code), ADD);
+        break;
+      case SUB:
+        GenerateArithmeticExpr(std::move(code), SUB);
+        break;
+      case MULT:
+        GenerateArithmeticExpr(std::move(code), MULT);
+        break;
+      case DIV:
+        GenerateArithmeticExpr(std::move(code), DIV);
+        break;
+      case LESSTHAN:
+        GenerateRelationalExpr(std::move(code), LESSTHAN);
+        break;
+      case LESSTHANEQ:
+        GenerateRelationalExpr(std::move(code), LESSTHANEQ);
+        break;
+      case GREATERTHAN:
+        GenerateRelationalExpr(std::move(code), GREATERTHAN);
+        break;
+      case GREATERTHANEQ:
+        GenerateRelationalExpr(std::move(code), GREATERTHANEQ);
+        break;
+      case EQUAL:
+        GenerateRelationalExpr(std::move(code), EQUAL);
+        break;
+      case LOGAND:
+        GenerateLogicalExpr(std::move(code), LOGAND);
+        break;
+      case LOGOR:
+        GenerateLogicalExpr(std::move(code), LOGOR);
+        break;
+      case LOGNOT:
+        GenerateLogicalExpr(std::move(code), LOGNOT);
+        break;
+      case LOOP:
+        outfile_ << "\t# LOOP\n";
         outfile_ << "\tpop %rax" << std::endl;
-        outfile_ << "\tcqto" << std::endl;  // indicating its a signed division
-        outfile_ << "\tidiv %rbx" << std::endl;
-        outfile_ << "\tpush %rax" << std::endl;
-    } else if (opcode.opcode() == LESSTHAN) {
-        // Compares less than
-        if (TestInSet(variableset, code->arg1.reg().name())) {
-          outfile_ << "\tmov " << code->arg1.reg().name()
-            << ", %rbx" << std::endl;
-          outfile_ << "\tpop %rax" << std::endl;
-          outfile_ << "\tcmp %rbx, %rax" << std:: endl;
-          outfile_ << "\tsetl %dl" << std::endl;
-          outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-          outfile_ << "\tpush %rcx" << std:: endl;
-        } else {
-          outfile_ << "\tpop %rbx" << std::endl;
-          outfile_ << "\tpop %rax" << std::endl;
-          outfile_ << "\tcmp %rbx, %rax" << std:: endl;
-          outfile_ << "\tsetl %dl" << std::endl;
-          outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-          outfile_ << "\tpush %rcx" << std:: endl;
-        }
-    } else if (opcode.opcode() == LESSTHANEQ) {
-        outfile_ << "\tpop %rbx" << std::endl;
+        outfile_ << "\tcmp $" << std::to_string(code->arg1.value())
+          << ", %rax\n"<< std::endl;
+        break;
+      case CONDITIONAL:
+        outfile_ << "\t# CONDITIONAL\n";
         outfile_ << "\tpop %rax" << std::endl;
-        outfile_ << "\tcmp %rbx, %rax" << std:: endl;
-        outfile_ << "\tsetle %dl" << std::endl;
-        outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-        outfile_ << "\tpush %rcx" << std:: endl;
-    } else if (opcode.opcode() == GREATERTHAN) {
-        outfile_ << "\tpop %rbx" << std::endl;
-        outfile_ << "\tpop %rax" << std::endl;
-        outfile_ << "\tcmp %rbx, %rax" << std:: endl;
-        outfile_ << "\tsetg %dl" << std::endl;
-        outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-        outfile_ << "\tpush %rcx" << std:: endl;
-    } else if (opcode.opcode() == GREATERTHANEQ) {
-        outfile_ << "\tpop %rbx" << std::endl;
-        outfile_ << "\tpop %rax" << std::endl;
-        outfile_ << "\tcmp %rbx, %rax" << std:: endl;
-        outfile_ << "\tsetge %dl" << std::endl;
-        outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-        outfile_ << "\tpush %rcx" << std:: endl;
-    } else if (opcode.opcode() == EQUAL) {
-        outfile_ << "\tpop %rbx" << std::endl;
-        outfile_ << "\tpop %rax" << std::endl;
-        outfile_ << "\tcmp %rbx, %rax" << std:: endl;
-        outfile_ << "\tsete %bl" << std:: endl;
-        outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-        outfile_ << "\tpush %rcx" << std:: endl;
-    } else if (opcode.opcode() == LOGAND) {
-        outfile_ << "\tpop %rbx" << std::endl;
-        outfile_ << "\tpop %rax" << std::endl;
-        outfile_ << "\tand %rbx, %rax" << std:: endl;
-        outfile_ << "\tpush %rax" << std:: endl;
-    } else if (opcode.opcode() == LOGOR) {
-        outfile_ << "\tpop %rbx" << std::endl;
-        outfile_ << "\tpop %rax" << std::endl;
-        outfile_ << "\tor %rbx, %rax" << std:: endl;
-        outfile_ << "\tpush %rax" << std:: endl;
-    } else if (opcode.opcode() == LOGNOT) {
-        outfile_ << "\tpop %rbx" << std::endl;
-        outfile_ << "\tnot %rbx" << std::endl;
-        outfile_ << "\tpush %rbx" << std::endl;
-    } else if (opcode.opcode() == LOOP) {
-        outfile_ << "\tpop %rax" << std::endl;
-        outfile_ << "\tcmp $" << std::to_string(code->arg1.value()) << ", %rax"
-          << std::endl;
-    } else if (opcode.opcode() == CONDITIONAL) {
-        outfile_ << "\tpop %rax" << std::endl;
-        outfile_ << "\tcmp $" << std::to_string(code->arg1.value()) << ", %rax"
-          << std::endl;
-    } else if (opcode.opcode() == JUMP) {
+        outfile_ << "\tcmp $" << std::to_string(code->arg1.value())
+          << ", %rax\n" << std::endl;
+        break;
+      // Note to self abstract jumps out later
+      case JUMP:
+        outfile_ << "\t# JUMP\n";
         outfile_ << "\tjmp " << code->target.label().name() << std::endl;
-    } else if (opcode.opcode() == JEQUAL) {
+        break;
+      case JEQUAL:
+        outfile_ << "\t# Jump on Equal\n";
         outfile_ << "\tje " << code->target.label().name() << std::endl;
-    } else if (opcode.opcode() == JNOTEQUAL) {
+        break;
+      case JNOTEQUAL:
+        outfile_ << "\t# Jump on Not Equal\n";
         outfile_ << "\tjne " << code->target.label().name() << std::endl;
-    } else if (opcode.opcode() == JGREATER) {
+        break;
+      case JGREATER:
+        outfile_ << "\t# Jump on greater than\n";
         outfile_ << "\tjg " << code->target.label().name() << std::endl;
-    } else if (opcode.opcode() == JGREATEREQ) {
+        break;
+      case JGREATEREQ:
+        outfile_ << "\t# Jump on greater or equal\n";
         outfile_ << "\tjge " << code->target.label().name() << std::endl;
-    } else if (opcode.opcode() == JLESS) {
+        break;
+      case JLESS:
+        outfile_ << "\t# Jump on less than\n";
         outfile_ << "\tjl " << code->target.label().name() << std::endl;
-    } else if (opcode.opcode() == JLESSEQ) {
+      case JLESSEQ:
+        outfile_ << "\t# Jump on less or equal\n";
         outfile_ << "\tjle " << code->target.label().name() << std::endl;
-    } else if (opcode.opcode() == LABEL) {
+        break;
+      case LABEL:
         outfile_ << code->target.label().name() << ":"   << std::endl;
-    } else if (opcode.opcode() == NOTYPE) {
-        outfile_ << "\t#Something really bad happened" << std::endl;
+        break;
+      default:
+        std::cerr << "Inside Generate and something really bad happened\n";
+        exit(1);
     }
   }
   // This will probably change later, call on the print function for the

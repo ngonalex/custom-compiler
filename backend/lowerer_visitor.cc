@@ -4,13 +4,15 @@
 namespace cs160 {
 namespace backend {
 
-void LowererVisitor::GetOutputArithmeticHelper(std::string const &output,
+std::string LowererVisitor::GetOutputArithmeticHelper(std::string output,
   int index, std::vector<std::string> printhelper) {
   output = output + blocks_[index]->target.reg().name()
     + " <- " + blocks_[index]->arg1.reg().name();
 
   output = output + " " + printhelper[blocks_[index]->op.opcode()]
     + " " + blocks_[index]->arg2.reg().name();
+
+  return output;
 }
 
 std::string LowererVisitor::GetOutput() {
@@ -97,7 +99,7 @@ std::string LowererVisitor::GetOutput() {
           blocks_[i]->target.label().name();
         break;
       default:
-        GetOutputArithmeticHelper(output, i, printhelper);
+        output = GetOutputArithmeticHelper(output, i, printhelper);
         break;
     }
     output = output + "\n";
@@ -256,11 +258,11 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
   blocks_.push_back(std::move(jumpblock2));
 
 
-  // Create continue label
-  auto jumpcontinueblock2 = make_unique<struct ThreeAddressCode>();
-  jumpcontinueblock->target = Target(Label(continuelabel));
-  jumpcontinueblock->op = Opcode(JUMP);
-  blocks_.push_back(std::move(jumpcontinueblock2));
+  // Create a continue label
+  auto createcontinue = make_unique<struct ThreeAddressCode>();
+  createcontinue->target = Target(Label(continuelabel));
+  createcontinue->op = Opcode(LABEL);
+  blocks_.push_back(std::move(createcontinue));
 }
 void LowererVisitor::VisitLoop(const Loop& loop) {
   // Similar to branching (Again flip conditionals + eval variables)
@@ -282,7 +284,6 @@ void LowererVisitor::VisitLoop(const Loop& loop) {
   loopblock->arg2 = Operand(blocks_[blocks_.size()-2]->target.reg());
   // Flip the comparision so it jumps if it's negative
   loopblock->arg1 = Operand(0);
-
   loopblock->op = Opcode(LOOP);
   loopblock->target = Target(Register("t_" +
     std::to_string(counter_.variablecount), VIRTUALREG));
@@ -380,8 +381,8 @@ void LowererVisitor::BinaryOperatorHelper(Type type,
 
   newblock->op = Opcode(type);
   // look at this later, just going to do this now to test some things
-  newblock->target = Target(Target(Register("t_" +
-    std::to_string(counter_.variablecount), VIRTUALREG)));
+  newblock->target = Target(Register("t_" +
+    std::to_string(counter_.variablecount), VIRTUALREG));
 
   // Push into vector
   blocks_.push_back(std::move(newblock));

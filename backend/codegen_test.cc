@@ -67,7 +67,7 @@ TEST_F(CodeGenTest, PrintTest) {
   CodeGen runner = CodeGen(file);
   auto test = lowerer_.GetIR();
   runner.GenerateData(lowerer_.variableset());
-  runner.Generate(std::move(test), lowerer_.variableset());
+  runner.Generate(std::move(test));
   std::string result = exec("gcc -c test.s && ld test.o && ./a.out");
   EXPECT_EQ(result, "The result is equal to: 16\n");
 }
