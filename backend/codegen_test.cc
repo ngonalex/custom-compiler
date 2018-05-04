@@ -28,7 +28,7 @@ class CodeGenTest : public ::testing::Test {
   LowererVisitor lowerer_;
 };
 
-// this piece of code is from stackoverflow 
+// this piece of code is from stackoverflow
 // link: https://stackoverflow.com/questions/478898/how-to-execute-a-command-and-get-output-of-command-within-c-using-posix
 std::string exec(const char* cmd) {
     std::array<char, 128> buffer;
@@ -51,7 +51,8 @@ TEST_F(CodeGenTest, IntegerExprIsVisited) {
   std::ofstream file = std::ofstream("test.s");
   CodeGen runner = CodeGen(file);
   auto test = lowerer_.GetIR();
-  runner.Generate(std::move(test));
+  runner.GenerateData(lowerer_.variableset());
+  runner.Generate(std::move(test), lowerer_.variableset());
   std::string result = exec("gcc -c test.s && ld test.o && ./a.out");
   EXPECT_EQ(result, "The result is equal to: 4\n");
 }
@@ -65,9 +66,9 @@ TEST_F(CodeGenTest, PrintTest) {
   std::ofstream file = std::ofstream("test.s");
   CodeGen runner = CodeGen(file);
   auto test = lowerer_.GetIR();
-  runner.Generate(std::move(test));
+  runner.GenerateData(lowerer_.variableset());
+  runner.Generate(std::move(test), lowerer_.variableset());
   std::string result = exec("gcc -c test.s && ld test.o && ./a.out");
   EXPECT_EQ(result, "The result is equal to: 16\n");
-
 }
 

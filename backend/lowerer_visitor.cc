@@ -6,7 +6,6 @@ namespace backend {
 
 void LowererVisitor::GetOutputArithmeticHelper(std::string &output, int index,
   std::vector<std::string> printhelper) {
-
   output = output + blocks_[index]->target.reg().name()
     + " <- " + blocks_[index]->arg1.reg().name();
 
@@ -273,7 +272,7 @@ void LowererVisitor::VisitLoop(const Loop& loop) {
   std::string looplabel = LoopLabelHelper();
   auto looplabelblock = make_unique<struct ThreeAddressCode>();
   looplabelblock->op = Opcode(LABEL);
-  looplabelblock->target = Target(Label(looplabel);
+  looplabelblock->target = Target(Label(looplabel));
   blocks_.push_back(std::move(looplabelblock));
 
   // Eval guard
@@ -369,7 +368,6 @@ void LowererVisitor::BinaryOperatorHelper(Type type,
   Register arg1, Register arg2) {
   // Load value into target (t <- prev->target + prev->prev->target)
   // Last two elements of the vector should be the integers to load in
-  int size = blocks_.size();
 
   auto newblock = make_unique<struct ThreeAddressCode>();
 
@@ -476,7 +474,7 @@ Register LowererVisitor::GetArgument(ChildType type) {
       break;
     case VARCHILD:
       // Check if variable has been assigned here?
-      arg = Register(variablestack_.top());
+      arg = Register(variablestack_.top(), VARIABLEREG);
       variablestack_.pop();
 
       if ( variableset_.count(arg.name()) == 0 ) {

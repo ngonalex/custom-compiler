@@ -46,13 +46,13 @@ int main() {
   LowererVisitor lowerer_;
   Statement::Block statements;
   auto expr = cs160::make_unique<DivideExpr>(
-   make_unique<IntegerExpr>(7), make_unique<IntegerExpr>(5));
+    make_unique<IntegerExpr>(7), make_unique<IntegerExpr>(5));
 
   statements.push_back(std::move(
       make_unique<const Assignment>(make_unique<const VariableExpr>("bob"),
                                     make_unique<const IntegerExpr>(50))));
 
-  Statement::Block assignmenttest; 
+  Statement::Block assignmenttest;
   assignmenttest.push_back(std::move(
     make_unique<const Assignment>(make_unique<const VariableExpr>("bob"),
       make_unique<const IntegerExpr>(100))));
@@ -82,10 +82,11 @@ int main() {
                                       make_unique<const IntegerExpr>(1)))));
 
   statements.push_back(std::move(make_unique<const Loop>(
-     //make_unique<const LogicalNotExpr>(
-          make_unique<const LessThanExpr>(make_unique<const VariableExpr>("bob"),
-                                         make_unique<const IntegerExpr>(0)),
-      std::move(body))));
+     // make_unique<const LogicalNotExpr>(
+          make_unique<const LessThanExpr>(
+            make_unique<const VariableExpr>("bob"),
+            make_unique<const IntegerExpr>(0)),
+          std::move(body))));
 
   auto ae = make_unique<const AddExpr>(
       make_unique<const SubtractExpr>(
@@ -97,15 +98,15 @@ int main() {
 
   auto ast = make_unique<const Program>(std::move(statements), std::move(ae));
 
-  //CountVisitor counter;
+  // CountVisitor counter;
   ast->Visit(&lowerer_);
-  //expr->Visit(&lowerer_);
+  // expr->Visit(&lowerer_);
 
   std::ofstream file = std::ofstream("test.s");
   CodeGen runner = CodeGen(file);
   auto test = lowerer_.GetIR();
   runner.GenerateData(lowerer_.variableset());
-  runner.Generate(std::move(test),lowerer_.variableset());
+  runner.Generate(std::move(test), lowerer_.variableset());
   std::string result = exec("gcc -g -c test.s && ld test.o && ./a.out");
   std::cout << result << std::endl;
   // CHANGE TO GENERATEEPILOGUE LATER

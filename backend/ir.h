@@ -117,9 +117,9 @@ class Opcode {
 
 class Target {
  public:
-  explicit Target(Register reg) : reg_(reg), 
+  explicit Target(Register reg) : reg_(reg),
     label_(Label("")), type_(TARGETREGISTER) {}
-  explicit Target(Label label) : reg_(Register()), 
+  explicit Target(Label label) : reg_(Register()),
     label_(label), type_(TARGETLABEL) {}
 
   Register reg() const {return reg_;}

@@ -24,9 +24,9 @@ namespace backend {
 // call printstart: -> call intloop -> (Potentiall a jump to printnegative:)
 // call printloop: -> call printnewline ->ret printloop: ... ret uniqueprinter
 // -> ret original place that called it (_start)
-// Basically this print routine should NOT affect the regular 
-// assembly in anyway and is ONLY really meant for making 
-// unit testing our assembly easier. Also Very crude implementation, 
+// Basically this print routine should NOT affect the regular
+// assembly in anyway and is ONLY really meant for making
+// unit testing our assembly easier. Also Very crude implementation,
 // doesn't follow calling conventions at all , Refactor later
 // Note to self each function requires that rax has the value to be printed
 // It cannot be at the top of the stack until after the call to printstart
@@ -94,14 +94,14 @@ void CodeGen::GeneratePrinter() {
   // printresult
   outfile_ << "printresult:" << std::endl;
   outfile_ << "\t.ascii \"The result is equal to: \"" << std::endl;
-  
+
   // printnewline
   outfile_ << "printnewline:" << std::endl;
   outfile_ << "\t.ascii \"\\n\""  << std::endl;
 
   GenerateResult();
 
-  //Generate Unique Printers here
+  // Generate Unique Printers here
   std::set<std::string>::iterator it;
   for (it = variableset_.begin(); it != variableset_.end(); ++it) {
     GenerateAssignment(*it);
@@ -114,7 +114,7 @@ void CodeGen::GeneratePrintHeader() {
   // Handle negative number here (If the number
   // were printing out is negative then note it
   // otherwise print normally)
-  
+
   // Why do we need these  2 lines, Look into later?
   outfile_ << "\txor %rsi, %rsi" << std::endl;
   outfile_ << "\txor %rdi, %rdi" << std::endl;
@@ -135,7 +135,8 @@ void CodeGen::GenerateAssignment(std::string variablename) {
   outfile_ << "\tmov $1, %rax" << std::endl;
   outfile_ << "\tmov $1, %rdi" << std::endl;
   outfile_ << "\tmov $" + variablename +"ascii, %rsi" << std::endl;
-  outfile_ << "\tmov $" + std::to_string(23+variablename.length()) +  +", %rdx" << std::endl;
+  outfile_ << "\tmov $" + std::to_string(23+variablename.length())
+    + ", %rdx" << std::endl;
   outfile_ << "\tsyscall" << std::endl;
 
   outfile_ << "\txor %rsi, %rsi" << std::endl;
@@ -147,15 +148,14 @@ void CodeGen::GenerateAssignment(std::string variablename) {
 
   outfile_ << variablename + "ascii:" << std::endl;
   outfile_ << "\t.ascii \"Variable " + variablename + " is equal to: \""
-    << std::endl;  
-
+    << std::endl;
 }
 
 void CodeGen::GenerateResult() {
   outfile_ << "printarith:" << std::endl;
 
   outfile_ << "\tpush %rax" << std::endl;
-  
+
   outfile_ << "\tmov $1, %rax" << std::endl;
   outfile_ << "\tmov $1, %rdi" << std::endl;
   outfile_ << "\tmov $printresult, %rsi" << std::endl;
@@ -169,10 +169,10 @@ void CodeGen::GenerateResult() {
   outfile_ << "\tret" << std::endl;
 }
 
-void CodeGen::GenerateData(std::set<std::string> variableset) { 
-  //Creates a .data section for variables
+void CodeGen::GenerateData(std::set<std::string> variableset) {
+  // Creates a .data section for variables
   outfile_ << ".data " << std::endl;
-  for ( auto iter = variableset.begin(); iter!=variableset.end(); ++iter) {
+  for (auto iter = variableset.begin(); iter != variableset.end(); ++iter) {
     outfile_ << "\t" << *iter << ":\n\t\t.quad 1" << std::endl;
   }
 }
@@ -191,7 +191,8 @@ void CodeGen::ClearRegister(std::string reg) {
   outfile_ << "\txor %" + reg + ", %" + reg << std::endl;
 }
 
-bool CodeGen::TestInSet(std::set<std::string> variableset, std::string findstring) {
+bool CodeGen::TestInSet(std::set<std::string> variableset,
+  std::string findstring) {
   if (variableset.count(findstring)) {
     return true;
   }
@@ -199,7 +200,8 @@ bool CodeGen::TestInSet(std::set<std::string> variableset, std::string findstrin
 }
 
 void CodeGen::Generate(std::vector
-  <std::unique_ptr<struct ThreeAddressCode>> blocks, std::set<std::string> variableset) {
+  <std::unique_ptr<struct ThreeAddressCode>> blocks,
+    std::set<std::string> variableset) {
   // boiler code here
   GenerateBoiler();
 
@@ -208,7 +210,7 @@ void CodeGen::Generate(std::vector
     auto code = std::move(blocks[i]);
     Opcode opcode = code->op;
 
-    // Two different loads now, one for reg <- int, 
+    // Two different loads now, one for reg <- int,
     // another variable <- arithmetic
     if (opcode.opcode() == LOAD) {
       // outfile_ << "\t#Storing " + code->arg1 + " into rcx" << std::endl;
@@ -217,23 +219,23 @@ void CodeGen::Generate(std::vector
           + ", %rcx" << std::endl;
         outfile_ << "\tpush %rcx" << std::endl;
       } else {
-
           ClearRegister("rbx");
           outfile_ << "\tpop %rbx" << std::endl;
-          outfile_ << "\tmov %rbx, " << code->target.name() << "" << std::endl;
+          outfile_ << "\tmov %rbx, " << code->target.reg().name()
+            << "" << std::endl;
           outfile_ << "\tpush %rbx" << std::endl;
-    
+
           // Add it to the set, then call the print function
-          variableset_.insert(code->target.name());
+          variableset_.insert(code->target.reg().name());
           outfile_ << "\tmov %rbx, %rax" << std::endl;
           // Call on correct print function
-          outfile_ << "\tcall print" + code->target.name() << std::endl;
+          outfile_ << "\tcall print" + code->target.reg().name() << std::endl;
       }
 
     } else if (opcode.opcode() == ADD) {
         // Load arg1,arg2 then add them into target
         // outfile_ << "\t#Adding << std::endl;
-        
+
         outfile_ << "\tpop %rbx" << std::endl;  // rbx = right
         outfile_ << "\tpop %rax" << std::endl;  // rax = left
         ClearRegister("rcx");
@@ -242,21 +244,25 @@ void CodeGen::Generate(std::vector
 
     } else if (opcode.opcode() == SUB) {
         // Load arg1,arg2 then sub them into target
-        if (TestInSet(variableset, code->arg1.reg().name()) && 
+        if (TestInSet(variableset, code->arg1.reg().name()) &&
           TestInSet(variableset, code->arg2.reg().name())) {
-            outfile_ << "\tmov " << code->arg1.reg().name() << ", %rax" << std::endl;
-            outfile_ << "\tmov " << code->arg2.reg().name() << ", %rbx" << std::endl;
+            outfile_ << "\tmov " << code->arg1.reg().name()
+              << ", %rax" << std::endl;
+            outfile_ << "\tmov " << code->arg2.reg().name() << ", %rbx"
+              << std::endl;
             outfile_ << "\tsub %rax, %rbx" << std::endl;
             outfile_ << "\tpush %rbx" << std::endl;
-        } else if (TestInSet(variableset, code->arg1.reg().name()) && 
+        } else if (TestInSet(variableset, code->arg1.reg().name()) &&
           !TestInSet(variableset, code->arg2.reg().name())) {
-            outfile_ << "\tmov " << code->arg1.reg().name() << ", %rax" << std::endl;
+            outfile_ << "\tmov " << code->arg1.reg().name()
+              << ", %rax" << std::endl;
             outfile_ << "\tpop %rbx" << std::endl;
             outfile_ << "\tsub %rbx, %rax" << std::endl;
             outfile_ << "\tpush %rax" << std::endl;
-        } else if (!TestInSet(variableset, code->arg1.reg().name()) && 
+        } else if (!TestInSet(variableset, code->arg1.reg().name()) &&
           TestInSet(variableset, code->arg2.reg().name())) {
-            outfile_ << "\tmov " << code->arg2.reg().name() << ", %rbx" << std::endl;
+            outfile_ << "\tmov " << code->arg2.reg().name()
+              << ", %rbx" << std::endl;
             outfile_ << "\tpop %rax" << std::endl;
             outfile_ << "\tsub %rbx, %rax" << std::endl;
             outfile_ << "\tpush %rbx" << std::endl;
@@ -281,16 +287,17 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tpush %rax" << std::endl;
     } else if (opcode.opcode() == LESSTHAN) {
         // Compares less than
-        if(TestInSet(variableset, code->arg1.reg().name())) {
-          outfile_ << "\tmov " << code->arg1.reg().name() << ", %rbx" << std::endl;
-          outfile_ << "\tpop %rax" << std::endl; 
+        if (TestInSet(variableset, code->arg1.reg().name())) {
+          outfile_ << "\tmov " << code->arg1.reg().name()
+            << ", %rbx" << std::endl;
+          outfile_ << "\tpop %rax" << std::endl;
           outfile_ << "\tcmp %rbx, %rax" << std:: endl;
           outfile_ << "\tsetl %dl" << std::endl;
           outfile_ << "\tmovzx %dl, %rcx" << std::endl;
           outfile_ << "\tpush %rcx" << std:: endl;
         } else {
           outfile_ << "\tpop %rbx" << std::endl;
-          outfile_ << "\tpop %rax" << std::endl; 
+          outfile_ << "\tpop %rax" << std::endl;
           outfile_ << "\tcmp %rbx, %rax" << std:: endl;
           outfile_ << "\tsetl %dl" << std::endl;
           outfile_ << "\tmovzx %dl, %rcx" << std::endl;
@@ -298,75 +305,75 @@ void CodeGen::Generate(std::vector
         }
     } else if (opcode.opcode() == LESSTHANEQ) {
         outfile_ << "\tpop %rbx" << std::endl;
-        outfile_ << "\tpop %rax" << std::endl; 
+        outfile_ << "\tpop %rax" << std::endl;
         outfile_ << "\tcmp %rbx, %rax" << std:: endl;
         outfile_ << "\tsetle %dl" << std::endl;
         outfile_ << "\tmovzx %dl, %rcx" << std::endl;
         outfile_ << "\tpush %rcx" << std:: endl;
     } else if (opcode.opcode() == GREATERTHAN) {
         outfile_ << "\tpop %rbx" << std::endl;
-        outfile_ << "\tpop %rax" << std::endl; 
+        outfile_ << "\tpop %rax" << std::endl;
         outfile_ << "\tcmp %rbx, %rax" << std:: endl;
         outfile_ << "\tsetg %dl" << std::endl;
         outfile_ << "\tmovzx %dl, %rcx" << std::endl;
         outfile_ << "\tpush %rcx" << std:: endl;
     } else if (opcode.opcode() == GREATERTHANEQ) {
         outfile_ << "\tpop %rbx" << std::endl;
-        outfile_ << "\tpop %rax" << std::endl; 
+        outfile_ << "\tpop %rax" << std::endl;
         outfile_ << "\tcmp %rbx, %rax" << std:: endl;
         outfile_ << "\tsetge %dl" << std::endl;
         outfile_ << "\tmovzx %dl, %rcx" << std::endl;
         outfile_ << "\tpush %rcx" << std:: endl;
-    } else if (opcode.opcode() == EQUAL) { 
+    } else if (opcode.opcode() == EQUAL) {
         outfile_ << "\tpop %rbx" << std::endl;
-        outfile_ << "\tpop %rax" << std::endl; 
+        outfile_ << "\tpop %rax" << std::endl;
         outfile_ << "\tcmp %rbx, %rax" << std:: endl;
         outfile_ << "\tsete %bl" << std:: endl;
         outfile_ << "\tmovzx %dl, %rcx" << std::endl;
         outfile_ << "\tpush %rcx" << std:: endl;
-    } else if (opcode.opcode() == LOGAND) { 
+    } else if (opcode.opcode() == LOGAND) {
         outfile_ << "\tpop %rbx" << std::endl;
-        outfile_ << "\tpop %rax" << std::endl; 
+        outfile_ << "\tpop %rax" << std::endl;
         outfile_ << "\tand %rbx, %rax" << std:: endl;
         outfile_ << "\tpush %rax" << std:: endl;
-    } else if (opcode.opcode() == LOGOR) {  
+    } else if (opcode.opcode() == LOGOR) {
         outfile_ << "\tpop %rbx" << std::endl;
-        outfile_ << "\tpop %rax" << std::endl; 
+        outfile_ << "\tpop %rax" << std::endl;
         outfile_ << "\tor %rbx, %rax" << std:: endl;
         outfile_ << "\tpush %rax" << std:: endl;
-    } else if (opcode.opcode() == LOGNOT) { 
+    } else if (opcode.opcode() == LOGNOT) {
         outfile_ << "\tpop %rbx" << std::endl;
         outfile_ << "\tnot %rbx" << std::endl;
         outfile_ << "\tpush %rbx" << std::endl;
-    } else if (opcode.opcode() == LOOP) {  
-        outfile_ << "\tpop %rax" << std::endl;  
+    } else if (opcode.opcode() == LOOP) {
+        outfile_ << "\tpop %rax" << std::endl;
         outfile_ << "\tcmp $" << std::to_string(code->arg1.value()) << ", %rax"
           << std::endl;
-    } else if (opcode.opcode() == CONDITIONAL) { 
-        outfile_ << "\tpop %rax" << std::endl;  
+    } else if (opcode.opcode() == CONDITIONAL) {
+        outfile_ << "\tpop %rax" << std::endl;
         outfile_ << "\tcmp $" << std::to_string(code->arg1.value()) << ", %rax"
           << std::endl;
-    } else if (opcode.opcode() == JUMP) { 
-        outfile_ << "\tjmp " << code->target.name() << std::endl;
+    } else if (opcode.opcode() == JUMP) {
+        outfile_ << "\tjmp " << code->target.label().name() << std::endl;
     } else if (opcode.opcode() == JEQUAL) {
-        outfile_ << "\tje " << code->target.name() << std::endl;
+        outfile_ << "\tje " << code->target.label().name() << std::endl;
     } else if (opcode.opcode() == JNOTEQUAL) {
-        outfile_ << "\tjne " << code->target.name() << std::endl;
+        outfile_ << "\tjne " << code->target.label().name() << std::endl;
     } else if (opcode.opcode() == JGREATER) {
-        outfile_ << "\tjg " << code->target.name() << std::endl;
+        outfile_ << "\tjg " << code->target.label().name() << std::endl;
     } else if (opcode.opcode() == JGREATEREQ) {
-        outfile_ << "\tjge " << code->target.name() << std::endl;
+        outfile_ << "\tjge " << code->target.label().name() << std::endl;
     } else if (opcode.opcode() == JLESS) {
-        outfile_ << "\tjl " << code->target.name() << std::endl;
+        outfile_ << "\tjl " << code->target.label().name() << std::endl;
     } else if (opcode.opcode() == JLESSEQ) {
-        outfile_ << "\tjle " << code->target.name() << std::endl;
+        outfile_ << "\tjle " << code->target.label().name() << std::endl;
     } else if (opcode.opcode() == LABEL) {
-        outfile_ << code->target.name() << ":"   << std::endl;
+        outfile_ << code->target.label().name() << ":"   << std::endl;
     } else if (opcode.opcode() == NOTYPE) {
         outfile_ << "\t#Something really bad happened" << std::endl;
     }
   }
-  //This will probably change later, call on the print function for the
+  // This will probably change later, call on the print function for the
   // Arith Expr
   outfile_ << "\tpop %rax" << std::endl;
   outfile_ << "\tcall printarith" << std::endl;
