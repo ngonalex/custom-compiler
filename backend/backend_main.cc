@@ -82,9 +82,9 @@ int main() {
                                       make_unique<const IntegerExpr>(1)))));
 
   statements.push_back(std::move(make_unique<const Loop>(
-      make_unique<const LogicalNotExpr>(
-          make_unique<const EqualToExpr>(make_unique<const VariableExpr>("bob"),
-                                         make_unique<const IntegerExpr>(0))),
+     //make_unique<const LogicalNotExpr>(
+          make_unique<const LessThanExpr>(make_unique<const VariableExpr>("bob"),
+                                         make_unique<const IntegerExpr>(0)),
       std::move(body))));
 
   auto ae = make_unique<const AddExpr>(
@@ -105,7 +105,7 @@ int main() {
   CodeGen runner = CodeGen(file);
   auto test = lowerer_.GetIR();
   runner.GenerateData(lowerer_.variableset());
-  runner.Generate(std::move(test));
+  runner.Generate(std::move(test),lowerer_.variableset());
   //std::string result = exec("gcc -g -c test.s && ld test.o && ./a.out");
   //std::cout << result << std::endl;
   // CHANGE TO GENERATEEPILOGUE LATER

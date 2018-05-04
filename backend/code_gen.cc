@@ -191,8 +191,15 @@ void CodeGen::ClearRegister(std::string reg) {
   outfile_ << "\txor %" + reg + ", %" + reg << std::endl;
 }
 
+bool CodeGen::TestInSet(std::set<std::string> variableset, std::string findstring) {
+  if (variableset.count(findstring)) {
+    return true;
+  }
+  return false;
+}
+
 void CodeGen::Generate(std::vector
-  <std::unique_ptr<struct ThreeAddressCode>> blocks) {
+  <std::unique_ptr<struct ThreeAddressCode>> blocks, std::set<std::string> variableset) {
   // boiler code here
   GenerateBoiler();
 
@@ -226,6 +233,7 @@ void CodeGen::Generate(std::vector
     } else if (opcode.opcode() == ADD) {
         // Load arg1,arg2 then add them into target
         // outfile_ << "\t#Adding << std::endl;
+        
         outfile_ << "\tpop %rbx" << std::endl;  // rbx = right
         outfile_ << "\tpop %rax" << std::endl;  // rax = left
         ClearRegister("rcx");
@@ -234,10 +242,30 @@ void CodeGen::Generate(std::vector
 
     } else if (opcode.opcode() == SUB) {
         // Load arg1,arg2 then sub them into target
-        outfile_ << "\tpop %rax" << std::endl;  // rbx = right
-        outfile_ << "\tpop %rcx" << std::endl;  // rax = left
-        outfile_ << "\tsub %rax, %rcx" << std::endl;
-        outfile_ << "\tpush %rcx" << std::endl;
+        if (TestInSet(variableset, code->arg1.reg().name()) && 
+          TestInSet(variableset, code->arg2.reg().name())) {
+            outfile_ << "\tmov " << code->arg1.reg().name() << ", %rax" << std::endl;
+            outfile_ << "\tmov " << code->arg2.reg().name() << ", %rbx" << std::endl;
+            outfile_ << "\tsub %rax, %rbx" << std::endl;
+            outfile_ << "\tpush %rbx" << std::endl;
+        } else if (TestInSet(variableset, code->arg1.reg().name()) && 
+          !TestInSet(variableset, code->arg2.reg().name())) {
+            outfile_ << "\tmov $" << code->arg1.reg().name() << ", %rax" << std::endl;
+            outfile_ << "\tpop %rbx" << std::endl;
+            outfile_ << "\tsub %rax, %rbx" << std::endl;
+            outfile_ << "\tpush %rbx" << std::endl;
+        } else if (!TestInSet(variableset, code->arg1.reg().name()) && 
+          TestInSet(variableset, code->arg2.reg().name())) {
+            outfile_ << "\tmov $" << code->arg2.reg().name() << ", %rbx" << std::endl;
+            outfile_ << "\tpop %rax" << std::endl;
+            outfile_ << "\tsub %rax, %rbx" << std::endl;
+            outfile_ << "\tpush %rbx" << std::endl;
+        } else {
+          outfile_ << "\tpop %rax" << std::endl;  // rbx = right
+          outfile_ << "\tpop %rcx" << std::endl;  // rax = left
+          outfile_ << "\tsub %rax, %rcx" << std::endl;
+          outfile_ << "\tpush %rcx" << std::endl;
+        }
     } else if (opcode.opcode() == MULT) {
         outfile_ << "\tpop %rbx" << std::endl;  // rbx = right
         outfile_ << "\tpop %rcx" << std::endl;  // rcx = left
@@ -253,12 +281,21 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tpush %rax" << std::endl;
     } else if (opcode.opcode() == LESSTHAN) {
         // Compares less than
-        outfile_ << "\tpop %rbx" << std::endl;
-        outfile_ << "\tpop %rax" << std::endl; 
-        outfile_ << "\tcmp %rbx, %rax" << std:: endl;
-        outfile_ << "\tsetl %dl" << std::endl;
-        outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-        outfile_ << "\tpush %rcx" << std:: endl;
+        if(TestInSet(variableset, code->arg1.reg().name())) {
+          outfile_ << "\tmov $" << code->arg1.reg().name() << ", %rbx" << std::endl;
+          outfile_ << "\tpop %rax" << std::endl; 
+          outfile_ << "\tcmp %rbx, %rax" << std:: endl;
+          outfile_ << "\tsetl %dl" << std::endl;
+          outfile_ << "\tmovzx %dl, %rcx" << std::endl;
+          outfile_ << "\tpush %rcx" << std:: endl;
+        } else {
+          outfile_ << "\tpop %rbx" << std::endl;
+          outfile_ << "\tpop %rax" << std::endl; 
+          outfile_ << "\tcmp %rbx, %rax" << std:: endl;
+          outfile_ << "\tsetl %dl" << std::endl;
+          outfile_ << "\tmovzx %dl, %rcx" << std::endl;
+          outfile_ << "\tpush %rcx" << std:: endl;
+        }
     } else if (opcode.opcode() == LESSTHANEQ) {
         outfile_ << "\tpop %rbx" << std::endl;
         outfile_ << "\tpop %rax" << std::endl; 
