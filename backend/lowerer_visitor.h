@@ -80,7 +80,7 @@ class LowererVisitor : public AstVisitor {
   void VisitDivideExpr(const DivideExpr& exp);
 
   // Helpers
-  void GetOutputArithmeticHelper(std::string &output, int index,
+  void GetOutputArithmeticHelper(std::string const &output, int index,
     std::vector<std::string> printhelper);
   void BinaryOperatorHelper(Type type, Register arg1, Register arg2);
   std::string JumpLabelHelper();
@@ -108,7 +108,6 @@ class LowererVisitor : public AstVisitor {
   std::set<std::string> variableset_;
   ChildType lastchildtype_;
   struct Counter counter_;
-
 };
 
 }  // namespace backend

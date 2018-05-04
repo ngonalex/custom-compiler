@@ -155,7 +155,6 @@ TEST_F(LowererTest, MoreComplexAssignment) {
 }
 
 TEST_F(LowererTest, BasicProgramCreation) {
-
   Statement::Block statements;
 
   statements.push_back(std::move(cs160::make_unique<Assignment>(
@@ -199,11 +198,11 @@ TEST_F(LowererTest, UnassignedVariable) {
     // t_2 <- 100
     // t_3 <- x > t_2
     // t_4 <- t_1 && t_3
-    EXPECT_EXIT(expr->Visit(&lowerer_),::testing::ExitedWithCode(1),"Variable x not assigned");
+    EXPECT_EXIT(expr->Visit(&lowerer_), ::testing::ExitedWithCode(1),
+      "Variable x not assigned");
 }
 
 TEST_F(LowererTest, NestedLogicalsWithInts) {
-
   auto expr = cs160::make_unique<const LogicalOrExpr>(
     cs160::make_unique<const LogicalAndExpr>(
       cs160::make_unique<const LessThanExpr>(
@@ -271,7 +270,7 @@ TEST_F(LowererTest, NestedLogicalsWithInts) {
 //   // t_7 <- 50 >= t_6
 //   // t_8 <- t_5 && t_7
 //   // t_9 <- t_3 || t_8
-//   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 100\nt_1 <- x < t_0\nt_2 <- y > x\n"
-//     "t_3 <- t_1 && t_2\nt_4 <- 100\nt_5 <- bob <= t_4\nt_6 <- 0\n"
-//       "t_7 <- 50 >= t_6\nt_8 <- t_5 && t_7\nt_9 <- t_3 || t_8\n");
+//   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 100\nt_1 <- x < t_0\n"
+//   "t_2 <- y > x\nt_3 <- t_1 && t_2\nt_4 <- 100\nt_5 <- bob <= t_4\n
+//   "t_6 <- 0\nt_7 <- 50 >= t_6\nt_8 <- t_5 && t_7\nt_9 <- t_3 || t_8\n");
 // }

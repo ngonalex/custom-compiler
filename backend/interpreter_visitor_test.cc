@@ -135,7 +135,6 @@ TEST_F(InterpreterTest, MoreComplexAssignment) {
 }
 
 TEST_F(InterpreterTest, SanityCheckProg) {
-  
   Statement::Block statements;
 
   auto state1 = cs160::make_unique<Assignment>(
@@ -158,7 +157,7 @@ TEST_F(InterpreterTest, SanityCheckProg) {
 
   // Idk how this works lol
   // for (auto& statement : statements) {
-    //std::string lol = dynamic_cast<Assignment*>(statement)->lhs().name();
+  // std::string lol = dynamic_cast<Assignment*>(statement)->lhs().name();
     EXPECT_EQ(interpreter_.GetVariable("x"), 15);
   // }
 

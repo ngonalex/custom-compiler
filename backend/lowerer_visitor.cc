@@ -4,8 +4,8 @@
 namespace cs160 {
 namespace backend {
 
-void LowererVisitor::GetOutputArithmeticHelper(std::string &output, int index,
-  std::vector<std::string> printhelper) {
+void LowererVisitor::GetOutputArithmeticHelper(std::string const &output,
+  int index, std::vector<std::string> printhelper) {
   output = output + blocks_[index]->target.reg().name()
     + " <- " + blocks_[index]->arg1.reg().name();
 
@@ -261,10 +261,8 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
   jumpcontinueblock->target = Target(Label(continuelabel));
   jumpcontinueblock->op = Opcode(JUMP);
   blocks_.push_back(std::move(jumpcontinueblock2));
-
 }
 void LowererVisitor::VisitLoop(const Loop& loop) {
-
   // Similar to branching (Again flip conditionals + eval variables)
   // Probably have a TAC to create a new label here
 

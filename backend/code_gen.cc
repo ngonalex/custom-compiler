@@ -129,7 +129,6 @@ void CodeGen::GeneratePrintHeader() {
 }
 
 void CodeGen::GenerateAssignment(std::string variablename) {
-
   outfile_ << "print" + variablename + ":" << std::endl;
   outfile_ << "\tpush %rax" << std::endl;
   outfile_ << "\tmov $1, %rax" << std::endl;

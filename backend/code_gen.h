@@ -17,7 +17,8 @@ namespace backend {
 class CodeGen {
  public:
     explicit CodeGen(std::ofstream &filename) : outfile_(filename) {}
-    void Generate(std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks, std::set<std::string> variableset);
+    void Generate(std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks,
+      std::set<std::string> variableset);
     void GenerateEpilogue();
     void ClearRegister(std::string reg);
     void GenerateBoiler();

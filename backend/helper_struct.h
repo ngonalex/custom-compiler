@@ -10,7 +10,7 @@ struct Counter {
   int branchcount;
   int continuecount;
   int loopcount;
-  Counter() : variablecount(0), branchcount(0), 
+  Counter() : variablecount(0), branchcount(0),
     continuecount(0), loopcount(0) {}
 };
 
