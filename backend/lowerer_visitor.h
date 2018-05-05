@@ -3,8 +3,12 @@
 
 #include <string>
 #include <vector>
+#include <stack>
 
+// #include "utility/assert.h"
 #include "abstract_syntax/abstract_syntax.h"
+#include "backend/ir.h"
+#include "utility/memory.h"
 
 using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::IntegerExpr;
@@ -13,173 +17,48 @@ using cs160::abstract_syntax::backend::SubtractExpr;
 using cs160::abstract_syntax::backend::MultiplyExpr;
 using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::BinaryOperatorExpr;
+using cs160::abstract_syntax::backend::Assignment;
+using cs160::abstract_syntax::backend::Program;
+using cs160::abstract_syntax::backend::VariableExpr;
+
 
 namespace cs160 {
 namespace backend {
 
-// Abstract .h implementations to a .cc file later
-
-// Structure to hold a 3Address, Basically 1 block
-// Right now all of them are strings,
-// but in the future I think that target should be from a symbol table
-// and arg1/2 are either ints or from the symbol table
-struct ThreeAddressCode {
-  std::string target;
-  std::string op;
-  std::string arg1;
-  std::string arg2;
-
-  struct ThreeAddressCode* next;
-  struct ThreeAddressCode* prev;
-};
-
-// For ThreeAddressCodes, arg1/arg2 can be a VirtualRegister or a Int
-class VirtualRegister {
-  explicit VirtualRegister(std::string name) : name_(name) {}
-
- private:
-  std::string name_;
-};
-
-class Operand {
-  explicit Operand(std::string op) : opcode_(op) {}
-
- private:
-  std::string opcode_;
-};
-
 class LowererVisitor : public AstVisitor {
  public:
-  LowererVisitor() {}
+  LowererVisitor() : variablecounter_(0) {}
   ~LowererVisitor() {}
 
-  std::vector<struct ThreeAddressCode*> blocks_;
+  const std::string GetOutput() const;
 
-  const std::string GetOutput() const {
-    // Iterate through the vector and print out each basic block
-    std::string output = "";
+  // Fill me in
+  void VisitAssignment(const Assignment& assignment);
+  void VisitProgram(const Program& program);
+  void VisitVariableExpr(const VariableExpr& exp);
 
-    for (unsigned int i = 0; i < blocks_.size(); ++i) {
-      output = output + blocks_[i]->target + " <- " + blocks_[i]->arg1;
+  void VisitIntegerExpr(const IntegerExpr& exp);
+  void VisitBinaryOperatorExpr(const BinaryOperatorExpr& exp) {}
+  void VisitAddExpr(const AddExpr& exp);
+  void VisitSubtractExpr(const SubtractExpr& exp);
+  void VisitMultiplyExpr(const MultiplyExpr& exp);
+  void VisitDivideExpr(const DivideExpr& exp);
+  void BinaryOperatorHelper(Type type, int leftindex);
 
-      if (blocks_[i]->op != "load") {
-        output = output + " " + blocks_[i]->op + " " + blocks_[i]->arg2;
-      }
-
-      output = output + "\n";
-    }
-
-    return output;
+  std::vector<std::unique_ptr<struct ThreeAddressCode>> GetIR() {
+    return std::move(blocks_);
   }
 
-  void VisitIntegerExpr(const IntegerExpr& exp) {
-    // Load value into a target (t <- value)
-    ThreeAddressCode* newblock = new ThreeAddressCode();
-
-    newblock->arg1 = std::to_string(exp.value());
-    newblock->op = "load";
-
-    // look at this later,just going to do this now to test some things
-    newblock->target = "t_" + std::to_string(blocks_.size());
-
-    // Push into vector
-    blocks_.push_back(newblock);
+  std::stack<std::string> variablestack() {
+    return variablestack_;
   }
 
-  void VisitBinaryOperatorExpr(const BinaryOperatorExpr& exp) {
-  }
+  int variablecounter() const { return variablecounter_; }
 
-  void VisitAddExpr(const AddExpr& exp) {
-    exp.lhs().Visit(const_cast<LowererVisitor*>(this));
-    int leftindex = blocks_.size();
-    exp.rhs().Visit(const_cast<LowererVisitor*>(this));
-
-    // Load value into target (t <- prev->target + prev->prev->target)
-    // Last two elements of the vector should be the integers to load in
-    int size = blocks_.size();
-
-    ThreeAddressCode* newblock = new ThreeAddressCode();
-
-    newblock->arg1 = blocks_[leftindex-1]->target;
-    newblock->arg2 = blocks_[size-1]->target;
-
-    newblock->op = "+";
-    // look at this later, just going to do this now to test some things
-    newblock->target = "t_" + std::to_string(blocks_.size());
-
-    // Push into vector
-    blocks_.push_back(newblock);
-  }
-
-
-  void VisitSubtractExpr(const SubtractExpr& exp) {
-    // Visit left then right(eventually reaches the base case of Int)
-    exp.lhs().Visit(const_cast<LowererVisitor*>(this));
-
-    int leftindex = blocks_.size();
-    exp.rhs().Visit(const_cast<LowererVisitor*>(this));
-
-    // Load value into target (t <- prev->target + prev->prev->target)
-    // Last two elements of the vector should be the integers to load in
-    int size = blocks_.size();
-
-    ThreeAddressCode* newblock = new ThreeAddressCode();
-
-    newblock->arg1 = blocks_[leftindex-1]->target;
-    newblock->arg2 = blocks_[size-1]->target;
-    newblock->op = "-";
-    // look at this later, just going to do this now to test some things
-    newblock->target = "t_" + std::to_string(blocks_.size());
-
-    // Push into vector
-    blocks_.push_back(newblock);
-  }
-
-  void VisitMultiplyExpr(const MultiplyExpr& exp) {
-    // Visit lhs,rhs
-    exp.lhs().Visit(const_cast<LowererVisitor*>(this));
-
-    int leftindex = blocks_.size();
-    exp.rhs().Visit(const_cast<LowererVisitor*>(this));
-
-    // Load value into target (t <- prev->target + prev->prev->target)
-    // Last two elements of the vector should be the integers to load in
-    int size = blocks_.size();
-
-    ThreeAddressCode* newblock = new ThreeAddressCode();
-
-    newblock->arg1 = blocks_[leftindex-1]->target;
-    newblock->arg2 = blocks_[size-1]->target;
-    newblock->op = "*";
-    // look at this later, just going to do this now to test some things
-    newblock->target = "t_" + std::to_string(blocks_.size());
-
-    // Push into vector
-    blocks_.push_back(newblock);
-  }
-
-  void VisitDivideExpr(const DivideExpr& exp) {
-    // Visit left/right
-    exp.lhs().Visit(const_cast<LowererVisitor*>(this));
-
-    int leftindex = blocks_.size();
-    exp.rhs().Visit(const_cast<LowererVisitor*>(this));
-
-    // Load value into target (t <- prev->target + prev->prev->target)
-    // Last two elements of the vector should be the integers to load in
-    int size = blocks_.size();
-
-    ThreeAddressCode* newblock = new ThreeAddressCode();
-
-    newblock->arg1 = blocks_[leftindex-1]->target;
-    newblock->arg2 = blocks_[size-1]->target;
-    newblock->op = "/";
-    // look at this later, just going to do this now to test some things
-    newblock->target = "t_" + std::to_string(blocks_.size());
-
-    // Push into vector
-    blocks_.push_back(newblock);
-  }
+ private:
+  std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks_;
+  std::stack<std::string> variablestack_;
+  int variablecounter_;
 };
 
 }  // namespace backend

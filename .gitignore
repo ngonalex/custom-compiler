@@ -1,6 +1,8 @@
 bazel-*
+.vscode
+.s
+.cfg
 .DS_Store
 .idea/
-.vscode
 /team-influx
 .xcodeproj

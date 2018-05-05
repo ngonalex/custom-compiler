@@ -1,6 +1,9 @@
 #include "backend/interpreter_visitor.h"
 
+#include <math.h>
+#include <iostream>
 #include <stack>
+#include <vector>
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "utility/memory.h"
@@ -32,6 +35,32 @@ TEST_F(InterpreterTest, AddExprIsVisited) {
                                    make_unique<IntegerExpr>(5));
   expr->Visit(&interpreter_);
   EXPECT_EQ(interpreter_.GetOutput(), 12);
+}
+
+TEST_F(InterpreterTest, AddLargeNum) {
+  auto expr = cs160::make_unique<AddExpr>(
+    (make_unique<IntegerExpr>(pow(2, 30))),
+    make_unique<IntegerExpr>(pow(2, 30)));
+  expr->Visit(&interpreter_);
+
+  EXPECT_EQ(interpreter_.GetOutput(), -pow(2, 31));
+}
+
+// not working for now, need to figure out mult overflow later
+// TEST_F(InterpreterTest, MultLargeNum){
+//   auto expr = cs160::make_unique<MultiplyExpr>((
+//   make_unique<IntegerExpr>(pow(2,30))),make_unique<IntegerExpr>(pow(2,30)));
+//   expr->Visit(&interpreter_);
+//   std::cout<<"result is "<< interpreter_.GetOutput()<<std::endl;
+//   EXPECT_EQ(interpreter_.GetOutput(), 0);
+// }
+
+TEST_F(InterpreterTest, DivisionByZero) {
+  auto expr = cs160::make_unique<DivideExpr>(
+    (make_unique<IntegerExpr>(1)), make_unique<IntegerExpr>(0));
+
+  EXPECT_EXIT(expr->Visit(&interpreter_),
+    ::testing::ExitedWithCode(1), "Dividing zero");
 }
 
 TEST_F(InterpreterTest, SubtractExprIsVisited) {
@@ -81,5 +110,55 @@ TEST_F(InterpreterTest, NestedVisitationsWorkProperly_2) {
   expr->Visit(&interpreter_);
   EXPECT_EQ(interpreter_.GetOutput(), 144);
 }
+
+TEST_F(InterpreterTest, SimpleAssignmentTest) {
+  auto expr = cs160::make_unique<Assignment>(
+    cs160::make_unique<VariableExpr>("x"),
+    cs160::make_unique<IntegerExpr>(5));
+
+  expr->Visit(&interpreter_);
+
+  EXPECT_EQ(interpreter_.GetVariable("x"), 5);
+}
+
+TEST_F(InterpreterTest, MoreComplexAssignment) {
+  auto expr = cs160::make_unique<Assignment>(
+    cs160::make_unique<VariableExpr>("x"),
+    cs160::make_unique<AddExpr>(
+      cs160::make_unique<IntegerExpr>(5),
+      cs160::make_unique<IntegerExpr>(10)));
+
+  expr->Visit(&interpreter_);
+
+  EXPECT_EQ(interpreter_.GetVariable("x"), 15);
+}
+
+TEST_F(InterpreterTest, SanityCheckProg) {
+  auto assignment = cs160::make_unique<Assignment>(
+    cs160::make_unique<VariableExpr>("x"),
+    cs160::make_unique<AddExpr>(
+      cs160::make_unique<IntegerExpr>(5),
+      cs160::make_unique<IntegerExpr>(10)));
+
+  std::vector<std::unique_ptr<const Assignment>> assignmentvector;
+  assignmentvector.push_back(std::move(assignment));
+
+  auto arithexpr = cs160::make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
+    make_unique<IntegerExpr>(5));
+
+  auto expr = cs160::make_unique<Program>(std::move(assignmentvector),
+    std::move(arithexpr));
+
+  expr->Visit(&interpreter_);
+
+  for (auto& assignment : assignmentvector) {
+    EXPECT_EQ(interpreter_.GetVariable((assignment)->lhs().name()), 15);
+  }
+
+  EXPECT_EQ(interpreter_.GetOutput(), 2);
+}
+
+
+
 
 
