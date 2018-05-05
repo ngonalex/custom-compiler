@@ -54,8 +54,8 @@ int main() {
 
   Statement::Block assignmenttest;
   assignmenttest.push_back(std::move(
-    make_unique<const Assignment>(make_unique<const VariableExpr>("bob"),
-      make_unique<const IntegerExpr>(55))));
+    make_unique<const Assignment>(make_unique<const VariableExpr>("lob"),
+      make_unique<const IntegerExpr>(10))));
 
   statements.push_back(std::move(make_unique<const Conditional>(
       make_unique<const LogicalOrExpr>(
@@ -75,18 +75,37 @@ int main() {
                   make_unique<const IntegerExpr>(0)))),
       std::move(assignmenttest), Statement::Block())));
 
-  Statement::Block body;
-  body.push_back(std::move(make_unique<const Assignment>(
+  Statement::Block outerbody;
+  Statement::Block innerbody;
+  innerbody.push_back(std::move(make_unique<const Assignment>(
+      make_unique<const VariableExpr>("lob"),
+      make_unique<const SubtractExpr>(
+        make_unique<const VariableExpr>("lob"),
+        make_unique<const IntegerExpr>(2)))));
+
+  outerbody.push_back(std::move(make_unique<const Loop>(
+     // make_unique<const LogicalNotExpr>(
+          make_unique<const GreaterThanExpr>(
+            make_unique<const VariableExpr>("lob"),
+            make_unique<const IntegerExpr>(0)),
+          std::move(innerbody))));
+
+  outerbody.push_back(std::move(make_unique<const Assignment>(
+      make_unique<const VariableExpr>("lob"),
+      make_unique<const IntegerExpr>(10))));
+
+  outerbody.push_back(std::move(make_unique<const Assignment>(
       make_unique<const VariableExpr>("bob"),
-      make_unique<const SubtractExpr>(make_unique<const VariableExpr>("bob"),
-                                      make_unique<const IntegerExpr>(1)))));
+      make_unique<const SubtractExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const VariableExpr>("lob")))));
 
   statements.push_back(std::move(make_unique<const Loop>(
      // make_unique<const LogicalNotExpr>(
           make_unique<const GreaterThanExpr>(
             make_unique<const VariableExpr>("bob"),
             make_unique<const IntegerExpr>(0)),
-          std::move(body))));
+          std::move(outerbody))));
 
   auto ae = make_unique<const AddExpr>(
       make_unique<const SubtractExpr>(
