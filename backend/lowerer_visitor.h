@@ -78,6 +78,10 @@ class LowererVisitor : public AstVisitor {
   void VisitMultiplyExpr(const MultiplyExpr& exp);
   void VisitDivideExpr(const DivideExpr& exp);
 
+  void CreateComparisionBlock(Type type);
+  void CreateLabelBlock(std::string labelname);
+  void CreateJumpBlock(std::string jumpname, Type type);
+
   // Helpers
   std::string GetOutputArithmeticHelper(std::string output, int index,
     std::vector<std::string> printhelper);

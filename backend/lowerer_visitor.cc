@@ -60,39 +60,40 @@ std::string LowererVisitor::GetOutput() {
         break;
       case LOOP:
         output = output + printhelper[LOOP] + " " +
-          blocks_[i]->arg1.reg().name() + " == 0";
+          blocks_[i]->arg2.reg().name() + " == 0";
         break;
       case CONDITIONAL:
         output = output + printhelper[CONDITIONAL] + " " +
-          blocks_[i]->arg1.reg().name() + " == 0";
+          blocks_[i]->arg2.reg().name() + " == 0";
         break;
+      // Abstract jumps out
       case JUMP:
         output = output + printhelper[JUMP] + " " +
           blocks_[i]->target.label().name();
         break;
       case JEQUAL:
         output = output + printhelper[JEQUAL] + " " +
-          blocks_[i]->target.reg().name();
+          blocks_[i]->target.label().name();
         break;
       case JNOTEQUAL:
         output = output + printhelper[JNOTEQUAL] + " " +
-          blocks_[i]->target.reg().name();
+          blocks_[i]->target.label().name();
         break;
       case JGREATER:
         output = output + printhelper[JGREATER] + " " +
-          blocks_[i]->target.reg().name();
+          blocks_[i]->target.label().name();
         break;
       case JGREATEREQ:
         output = output + printhelper[JGREATEREQ] + " " +
-          blocks_[i]->target.reg().name();
+          blocks_[i]->target.label().name();
         break;
       case JLESS:
-        output = output + printhelper[JEQUAL] + " " +
-          blocks_[i]->target.reg().name();
+        output = output + printhelper[JLESS] + " " +
+          blocks_[i]->target.label().name();
         break;
       case JLESSEQ:
-        output = output + printhelper[JEQUAL] + " " +
-          blocks_[i]->target.reg().name();
+        output = output + printhelper[JLESSEQ] + " " +
+          blocks_[i]->target.label().name();
         break;
       case LABEL:
         output = output + printhelper[LABEL] + " " +
@@ -185,44 +186,12 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
   // value of the guard has been reached
   conditional.guard().Visit(const_cast<LowererVisitor*>(this));
 
-  // So at this point the last statement should be something of the form
-  // t_a <- t_b re t_c
-  // How should we structure the if TAC
-  // Ideas: 1) Structure it like the assembly instructions
-  // If/Else branches in assembly are done with cmp, j[re] chains
-  // Algorithm would be
-  // 1) Look at the previous instructions opcode
-  // 2) represent the "if" as a condition jump statement
-  // Ex. if(x>5) translates to
-  // t0 <- 5, t1 <- x > 5, block1 <- t1 jge/jmp (Basically if t1 is true
-  // jump to block 1
-
-  // Code to create if TAC here
-  // Two notes: I looked at the gcc compiler and it'll reverse the conditional
-  // e.x. x == 5 is represented as a jne
-
   // Create a cmp to let codegen know it's a branch coming
-  auto branchcmpblock = make_unique<struct ThreeAddressCode>();
-  branchcmpblock->arg2 = Operand(blocks_[blocks_.size()-1]->target.reg());
-  // Flip the comparision so it jumps if it's negative
-  branchcmpblock->arg1 = Operand(0);
-
-  branchcmpblock->op = Opcode(CONDITIONAL);
-  branchcmpblock->target = Target(Register("t_" +
-    std::to_string(counter_.variablecount), VIRTUALREG));
-  ++counter_.variablecount;
-
-  blocks_.push_back(std::move(branchcmpblock));
+  CreateComparisionBlock(CONDITIONAL);
 
   // Jump conditional to the false branch here
-  auto jumpblock = make_unique<struct ThreeAddressCode>();
-  // Is it okay to make a "label" a register or should we make
-  // a target class that can either be a label or a register?
   std::string falselabel = JumpLabelHelper();
-  jumpblock->target = Target(Label(falselabel));
-  jumpblock->op = Opcode(JEQUAL);
-
-  blocks_.push_back(std::move(jumpblock));
+  CreateJumpBlock(falselabel, JEQUAL);
 
   // Do this normally
   for (auto& statement : conditional.true_branch()) {
@@ -231,38 +200,21 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
 
   // Create a jump to the continue
   std::string continuelabel = ContinueLabelHelper();
-  auto jumpcontinueblock = make_unique<struct ThreeAddressCode>();
-  jumpcontinueblock->target = Target(Label(continuelabel));
-  jumpcontinueblock->op = Opcode(JUMP);
-  blocks_.push_back(std::move(jumpcontinueblock));
-
+  CreateJumpBlock(continuelabel, JUMP);
 
   // Create a false label
-  auto falselabelblock  = make_unique<struct ThreeAddressCode>();
-  falselabelblock->target = Target(Label(falselabel));
-  falselabelblock->op = Opcode(LABEL);
-  blocks_.push_back(std::move(falselabelblock));
+  CreateLabelBlock(falselabel);
 
-
-  // This should be inside the false label also
-  // is it worth it to check if this branch is empty
-  // (if it's empty you don't even need to create a label)
+  // This should be inside the false label
   for (auto& statement : conditional.false_branch()) {
     statement->Visit(this);
   }
 
   // TAC to jump to continue here
-  auto jumpblock2 = make_unique<struct ThreeAddressCode>();
-  jumpblock2->target = Target(Label(continuelabel));
-  jumpblock2->op = Opcode(JUMP);
-  blocks_.push_back(std::move(jumpblock2));
+  CreateJumpBlock(continuelabel, JUMP);
 
-
-  // Create a continue label
-  auto createcontinue = make_unique<struct ThreeAddressCode>();
-  createcontinue->target = Target(Label(continuelabel));
-  createcontinue->op = Opcode(LABEL);
-  blocks_.push_back(std::move(createcontinue));
+  // Create a continue label (Entrypoint back to main prog)
+  CreateLabelBlock(continuelabel);
 }
 void LowererVisitor::VisitLoop(const Loop& loop) {
   // Similar to branching (Again flip conditionals + eval variables)
@@ -270,34 +222,17 @@ void LowererVisitor::VisitLoop(const Loop& loop) {
 
   // create a looplabel
   std::string looplabel = LoopLabelHelper();
-  auto looplabelblock = make_unique<struct ThreeAddressCode>();
-  looplabelblock->op = Opcode(LABEL);
-  looplabelblock->target = Target(Label(looplabel));
-  blocks_.push_back(std::move(looplabelblock));
+  CreateLabelBlock(looplabel);
 
   // Eval guard
   loop.guard().Visit(const_cast<LowererVisitor*>(this));
 
-
   // Create a loop to let codegen know it's a loop coming
-  auto loopblock = make_unique<struct ThreeAddressCode>();
-  loopblock->arg2 = Operand(blocks_[blocks_.size()-2]->target.reg());
-  // Flip the comparision so it jumps if it's negative
-  loopblock->arg1 = Operand(0);
-  loopblock->op = Opcode(LOOP);
-  loopblock->target = Target(Register("t_" +
-    std::to_string(counter_.variablecount), VIRTUALREG));
-  ++counter_.variablecount;
-  blocks_.push_back(std::move(loopblock));
-
+  CreateComparisionBlock(LOOP);
 
   // Jump conditional to the continue here
-  auto jumpblock = make_unique<struct ThreeAddressCode>();
   std::string continuelabel = ContinueLabelHelper();
-  jumpblock->target = Target(Label(continuelabel));
-  jumpblock->op = Opcode(JEQUAL);
-  blocks_.push_back(std::move(jumpblock));
-
+  CreateJumpBlock(continuelabel, JEQUAL);
 
   // Do this normally
   for (auto& statement : loop.body()) {
@@ -305,17 +240,10 @@ void LowererVisitor::VisitLoop(const Loop& loop) {
   }
 
   // Jump to the loop again
-  auto jumploop = make_unique<struct ThreeAddressCode>();
-  jumploop->target = Target(Label(looplabel));
-  jumploop->op = Opcode(JUMP);
-  blocks_.push_back(std::move(jumploop));
-
+  CreateJumpBlock(looplabel, JUMP);
 
   // Create a continue label
-  auto jumpcontinueblock = make_unique<struct ThreeAddressCode>();
-  jumpcontinueblock->target = Target(Label(continuelabel));
-  jumpcontinueblock->op = Opcode(LABEL);
-  blocks_.push_back(std::move(jumpcontinueblock));
+  CreateLabelBlock(continuelabel);
 }
 
 void LowererVisitor::VisitAssignment(const Assignment& assignment) {
@@ -324,7 +252,6 @@ void LowererVisitor::VisitAssignment(const Assignment& assignment) {
   // Visit the left which will add its variable name to the stack
   assignment.lhs().Visit(const_cast<LowererVisitor*>(this));
   std::string varname = variablestack_.top();
-  variableset_.insert(varname);
   variablestack_.pop();
 
   // Push variablename into the set (Flagging it as being assigned)
@@ -447,20 +374,58 @@ void LowererVisitor::VisitDivideExpr(const DivideExpr& exp) {
   BinaryOperatorHelper(DIV, arg1, arg2);
 }
 
+void LowererVisitor::CreateComparisionBlock(Type type) {
+  ASSERT(type == CONDITIONAL || type == LOOP,
+    "Must be a loop or a conditional type");
+
+  auto newblock = make_unique<struct ThreeAddressCode>();
+  newblock->arg2 = Operand(blocks_[blocks_.size()-1]->target.reg());
+  // Flip the comparision so it jumps if it's negative
+  newblock->arg1 = Operand(0);
+
+  newblock->op = Opcode(type);
+
+  // Might not need this
+  // newblock->target = Target(Register("t_" +
+  //   std::to_string(counter_.variablecount), VIRTUALREG));
+  // ++counter_.variablecount;
+  blocks_.push_back(std::move(newblock));
+}
+
+void LowererVisitor::CreateLabelBlock(std::string labelname) {
+  auto labelblock  = make_unique<struct ThreeAddressCode>();
+  labelblock->target = Target(Label(labelname));
+  labelblock->op = Opcode(LABEL);
+  blocks_.push_back(std::move(labelblock));
+}
+
+void LowererVisitor::CreateJumpBlock(std::string jumpname, Type type) {
+  // Probably a better way to do this
+  ASSERT(type == JUMP || type == JEQUAL || type == JGREATER
+    || type == JGREATEREQ || type == JLESS || type == JLESSEQ
+    || type == JNOTEQUAL, "Must be a jump type");
+
+  auto jumpblock = make_unique<struct ThreeAddressCode>();
+  jumpblock->target = Target(Label(jumpname));
+  jumpblock->op = Opcode(type);
+
+  blocks_.push_back(std::move(jumpblock));
+}
+
 std::string LowererVisitor::JumpLabelHelper() {
-  std::string newlabel = "falsebranch" + counter_.branchcount;
+  std::string newlabel = "falsebranch" + std::to_string(counter_.branchcount);
   ++counter_.branchcount;
   return newlabel;
 }
 
 std::string LowererVisitor::LoopLabelHelper() {
-  std::string newloop = "loop" + counter_.loopcount;
+  std::string newloop = "loop" + std::to_string(counter_.loopcount);
   ++counter_.loopcount;
   return newloop;
 }
 
 std::string LowererVisitor::ContinueLabelHelper() {
-  std::string newcontinue = "continue" + counter_.continuecount;
+  std::string newcontinue = "continue" + std::to_string(counter_.continuecount);
   ++counter_.continuecount;
   return newcontinue;
 }
