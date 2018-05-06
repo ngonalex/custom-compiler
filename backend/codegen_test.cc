@@ -42,6 +42,15 @@ std::string exec(const char* cmd) {
     return result;
 }
 
+// Todo:
+// 1a) ArithmeticExprs (Add/Sub/Mult/Div) + corner cases (div / zero, Overflow)
+//  b) Diff combos (Int/Int, Var/Var, Var/Int etc), Nested
+// 2a) RelationalExprs + LogicalExprs
+//  b) Diff combos (Int/Int, Var/Var, Var/Int etc), Nested
+// 3) Loops + Conditionals, Nested
+// 4) Variable not assigned, Variable reassigned, Handle different Variables
+// 5) Complex Program
+
 TEST_F(CodeGenTest, IntegerExprIsVisited) {
   auto expr = cs160::make_unique<DivideExpr>(
     make_unique<IntegerExpr>(21), make_unique<IntegerExpr>(5));

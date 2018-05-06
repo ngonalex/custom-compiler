@@ -81,13 +81,13 @@ int main() {
       make_unique<const VariableExpr>("lob"),
       make_unique<const SubtractExpr>(
         make_unique<const VariableExpr>("lob"),
-        make_unique<const IntegerExpr>(2)))));
+        make_unique<const IntegerExpr>(1)))));
 
   outerbody.push_back(std::move(make_unique<const Loop>(
      // make_unique<const LogicalNotExpr>(
-          make_unique<const GreaterThanExpr>(
-            make_unique<const VariableExpr>("lob"),
-            make_unique<const IntegerExpr>(0)),
+          make_unique<const LessThanExpr>(
+            make_unique<const IntegerExpr>(0),
+            make_unique<const VariableExpr>("lob")),
           std::move(innerbody))));
 
   outerbody.push_back(std::move(make_unique<const Assignment>(
