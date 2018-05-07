@@ -193,10 +193,18 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
   std::string falselabel = JumpLabelHelper();
   CreateJumpBlock(falselabel, JEQUAL);
 
+  // Save the state of the last variable set
+  std::set<std::string> originalset_ = globalset_;
+
   // Do this normally
   for (auto& statement : conditional.true_branch()) {
     statement->Visit(this);
   }
+
+  // Push the set into the vector to check after
+  localsets_.push_back(globalset_);
+  // Restore the state of the globalset
+  globalset_ = originalset_;
 
   // Create a jump to the continue
   std::string continuelabel = ContinueLabelHelper();
@@ -208,6 +216,25 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
   // This should be inside the false label
   for (auto& statement : conditional.false_branch()) {
     statement->Visit(this);
+  }
+
+  // Push the set into the vector
+  localsets_.push_back(globalset_);
+  // Restore the state of the global set
+  globalset_ = originalset_;
+
+  // Check here if there's an issue with unassigned variables
+  if (localsets_[localsets_.size()-1] != localsets_[localsets_.size()-2]) {
+    std::cerr << "Unassigned Variable Detected\n";
+    exit(1);
+  } else {
+    // Otherwise we can now safely copy one of the local sets
+    // as a globalset
+    globalset_ = localsets_[localsets_.size()-1];
+
+    // Delete the last two
+    localsets_.pop_back();
+    localsets_.pop_back();
   }
 
   // TAC to jump to continue here
@@ -255,7 +282,7 @@ void LowererVisitor::VisitAssignment(const Assignment& assignment) {
   variablestack_.pop();
 
   // Push variablename into the set (Flagging it as being assigned)
-  variableset_.insert(varname);
+  globalset_.insert(varname);
 
   // assign the right hand side to be equal to the left hand side
   // The latest vector addition is the final register to be set to the
@@ -441,8 +468,8 @@ Register LowererVisitor::GetArgument(ChildType type) {
       arg = Register(variablestack_.top(), VARIABLEREG);
       variablestack_.pop();
 
-      if ( variableset_.count(arg.name()) == 0 ) {
-        std::cerr << "Variable "+ arg.name() +" not assigned";
+      if ( globalset_.count(arg.name()) == 0 ) {
+        std::cerr << "Variable "+ arg.name() +" not assigned\n";
         exit(1);
       }
       break;
