@@ -41,6 +41,7 @@ std::unique_ptr<const VariableExpr> Parser::ParseVariable(Token curr) {
     return make_unique<VariableExpr>(curr.idVal());
   } 
   Error();
+  return nullptr;
 }
 
 std::unique_ptr<const ArithmeticExpr> Parser::Eparser() {
@@ -96,7 +97,6 @@ std::unique_ptr<const ArithmeticExpr> Parser::ParseExpression() {
   // A variable
   else if (type == Token::Type::IDENTIFIER) {
     std::unique_ptr<const ArithmeticExpr> var = ParseVariable(program_.back());
-    Consume();
     return var;
   }
   // Or an error
