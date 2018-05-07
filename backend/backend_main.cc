@@ -59,20 +59,17 @@ int main() {
 
   statements.push_back(std::move(make_unique<const Conditional>(
       make_unique<const LogicalOrExpr>(
-          make_unique<const LogicalAndExpr>(
+          make_unique<const LogicalNotExpr>(
               make_unique<const LessThanExpr>(
                   make_unique<const VariableExpr>("bob"),
-                  make_unique<const IntegerExpr>(100)),
-              make_unique<const GreaterThanExpr>(
-                  make_unique<const VariableExpr>("bob"),
-                  make_unique<const IntegerExpr>(0))),
+                  make_unique<const IntegerExpr>(100))),
           make_unique<const LogicalAndExpr>(
               make_unique<const LessThanEqualToExpr>(
                   make_unique<const VariableExpr>("bob"),
                   make_unique<const IntegerExpr>(100)),
               make_unique<const GreaterThanEqualToExpr>(
                   make_unique<const VariableExpr>("bob"),
-                  make_unique<const IntegerExpr>(0)))),
+                  make_unique<const IntegerExpr>(100)))),
       std::move(assignmenttest), Statement::Block())));
 
   Statement::Block outerbody;

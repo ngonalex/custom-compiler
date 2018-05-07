@@ -326,6 +326,7 @@ void CodeGen::GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
       outfile_ << "\t# LogicalNot\n";
       outfile_ << "\tpop %rbx" << std::endl;
       outfile_ << "\tnot %rbx" << std::endl;
+      // outfile_ << "\tmovzx %bl, %rbx" << std::endl;
       outfile_ << "\tpush %rbx\n" << std::endl;
       break;
     default:

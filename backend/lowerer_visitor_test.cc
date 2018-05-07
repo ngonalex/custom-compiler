@@ -49,7 +49,7 @@ TEST_F(LowererTest, IntegerExprIsVisited_0) {
 }
 
 TEST_F(LowererTest, AddExprIsVisited) {
-  auto expr = cs160::make_unique<AddExpr>((make_unique<IntegerExpr>(7)),
+  auto expr = make_unique<AddExpr>((make_unique<IntegerExpr>(7)),
                                     make_unique<IntegerExpr>(5));
   expr->Visit(&lowerer_);
 
@@ -60,7 +60,7 @@ TEST_F(LowererTest, AddExprIsVisited) {
 }
 
 TEST_F(LowererTest, SubtractExprIsVisited) {
-  auto expr = cs160::make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
+  auto expr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
     make_unique<IntegerExpr>(5));
 
   expr->Visit(&lowerer_);
@@ -69,7 +69,7 @@ TEST_F(LowererTest, SubtractExprIsVisited) {
 }
 
 TEST_F(LowererTest, MultiplyExprIsVisited) {
-  auto expr = cs160::make_unique<MultiplyExpr>(make_unique<IntegerExpr>(7),
+  auto expr = make_unique<MultiplyExpr>(make_unique<IntegerExpr>(7),
     make_unique<IntegerExpr>(5));
 
   expr->Visit(&lowerer_);
@@ -81,7 +81,7 @@ TEST_F(LowererTest, MultiplyExprIsVisited) {
 }
 
 TEST_F(LowererTest, DivideExprIsVisited) {
-  auto expr = cs160::make_unique<DivideExpr>(make_unique<IntegerExpr>(7),
+  auto expr = make_unique<DivideExpr>(make_unique<IntegerExpr>(7),
     make_unique<IntegerExpr>(5));
 
   expr->Visit(&lowerer_);
@@ -93,10 +93,10 @@ TEST_F(LowererTest, DivideExprIsVisited) {
 }
 
 TEST_F(LowererTest, NestedIntVisitationsWorkProperly) {
-  auto expr = cs160::make_unique<DivideExpr>(
-    cs160::make_unique<AddExpr>(make_unique<IntegerExpr>(7),
+  auto expr = make_unique<DivideExpr>(
+    make_unique<AddExpr>(make_unique<IntegerExpr>(7),
       make_unique<IntegerExpr>(5)),
-    cs160::make_unique<SubtractExpr>(make_unique<IntegerExpr>(2),
+    make_unique<SubtractExpr>(make_unique<IntegerExpr>(2),
       make_unique<IntegerExpr>(1)));
 
   expr->Visit(&lowerer_);
@@ -113,9 +113,9 @@ TEST_F(LowererTest, NestedIntVisitationsWorkProperly) {
 }
 
 TEST_F(LowererTest, SimpleAssignmentTest) {
-  auto expr = cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("x"),
-    cs160::make_unique<IntegerExpr>(5));
+  auto expr = make_unique<Assignment>(
+    make_unique<VariableExpr>("x"),
+    make_unique<IntegerExpr>(5));
 
   expr->Visit(&lowerer_);
   // t_0 <- 5
@@ -124,9 +124,9 @@ TEST_F(LowererTest, SimpleAssignmentTest) {
 }
 
 TEST_F(LowererTest, AssignmentTest) {
-  auto expr = cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("x"),
-    cs160::make_unique<AddExpr>(
+  auto expr = make_unique<Assignment>(
+    make_unique<VariableExpr>("x"),
+    make_unique<AddExpr>(
       make_unique<VariableExpr>("x"),
       make_unique<IntegerExpr>(5)));
 
@@ -139,10 +139,10 @@ TEST_F(LowererTest, AssignmentTest) {
 
 TEST_F(LowererTest, DoubleIntAssignmentTest) {
   auto expr = cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("x"),
-    cs160::make_unique<AddExpr>(
-      cs160::make_unique<IntegerExpr>(5),
-      cs160::make_unique<IntegerExpr>(10)));
+    make_unique<VariableExpr>("x"),
+    make_unique<AddExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)));
 
   expr->Visit(&lowerer_);
 
@@ -157,16 +157,16 @@ TEST_F(LowererTest, DoubleIntAssignmentTest) {
 TEST_F(LowererTest, BasicProgramCreation) {
   Statement::Block statements;
 
-  statements.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("x"),
-    cs160::make_unique<AddExpr>(
-      cs160::make_unique<IntegerExpr>(5),
-      cs160::make_unique<IntegerExpr>(10)))));
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("x"),
+    make_unique<AddExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
 
-  auto arithexpr = cs160::make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
+  auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
     make_unique<IntegerExpr>(5));
 
-  auto expr = cs160::make_unique<Program>(std::move(statements),
+  auto expr = make_unique<Program>(std::move(statements),
     std::move(arithexpr));
 
   expr->Visit(&lowerer_);
@@ -185,12 +185,12 @@ TEST_F(LowererTest, BasicProgramCreation) {
 
 TEST_F(LowererTest, UnassignedVariable) {
   auto expr = make_unique<const LogicalAndExpr>(
-    cs160::make_unique<const LessThanExpr>(
-        cs160::make_unique<const VariableExpr>("x"),
-        cs160::make_unique<const IntegerExpr>(100)),
-    cs160::make_unique<const GreaterThanExpr>(
-        cs160::make_unique<const VariableExpr>("x"),
-        cs160::make_unique<const IntegerExpr>(100)));
+    make_unique<const LessThanExpr>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(100)),
+    make_unique<const GreaterThanExpr>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(100)));
 
     // t_0 <- 100
     // t_1 <- x < t_0
