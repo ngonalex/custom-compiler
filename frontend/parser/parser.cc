@@ -28,9 +28,18 @@ std::unique_ptr<const Assignment> Parser::ParseAssignment() {
     return NULL;
   }
   std::unique_ptr<const VariableExpr> var = ParseVariable(program_.back());
-  Expect(Token::Type::FIELD);
-  ExpectID("int");
-  Expect(Token::Type::EQUAL_SIGN);
+  // VAR NAME : int = AE 
+  if (Next() == Token::Type::FIELD) {
+    Consume();
+    ExpectID("int");
+    Expect(Token::Type::EQUAL_SIGN);
+  } 
+  // VAR NAME = AE
+  else if (Next() == Token::Type::EQUAL_SIGN) {
+    Consume();
+  } else {
+    Error();
+  }
   std::unique_ptr<const ArithmeticExpr> expr = Eparser();
   return make_unique<Assignment>(std::move(var), std::move(expr));
 }
