@@ -25,7 +25,7 @@ Tokenizer::Tokenizer(std::string program) : input_program_(program) {
                 Token newToken(type);
                 tokens_.push_back(newToken);
             }
-            printf("Current String: %s\n", currString.c_str());
+            // printf("Current String: %s\n", currString.c_str());
             }
             if (separatorType != Token::WHITESPACE){
                 Token newToken(separatorType);

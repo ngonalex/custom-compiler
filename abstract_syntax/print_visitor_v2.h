@@ -26,41 +26,41 @@ class PrintVisitor : public AstVisitor {
   }
 
   void VisitAddExpr(const AddExpr& exp) override {
-    output_ << "(+ ";
+    output_ << "(";
     exp.lhs().Visit(this);
-    output_ << " ";
+    output_ << " + ";
     exp.rhs().Visit(this);
     output_ << ")";
   }
 
   void VisitSubtractExpr(const SubtractExpr& exp) override {
-    output_ << "(- ";
+    output_ << "(";
     exp.lhs().Visit(this);
-    output_ << " ";
+    output_ << " - ";
     exp.rhs().Visit(this);
     output_ << ")";
   }
 
   void VisitMultiplyExpr(const MultiplyExpr& exp) override {
-    output_ << "(* ";
+    output_ << "(";
     exp.lhs().Visit(this);
-    output_ << " ";
+    output_ << " * ";
     exp.rhs().Visit(this);
     output_ << ")";
   }
 
   void VisitDivideExpr(const DivideExpr& exp) override {
-    output_ << "(/ ";
+    output_ << "(";
     exp.lhs().Visit(this);
-    output_ << " ";
+    output_ << " / ";
     exp.rhs().Visit(this);
     output_ << ")";
   }
 
   void VisitAssignment(const Assignment& assignment) override {
-    output_ << "(= ";
+    assignment.lhs().Visit(this);
+    output_ << " = ";
     assignment.rhs().Visit(this);
-    output_ << ")";
   }
   
   void VisitProgram(const Program& program) override {
