@@ -50,6 +50,9 @@ class Parser {
   }
   Parser() { }
   Token::Type Next() { return program_.back().type(); }
+  Token::Type DoubleNext() {
+    return program_.rbegin()[1].type();
+  }
   void Consume() { program_.pop_back(); };
   void Error() {
     std::cerr << "Error!" << std::endl;

@@ -20,28 +20,31 @@ std::unique_ptr<const Program> Parser::ParseProgram() {
 }
 
 // Assignment should follow the structure of
-// VAR_NAME, (ID, $name), FIELD, (ID, "int"), EQUALS, EXPR
+// VAR_NAME, ID, FIELD, ID, EQUALS, EXPR
+// ID, EQUALS, EXPR
 std::unique_ptr<const Assignment> Parser::ParseAssignment() {
   if (Next() == Token::Type::VAR_NAME) {
     Consume();
-  } else {
-    return NULL;
-  }
-  std::unique_ptr<const VariableExpr> var = ParseVariable(program_.back());
-  // VAR NAME : int = AE 
-  if (Next() == Token::Type::FIELD) {
-    Consume();
+    std::unique_ptr<const VariableExpr> var = ParseVariable(program_.back());
+    Expect(Token::Type::FIELD);
     ExpectID("int");
     Expect(Token::Type::EQUAL_SIGN);
+    std::unique_ptr<const ArithmeticExpr> expr = Eparser();
+    return make_unique<Assignment>(std::move(var), std::move(expr));
   } 
-  // VAR NAME = AE
-  else if (Next() == Token::Type::EQUAL_SIGN) {
-    Consume();
-  } else {
-    Error();
+  if (Next() == Token::Type::IDENTIFIER) {
+    if (DoubleNext() != Token::Type::EQUAL_SIGN) {
+      printf("Not double next\n");
+      return NULL;
+    }
+    std::unique_ptr<const VariableExpr> var = ParseVariable(program_.back());
+    Expect(Token::Type::EQUAL_SIGN);
+    std::unique_ptr<const ArithmeticExpr> expr = Eparser();
   }
-  std::unique_ptr<const ArithmeticExpr> expr = Eparser();
-  return make_unique<Assignment>(std::move(var), std::move(expr));
+  else {
+    printf("Error Here\n");
+    return NULL;
+  }
 }
 
 std::unique_ptr<const VariableExpr> Parser::ParseVariable(Token curr) {
