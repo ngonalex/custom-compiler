@@ -5,11 +5,22 @@
 
 #include "gtest/gtest.h"
 
+//Basic single_char.cc test
 TEST(Combinators, SingleCharTest) {
   ParseStatus result;
   result.status = true;
-  result.remainingCharacters = '';
-  SingleCharParser test();
+  result.remainingCharacters = "";
+  SingleCharParser test;
 
-  EXPECT_EQ(test.parse(), result);
+  EXPECT_EQ(test.parse("a"), result);
+}
+
+// Basic single_digit.cc test
+TEST(Combinators, SingleDigitTest) {
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "";
+  SingleCharParser test;
+
+  EXPECT_EQ(test.parse("a"), result);
 }
