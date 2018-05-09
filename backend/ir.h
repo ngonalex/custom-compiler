@@ -32,6 +32,9 @@ enum Type {
   JLESS,
   JLESSEQ,
   LABEL,
+  FUNCALL,
+  FUNDEF,
+  FUNLOAD,
   NOTYPE
 };
 

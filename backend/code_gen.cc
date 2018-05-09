@@ -325,7 +325,7 @@ void CodeGen::GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
     case LOGNOT:
       outfile_ << "\t# LogicalNot\n";
       outfile_ << "\tpop %rbx" << std::endl;
-      outfile_ << "\txor $1, %rbx" << std::endl;
+      outfile_ << "\txor $1,\ %rbx" << std::endl;
       // outfile_ << "\tmovzx %bl, %rbx" << std::endl;
       outfile_ << "\tpush %rbx\n" << std::endl;
       break;

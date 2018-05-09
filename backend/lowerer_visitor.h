@@ -6,6 +6,7 @@
 #include <stack>
 #include <set>
 #include <iostream>
+#include <algorithm>
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "backend/ir.h"

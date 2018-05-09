@@ -117,14 +117,38 @@ void LowererVisitor::VisitFunctionCall(const FunctionCall& call) {
   // So high level wise (didn't read fully so may be missing steps like
   // stack restoration but im p sure that's in the callee)
   // 1) Signal to code gen that there is a function call
+
   // 2) Now load in arguments at a offset to the stack frame
   // 3) Create the call TAC, e.g call funcname
   // 4) TAC to indicate "pop" off the retval
   // 5) Assignment to the lhs
-  for (auto& arg : call.arguments()) {
-    arg->Visit(this);
+
+  // Evaluate the arguments to a single value
+  // Do it backwards to make loading into the stack easier
+  for (int i = call.arguments().size() - 1 ; i >= 0 ; --i) {
+    call.arguments()[i]->Visit(this);
   }
+
+  // At this point the top X things on the stack should be
+  // the arguments of the function in the correct order
+
+  // Function should return here get its return value
+  // lhs is a variable expr
   call.lhs().Visit(this);
+
+  // Abstract this out and have VisitAssignment + this call
+  // it
+  std::string varname = variablestack_.top();
+  variablestack_.pop();
+
+  // Push variablename into the set (Flagging it as being assigned)
+  globalset_.insert(varname);
+
+  // Load it in
+  auto newblock = make_unique<struct ThreeAddressCode>();
+  newblock->target = Target(Register(varname, VARIABLEREG));
+  newblock->op = Opcode(LOAD);
+  newblock->arg1 = Operand(blocks_[blocks_.size()-1]->target.reg());
 }
 void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
   // Problem! - creating a function is essentially just
@@ -376,6 +400,7 @@ void LowererVisitor::VisitAssignment(const Assignment& assignment) {
   blocks_.push_back(std::move(newblock));
 }
 
+// NEEDS TO BE UPDATED
 void LowererVisitor::VisitProgram(const Program& program) {
   // Do all the Assignments, then eval the AE?
 
