@@ -10,7 +10,7 @@ struct ParseStatus {
 
 struct SuccessStatus{
 	struct ParseStatus;
-}
+};
 
 // check if two ParseStatuses are equal
 bool operator==(const ParseStatus &a, const ParseStatus &b);
