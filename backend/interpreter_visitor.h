@@ -1,7 +1,12 @@
 #ifndef BACKEND_INTERPRETER_VISITOR_H_
 #define BACKEND_INTERPRETER_VISITOR_H_
 
+#include <stdio.h>
+#include <map>
 #include <stack>
+#include <iostream>
+#include <utility>
+#include <string>
 
 #include "abstract_syntax/abstract_syntax.h"
 
@@ -12,6 +17,10 @@ using cs160::abstract_syntax::backend::SubtractExpr;
 using cs160::abstract_syntax::backend::MultiplyExpr;
 using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::BinaryOperatorExpr;
+using cs160::abstract_syntax::backend::DivideExpr;
+using cs160::abstract_syntax::backend::Assignment;
+using cs160::abstract_syntax::backend::Program;
+using cs160::abstract_syntax::backend::VariableExpr;
 
 namespace cs160 {
 namespace backend {
@@ -21,7 +30,17 @@ class InterpreterVisitor : public AstVisitor {
   InterpreterVisitor() {}
   ~InterpreterVisitor() {}
 
-  const int GetOutput() const { return opstack_.top(); }
+  // Should we check if the top of the stack is 1 here?
+  // Assert (one item in stack)
+  const int GetOutput() {
+    int result = opstack_.top();
+    opstack_.pop();
+    return result;
+  }
+
+  const int GetVariable(std::string variable) const {
+    return variablemap_.find(variable)->second;
+  }
 
   // these should be able to change members of the visitor, thus not const
   void VisitIntegerExpr(const IntegerExpr& exp) {
@@ -66,9 +85,9 @@ class InterpreterVisitor : public AstVisitor {
     exp.rhs().Visit(const_cast<InterpreterVisitor*>(this));
 
     // Pop top two, push result back in
-    int r = opstack_.top();
+    unsigned int r = opstack_.top();
     opstack_.pop();
-    int l = opstack_.top();
+    unsigned int l = opstack_.top();
     opstack_.pop();
     opstack_.push(l*r);
   }
@@ -79,17 +98,52 @@ class InterpreterVisitor : public AstVisitor {
     exp.rhs().Visit(const_cast<InterpreterVisitor*>(this));
 
     // Pop top two, push result back in
-    // Should we check for division by zero here?
     int r = opstack_.top();
+
+    // Check if divisor is zero
+    if (r == 0) {
+      perror("Dividing zero");
+      exit(1);
+    }
+
     opstack_.pop();
     int l = opstack_.top();
     opstack_.pop();
     opstack_.push(l/r);
   }
 
+  void VisitVariableExpr(const VariableExpr& exp) {
+    variablestack_.push(exp.name());
+  }
+
+  void VisitAssignment(const Assignment& assignment) {
+    // Visit left/right
+    assignment.lhs().Visit(const_cast<InterpreterVisitor*>(this));
+    assignment.rhs().Visit(const_cast<InterpreterVisitor*>(this));
+
+    std::string assignee = variablestack_.top();
+    variablestack_.pop();
+
+    int assigner = opstack_.top();
+    opstack_.top();
+
+    variablemap_.insert(std::pair<std::string, int>(assignee, assigner));
+  }
+
+  void VisitProgram(const Program& program) {
+    for (auto& assignment : program.assignments()) {
+      assignment->Visit(this);
+    }
+
+    program.arithmetic_exp().Visit(this);
+  }
+
+
  private:
   // Not very general, this is probably a bad idea for future ASTS
   std::stack<int> opstack_;
+  std::stack<std::string> variablestack_;
+  std::map<std::string, int> variablemap_;
 };
 
 }  // namespace backend
