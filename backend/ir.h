@@ -9,7 +9,9 @@ namespace backend {
 
 // Somewhat unwieldy and long is there a better way to do this?
 enum Type {
-  LOAD,
+  INTLOAD,
+  VARLOAD,
+  FUNLOAD,
   ADD,
   SUB,
   MULT,
@@ -34,7 +36,6 @@ enum Type {
   LABEL,
   FUNCALL,
   FUNDEF,
-  FUNLOAD,
   NOTYPE
 };
 
@@ -52,6 +53,11 @@ enum RegisterType {
   VIRTUALREG,
   VARIABLEREG,
   NOREG
+};
+
+enum Scope {
+  GLOBAL,
+  FUNCTION
 };
 
 class Label {

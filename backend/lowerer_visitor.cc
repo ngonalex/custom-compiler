@@ -20,23 +20,24 @@ std::string LowererVisitor::GetOutput() {
   std::string output = "";
 
   // Probably make this a private variable or something?
-  std::vector<std::string> printhelper = {"load", "+", "-", "*", "/", "<", "<=",
-    ">", ">=", "==", "&&", "||", "¬", "while", "if",
-    "jmp", "je", "jne", "jg", "jge", "jl", "jle", "MkLabel"};
+  std::vector<std::string> printhelper = {"intload", "varload", "funload", "+",
+    "-", "*", "/", "<", "<=", ">", ">=", "==", "&&", "||", "¬",
+    "while", "if", "jmp", "je", "jne", "jg", "jge", "jl",
+    "jle", "MkLabel"};
 
   for (unsigned int i = 0; i < blocks_.size(); ++i) {
     // If it's a just a int (Register without a name then access it's value)
     // Otherwise access its name
     Type opcodetype = blocks_[i]->op.opcode();
     switch (opcodetype) {
-      case LOAD:
-        if (blocks_[i]->arg1.optype() == INT) {
-          output = output + blocks_[i]->target.reg().name()
-            + " <- " + std::to_string(blocks_[i]->arg1.value());
-        } else {
-            output = output + blocks_[i]->target.reg().name()
+      case INTLOAD:
+        output = output + blocks_[i]->target.reg().name()
+          + " <- " + std::to_string(blocks_[i]->arg1.value());
+        break;
+      case VARLOAD:
+        output = output + blocks_[i]->target.reg().name()
               + " <- " + blocks_[i]->arg1.reg().name();
-        }
+      case FUNLOAD:
         break;
       // case ADD:
       //   GetOutputArithmeticHelper(output, i, printhelper);
@@ -136,20 +137,10 @@ void LowererVisitor::VisitFunctionCall(const FunctionCall& call) {
   // lhs is a variable expr
   call.lhs().Visit(this);
 
-  // Abstract this out and have VisitAssignment + this call
-  // it
-  std::string varname = variablestack_.top();
-  variablestack_.pop();
-
-  // Push variablename into the set (Flagging it as being assigned)
-  globalset_.insert(varname);
-
-  // Load it in
-  auto newblock = make_unique<struct ThreeAddressCode>();
-  newblock->target = Target(Register(varname, VARIABLEREG));
-  newblock->op = Opcode(LOAD);
-  newblock->arg1 = Operand(blocks_[blocks_.size()-1]->target.reg());
+  // Basically do an assignment here
+  CreateLoadBlock(FUNLOAD, Operand(0));
 }
+
 void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
   // Problem! - creating a function is essentially just
   // creating a label + using the stack frame correctly
@@ -194,13 +185,33 @@ void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
   // gcc uses eax, yales says eax so probably eax or maybe rax for us
   // 4) TAC for ret (probably wont need this)
 
+  // Everything gets pushed to a function vector
+
+  // Change Scope!
+  currentscope_ = FUNCTION;
+
+  // Create a label for the function
+  CreateLabelBlock(def.function_name());
+
+  // Create function prologue
+  // push %rbp
+  // mov %rsp, %rbp
+  // CreateFunctionPrologue();
+
+  // Move arguments into the local stack
   for (auto& param : def.parameters()) {
       param->Visit(this);
   }
+
+  // Eval the body
   for (auto& statement : def.function_body()) {
     statement->Visit(this);
   }
+
+  // Load the ret value into eax
   def.retval().Visit(this);
+
+  // CreateLoadBlock();
 }
 
 void LowererVisitor::VisitLessThanExpr(const LessThanExpr& exp) {
@@ -382,22 +393,15 @@ void LowererVisitor::VisitAssignment(const Assignment& assignment) {
 
   // Visit the left which will add its variable name to the stack
   assignment.lhs().Visit(const_cast<LowererVisitor*>(this));
-  std::string varname = variablestack_.top();
-  variablestack_.pop();
-
-  // Push variablename into the set (Flagging it as being assigned)
-  globalset_.insert(varname);
 
   // assign the right hand side to be equal to the left hand side
   // The latest vector addition is the final register to be set to the
   // string name
   assignment.rhs().Visit(const_cast<LowererVisitor*>(this));
 
-  newblock->target = Target(Register(varname, VARIABLEREG));
-  newblock->op = Opcode(LOAD);
-  newblock->arg1 = Operand(blocks_[blocks_.size()-1]->target.reg());
+  Operand arg1 = Operand(blocks_[blocks_.size()-1]->target.reg());
 
-  blocks_.push_back(std::move(newblock));
+  CreateLoadBlock(VARLOAD, arg1);
 }
 
 // NEEDS TO BE UPDATED
@@ -452,19 +456,11 @@ void LowererVisitor::BinaryOperatorHelper(Type type,
 
 void LowererVisitor::VisitIntegerExpr(const IntegerExpr& exp) {
   // Load value into a target (t <- value)
-  auto newblock = make_unique<struct ThreeAddressCode>();
 
-  newblock->arg1 = Operand(exp.value());
-  newblock->op = Opcode(LOAD);
+  Operand arg1 = Operand(exp.value());
+  CreateLoadBlock(INTLOAD, arg1);
 
-  // look at this later,just going to do this now to test some things
-  newblock->target = Target(Register("t_" +
-    std::to_string(counter_.variablecount), VIRTUALREG));
-
-  // Push into vector
-  blocks_.push_back(std::move(newblock));
   lastchildtype_ = INTCHILD;
-
   ++counter_.variablecount;
 }
 
@@ -506,6 +502,42 @@ void LowererVisitor::VisitDivideExpr(const DivideExpr& exp) {
   BinaryOperatorHelper(DIV, arg1, arg2);
 }
 
+void LowererVisitor::CreateLoadBlock(Type type, Operand arg1) {
+  ASSERT(type == INTLOAD || type == VARLOAD || type == FUNLOAD,
+  "Must be an Int, Variable, or function load\n");
+
+  auto newblock = make_unique<struct ThreeAddressCode>();
+  std::string varname;
+  switch (type) {
+    case VARLOAD:
+      varname = variablestack_.top();
+      variablestack_.pop();
+
+      // Push variablename into the set (Flagging it as being assigned)
+      globalset_.insert(varname);
+
+      newblock->target = Target(Register(varname, VARIABLEREG));
+      newblock->op = Opcode(VARLOAD);
+      newblock->arg1 = arg1;
+
+      blocks_.push_back(std::move(newblock));
+      break;
+    case INTLOAD:
+      newblock->arg1 = arg1;
+      newblock->op = Opcode(INTLOAD);
+
+      // look at this later,just going to do this now to test some things
+      newblock->target = Target(Register("t_" +
+        std::to_string(counter_.variablecount), VIRTUALREG));
+
+      // Push into vector
+      blocks_.push_back(std::move(newblock));
+      break;
+    default:
+      break;
+  }
+}
+
 void LowererVisitor::CreateComparisionBlock(Type type) {
   ASSERT(type == CONDITIONAL || type == LOOP,
     "Must be a loop or a conditional type");
@@ -517,10 +549,6 @@ void LowererVisitor::CreateComparisionBlock(Type type) {
 
   newblock->op = Opcode(type);
 
-  // Might not need this
-  // newblock->target = Target(Register("t_" +
-  //   std::to_string(counter_.variablecount), VIRTUALREG));
-  // ++counter_.variablecount;
   blocks_.push_back(std::move(newblock));
 }
 

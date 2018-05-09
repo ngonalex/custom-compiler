@@ -191,12 +191,16 @@ void CodeGen::ClearRegister(std::string reg) {
 }
 
 void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
-  if (tac->arg1.optype() == INT) {
-        outfile_ << "\t# Loading in an integer" << std::endl;
-        outfile_ << "\tmov $" + std::to_string(tac->arg1.value())
-          + ", %rcx" << std::endl;
-        outfile_ << "\tpush %rcx\n" << std::endl;
-  } else {
+  Type loadtype = tac->op.opcode();
+
+  switch (loadtype) {
+    case INTLOAD:
+      outfile_ << "\t# Loading in an integer" << std::endl;
+      outfile_ << "\tmov $" + std::to_string(tac->arg1.value())
+        + ", %rcx" << std::endl;
+      outfile_ << "\tpush %rcx\n" << std::endl;
+      break;
+    case VARLOAD:
       outfile_ << "\t# Loading a value into variable "
         + tac->target.reg().name() << std::endl;
       ClearRegister("rbx");
@@ -214,6 +218,10 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
       outfile_ << "\tcall print" + tac->target.reg().name() << std::endl;
       outfile_ << "\n\t# Returning from printing "
         << tac->target.reg().name() << "\n" << std::endl;
+      break;
+    case FUNLOAD:
+    default:
+      break;
   }
 }
 
@@ -325,7 +333,7 @@ void CodeGen::GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
     case LOGNOT:
       outfile_ << "\t# LogicalNot\n";
       outfile_ << "\tpop %rbx" << std::endl;
-      outfile_ << "\txor $1,\ %rbx" << std::endl;
+      outfile_ << "\txor $1, %rbx" << std::endl;
       // outfile_ << "\tmovzx %bl, %rbx" << std::endl;
       outfile_ << "\tpush %rbx\n" << std::endl;
       break;
@@ -381,7 +389,13 @@ void CodeGen::Generate(std::vector
     Type opcode = code->op.opcode();
 
     switch (opcode) {
-      case LOAD:
+      case INTLOAD:
+        GenerateLoadInstructions(std::move(code));
+        break;
+      case VARLOAD:
+        GenerateLoadInstructions(std::move(code));
+        break;
+      case FUNLOAD:
         GenerateLoadInstructions(std::move(code));
         break;
       case ADD:
