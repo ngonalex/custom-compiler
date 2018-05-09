@@ -2,6 +2,7 @@
 #include "abstract_syntax/print_visitor_v1.h"
 #include "frontend/combinators/single_char.h"
 #include "frontend/combinators/single_digit.h"
+#include "frontend/combinators/parsestatus.h"
 
 #include "gtest/gtest.h"
 
@@ -26,11 +27,21 @@ TEST(Combinators, FailedSingleCharTest) {
 }
 
 // Success case for Single Digit test :: single_digit.cc
-TEST(Combinators, SingleDigitTest) {
+TEST(Combinators, SuccessSingleDigitTest) {
   ParseStatus result;
   result.status = true;
   result.remainingCharacters = "";
   SingleDigitParser test;
 
   EXPECT_EQ(test.parse("1"), result);
+}
+
+// Failed case for Single Digit test :: single_digit.cc
+TEST(Combinators, FailedSingleDigitTest) {
+  ParseStatus result;
+  result.status = false;
+  result.remainingCharacters = "a";
+  SingleDigitParser test;
+
+  EXPECT_EQ(test.parse("a"), result);
 }

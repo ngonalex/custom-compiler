@@ -1,4 +1,4 @@
-#include "frontend/combinators/null.h"
+#include "frontend/combinators/parsestatus.h"
 
 ParseStatus NullParser::parse(std::string inputProgram){
 	ParseStatus status;
