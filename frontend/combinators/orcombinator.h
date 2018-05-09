@@ -1,11 +1,11 @@
-#ifndef AND_COMBINATOR_H_
-#define AND_COMBINATOR_H_
+#ifndef OR_COMBINATOR_H_
+#define OR_COMBINATOR_H_
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/tokenizer/token.h"
 #include "frontend/combinators/null.h"
 
-class AndCombinator : NullParser
+class OrCombinator : NullParser
 {
 	NullParser firstParser;
 	NullParser secondParser;
@@ -13,4 +13,4 @@ class AndCombinator : NullParser
 	virtual ParseStatus parse(std::string inputProgram);
 };
 
-#endif AND_COMBINATOR_H_
+#endif OR_COMBINATOR_H_
