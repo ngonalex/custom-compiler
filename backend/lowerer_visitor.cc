@@ -261,9 +261,19 @@ void LowererVisitor::VisitLoop(const Loop& loop) {
   std::string continuelabel = ContinueLabelHelper();
   CreateJumpBlock(continuelabel, JEQUAL);
 
+  // Save the state of the last variable set
+  // Not as tested as the conditional version
+  std::set<std::string> originalset_ = globalset_;
+
   // Do this normally
   for (auto& statement : loop.body()) {
     statement->Visit(this);
+  }
+
+  // Not as tested as the conditional version
+  if (globalset_ != originalset_) {
+    std::cerr << "Unassigned Variable Detected (Loop)\n";
+    exit(1);
   }
 
   // Jump to the loop again
