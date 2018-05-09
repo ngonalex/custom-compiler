@@ -45,7 +45,7 @@ std::string exec(const char* cmd) {
 int main() {
   LowererVisitor lowerer_;
   Statement::Block statements;
-  auto expr = cs160::make_unique<DivideExpr>(
+  auto expr = make_unique<DivideExpr>(
     make_unique<IntegerExpr>(7), make_unique<IntegerExpr>(5));
 
   statements.push_back(std::move(
@@ -53,9 +53,35 @@ int main() {
                                     make_unique<const IntegerExpr>(50))));
 
   Statement::Block assignmenttest;
+  Statement::Block assignmenttestcopy;
+  Statement::Block assignmenttestcopy2;
   assignmenttest.push_back(std::move(
     make_unique<const Assignment>(make_unique<const VariableExpr>("lob"),
       make_unique<const IntegerExpr>(10))));
+
+  assignmenttestcopy.push_back(std::move(
+    make_unique<const Assignment>(make_unique<const VariableExpr>("lob"),
+      make_unique<const IntegerExpr>(20))));
+
+  assignmenttestcopy2.push_back(std::move(
+    make_unique<const Assignment>(make_unique<const VariableExpr>("lob"),
+      make_unique<const IntegerExpr>(30))));
+
+  Statement::Block assignmenttest2;
+  assignmenttest2.push_back(std::move(make_unique<const Conditional>(
+      make_unique<const LogicalOrExpr>(
+          make_unique<const LogicalNotExpr>(
+              make_unique<const LessThanExpr>(
+                  make_unique<const VariableExpr>("bob"),
+                  make_unique<const IntegerExpr>(100))),
+          make_unique<const LogicalAndExpr>(
+              make_unique<const LessThanEqualToExpr>(
+                  make_unique<const VariableExpr>("bob"),
+                  make_unique<const IntegerExpr>(50)),
+              make_unique<const GreaterThanEqualToExpr>(
+                  make_unique<const VariableExpr>("bob"),
+                  make_unique<const IntegerExpr>(0)))),
+      std::move(assignmenttestcopy2), std::move(assignmenttestcopy))));
 
   statements.push_back(std::move(make_unique<const Conditional>(
       make_unique<const LogicalOrExpr>(
@@ -66,11 +92,11 @@ int main() {
           make_unique<const LogicalAndExpr>(
               make_unique<const LessThanEqualToExpr>(
                   make_unique<const VariableExpr>("bob"),
-                  make_unique<const IntegerExpr>(100)),
+                  make_unique<const IntegerExpr>(50)),
               make_unique<const GreaterThanEqualToExpr>(
                   make_unique<const VariableExpr>("bob"),
                   make_unique<const IntegerExpr>(100)))),
-      std::move(assignmenttest), Statement::Block())));
+      std::move(assignmenttest), std::move(assignmenttest2))));
 
   Statement::Block outerbody;
   Statement::Block innerbody;

@@ -52,7 +52,7 @@ std::string exec(const char* cmd) {
 // 5) Complex Program
 
 TEST_F(CodeGenTest, IntegerExprIsVisited) {
-  auto expr = cs160::make_unique<DivideExpr>(
+  auto expr = make_unique<DivideExpr>(
     make_unique<IntegerExpr>(21), make_unique<IntegerExpr>(5));
 
   expr->Visit(&lowerer_);
@@ -60,14 +60,14 @@ TEST_F(CodeGenTest, IntegerExprIsVisited) {
   std::ofstream file = std::ofstream("test.s");
   CodeGen runner = CodeGen(file);
   auto test = lowerer_.GetIR();
-  runner.GenerateData(lowerer_.variableset());
+  runner.GenerateData(lowerer_.globalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -c test.s && ld test.o && ./a.out");
   EXPECT_EQ(result, "The result is equal to: 4\n");
 }
 
 TEST_F(CodeGenTest, PrintTest) {
-  auto expr = cs160::make_unique<SubtractExpr>(
+  auto expr = make_unique<SubtractExpr>(
     make_unique<IntegerExpr>(21), make_unique<IntegerExpr>(5));
 
   expr->Visit(&lowerer_);
@@ -75,7 +75,7 @@ TEST_F(CodeGenTest, PrintTest) {
   std::ofstream file = std::ofstream("test.s");
   CodeGen runner = CodeGen(file);
   auto test = lowerer_.GetIR();
-  runner.GenerateData(lowerer_.variableset());
+  runner.GenerateData(lowerer_.globalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -c test.s && ld test.o && ./a.out");
   EXPECT_EQ(result, "The result is equal to: 16\n");

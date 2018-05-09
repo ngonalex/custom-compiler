@@ -138,7 +138,7 @@ TEST_F(LowererTest, AssignmentTest) {
 }
 
 TEST_F(LowererTest, DoubleIntAssignmentTest) {
-  auto expr = cs160::make_unique<Assignment>(
+  auto expr = make_unique<Assignment>(
     make_unique<VariableExpr>("x"),
     make_unique<AddExpr>(
       make_unique<IntegerExpr>(5),
@@ -202,21 +202,21 @@ TEST_F(LowererTest, UnassignedVariable) {
 }
 
 TEST_F(LowererTest, NestedLogicalsWithInts) {
-  auto expr = cs160::make_unique<const LogicalOrExpr>(
-    cs160::make_unique<const LogicalAndExpr>(
-      cs160::make_unique<const LessThanExpr>(
-        cs160::make_unique<const IntegerExpr>(50),
-        cs160::make_unique<const IntegerExpr>(100)),
-      cs160::make_unique<const GreaterThanExpr>(
-        cs160::make_unique<const IntegerExpr>(50),
-        cs160::make_unique<const IntegerExpr>(0))),
-    cs160::make_unique<const LogicalAndExpr>(
-      cs160::make_unique<const LessThanEqualToExpr>(
-        cs160::make_unique<const IntegerExpr>(50),
-        cs160::make_unique<const IntegerExpr>(100)),
-      cs160::make_unique<const GreaterThanEqualToExpr>(
-        cs160::make_unique<const IntegerExpr>(50),
-        cs160::make_unique<const IntegerExpr>(0))));
+  auto expr = make_unique<const LogicalOrExpr>(
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanExpr>(
+        make_unique<const IntegerExpr>(50),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanExpr>(
+        make_unique<const IntegerExpr>(50),
+        make_unique<const IntegerExpr>(0))),
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanEqualToExpr>(
+        make_unique<const IntegerExpr>(50),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanEqualToExpr>(
+        make_unique<const IntegerExpr>(50),
+        make_unique<const IntegerExpr>(0))));
 
   expr->Visit(&lowerer_);
   // t_0 <- 50
@@ -243,22 +243,22 @@ TEST_F(LowererTest, NestedLogicalsWithInts) {
 TEST_F(LowererTest, VariabletoVariableAssignmentTest) {
   Statement::Block statements;
 
-  statements.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("x"),
-    cs160::make_unique<AddExpr>(
-      cs160::make_unique<IntegerExpr>(5),
-      cs160::make_unique<IntegerExpr>(10)))));
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("x"),
+    make_unique<AddExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("y"),
-    cs160::make_unique<SubtractExpr>(
-      cs160::make_unique<VariableExpr>("x"),
-      cs160::make_unique<IntegerExpr>(10)))));
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("y"),
+    make_unique<SubtractExpr>(
+      make_unique<VariableExpr>("x"),
+      make_unique<IntegerExpr>(10)))));
 
-  auto arithexpr = cs160::make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
+  auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
     make_unique<IntegerExpr>(5));
 
-  auto expr = cs160::make_unique<Program>(std::move(statements),
+  auto expr = make_unique<Program>(std::move(statements),
     std::move(arithexpr));
 
   expr->Visit(&lowerer_);
@@ -282,46 +282,46 @@ TEST_F(LowererTest, VariabletoVariableAssignmentTest) {
 TEST_F(LowererTest, ConditionalWithNestedLogicalsWithVariables) {
   Statement::Block statements;
 
-  statements.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("x"),
-    cs160::make_unique<AddExpr>(
-      cs160::make_unique<IntegerExpr>(5),
-      cs160::make_unique<IntegerExpr>(10)))));
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("x"),
+    make_unique<AddExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("y"),
-    cs160::make_unique<SubtractExpr>(
-      cs160::make_unique<IntegerExpr>(5),
-      cs160::make_unique<IntegerExpr>(10)))));
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("y"),
+    make_unique<SubtractExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("bob"),
-    cs160::make_unique<AddExpr>(
-      cs160::make_unique<VariableExpr>("y"),
-      cs160::make_unique<VariableExpr>("x")))));
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("bob"),
+    make_unique<AddExpr>(
+      make_unique<VariableExpr>("y"),
+      make_unique<VariableExpr>("x")))));
 
   statements.push_back(std::move(make_unique<const Conditional>(
-    cs160::make_unique<LogicalOrExpr>(
-    cs160::make_unique<const LogicalAndExpr>(
-      cs160::make_unique<const LessThanExpr>(
-        cs160::make_unique<const VariableExpr>("x"),
-        cs160::make_unique<const IntegerExpr>(100)),
-      cs160::make_unique<const GreaterThanExpr>(
-        cs160::make_unique<const VariableExpr>("y"),
-        cs160::make_unique<const VariableExpr>("x"))),
-    cs160::make_unique<const LogicalAndExpr>(
-      cs160::make_unique<const LessThanEqualToExpr>(
-        cs160::make_unique<const VariableExpr>("bob"),
-        cs160::make_unique<const IntegerExpr>(100)),
-      cs160::make_unique<const GreaterThanEqualToExpr>(
-        cs160::make_unique<const VariableExpr>("bob"),
-        cs160::make_unique<const IntegerExpr>(0)))),
+    make_unique<LogicalOrExpr>(
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanExpr>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanExpr>(
+        make_unique<const VariableExpr>("y"),
+        make_unique<const VariableExpr>("x"))),
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanEqualToExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanEqualToExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(0)))),
         Statement::Block(), Statement::Block())));
 
-  auto arithexpr = cs160::make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
+  auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
     make_unique<IntegerExpr>(5));
 
-  auto expr = cs160::make_unique<Program>(std::move(statements),
+  auto expr = make_unique<Program>(std::move(statements),
     std::move(arithexpr));
 
   expr->Visit(&lowerer_);
@@ -368,46 +368,46 @@ TEST_F(LowererTest, ConditionalWithNestedLogicalsWithVariables) {
 TEST_F(LowererTest, LoopWithNestedLogicalsWithVariables) {
   Statement::Block statements;
 
-  statements.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("x"),
-    cs160::make_unique<AddExpr>(
-      cs160::make_unique<IntegerExpr>(5),
-      cs160::make_unique<IntegerExpr>(10)))));
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("x"),
+    make_unique<AddExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("y"),
-    cs160::make_unique<SubtractExpr>(
-      cs160::make_unique<IntegerExpr>(5),
-      cs160::make_unique<IntegerExpr>(10)))));
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("y"),
+    make_unique<SubtractExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("bob"),
-    cs160::make_unique<AddExpr>(
-      cs160::make_unique<VariableExpr>("y"),
-      cs160::make_unique<VariableExpr>("x")))));
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("bob"),
+    make_unique<AddExpr>(
+      make_unique<VariableExpr>("y"),
+      make_unique<VariableExpr>("x")))));
 
   statements.push_back(std::move(make_unique<const Loop>(
-    cs160::make_unique<LogicalOrExpr>(
-    cs160::make_unique<const LogicalAndExpr>(
-      cs160::make_unique<const LessThanExpr>(
-        cs160::make_unique<const VariableExpr>("x"),
-        cs160::make_unique<const IntegerExpr>(100)),
-      cs160::make_unique<const GreaterThanExpr>(
-        cs160::make_unique<const VariableExpr>("y"),
-        cs160::make_unique<const VariableExpr>("x"))),
-    cs160::make_unique<const LogicalAndExpr>(
-      cs160::make_unique<const LessThanEqualToExpr>(
-        cs160::make_unique<const VariableExpr>("bob"),
-        cs160::make_unique<const IntegerExpr>(100)),
-      cs160::make_unique<const GreaterThanEqualToExpr>(
-        cs160::make_unique<const VariableExpr>("bob"),
-        cs160::make_unique<const IntegerExpr>(0)))),
+    make_unique<LogicalOrExpr>(
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanExpr>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanExpr>(
+        make_unique<const VariableExpr>("y"),
+        make_unique<const VariableExpr>("x"))),
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanEqualToExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanEqualToExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(0)))),
         Statement::Block())));
 
-  auto arithexpr = cs160::make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
+  auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
     make_unique<IntegerExpr>(5));
 
-  auto expr = cs160::make_unique<Program>(std::move(statements),
+  auto expr = make_unique<Program>(std::move(statements),
     std::move(arithexpr));
 
   expr->Visit(&lowerer_);
@@ -453,52 +453,52 @@ TEST_F(LowererTest, ConditionalsWithTrueBranch) {
   Statement::Block statements;
   Statement::Block trueblock;
 
-  statements.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("x"),
-    cs160::make_unique<AddExpr>(
-      cs160::make_unique<IntegerExpr>(5),
-      cs160::make_unique<IntegerExpr>(10)))));
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("x"),
+    make_unique<AddExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("y"),
-    cs160::make_unique<SubtractExpr>(
-      cs160::make_unique<IntegerExpr>(5),
-      cs160::make_unique<IntegerExpr>(10)))));
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("y"),
+    make_unique<SubtractExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("bob"),
-    cs160::make_unique<AddExpr>(
-      cs160::make_unique<VariableExpr>("y"),
-      cs160::make_unique<VariableExpr>("x")))));
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("bob"),
+    make_unique<AddExpr>(
+      make_unique<VariableExpr>("y"),
+      make_unique<VariableExpr>("x")))));
 
-  trueblock.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("bob"),
-      cs160::make_unique<AddExpr>(
-      cs160::make_unique<VariableExpr>("y"),
-      cs160::make_unique<VariableExpr>("x")))));
+  trueblock.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("bob"),
+      make_unique<AddExpr>(
+      make_unique<VariableExpr>("y"),
+      make_unique<VariableExpr>("x")))));
 
   statements.push_back(std::move(make_unique<const Conditional>(
-    cs160::make_unique<LogicalOrExpr>(
-    cs160::make_unique<const LogicalAndExpr>(
-      cs160::make_unique<const LessThanExpr>(
-        cs160::make_unique<const VariableExpr>("x"),
-        cs160::make_unique<const IntegerExpr>(100)),
-      cs160::make_unique<const GreaterThanExpr>(
-        cs160::make_unique<const VariableExpr>("y"),
-        cs160::make_unique<const VariableExpr>("x"))),
-    cs160::make_unique<const LogicalAndExpr>(
-      cs160::make_unique<const LessThanEqualToExpr>(
-        cs160::make_unique<const VariableExpr>("bob"),
-        cs160::make_unique<const IntegerExpr>(100)),
-      cs160::make_unique<const GreaterThanEqualToExpr>(
-        cs160::make_unique<const VariableExpr>("bob"),
-        cs160::make_unique<const IntegerExpr>(0)))),
+    make_unique<LogicalOrExpr>(
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanExpr>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanExpr>(
+        make_unique<const VariableExpr>("y"),
+        make_unique<const VariableExpr>("x"))),
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanEqualToExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanEqualToExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(0)))),
         std::move(trueblock), Statement::Block())));
 
-  auto arithexpr = cs160::make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
+  auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
     make_unique<IntegerExpr>(5));
 
-  auto expr = cs160::make_unique<Program>(std::move(statements),
+  auto expr = make_unique<Program>(std::move(statements),
     std::move(arithexpr));
 
   expr->Visit(&lowerer_);
@@ -548,52 +548,52 @@ TEST_F(LowererTest, ConditionalsWithFalseBranch) {
   Statement::Block statements;
   Statement::Block falseblock;
 
-  statements.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("x"),
-    cs160::make_unique<AddExpr>(
-      cs160::make_unique<IntegerExpr>(5),
-      cs160::make_unique<IntegerExpr>(10)))));
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("x"),
+    make_unique<AddExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("y"),
-    cs160::make_unique<SubtractExpr>(
-      cs160::make_unique<IntegerExpr>(5),
-      cs160::make_unique<IntegerExpr>(10)))));
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("y"),
+    make_unique<SubtractExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("bob"),
-    cs160::make_unique<AddExpr>(
-      cs160::make_unique<VariableExpr>("y"),
-      cs160::make_unique<VariableExpr>("x")))));
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("bob"),
+    make_unique<AddExpr>(
+      make_unique<VariableExpr>("y"),
+      make_unique<VariableExpr>("x")))));
 
-  falseblock.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("bob"),
-      cs160::make_unique<AddExpr>(
-      cs160::make_unique<VariableExpr>("y"),
-      cs160::make_unique<VariableExpr>("x")))));
+  falseblock.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("bob"),
+      make_unique<AddExpr>(
+      make_unique<VariableExpr>("y"),
+      make_unique<VariableExpr>("x")))));
 
   statements.push_back(std::move(make_unique<const Conditional>(
-    cs160::make_unique<LogicalOrExpr>(
-    cs160::make_unique<const LogicalAndExpr>(
-      cs160::make_unique<const LessThanExpr>(
-        cs160::make_unique<const VariableExpr>("x"),
-        cs160::make_unique<const IntegerExpr>(100)),
-      cs160::make_unique<const GreaterThanExpr>(
-        cs160::make_unique<const VariableExpr>("y"),
-        cs160::make_unique<const VariableExpr>("x"))),
-    cs160::make_unique<const LogicalAndExpr>(
-      cs160::make_unique<const LessThanEqualToExpr>(
-        cs160::make_unique<const VariableExpr>("bob"),
-        cs160::make_unique<const IntegerExpr>(100)),
-      cs160::make_unique<const GreaterThanEqualToExpr>(
-        cs160::make_unique<const VariableExpr>("bob"),
-        cs160::make_unique<const IntegerExpr>(0)))),
+    make_unique<LogicalOrExpr>(
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanExpr>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanExpr>(
+        make_unique<const VariableExpr>("y"),
+        make_unique<const VariableExpr>("x"))),
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanEqualToExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanEqualToExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(0)))),
         Statement::Block(), std::move(falseblock))));
 
-  auto arithexpr = cs160::make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
+  auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
     make_unique<IntegerExpr>(5));
 
-  auto expr = cs160::make_unique<Program>(std::move(statements),
+  auto expr = make_unique<Program>(std::move(statements),
     std::move(arithexpr));
 
   expr->Visit(&lowerer_);
@@ -644,58 +644,58 @@ TEST_F(LowererTest, ConditionalsWithBothBranch) {
   Statement::Block trueblock;
   Statement::Block falseblock;
 
-  statements.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("x"),
-    cs160::make_unique<AddExpr>(
-      cs160::make_unique<IntegerExpr>(5),
-      cs160::make_unique<IntegerExpr>(10)))));
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("x"),
+    make_unique<AddExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("y"),
-    cs160::make_unique<SubtractExpr>(
-      cs160::make_unique<IntegerExpr>(5),
-      cs160::make_unique<IntegerExpr>(10)))));
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("y"),
+    make_unique<SubtractExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("bob"),
-    cs160::make_unique<AddExpr>(
-      cs160::make_unique<VariableExpr>("y"),
-      cs160::make_unique<VariableExpr>("x")))));
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("bob"),
+    make_unique<AddExpr>(
+      make_unique<VariableExpr>("y"),
+      make_unique<VariableExpr>("x")))));
 
-  trueblock.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("bob"),
-      cs160::make_unique<AddExpr>(
-      cs160::make_unique<VariableExpr>("y"),
-      cs160::make_unique<VariableExpr>("x")))));
+  trueblock.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("bob"),
+      make_unique<AddExpr>(
+      make_unique<VariableExpr>("y"),
+      make_unique<VariableExpr>("x")))));
 
-  falseblock.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("bob"),
-      cs160::make_unique<SubtractExpr>(
-      cs160::make_unique<VariableExpr>("y"),
-      cs160::make_unique<VariableExpr>("x")))));
+  falseblock.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("bob"),
+      make_unique<SubtractExpr>(
+      make_unique<VariableExpr>("y"),
+      make_unique<VariableExpr>("x")))));
 
   statements.push_back(std::move(make_unique<const Conditional>(
-    cs160::make_unique<LogicalOrExpr>(
-    cs160::make_unique<const LogicalAndExpr>(
-      cs160::make_unique<const LessThanExpr>(
-        cs160::make_unique<const VariableExpr>("x"),
-        cs160::make_unique<const IntegerExpr>(100)),
-      cs160::make_unique<const GreaterThanExpr>(
-        cs160::make_unique<const VariableExpr>("y"),
-        cs160::make_unique<const VariableExpr>("x"))),
-    cs160::make_unique<const LogicalAndExpr>(
-      cs160::make_unique<const LessThanEqualToExpr>(
-        cs160::make_unique<const VariableExpr>("bob"),
-        cs160::make_unique<const IntegerExpr>(100)),
-      cs160::make_unique<const GreaterThanEqualToExpr>(
-        cs160::make_unique<const VariableExpr>("bob"),
-        cs160::make_unique<const IntegerExpr>(0)))),
+    make_unique<LogicalOrExpr>(
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanExpr>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanExpr>(
+        make_unique<const VariableExpr>("y"),
+        make_unique<const VariableExpr>("x"))),
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanEqualToExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanEqualToExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(0)))),
         std::move(trueblock), std::move(falseblock))));
 
-  auto arithexpr = cs160::make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
+  auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
     make_unique<IntegerExpr>(5));
 
-  auto expr = cs160::make_unique<Program>(std::move(statements),
+  auto expr = make_unique<Program>(std::move(statements),
     std::move(arithexpr));
 
   expr->Visit(&lowerer_);
@@ -748,52 +748,52 @@ TEST_F(LowererTest, LoopWithBody) {
   Statement::Block statements;
   Statement::Block loopbody;
 
-  statements.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("x"),
-    cs160::make_unique<AddExpr>(
-      cs160::make_unique<IntegerExpr>(5),
-      cs160::make_unique<IntegerExpr>(10)))));
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("x"),
+    make_unique<AddExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("y"),
-    cs160::make_unique<SubtractExpr>(
-      cs160::make_unique<IntegerExpr>(5),
-      cs160::make_unique<IntegerExpr>(10)))));
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("y"),
+    make_unique<SubtractExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("bob"),
-    cs160::make_unique<AddExpr>(
-      cs160::make_unique<VariableExpr>("y"),
-      cs160::make_unique<VariableExpr>("x")))));
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("bob"),
+    make_unique<AddExpr>(
+      make_unique<VariableExpr>("y"),
+      make_unique<VariableExpr>("x")))));
 
-  loopbody.push_back(std::move(cs160::make_unique<Assignment>(
-    cs160::make_unique<VariableExpr>("bob"),
-      cs160::make_unique<SubtractExpr>(
-      cs160::make_unique<VariableExpr>("y"),
-      cs160::make_unique<VariableExpr>("x")))));
+  loopbody.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("bob"),
+      make_unique<SubtractExpr>(
+      make_unique<VariableExpr>("y"),
+      make_unique<VariableExpr>("x")))));
 
   statements.push_back(std::move(make_unique<const Loop>(
-    cs160::make_unique<LogicalOrExpr>(
-    cs160::make_unique<const LogicalAndExpr>(
-      cs160::make_unique<const LessThanExpr>(
-        cs160::make_unique<const VariableExpr>("x"),
-        cs160::make_unique<const IntegerExpr>(100)),
-      cs160::make_unique<const GreaterThanExpr>(
-        cs160::make_unique<const VariableExpr>("y"),
-        cs160::make_unique<const VariableExpr>("x"))),
-    cs160::make_unique<const LogicalAndExpr>(
-      cs160::make_unique<const LessThanEqualToExpr>(
-        cs160::make_unique<const VariableExpr>("bob"),
-        cs160::make_unique<const IntegerExpr>(100)),
-      cs160::make_unique<const GreaterThanEqualToExpr>(
-        cs160::make_unique<const VariableExpr>("bob"),
-        cs160::make_unique<const IntegerExpr>(0)))),
+    make_unique<LogicalOrExpr>(
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanExpr>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanExpr>(
+        make_unique<const VariableExpr>("y"),
+        make_unique<const VariableExpr>("x"))),
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanEqualToExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanEqualToExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(0)))),
         std::move(loopbody))));
 
-  auto arithexpr = cs160::make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
+  auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
     make_unique<IntegerExpr>(5));
 
-  auto expr = cs160::make_unique<Program>(std::move(statements),
+  auto expr = make_unique<Program>(std::move(statements),
     std::move(arithexpr));
 
   expr->Visit(&lowerer_);
