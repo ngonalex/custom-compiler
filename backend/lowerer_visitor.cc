@@ -111,12 +111,27 @@ std::string LowererVisitor::GetOutput() {
 
 // To Do:
 void LowererVisitor::VisitFunctionCall(const FunctionCall& call) {
-  call.lhs().Visit(this);
+  // Notes:
+  // The function call form looks like this
+  // VarExpr = funcname(arg1,...,argn) where args are arithmetic exprs
+  // So high level wise (didn't read fully so may be missing steps like
+  // stack restoration but im p sure that's in the callee)
+  // 1) Signal to code gen that there is a function call
+  // 2) Now load in arguments at a offset to the stack frame
+  // 3) Create the call TAC, e.g call funcname
+  // 4) TAC to indicate "pop" off the retval
+  // 5) Assignment to the lhs
   for (auto& arg : call.arguments()) {
     arg->Visit(this);
   }
+  call.lhs().Visit(this);
 }
 void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
+  // -> Codegen here should probably get the stack ready here
+  // e.g push %rbp
+  // mov %rsp, %rbp
+  // sub $X,%rsp where X is the size of all variables used in the func
+
   for (auto& param : def.parameters()) {
       param->Visit(this);
   }
