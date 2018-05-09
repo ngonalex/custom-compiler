@@ -11,7 +11,7 @@ ParseStatus SingleCharParser::parse(std::string inputProgram){
 		(inputProgram[0] >= 'A' && inputProgram[0] <= 'Z')){
 		ParseStatus status;
 		status.status = true;
-		status.remainingCharacters = std::erase(inputProgram.begin() + 1, inputProgram.end());
+		status.remainingCharacters = inputProgram.erase(0, 1);
 	} else {
 		return super::parse(inputProgram);
 	}
