@@ -6,6 +6,7 @@
 
 class SingleDigitParser : NullParser
 {
+public: 
 	virtual ParseStatus parse(std::string inputProgram);
 };
 

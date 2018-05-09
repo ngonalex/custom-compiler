@@ -7,9 +7,9 @@ ParseStatus SingleCharParser::parse(std::string inputProgram){
 		return super::parse(inputProgram);
 	}
 
+	ParseStatus status;
 	if ((inputProgram[0] >= 'a' && inputProgram[0] <= 'z') ||
 		(inputProgram[0] >= 'A' && inputProgram[0] <= 'Z')){
-		ParseStatus status;
 		status.status = true;
 		status.remainingCharacters = inputProgram.erase(0, 1);
 	} else {
