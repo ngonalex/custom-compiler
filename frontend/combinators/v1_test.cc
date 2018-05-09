@@ -5,22 +5,32 @@
 
 #include "gtest/gtest.h"
 
-//Basic single_char.cc test
+// Success case for Single Character test :: single_char.cc
 TEST(Combinators, SingleCharTest) {
+  SingleCharParser test;
   ParseStatus result;
   result.status = true;
   result.remainingCharacters = "";
-  SingleCharParser test;
 
   EXPECT_EQ(test.parse("a"), result);
 }
 
-// Basic single_digit.cc test
+// Fail case for Single Character test :: single_char.cc
+TEST(Combinators, FailedSingleCharTest) {
+  SingleCharParser test;
+  ParseStatus result;
+  result.status = false;
+  result.remainingCharacters = "1";
+
+  EXPECT_EQ(test.parse("1"), result);
+}
+
+// Success case for Single Digit test :: single_digit.cc
 TEST(Combinators, SingleDigitTest) {
   ParseStatus result;
   result.status = true;
   result.remainingCharacters = "";
-  SingleCharParser test;
+  SingleDigitTest test;
 
-  EXPECT_EQ(test.parse("a"), result);
+  EXPECT_EQ(test.parse("1"), result);
 }
