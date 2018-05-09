@@ -25,6 +25,8 @@ using cs160::abstract_syntax::backend::Assignment;
 using cs160::abstract_syntax::backend::Conditional;
 using cs160::abstract_syntax::backend::Loop;
 using cs160::abstract_syntax::backend::Program;
+using cs160::abstract_syntax::backend::FunctionCall;
+using cs160::abstract_syntax::backend::FunctionDef;
 using cs160::backend::LowererVisitor;
 using cs160::backend::ThreeAddressCode;
 using cs160::backend::CodeGen;
@@ -138,7 +140,27 @@ int main() {
       make_unique<const MultiplyExpr>(make_unique<const IntegerExpr>(3),
                                       make_unique<const IntegerExpr>(2)));
 
-  auto ast = make_unique<const Program>(std::move(statements), std::move(ae));
+
+  auto foo_retval = make_unique<const AddExpr>(
+      make_unique<const SubtractExpr>(
+          make_unique<const DivideExpr>(make_unique<const IntegerExpr>(12),
+                                        make_unique<const IntegerExpr>(3)),
+          make_unique<const IntegerExpr>(4)),
+      make_unique<const MultiplyExpr>(make_unique<const IntegerExpr>(3),
+                                      make_unique<const IntegerExpr>(2)));
+
+  auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
+  foo_params.push_back(std::move(make_unique<const VariableExpr>("bob")));
+
+  auto foo_def = make_unique<const FunctionDef>("foo", std::move(foo_params),
+                                                Statement::Block(),
+                                                std::move(foo_retval));
+
+  FunctionDef::Block function_defs;
+  function_defs.push_back(std::move(foo_def));
+
+  auto ast = make_unique<const Program>(std::move(function_defs),
+    std::move(statements), std::move(ae));
 
   // CountVisitor counter;
   ast->Visit(&lowerer_);

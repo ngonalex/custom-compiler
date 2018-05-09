@@ -793,7 +793,7 @@ TEST_F(LowererTest, LoopWithBody) {
   auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
     make_unique<IntegerExpr>(5));
 
-  auto expr = make_unique<Program>(std::move(statements),
+  auto expr = make_unique<Program>(Statement::Block(),std::move(statements),
     std::move(arithexpr));
 
   expr->Visit(&lowerer_);

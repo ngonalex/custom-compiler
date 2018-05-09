@@ -109,6 +109,23 @@ std::string LowererVisitor::GetOutput() {
   return output;
 }
 
+// To Do:
+void LowererVisitor::VisitFunctionCall(const FunctionCall& call) {
+  call.lhs().Visit(this);
+  for (auto& arg : call.arguments()) {
+    arg->Visit(this);
+  }
+}
+void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
+  for (auto& param : def.parameters()) {
+      param->Visit(this);
+  }
+  for (auto& statement : def.function_body()) {
+    statement->Visit(this);
+  }
+  def.retval().Visit(this);
+}
+
 void LowererVisitor::VisitLessThanExpr(const LessThanExpr& exp) {
   // Visit left hand side (Last thing should be the target where it stores it)
   exp.lhs().Visit(const_cast<LowererVisitor*>(this));

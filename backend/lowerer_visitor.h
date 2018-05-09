@@ -33,6 +33,8 @@ using cs160::abstract_syntax::backend::LogicalNotExpr;
 using cs160::abstract_syntax::backend::LogicalOrExpr;
 using cs160::abstract_syntax::backend::Loop;
 using cs160::abstract_syntax::backend::Conditional;
+using cs160::abstract_syntax::backend::FunctionCall;
+using cs160::abstract_syntax::backend::FunctionDef;
 using cs160::make_unique;
 
 
@@ -53,7 +55,11 @@ class LowererVisitor : public AstVisitor {
 
   std::string GetOutput();
 
-  // V3 (Assignment + Program updated) Fill
+  // V4 (Program Updated)
+  void VisitFunctionCall(const FunctionCall& call);
+  void VisitFunctionDef(const FunctionDef& def);
+
+  // V3 (Assignment + Program updated)
   void VisitLessThanExpr(const LessThanExpr& exp);
   void VisitLessThanEqualToExpr(const LessThanEqualToExpr& exp);
   void VisitGreaterThanExpr(const GreaterThanExpr& exp);
