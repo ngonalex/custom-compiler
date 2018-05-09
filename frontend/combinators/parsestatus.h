@@ -1,6 +1,9 @@
+#ifndef PARSESTATUS_H
+#define PARSESTATUS_H
 #include <string>
 
 class ParseStatus { // Super class
+public:
 	bool status;
 	std::string remainingCharacters;
 	std::string parsedCharacters;
@@ -15,3 +18,5 @@ class ParseStatus { // Super class
 
 	bool operator!=(const ParseStatus &b) const;
 };
+
+#endif PARSESTATUS_HJ

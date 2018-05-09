@@ -1,8 +1,8 @@
 cc_library(
 	name = "combinators",
 	copts = ["-Wall -g"],
-	hdrs = ["null.h", "single_char.h", "single_digit.h"],
-	srcs = ["single_char.cc", "single_digit.cc", "null.cc"],
+	hdrs = ["null.h", "single_char.h", "single_digit.h", "parsestatus.h"],
+	srcs = ["single_char.cc", "single_digit.cc", "null.cc", "parsestatus.cc"],
 	deps = ["//utility", "//abstract_syntax:abstract_syntax",
 	"//abstract_syntax:print_visitor_v1"],
 	visibility = ["//visibility:public"],
