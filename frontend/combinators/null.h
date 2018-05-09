@@ -2,20 +2,7 @@
 #define NULL_PARSER_H
 
 #include "abstract_syntax/abstract_syntax.h"
-
-struct ParseStatus {
-	bool status;
-	std::string remainingCharacters;
-};
-
-struct SuccessStatus{
-	struct ParseStatus;
-};
-
-// check if two ParseStatuses are equal
-bool operator==(const ParseStatus &a, const ParseStatus &b);
-
-bool operator!=(const ParseStatus &a, const ParseStatus &b);
+#include "parsestatus.h"
 
 class NullParser
 {
