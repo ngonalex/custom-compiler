@@ -1,17 +1,17 @@
 cc_library(
-	name = "parser",
+	name = "combinators",
 	copts = ["-Wall -g"],
-	hdrs = ["parser.h"],
-	srcs = ["parser.cc"],
-	deps = ["//utility", "//frontend/tokenizer", "//abstract_syntax:abstract_syntax", 
+	hdrs = ["null.h", "single_char.h", "single_digit.h"],
+	srcs = ["single_char.cc", "single_digit.cc", "null.cc"],
+	deps = ["//utility", "//abstract_syntax:abstract_syntax",
 	"//abstract_syntax:print_visitor_v1"],
 	visibility = ["//visibility:public"],
 )
 
 cc_test(
-	name = "parser_test",
-	deps = ["@gtest//:main", ":parser", "//abstract_syntax:abstract_syntax"],
-	srcs = ["parser_test.cc"],
+	name = "combinators_test",
+	deps = ["@gtest//:main", ":combinators", "//abstract_syntax:abstract_syntax"],
+	srcs = ["v1_test.cc"],
 	copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
 	timeout = "short",
 	size = "small",
