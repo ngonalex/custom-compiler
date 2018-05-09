@@ -127,10 +127,48 @@ void LowererVisitor::VisitFunctionCall(const FunctionCall& call) {
   call.lhs().Visit(this);
 }
 void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
+  // Problem! - creating a function is essentially just
+  // creating a label + using the stack frame correctly
+  // then returning correctly
+  // the thing is though the way code_gen's generate works
+  // is it will create a function body directly in the middle of
+  // a main function
+
+  // Couple of ideas to fix this, have a vector of vectors that store TACS
+  // e.g. vector<vector<uni_ptr ThreeAddressCode>>
+  // so basically at the end/beg of the first for loop we just have a nested
+  // that "creates" the functions at the end/beg
+
+  // In codegen the second you see a FunctionDef TAC,
+  // immediately write to a different
+  // buffer and concat that to the end
+  // or store the index of that TAC, figure out the index of the end of the
+  // block and then create them at the end
+  // My opinion is that the first idea is probably the easiest.
+
+  // Notes:
+  // Form of func def in a "C++ function style is"
+  // ArithmeticExpr (Return value) funcname(arg1...argn) {(funcbody)}
+  // where arguments are simply variables
+
+  // High level wise
+  // 1) Do you actually need to do anything with the variables?
+  // 2) Eval the body
   // -> Codegen here should probably get the stack ready here
   // e.g push %rbp
   // mov %rsp, %rbp
+
+  // then gcc likes to store the arguments from the func inside the stack here
+  // Also gcc likes to use these registers in this order
+  // arg1 : edi, arg2: esi, arg3: edx, arg4: ecx, arg5:r8d?
+
   // sub $X,%rsp where X is the size of all variables used in the func
+  // gcc does the last statement manually by loading them in a offset
+  // as local variables are encountered
+
+  // 3) move the ret value into the correct register
+  // gcc uses eax, yales says eax so probably eax or maybe rax for us
+  // 4) TAC for ret (probably wont need this)
 
   for (auto& param : def.parameters()) {
       param->Visit(this);
