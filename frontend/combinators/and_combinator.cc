@@ -3,11 +3,11 @@
 #define super NullParser
 
 ParseStatus AndCombinator::parse(std::string inputProgram){
-	ParseStatus firstStatus = firstParser.parse(inputProgram);
+	ParseStatus firstStatus = firstParser->parse(inputProgram);
 	if (!firstStatus.status){
 		return firstStatus;
 	}
 
-	ParseStatus secondStatus = secondParser.parse(firstStatus.remainingCharacters);
+	ParseStatus secondStatus = secondParser->parse(firstStatus.remainingCharacters);
 	return secondStatus;
 }

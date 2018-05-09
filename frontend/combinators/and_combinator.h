@@ -7,8 +7,8 @@
 
 class AndCombinator : NullParser
 {
-	NullParser firstParser;
-	NullParser secondParser;
+	NullParser *firstParser;
+	NullParser *secondParser;
 
 	virtual ParseStatus parse(std::string inputProgram);
 };
