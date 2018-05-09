@@ -40,11 +40,13 @@ std::unique_ptr<const Assignment> Parser::ParseAssignment() {
     std::unique_ptr<const VariableExpr> var = ParseVariable(program_.back());
     Expect(Token::Type::EQUAL_SIGN);
     std::unique_ptr<const ArithmeticExpr> expr = Eparser();
+    return make_unique<Assignment>(std::move(var), std::move(expr));
   }
   else {
     // printf("Error Here\n");
     return NULL;
   }
+  return NULL;
 }
 
 std::unique_ptr<const VariableExpr> Parser::ParseVariable(Token curr) {
