@@ -12,6 +12,7 @@ enum Type {
   INTLOAD,
   VARLOAD,
   FUNLOAD,
+  FUNRETLOAD,
   ADD,
   SUB,
   MULT,
@@ -57,6 +58,7 @@ enum RegisterType {
   NOREG
 };
 
+// Maybe unneeded
 enum Scope {
   GLOBAL,
   FUNCTION

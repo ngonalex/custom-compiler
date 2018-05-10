@@ -141,7 +141,7 @@ void LowererVisitor::VisitFunctionCall(const FunctionCall& call) {
   // (add $8*#args %esp)
 
   // Basically do an assignment here
-  CreateLoadBlock(FUNLOAD, Operand(0));
+  CreateLoadBlock(FUNRETLOAD, Operand(0));
 }
 
 void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
@@ -477,8 +477,8 @@ void LowererVisitor::VisitDivideExpr(const DivideExpr& exp) {
 }
 
 void LowererVisitor::CreateLoadBlock(Type type, Operand arg1) {
-  ASSERT(type == INTLOAD || type == VARLOAD || type == FUNLOAD,
-  "Must be an Int, Variable, or function load\n");
+  ASSERT(type == INTLOAD || type == VARLOAD || type == FUNLOAD
+  || type == FUNRETLOAD, "Must be an Int, Variable, or function load\n");
 
   auto newblock = make_unique<struct ThreeAddressCode>();
   std::string varname;

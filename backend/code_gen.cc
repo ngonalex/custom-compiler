@@ -201,23 +201,29 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
       outfile_ << "\tpush %rcx\n" << std::endl;
       break;
     case VARLOAD:
-      outfile_ << "\t# Loading a value into variable "
-        + tac->target.reg().name() << std::endl;
-      ClearRegister("rbx");
-      outfile_ << "\tpop %rbx" << std::endl;
-      outfile_ << "\tmov %rbx, " << tac->target.reg().name()
-        << "" << std::endl;
-      outfile_ << "\tpush %rbx" << std::endl;
 
-      // Add it to the set, then call the print function
-      assignmentset_.insert(tac->target.reg().name());
-      outfile_ << "\tmov %rbx, %rax\n" << std::endl;
-      // Call on correct print function
-      outfile_ << "\t# Going to print " << tac->target.reg().name() << "\n"
-        << std::endl;
-      outfile_ << "\tcall print" + tac->target.reg().name() << std::endl;
-      outfile_ << "\n\t# Returning from printing "
-        << tac->target.reg().name() << "\n" << std::endl;
+      // change later to be if inside global scope
+      if (true) {
+        outfile_ << "\t# Loading a value into variable "
+          + tac->target.reg().name() << std::endl;
+        ClearRegister("rbx");
+        outfile_ << "\tpop %rbx" << std::endl;
+        outfile_ << "\tmov %rbx, " << tac->target.reg().name()
+          << "" << std::endl;
+        outfile_ << "\tpush %rbx" << std::endl;
+
+        // Add it to the set, then call the print function
+        assignmentset_.insert(tac->target.reg().name());
+        outfile_ << "\tmov %rbx, %rax\n" << std::endl;
+        // Call on correct print function
+        outfile_ << "\t# Going to print " << tac->target.reg().name() << "\n"
+          << std::endl;
+        outfile_ << "\tcall print" + tac->target.reg().name() << std::endl;
+        outfile_ << "\n\t# Returning from printing "
+          << tac->target.reg().name() << "\n" << std::endl;
+      } else {
+         // We're inside a function
+      }
       break;
     case FUNLOAD:
     default:
