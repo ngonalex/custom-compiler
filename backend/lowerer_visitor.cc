@@ -196,6 +196,8 @@ void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
   // mov %rsp, %rbp
   // CreateFunctionPrologue();
 
+  // Use a function specific stack here to keep track of variables
+
   // Move arguments into the local stack
   for (auto& param : def.parameters()) {
     param->Visit(this);
