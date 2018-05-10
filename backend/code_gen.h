@@ -42,6 +42,7 @@ class CodeGen {
   std::ofstream& outfile_;
   int printercount_;
   std::set<std::string> assignmentset_;
+  Scope currscope_;
 };
 
 }  // namespace backend

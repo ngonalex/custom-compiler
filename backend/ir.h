@@ -36,6 +36,8 @@ enum Type {
   LABEL,
   FUNCALL,
   FUNDEF,
+  FUNPROLOGUE,
+  FUNEPILOGUE,
   NOTYPE
 };
 

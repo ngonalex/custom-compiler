@@ -49,8 +49,7 @@ enum ChildType {
 
 class LowererVisitor : public AstVisitor {
  public:
-  LowererVisitor() : counter_(), currentscope_(GLOBAL),
-    currentfunctionblockindex_(0) {}
+  LowererVisitor() : counter_() {}
   ~LowererVisitor() {}
 
   std::string GetOutput();
@@ -84,6 +83,9 @@ class LowererVisitor : public AstVisitor {
   void VisitMultiplyExpr(const MultiplyExpr& exp);
   void VisitDivideExpr(const DivideExpr& exp);
 
+  void CreateFunctionPrologue();
+  void CreateFunctionEpilogue();
+  void CreateReturnBlock();
   void CreateLoadBlock(Type type, Operand arg1);
   void CreateComparisionBlock(Type type);
   void CreateLabelBlock(std::string labelname);
@@ -104,10 +106,10 @@ class LowererVisitor : public AstVisitor {
     return std::move(blocks_);
   }
 
-  std::vector<std::vector<std::unique_ptr<struct ThreeAddressCode>>>
-    GetFuncDefs() {
-     return std::move(functiondefblocks_);
-  }
+  // std::vector<std::vector<std::unique_ptr<struct ThreeAddressCode>>>
+  //   GetFuncDefs() {
+  //    return std::move(functiondefblocks_);
+  // }
 
 
   std::stack<std::string> variablestack() {
@@ -122,21 +124,13 @@ class LowererVisitor : public AstVisitor {
     return globalset_;
   }
 
-  Scope currentscope() {
-    return currentscope_;
-  }
-
  private:
   std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks_;
-  std::vector<std::vector<std::unique_ptr<struct ThreeAddressCode>>>
-    functiondefblocks_;
-  int currentfunctionblockindex_;
   std::stack<std::string> variablestack_;
   std::vector<std::set<std::string>> localsets_;
   std::set<std::string> globalset_;
   ChildType lastchildtype_;
   struct Counter counter_;
-  Scope currentscope_;
 };
 
 }  // namespace backend

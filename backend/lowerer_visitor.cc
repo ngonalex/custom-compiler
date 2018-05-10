@@ -137,6 +137,9 @@ void LowererVisitor::VisitFunctionCall(const FunctionCall& call) {
   // lhs is a variable expr
   call.lhs().Visit(this);
 
+  // Restore the stack (Based on # of args)? gcc doesn't do this
+  // (add $8*#args %esp)
+
   // Basically do an assignment here
   CreateLoadBlock(FUNLOAD, Operand(0));
 }
@@ -164,7 +167,7 @@ void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
   // Notes:
   // Form of func def in a "C++ function style is"
   // ArithmeticExpr (Return value) funcname(arg1...argn) {(funcbody)}
-  // where arguments are simply variables
+  // where arguments are VarExpr
 
   // High level wise
   // 1) Do you actually need to do anything with the variables?
@@ -185,11 +188,6 @@ void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
   // gcc uses eax, yales says eax so probably eax or maybe rax for us
   // 4) TAC for ret (probably wont need this)
 
-  // Everything gets pushed to a function vector
-
-  // Change Scope!
-  currentscope_ = FUNCTION;
-
   // Create a label for the function
   CreateLabelBlock(def.function_name());
 
@@ -200,7 +198,8 @@ void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
 
   // Move arguments into the local stack
   for (auto& param : def.parameters()) {
-      param->Visit(this);
+    param->Visit(this);
+    // FUNLOAD by popping off the stack
   }
 
   // Eval the body
@@ -212,6 +211,9 @@ void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
   def.retval().Visit(this);
 
   // CreateLoadBlock();
+
+  // Create a returnblock
+  // CreateReturnBlock();
 }
 
 void LowererVisitor::VisitLessThanExpr(const LessThanExpr& exp) {
@@ -404,15 +406,19 @@ void LowererVisitor::VisitAssignment(const Assignment& assignment) {
   CreateLoadBlock(VARLOAD, arg1);
 }
 
-// NEEDS TO BE UPDATED
+// NEEDS TO BE UPDATED (Updated)
 void LowererVisitor::VisitProgram(const Program& program) {
-  // Do all the Assignments, then eval the AE?
+  // Do all the Assignments, then the AE, then the functions
 
   for (auto& statement : program.statements()) {
       statement->Visit(this);
   }
 
   program.arithmetic_exp().Visit(this);
+
+  for (auto& def : program.function_defs()) {
+      def->Visit(this);
+  }
 }
 
 void LowererVisitor::VisitVariableExpr(const VariableExpr& exp) {
@@ -420,38 +426,6 @@ void LowererVisitor::VisitVariableExpr(const VariableExpr& exp) {
   // the stack
   variablestack_.push(exp.name());
   lastchildtype_ = VARCHILD;
-}
-
-// General comment, Lots of reused code, Think about abstracting out to helper
-// functions as the only difference between add/sub/mult/div is their "sign"
-// (Also some additional error handling for div req)
-
-void LowererVisitor::BinaryOperatorHelper(Type type,
-  Register arg1, Register arg2) {
-  // Load value into target (t <- prev->target + prev->prev->target)
-  // Last two elements of the vector should be the integers to load in
-
-  auto newblock = make_unique<struct ThreeAddressCode>();
-
-  // Check for variable non assignment here?
-  newblock->arg1 = Operand(arg1);
-
-  if (arg2.name() != "") {
-    newblock->arg2 = Operand(arg2);
-  }
-
-  // if (type == DIV) {check for div zero?}
-
-  newblock->op = Opcode(type);
-  // look at this later, just going to do this now to test some things
-  newblock->target = Target(Register("t_" +
-    std::to_string(counter_.variablecount), VIRTUALREG));
-
-  // Push into vector
-  blocks_.push_back(std::move(newblock));
-
-  ++counter_.variablecount;
-  lastchildtype_ = INTCHILD;
 }
 
 void LowererVisitor::VisitIntegerExpr(const IntegerExpr& exp) {
@@ -611,6 +585,34 @@ Register LowererVisitor::GetArgument(ChildType type) {
       break;
   }
   return arg;
+}
+
+void LowererVisitor::BinaryOperatorHelper(Type type,
+  Register arg1, Register arg2) {
+  // Load value into target (t <- prev->target + prev->prev->target)
+  // Last two elements of the vector should be the integers to load in
+
+  auto newblock = make_unique<struct ThreeAddressCode>();
+
+  // Check for variable non assignment here?
+  newblock->arg1 = Operand(arg1);
+
+  if (arg2.name() != "") {
+    newblock->arg2 = Operand(arg2);
+  }
+
+  // if (type == DIV) {check for div zero?}
+
+  newblock->op = Opcode(type);
+  // look at this later, just going to do this now to test some things
+  newblock->target = Target(Register("t_" +
+    std::to_string(counter_.variablecount), VIRTUALREG));
+
+  // Push into vector
+  blocks_.push_back(std::move(newblock));
+
+  ++counter_.variablecount;
+  lastchildtype_ = INTCHILD;
 }
 
 
