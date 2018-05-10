@@ -4,21 +4,21 @@
 
 ParseStatus OneOrMoreCombinator::parse(std::string inputProgram){
 
-	ParseStatus status = parser->parse(inputProgram);
+	ParseStatus pStatus = parser->parse(inputProgram);
 
-	if (!status.success){
-		return status;
+	if (!pStatus.status){
+		return pStatus;
 	}
 
-	while (status.success){
-		ParseStatus status2 = parser->parse(status.remainingCharacters);
-		status.success = status2.success;
-		if (status2.success){
-			status.remainingCharacters = status2.remainingCharacters;
+	while (pStatus.status){
+		ParseStatus pStatus2 = parser->parse(pStatus.remainingCharacters);
+		pStatus.status = pStatus2.status;
+		if (pStatus2.status){
+			pStatus.remainingCharacters = pStatus2.remainingCharacters;
 		}
 	}
 
-	status.success = true;
+	pStatus.status = true;
 
-	return status;
+	return pStatus;
 }

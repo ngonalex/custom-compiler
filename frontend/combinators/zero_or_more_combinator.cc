@@ -1,22 +1,22 @@
-#include "frontend/combinators/one_or_more_combinator.h"
+#include "frontend/combinators/zero_or_more_combinator.h"
 
 #define super NullParser
 
 ParseStatus ZeroOrMoreCombinator::parse(std::string inputProgram){
 
-	ParseStatus status;
-	status.success = true;
-	status.remainingCharacters = inputProgram;
+	ParseStatus pStatus;
+	pStatus.status = true;
+	pStatus.remainingCharacters = inputProgram;
 
-	while (status.success){
-		ParseStatus status2 = parser->parse(status.remainingCharacters);
-		status.success = status2.success;
-		if (status2.success){
-			status.remainingCharacters = status2.remainingCharacters;
+	while (pStatus.status){
+		ParseStatus status2 = parser->parse(pStatus.remainingCharacters);
+		pStatus.status = status2.status;
+		if (status2.status){
+			pStatus.remainingCharacters = status2.remainingCharacters;
 		}
 	}
 
-	status.success = true;
+	pStatus.status = true;
 
-	return status;
+	return pStatus;
 }

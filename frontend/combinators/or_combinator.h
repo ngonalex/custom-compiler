@@ -2,7 +2,6 @@
 #define OR_COMBINATOR_H_
 
 #include "abstract_syntax/abstract_syntax.h"
-#include "frontend/tokenizer/token.h"
 #include "frontend/combinators/null.h"
 
 class OrCombinator : NullParser

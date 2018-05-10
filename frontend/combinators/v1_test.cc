@@ -3,6 +3,7 @@
 #include "frontend/combinators/single_char.h"
 #include "frontend/combinators/single_digit.h"
 #include "frontend/combinators/parsestatus.h"
+#include "frontend/combinators/and_combinator.h"
 
 #include "gtest/gtest.h"
 
@@ -45,3 +46,31 @@ TEST(Combinators, FailedSingleDigitTest) {
 
   EXPECT_EQ(test.parse("a"), result);
 }
+
+// TODO below
+
+// one or more combinators test
+TEST(Combinators, DigitOrCharCombinator) {
+  SingleDigitParser digitParser;
+  SingleCharParser charParser;
+
+  AndCombinator andC;
+  andC.firstParser = &digitParser;
+  andC.secondParser = &charParser;
+
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "";
+
+  EXPECT_EQ(AndCombinator("a"), result);
+}
+/*
+// Failed case for Single Digit test :: single_digit.cc
+TEST(Combinators, DigitAndLetterCombinator) {
+  ParseStatus result;
+  result.status = false;
+  result.remainingCharacters = "a";
+  SingleDigitParser test;
+
+  EXPECT_EQ(test.parse("a"), result);
+}*/

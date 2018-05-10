@@ -1,4 +1,5 @@
 #include "frontend/combinators/single_op.h"
+#include <string>
 
 #define super NullParser
 
@@ -6,12 +7,12 @@ ParseStatus SingleOperatorParser::parse(std::string inputProgram){
 	if (inputProgram.size() == 0){
 		return super::parse(inputProgram);
 	}
+	ParseStatus status;
 
 	if (inputProgram[0] == '+' || inputProgram[0] == '-' ||
 		(inputProgram[0] == '*' || inputProgram[0] == '/')) {
-		ParseStatus status;
 		status.status = true;
-		status.remainingCharacters = std::erase(inputProgram.begin() + 1, inputProgram.end());
+		status.remainingCharacters = inputProgram.erase(0, 1);
 	} else {
 		return super::parse(inputProgram);
 	}
