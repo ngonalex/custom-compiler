@@ -6,6 +6,7 @@
 
 class OrCombinator : NullParser
 {
+public:
 	NullParser *firstParser;
 	NullParser *secondParser;
 

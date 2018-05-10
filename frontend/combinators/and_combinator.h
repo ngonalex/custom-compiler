@@ -6,6 +6,7 @@
 
 class AndCombinator : NullParser
 {
+public: 
 	NullParser *firstParser;
 	NullParser *secondParser;
 
