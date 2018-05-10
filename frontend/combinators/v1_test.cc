@@ -60,8 +60,8 @@ TEST(Combinators, DigitOrCharCombinator) {
   andC.secondParser = reinterpret_cast<NullParser *>(&charParser);
 
   ParseStatus result;
-  result.status = true;
-  result.remainingCharacters = "";
+  result.status = false;
+  result.remainingCharacters = "a";
 
   EXPECT_EQ(andC.parse("a"), result);
 }
