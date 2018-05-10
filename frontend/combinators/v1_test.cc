@@ -48,7 +48,7 @@ TEST(Combinators, FailedSingleDigitTest) {
 }
 
 // TODO below
-/*
+
 // NOTE this test doesn't work
 // one or more combinators test
 TEST(Combinators, DigitOrCharCombinator) {
@@ -65,7 +65,7 @@ TEST(Combinators, DigitOrCharCombinator) {
 
   EXPECT_EQ(andC.parse("a"), result);
 }
-
+/*
 // Failed case for Single Digit test :: single_digit.cc
 TEST(Combinators, DigitAndLetterCombinator) {
   ParseStatus result;
