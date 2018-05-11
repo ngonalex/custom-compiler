@@ -132,21 +132,22 @@ int main() {
             make_unique<const IntegerExpr>(0)),
           std::move(outerbody))));
 
-  auto ae = make_unique<const AddExpr>(
-      make_unique<const SubtractExpr>(
-          make_unique<const DivideExpr>(make_unique<const IntegerExpr>(12),
-                                        make_unique<const IntegerExpr>(3)),
-          make_unique<const IntegerExpr>(4)),
-      make_unique<const MultiplyExpr>(make_unique<const IntegerExpr>(3),
-                                      make_unique<const IntegerExpr>(2)));
+  // auto ae = make_unique<const AddExpr>(
+  //     make_unique<const SubtractExpr>(
+  //         make_unique<const DivideExpr>(make_unique<const IntegerExpr>(12),
+  //                                       make_unique<const IntegerExpr>(3)),
+  //         make_unique<const IntegerExpr>(4)),
+  //     make_unique<const MultiplyExpr>(make_unique<const IntegerExpr>(3),
+  //                                     make_unique<const IntegerExpr>(2)));
 
+  auto ae = make_unique<const VariableExpr>("lob");
 
   auto foo_retval = make_unique<const AddExpr>(
       make_unique<const SubtractExpr>(
           make_unique<const DivideExpr>(make_unique<const IntegerExpr>(12),
                                         make_unique<const IntegerExpr>(3)),
           make_unique<const IntegerExpr>(4)),
-      make_unique<const MultiplyExpr>(make_unique<const IntegerExpr>(3),
+      make_unique<const MultiplyExpr>(make_unique<const VariableExpr>("bob"),
                                       make_unique<const IntegerExpr>(2)));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();

@@ -50,7 +50,6 @@ enum ChildType {
 class LowererVisitor : public AstVisitor {
  public:
   LowererVisitor() : counter_() {}
-  ~LowererVisitor() {}
 
   std::string GetOutput();
 
@@ -83,7 +82,7 @@ class LowererVisitor : public AstVisitor {
   void VisitMultiplyExpr(const MultiplyExpr& exp);
   void VisitDivideExpr(const DivideExpr& exp);
 
-  void CreateFunctionDefPrologue(std::string name, int numofargs);
+  void CreateFunctionDefPrologue(std::string name);
   void CreateFunctionDefEpilogue(std::string name);
   void CreateFunctionDefReturnBlock();
   void CreateFunctionDefSignal(std::string name);

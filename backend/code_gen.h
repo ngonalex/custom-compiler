@@ -26,8 +26,8 @@ class CodeGen {
     // Printing functions
     void GeneratePrinter();
     void GeneratePrintHeader();
-    void GenerateAssignment(std::string);
-    void GenerateResult();
+    void GeneratePrintAssignment(std::string);
+    void GeneratePrintResult();
     void GenerateData(std::set<std::string>);
     // Different nodes + helpers
     void GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac);

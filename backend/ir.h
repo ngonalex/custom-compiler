@@ -11,7 +11,8 @@ namespace backend {
 enum Type {
   INTLOAD,
   VARLOAD,
-  FUNLOAD,
+  VARASSIGNLOAD,
+  FUNARGLOAD,
   FUNRETLOAD,
   ADD,
   SUB,
@@ -40,6 +41,7 @@ enum Type {
   FUNDEF,
   FUNPROLOGUE,
   FUNEPILOGUE,
+  PRINTARITH,
   NOTYPE
 };
 
