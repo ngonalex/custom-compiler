@@ -134,8 +134,7 @@ void LowererVisitor::VisitFunctionCall(const FunctionCall& call) {
 
   // Restore the stack (Based on # of args)? gcc doesn't do this
   // (add $8*#args %esp)
-  CreateFunctionCallReturnEpilogue(call.arguments().size());
-
+  CreateFunctionCallReturnEpilogue(call.arguments().size()-1);
 }
 
 void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
@@ -580,8 +579,8 @@ void LowererVisitor::CreateFunctionCallReturnEpilogue(int numofregs) {
   callblock->target = Target(Register());
   callblock->op = Opcode(FUNRETEP);
   callblock->arg1 = Operand(numofregs);
-  blocks_.push_back(std::move(callblock)); 
- }
+  blocks_.push_back(std::move(callblock));
+}
 
 void LowererVisitor::CreateFunctionDefSignal(std::string name) {
   auto block = make_unique<struct ThreeAddressCode>();

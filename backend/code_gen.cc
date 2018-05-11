@@ -483,6 +483,37 @@ void CodeGen::Generate(std::vector
       case LABEL:
         outfile_ << code->target.label().name() << ":"   << std::endl;
         break;
+      case FUNRETLOAD:
+        
+        break;
+      case FUNCALL:
+        outfile_ << "\t# Calling Function" << std::endl;
+        outfile_ << "\tcall " << code->target.label().name() << "\n"
+          << std::endl;
+        break;
+      case FUNRETEP:
+        outfile_ << "\t# FunctionRetEpilogue (Restore Stack)" << std::endl;
+        outfile_ << "\tadd $" << code->arg1.value() * 8 << "\n" << std::endl;
+        break;
+      case FUNDEF:
+        // Change scope
+        currscope_ = FUNCTION;
+        // Clear map
+        break;
+      case FUNPROLOGUE:
+        outfile_ << "\t# Function Prologue " << std::endl;
+        outfile_ << "\tpush %rbp" << std::endl;
+        outfile_ << "\tmov %rsp, %rbp" << std::endl;
+        // May be unneeded
+        outfile_ << "\tpush %rbx\n" << std::endl;
+        break;
+      case FUNEPILOGUE:
+        outfile_ << "\t# Function Epilogue " << std::endl;
+        outfile_ << "\tpop %rbx" << std::endl;
+        outfile_ << "\tmov %rbp, %rsp" << std::endl;
+        outfile_ << "\pop %rbp" << std::endl;
+        outfile_ << "\tret\n" << std::endl;
+        break;
       default:
         std::cerr << "Inside Generate and something really bad happened\n";
         exit(1);
