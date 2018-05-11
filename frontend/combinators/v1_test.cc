@@ -6,6 +6,9 @@
 #include "frontend/combinators/and_combinator.h"
 #include "frontend/combinators/or_combinator.h"
 #include "frontend/combinators/single_op.h"
+#include "frontend/combinators/zero_or_more_combinator.h"
+#include "frontend/combinators/one_or_more_combinator.h"
+
 
 #include "gtest/gtest.h"
 
@@ -81,7 +84,6 @@ TEST(Combinators, DigitOrCharCombinator) {
   EXPECT_EQ(orC.parse("a"), result);
 }
 
-//TODO below
 // single_op test
 TEST(Combinators, SingleOp) {
   ParseStatus result;
@@ -103,12 +105,59 @@ TEST(Combinators, FailSingleOp) {
   EXPECT_EQ(test.parse("a"), result);
 }
 
+// Zero or more combinator test
+TEST(Combinators, ZeroOrMoreCombinator) {
+  SingleDigitParser digitParser;
+  ZeroOrMoreCombinator zeroOrMore;
+
+  zeroOrMore.parser = reinterpret_cast<NullParser *>(&digitParser);
+
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "ab";
+
+  EXPECT_EQ(zeroOrMore.parse("123ab"), result);
+}
+
+// Passing in nothing for Zero or more combinator test
+TEST(Combinators, NoMatchZeroOrMoreCombinator) {
+  SingleDigitParser digitParser;
+  ZeroOrMoreCombinator zeroOrMore;
+
+  zeroOrMore.parser = reinterpret_cast<NullParser *>(&digitParser);
+
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "ab";
+
+  EXPECT_EQ(zeroOrMore.parse("ab"), result);
+}
+
+
 // One or more combinator test
 TEST(Combinators, OneOrMoreCombinator) {
+  SingleCharParser charParser;
+  OneOrMoreCombinator oneOrMore;
+
+  oneOrMore.parser = reinterpret_cast<NullParser *>(&charParser);
+
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "1cd";
+
+  EXPECT_EQ(oneOrMore.parse("ab1cd"), result);
+}
+
+// Fail Case for One or more combinator test
+TEST(Combinators, FailOneOrMoreCombinator) {
+  SingleDigitParser digitParser;
+  OneOrMoreCombinator oneOrMore;
+
+  oneOrMore.parser = reinterpret_cast<NullParser *>(&digitParser);
+
   ParseStatus result;
   result.status = false;
-  result.remainingCharacters = "a";
-  SingleDigitParser test;
+  result.remainingCharacters = "ab1cd";
 
-  EXPECT_EQ(test.parse("a"), result);
+  EXPECT_EQ(oneOrMore.parse("ab1cd"), result);
 }
