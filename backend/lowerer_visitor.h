@@ -83,9 +83,12 @@ class LowererVisitor : public AstVisitor {
   void VisitMultiplyExpr(const MultiplyExpr& exp);
   void VisitDivideExpr(const DivideExpr& exp);
 
-  void CreateFunctionPrologue();
-  void CreateFunctionEpilogue();
-  void CreateReturnBlock();
+  void CreateFunctionDefPrologue(std::string name, int numofargs);
+  void CreateFunctionDefEpilogue(std::string name);
+  void CreateFunctionDefReturnBlock();
+  void CreateFunctionDefSignal(std::string name);
+  void CreateFunctionCallBlock(std::string funname);
+  void CreateFunctionCallReturnEpilogue(int numofregs);
   void CreateLoadBlock(Type type, Operand arg1);
   void CreateComparisionBlock(Type type);
   void CreateLabelBlock(std::string labelname);

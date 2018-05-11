@@ -110,25 +110,17 @@ std::string LowererVisitor::GetOutput() {
   return output;
 }
 
-// To Do:
 void LowererVisitor::VisitFunctionCall(const FunctionCall& call) {
-  // Notes:
-  // The function call form looks like this
-  // VarExpr = funcname(arg1,...,argn) where args are arithmetic exprs
-  // So high level wise (didn't read fully so may be missing steps like
-  // stack restoration but im p sure that's in the callee)
-  // 1) Signal to code gen that there is a function call
-
-  // 2) Now load in arguments at a offset to the stack frame
-  // 3) Create the call TAC, e.g call funcname
-  // 4) TAC to indicate "pop" off the retval
-  // 5) Assignment to the lhs
-
+  // - This DOES NOT Signal to code gen
+  
   // Evaluate the arguments to a single value
   // Do it backwards to make loading into the stack easier
   for (int i = call.arguments().size() - 1 ; i >= 0 ; --i) {
     call.arguments()[i]->Visit(this);
   }
+
+  // Creat a call TAC
+  CreateFunctionCallBlock(call.callee_name());
 
   // At this point the top X things on the stack should be
   // the arguments of the function in the correct order
@@ -137,33 +129,19 @@ void LowererVisitor::VisitFunctionCall(const FunctionCall& call) {
   // lhs is a variable expr
   call.lhs().Visit(this);
 
+  // Basically do an assignment here
+  CreateLoadBlock(VARLOAD, Operand(0));
+
   // Restore the stack (Based on # of args)? gcc doesn't do this
   // (add $8*#args %esp)
+  CreateFunctionCallReturnEpilogue(call.arguments().size());
 
-  // Basically do an assignment here
-  CreateLoadBlock(FUNRETLOAD, Operand(0));
 }
 
 void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
-  // Problem! - creating a function is essentially just
-  // creating a label + using the stack frame correctly
-  // then returning correctly
-  // the thing is though the way code_gen's generate works
-  // is it will create a function body directly in the middle of
-  // a main function
+  CreateFunctionDefSignal(def.function_name());
 
-  // Couple of ideas to fix this, have a vector of vectors that store TACS
-  // e.g. vector<vector<uni_ptr ThreeAddressCode>>
-  // so basically at the end/beg of the first for loop we just have a nested
-  // that "creates" the functions at the end/beg
-
-  // In codegen the second you see a FunctionDef TAC,
-  // immediately write to a different
-  // buffer and concat that to the end
-  // or store the index of that TAC, figure out the index of the end of the
-  // block and then create them at the end
-  // My opinion is that the first idea is probably the easiest.
-
+  
   // Notes:
   // Form of func def in a "C++ function style is"
   // ArithmeticExpr (Return value) funcname(arg1...argn) {(funcbody)}
@@ -191,17 +169,28 @@ void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
   // Create a label for the function
   CreateLabelBlock(def.function_name());
 
+
+  int numofargs = def.parameters().size() - 1;
+
+
   // Create function prologue
   // push %rbp
   // mov %rsp, %rbp
-  // CreateFunctionPrologue();
+  CreateFunctionDefPrologue(def.function_name(), numofargs);
 
   // Use a function specific stack here to keep track of variables
 
   // Move arguments into the local stack
-  for (auto& param : def.parameters()) {
-    param->Visit(this);
-    // FUNLOAD by popping off the stack
+  // for (auto& param : def.parameters()) {
+  //   param->Visit(this);
+  //   // FUNLOAD by popping off the stack
+  // }
+  std::set<std::string> originalglobalset(globalset_);
+  globalset_.clear();
+
+  for (int i = def.parameters().size() - 1 ; i >= 0 ; --i) {
+    def.parameters()[i]->Visit(this);
+    CreateLoadBlock(FUNLOAD, Operand(i));
   }
 
   // Eval the body
@@ -209,13 +198,17 @@ void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
     statement->Visit(this);
   }
 
+  
   // Load the ret value into eax
   def.retval().Visit(this);
 
   // CreateLoadBlock();
 
   // Create a returnblock
-  // CreateReturnBlock();
+  CreateFunctionDefEpilogue(def.function_name());
+
+  globalset_ = originalglobalset;
+
 }
 
 void LowererVisitor::VisitLessThanExpr(const LessThanExpr& exp) {
@@ -408,7 +401,6 @@ void LowererVisitor::VisitAssignment(const Assignment& assignment) {
   CreateLoadBlock(VARLOAD, arg1);
 }
 
-// NEEDS TO BE UPDATED (Updated)
 void LowererVisitor::VisitProgram(const Program& program) {
   // Do all the Assignments, then the AE, then the functions
 
@@ -509,10 +501,37 @@ void LowererVisitor::CreateLoadBlock(Type type, Operand arg1) {
       // Push into vector
       blocks_.push_back(std::move(newblock));
       break;
+    case FUNRETLOAD:
+      varname = variablestack_.top();
+      variablestack_.pop();
+
+      // Push variablename into the set (Flagging it as being assigned)
+      globalset_.insert(varname);
+
+      newblock->target = Target(Register(varname, VARIABLEREG));
+      newblock->op = Opcode(VARLOAD);
+      newblock->arg1 = Operand(Register("FUNRETLOAD", VIRTUALREG));
+
+      blocks_.push_back(std::move(newblock));
+      break;
+    case FUNLOAD:
+      varname = variablestack_.top();
+      variablestack_.pop();
+
+      // Push variablename into the set (Flagging it as being assigned)
+      globalset_.insert(varname);
+
+      newblock->target = Target(Register(varname, VARIABLEREG));
+      newblock->op = Opcode(FUNLOAD);
+      newblock->arg1 = arg1;
+
+      blocks_.push_back(std::move(newblock));
+      break;
     default:
       break;
   }
 }
+
 
 void LowererVisitor::CreateComparisionBlock(Type type) {
   ASSERT(type == CONDITIONAL || type == LOOP,
@@ -546,6 +565,46 @@ void LowererVisitor::CreateJumpBlock(std::string jumpname, Type type) {
   jumpblock->op = Opcode(type);
 
   blocks_.push_back(std::move(jumpblock));
+}
+
+void LowererVisitor::CreateFunctionCallBlock(std::string funname){
+  auto callblock = make_unique<struct ThreeAddressCode>();
+  callblock->target = Target(Label(funname));
+  callblock->op = Opcode(FUNCALL);
+
+  blocks_.push_back(std::move(callblock));
+}
+
+void LowererVisitor::CreateFunctionCallReturnEpilogue(int numofregs) {
+  auto callblock = make_unique<struct ThreeAddressCode>();
+  callblock->target = Target(Register());
+  callblock->op = Opcode(FUNRETEP);
+  callblock->arg1 = Operand(numofregs);
+  blocks_.push_back(std::move(callblock)); 
+ }
+
+void LowererVisitor::CreateFunctionDefSignal(std::string name) {
+  auto block = make_unique<struct ThreeAddressCode>();
+  block->target = Target(Label(name));
+  block->op = Opcode(FUNDEF);
+
+  blocks_.push_back(std::move(block));
+}
+
+void LowererVisitor::CreateFunctionDefPrologue(std::string name, int numofargs) {
+  auto block = make_unique<struct ThreeAddressCode>();
+  block->target = Target(Label(name));
+  block->op = Opcode(FUNPROLOGUE);
+
+  blocks_.push_back(std::move(block));
+}
+
+void LowererVisitor::CreateFunctionDefEpilogue(std::string name) {
+  auto block = make_unique<struct ThreeAddressCode>();
+  block->target = Target(Label(name));
+  block->op = Opcode(FUNEPILOGUE);
+
+  blocks_.push_back(std::move(block));
 }
 
 std::string LowererVisitor::JumpLabelHelper() {
