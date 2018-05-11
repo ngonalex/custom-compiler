@@ -4,6 +4,8 @@
 #include "frontend/combinators/single_digit.h"
 #include "frontend/combinators/parsestatus.h"
 #include "frontend/combinators/and_combinator.h"
+#include "frontend/combinators/or_combinator.h"
+#include "frontend/combinators/single_op.h"
 
 #include "gtest/gtest.h"
 
@@ -47,11 +49,8 @@ TEST(Combinators, FailedSingleDigitTest) {
   EXPECT_EQ(test.parse("a"), result);
 }
 
-// TODO below
-
-// NOTE this test doesn't work
-// one or more combinators test
-TEST(Combinators, DigitOrCharCombinator) {
+// Simple AND combinator test
+TEST(Combinators, DigitAndCharCombinator) {
   SingleDigitParser digitParser;
   SingleCharParser charParser;
 
@@ -65,13 +64,51 @@ TEST(Combinators, DigitOrCharCombinator) {
 
   EXPECT_EQ(andC.parse("a"), result);
 }
-/*
-// Failed case for Single Digit test :: single_digit.cc
-TEST(Combinators, DigitAndLetterCombinator) {
+
+// Simple OR combinator test
+TEST(Combinators, DigitOrCharCombinator) {
+  SingleDigitParser digitParser;
+  SingleCharParser charParser;
+
+  OrCombinator orC;
+  orC.firstParser = reinterpret_cast<NullParser *>(&digitParser);
+  orC.secondParser = reinterpret_cast<NullParser *>(&charParser);
+
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "";
+
+  EXPECT_EQ(orC.parse("a"), result);
+}
+
+//TODO below
+// single_op test
+TEST(Combinators, SingleOp) {
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "";
+  SingleOperatorParser test;
+
+  EXPECT_EQ(test.parse("*"), result);
+}
+
+// single_op fail test
+TEST(Combinators, FailSingleOp) {
+
   ParseStatus result;
   result.status = false;
   result.remainingCharacters = "a";
   SingleDigitParser test;
 
   EXPECT_EQ(test.parse("a"), result);
-}*/
+}
+
+// One or more combinator test
+TEST(Combinators, OneOrMoreCombinator) {
+  ParseStatus result;
+  result.status = false;
+  result.remainingCharacters = "a";
+  SingleDigitParser test;
+
+  EXPECT_EQ(test.parse("a"), result);
+}
