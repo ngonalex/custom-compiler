@@ -2,11 +2,11 @@
 #define AND_COMBINATOR_H_
 
 #include "abstract_syntax/abstract_syntax.h"
-#include "frontend/combinators/null.h"
+#include "frontend/combinators/basic_combinators/null.h"
 
 class AndCombinator : NullParser
 {
-public: 
+public:
 	NullParser *firstParser;
 	NullParser *secondParser;
 

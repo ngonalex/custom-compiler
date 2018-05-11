@@ -2,7 +2,7 @@
 #define ONE_OR_MORE_COMBINATOR_H_
 
 #include "abstract_syntax/abstract_syntax.h"
-#include "frontend/combinators/null.h"
+#include "frontend/combinators/basic_combinators/null.h"
 
 class OneOrMoreCombinator : NullParser
 {

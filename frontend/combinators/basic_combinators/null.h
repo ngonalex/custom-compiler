@@ -2,7 +2,7 @@
 #define NULL_PARSER_H
 
 #include "abstract_syntax/abstract_syntax.h"
-#include "frontend/combinators/parsestatus.h"
+#include "frontend/combinators/basic_combinators/parsestatus.h"
 
 class NullParser
 {
