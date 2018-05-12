@@ -178,7 +178,7 @@ void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
 
   // Check how many variables there are after
   int numoflocalvars = totalset_.size();
-  std::cerr << "SIZE: " << numoflocalvars << std::endl;
+  // std::cerr << "SIZE: " << numoflocalvars << std::endl;
   // Modify the prologue so it can create space for ALL local
   // variables
   blocks_[prologueindex]->arg1 = Operand(numoflocalvars);
@@ -311,10 +311,10 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
   std::set<std::string> intersectionset(SetIntersectionHelper(s1, s2));
   std::set<std::string> differenceset(SetDifferenceHelper(s1, s2));
 
-  std::cerr << "SIZE OF SET1: " << s1.size() << std::endl;
-  std::cerr << "SIZE OF SET2: " << s2.size() << std::endl;
-  std::cerr << "SIZE OF INTER SET: " << intersectionset.size() << std::endl;
-  std::cerr << "SIZE OF DIFF SET: " << differenceset.size() << std::endl;
+  // std::cerr << "SIZE OF SET1: " << s1.size() << std::endl;
+  // std::cerr << "SIZE OF SET2: " << s2.size() << std::endl;
+  // std::cerr << "SIZE OF INTER SET: " << intersectionset.size() << std::endl;
+  // std::cerr << "SIZE OF DIFF SET: " << differenceset.size() << std::endl;
 
   totalset_.insert(intersectionset.begin(), intersectionset.end());
   totalset_.insert(differenceset.begin(), differenceset.end());
@@ -326,6 +326,8 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
     globalset_ = localsets_[localsets_.size()-1];
   } else {
     // otherwise use only the intersection set
+    std::cerr << "A variable assignment in only one branch has been detected"
+      << " may cause problems later" << std::endl;
     globalset_ = intersectionset;
   }
 
