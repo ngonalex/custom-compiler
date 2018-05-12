@@ -128,14 +128,16 @@ void LowererVisitor::VisitFunctionCall(const FunctionCall& call) {
 
   // Function should return here, get its return value
   // lhs is a variable expr
+  currvariabletype_ = LEFTHAND;
   call.lhs().Visit(this);
+  currvariabletype_ = RIGHTHAND;
 
   // Basically do an assignment here
   CreateLoadBlock(FUNRETLOAD, Operand(0));
 
   // Restore the stack (Based on # of args)
   // (add $8*#args %esp)
-  CreateFunctionCallReturnEpilogue(call.arguments().size()-1);
+  CreateFunctionCallReturnEpilogue(call.arguments().size());
 }
 
 void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
@@ -156,18 +158,22 @@ void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
   globalset_.clear();
 
   // Move arguments into the local stack
+  currvariabletype_ = LEFTHAND;
   for (int i = def.parameters().size() - 1 ; i >= 0 ; --i) {
     def.parameters()[i]->Visit(this);
     CreateLoadBlock(FUNARGLOAD, Operand(i));
   }
+  currvariabletype_ = RIGHTHAND;
 
   // Eval the body
   for (auto& statement : def.function_body()) {
     statement->Visit(this);
   }
 
+  currvariabletype_ = LEFTHAND;
   // Load the ret value into eax
   def.retval().Visit(this);
+  currvariabletype_ = RIGHTHAND;
 
   // Create a returnblock
   CreateFunctionDefEpilogue(def.function_name());
@@ -267,10 +273,10 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
     statement->Visit(this);
   }
 
-  // Push the set into the vector to check after
-  localsets_.push_back(globalset_);
-  // Restore the state of the globalset
-  globalset_ = originalset_;
+  // // Push the set into the vector to check after
+  // localsets_.push_back(globalset_);
+  // // Restore the state of the globalset
+  // globalset_ = originalset_;
 
   // Create a jump to the continue
   std::string continuelabel = ContinueLabelHelper();
@@ -284,24 +290,24 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
     statement->Visit(this);
   }
 
-  // Push the set into the vector
-  localsets_.push_back(globalset_);
-  // Restore the state of the global set
+  // // Push the set into the vector
+  // localsets_.push_back(globalset_);
+  // // Restore the state of the global set
   globalset_ = originalset_;
 
-  // Check here if there's an issue with unassigned variables
-  if (localsets_[localsets_.size()-1] != localsets_[localsets_.size()-2]) {
-    std::cerr << "Unassigned Variable Detected\n";
-    exit(1);
-  } else {
-    // Otherwise we can now safely copy one of the local sets
-    // as a globalset
-    globalset_ = localsets_[localsets_.size()-1];
+  // // Check here if there's an issue with unassigned variables
+  // if (localsets_[localsets_.size()-1] != localsets_[localsets_.size()-2]) {
+  //   std::cerr << "Unassigned Variable Detected\n";
+  //   exit(1);
+  // } else {
+  //   // Otherwise we can now safely copy one of the local sets
+  //   // as a globalset
+  //   globalset_ = localsets_[localsets_.size()-1];
 
-    // Delete the last two
-    localsets_.pop_back();
-    localsets_.pop_back();
-  }
+  //   // Delete the last two
+  //   localsets_.pop_back();
+  //   localsets_.pop_back();
+  // }
 
   // TAC to jump to continue here
   CreateJumpBlock(continuelabel, JUMP);
@@ -351,8 +357,9 @@ void LowererVisitor::VisitLoop(const Loop& loop) {
 
 void LowererVisitor::VisitAssignment(const Assignment& assignment) {
   // Visit the left which will add its variable name to the stack
+  currvariabletype_ = LEFTHAND;
   assignment.lhs().Visit(const_cast<LowererVisitor*>(this));
-
+  currvariabletype_ = RIGHTHAND;
   // assign the right hand side to be equal to the left hand side
   // The latest vector addition is the final register to be set to the
   // string name
@@ -385,7 +392,17 @@ void LowererVisitor::VisitVariableExpr(const VariableExpr& exp) {
   // Just get the string stored in VariableExpr and push it to
   // the stack
   variablestack_.push(exp.name());
-  lastchildtype_ = VARCHILD;
+  if (currvariabletype_ == LEFTHAND) {
+    // It's a load into operation
+    // Var assignload will take care of it
+    lastchildtype_ = VARCHILD;
+    return;
+  } else {
+    // It's a right hand side so just access its
+    // value and put it in a virt reg
+    CreateLoadBlock(VARLOAD, Operand(0));
+    ++counter_.variablecount;
+  }
 }
 
 void LowererVisitor::VisitIntegerExpr(const IntegerExpr& exp) {
@@ -438,11 +455,29 @@ void LowererVisitor::VisitDivideExpr(const DivideExpr& exp) {
 
 void LowererVisitor::CreateLoadBlock(Type type, Operand arg1) {
   ASSERT(type == INTLOAD || type == VARASSIGNLOAD || type == FUNARGLOAD
-  || type == FUNRETLOAD, "Must be an Int, Variable, or function load\n");
+  || type == FUNRETLOAD || type == VARLOAD,
+  "Must be an Int, Variable, or function load\n");
 
   auto newblock = make_unique<struct ThreeAddressCode>();
   std::string varname;
   switch (type) {
+    case VARLOAD:
+      varname = variablestack_.top();
+      variablestack_.pop();
+
+      if ( globalset_.count(varname) == 0 ) {
+        std::cerr << "Variable "+ varname +" not assigned\n";
+        exit(1);
+      }
+
+      newblock->target = Target(Register("t_" +
+        std::to_string(counter_.variablecount), VIRTUALREG));
+      newblock->op = Opcode(VARLOAD);
+      // Not consistent rework later
+      newblock->arg1 = Operand(Register(varname, VARIABLEREG));
+
+      blocks_.push_back(std::move(newblock));
+      break;
     case VARASSIGNLOAD:
       varname = variablestack_.top();
       variablestack_.pop();
@@ -590,26 +625,27 @@ std::string LowererVisitor::ContinueLabelHelper() {
   return newcontinue;
 }
 
+// Obsolete Function now, remove later
 Register LowererVisitor::GetArgument(ChildType type) {
-  Register arg;
-  switch (type) {
-    case INTCHILD:
-      arg = blocks_[blocks_.size()-1]->target.reg();
-      break;
-    case VARCHILD:
-      // Check if variable has been assigned here?
-      arg = Register(variablestack_.top(), VARIABLEREG);
-      variablestack_.pop();
+  Register arg = blocks_[blocks_.size()-1]->target.reg();
+  // switch (type) {
+  //   case INTCHILD:
+  //     // arg = blocks_[blocks_.size()-1]->target.reg();
+  //     break;
+  //   case VARCHILD:
+  //     // Check if variable has been assigned here?
+  //     // arg = Register(variablestack_.top(), VARIABLEREG);
+  //     variablestack_.pop();
 
-      if ( globalset_.count(arg.name()) == 0 ) {
-        std::cerr << "Variable "+ arg.name() +" not assigned\n";
-        exit(1);
-      }
-      break;
-    default:
-      // There should be type throw error?
-      break;
-  }
+  //     if ( globalset_.count(arg.name()) == 0 ) {
+  //       std::cerr << "Variable "+ arg.name() +" not assigned\n";
+  //       exit(1);
+  //     }
+  //     break;
+  //   default:
+  //     // There should be type throw error?
+  //     break;
+  // }
   return arg;
 }
 

@@ -27,6 +27,7 @@ class CodeGen {
     void GeneratePrinter();
     void GeneratePrintHeader();
     void GeneratePrintAssignment(std::string);
+    void GeneratePrintFunctionResult();
     void GeneratePrintResult();
     void GenerateData(std::set<std::string>);
     // Different nodes + helpers

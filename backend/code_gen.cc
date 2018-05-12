@@ -104,6 +104,7 @@ void CodeGen::GeneratePrinter() {
   outfile_ << "\t.ascii \"\\n\""  << std::endl;
 
   GeneratePrintResult();
+  GeneratePrintFunctionResult();
 
   // Generate Unique Printers here
   std::set<std::string>::iterator it;
@@ -152,6 +153,23 @@ void CodeGen::GeneratePrintAssignment(std::string variablename) {
   outfile_ << variablename + "ascii:" << std::endl;
   outfile_ << "\t.ascii \"Variable " + variablename + " is equal to: \""
     << std::endl;
+}
+
+void CodeGen::GeneratePrintFunctionResult() {
+  // printfunctionresult
+  outfile_ << "printfunctionret:" << std::endl;
+  outfile_ << "\tpush %rax" << std::endl;
+
+  outfile_ << "\tmov $1, %rax" << std::endl;
+  outfile_ << "\tmov $1, %rdi" << std::endl;
+  outfile_ << "\tmov $printfunctionresult, %rsi" << std::endl;
+  outfile_ << "\tmov $23, %rdx" << std::endl;
+  outfile_ << "\tsyscall" << std::endl;
+
+  outfile_ << "\tpop %rax" << std::endl;
+
+  outfile_ << "\tjmp printstart" << std::endl;
+  outfile_ << "\tret" << std::endl;
 }
 
 void CodeGen::GeneratePrintResult() {
@@ -206,18 +224,36 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
         + ", %rcx" << std::endl;
       outfile_ << "\tpush %rcx\n" << std::endl;
       break;
+    case VARLOAD:
+      outfile_ << "\t# Loading a variable" << std::endl;
+      outfile_ << "\tmov " + VariableNameHelper(tac->arg1.reg().name())
+        + ", %rcx" << std::endl;
+      outfile_ << "\tpush %rcx\n" << std::endl;
+      break;
     case VARASSIGNLOAD:
-      // change later to be if inside global scope
-      if (currscope_ == GLOBAL) {
-        outfile_ << "\t# Loading a value into variable "
-          + tac->target.reg().name() << std::endl;
-        ClearRegister("rbx");
-        outfile_ << "\tpop %rbx" << std::endl;
-        outfile_ << "\tmov %rbx, " << tac->target.reg().name()
-          << "" << std::endl;
-        outfile_ << "\tpush %rbx" << std::endl;
+      if (symboltable_.count(tac->target.reg().name()) == 0) {
+        // Add it to the map then create a spot for it (if its a function)
+        symboltable_.insert(std::pair<std::string, int>(
+        tac->target.reg().name(), -8+-8*(symboltable_.size()+1)));
+        if (currscope_ == FUNCTION) {
+          outfile_ << "\n\t# Creating space for " << tac->target.reg().name()
+            << " on the stack" << std::endl;
+          outfile_ << "\tsub $8, %rsp" << std::endl;
+          outfile_ << "\tmov %rax, -" <<
+            std::to_string(8+symboltable_.size()*8) << "(%rbp)\n" << std::endl;
+        }
+      }
 
-        // Add it to the set, then call the print function
+      outfile_ << "\t# Loading a value into variable "
+        + tac->target.reg().name() << std::endl;
+      ClearRegister("rbx");
+      outfile_ << "\tpop %rbx" << std::endl;
+      outfile_ << "\tmov %rbx, "
+        << VariableNameHelper(tac->target.reg().name()) << "" << std::endl;
+      outfile_ << "\tpush %rbx" << std::endl;
+
+      // Add it to the set, then call the print function
+      if (currscope_ == GLOBAL) {
         assignmentset_.insert(tac->target.reg().name());
         outfile_ << "\tmov %rbx, %rax\n" << std::endl;
         // Call on correct print function
@@ -225,10 +261,9 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
           << std::endl;
         outfile_ << "\tcall print" + tac->target.reg().name() << std::endl;
         outfile_ << "\n\t# Returning from printing "
-          << tac->target.reg().name() << "\n" << std::endl;
-      } else {
-         // We're inside a function
+          << tac->target.reg().name() << std::endl;
       }
+      outfile_ << std::endl;
       break;
     case FUNARGLOAD:
       // Here we're moving arguments loaded into the stack before the
@@ -254,6 +289,18 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
     case FUNRETLOAD:
       // All we do here is move the value from the function to the correct
       // variable
+      if (symboltable_.count(tac->target.reg().name()) == 0) {
+        // Add it to the map then create a spot for it (if its a function)
+        symboltable_.insert(std::pair<std::string, int>(
+        tac->target.reg().name(), -8+-8*(symboltable_.size()+1)));
+        if (currscope_ == FUNCTION) {
+          outfile_ << "\n\t# Creating space for " << tac->target.reg().name()
+            << " on the stack" << std::endl;
+          outfile_ << "\tsub $8, %rsp" << std::endl;
+          outfile_ << "\tmov %rax, -" <<
+            std::to_string(8+symboltable_.size()*8) << "(%rbp)\n" << std::endl;
+        }
+      }
       outfile_ << "\t# Returning from function and loading value" << std::endl;
       outfile_ << "\tmov %rax, " <<
         VariableNameHelper(tac->target.reg().name()) << "\n" << std::endl;
@@ -386,34 +433,34 @@ void CodeGen::GenerateBinaryExprHelper(
   std::unique_ptr<ThreeAddressCode> tac) {
   // Shouldn't have to check it it's been assigned yet
   // Lowerer should have done that
-  RegisterType arg1type = tac->arg1.reg().type();
-  RegisterType arg2type = tac->arg2.reg().type();
+  // RegisterType arg1type = tac->arg1.reg().type();
+  // RegisterType arg2type = tac->arg2.reg().type();
 
-  if ( arg1type == VARIABLEREG && arg2type == VARIABLEREG ) {
-    // Do a double load from the variable names
-    outfile_ << " btwn two variables\n";
-    outfile_ << "\tmov " << VariableNameHelper(tac->arg1.reg().name())
-      << ", %rax" << std::endl;
-    outfile_ << "\tmov " << VariableNameHelper(tac->arg2.reg().name())
-      << ", %rbx" << std::endl;
-  } else if ( arg1type == VARIABLEREG && arg2type == VIRTUALREG ) {
-      // Load from the first variable
-      outfile_ << " btwn var,int\n";
-      outfile_ << "\tmov " << VariableNameHelper(tac->arg1.reg().name())
-        << ", %rax" << std::endl;
-      outfile_ << "\tpop %rbx" << std::endl;
-  } else if ( arg1type == VIRTUALREG && arg2type == VARIABLEREG ) {
-      // Load from the second variable
-      outfile_ << " btwn int, var\n";
-      outfile_ << "\tmov " << VariableNameHelper(tac->arg2.reg().name())
-        << ", %rbx" << std::endl;
-      outfile_ << "\tpop %rax" << std::endl;
-  } else {
+  // if ( arg1type == VARIABLEREG && arg2type == VARIABLEREG ) {
+  //   // Do a double load from the variable names
+  //   outfile_ << " btwn two variables\n";
+  //   outfile_ << "\tmov " << VariableNameHelper(tac->arg1.reg().name())
+  //     << ", %rax" << std::endl;
+  //   outfile_ << "\tmov " << VariableNameHelper(tac->arg2.reg().name())
+  //     << ", %rbx" << std::endl;
+  // } else if ( arg1type == VARIABLEREG && arg2type == VIRTUALREG ) {
+  //     // Load from the first variable
+  //     outfile_ << " btwn var,int\n";
+  //     outfile_ << "\tmov " << VariableNameHelper(tac->arg1.reg().name())
+  //       << ", %rax" << std::endl;
+  //     outfile_ << "\tpop %rbx" << std::endl;
+  // } else if ( arg1type == VIRTUALREG && arg2type == VARIABLEREG ) {
+  //     // Load from the second variable
+  //     outfile_ << " btwn int, var\n";
+  //     outfile_ << "\tmov " << VariableNameHelper(tac->arg2.reg().name())
+  //       << ", %rbx" << std::endl;
+  //     outfile_ << "\tpop %rax" << std::endl;
+  // } else {
       // double pop from stack
       outfile_ << " btwn int, int\n";
       outfile_ << "\tpop %rbx" << std::endl;  // rbx = right
       outfile_ << "\tpop %rax" << std::endl;  // rax = left
-  }
+  // }
 }
 
 std::string CodeGen::VariableNameHelper(std::string variablename) {
@@ -421,9 +468,16 @@ std::string CodeGen::VariableNameHelper(std::string variablename) {
     return variablename;
   } else {
     // We're inside a function so consult the map
-    std::string mappedname = std::to_string(
-      symboltable_.find(variablename)->second) + "(%rbp)";
-    return mappedname;
+    if (symboltable_.count(variablename) == 1) {
+      std::string mappedname = std::to_string(
+        symboltable_.find(variablename)->second) + "(%rbp)";
+      return mappedname;
+    } else {
+      // something bad happened
+      std::cerr << "Variable name helper could not find the mapping for "
+        << variablename <<" \n";
+      exit(1);
+    }
   }
 }
 
@@ -439,6 +493,9 @@ void CodeGen::Generate(std::vector
 
     switch (opcode) {
       case INTLOAD:
+        GenerateLoadInstructions(std::move(code));
+        break;
+      case VARLOAD:
         GenerateLoadInstructions(std::move(code));
         break;
       case VARASSIGNLOAD:
@@ -536,7 +593,9 @@ void CodeGen::Generate(std::vector
         break;
       case FUNRETEP:
         outfile_ << "\t# FunctionRetEpilogue (Restore Stack)" << std::endl;
-        outfile_ << "\tadd $" << code->arg1.value() * 8 << "\n" << std::endl;
+        outfile_ << "\tadd $" << code->arg1.value() * 8 <<
+          ", %rsp" << std::endl;
+        outfile_ << "\tcall printfunctionret\n" << std::endl;
         break;
       case FUNDEF:
         // Change scope
@@ -553,9 +612,10 @@ void CodeGen::Generate(std::vector
         break;
       case FUNEPILOGUE:
 
-        // Do a correct load lol
-
         outfile_ << "\t# Function Epilogue " << std::endl;
+        // Do a correct load lol
+        outfile_ << "\tpop %rax" << std::endl;
+
         outfile_ << "\tpop %rbx" << std::endl;
         outfile_ << "\tmov %rbp, %rsp" << std::endl;
         outfile_ << "\tpop %rbp" << std::endl;

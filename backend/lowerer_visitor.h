@@ -49,7 +49,7 @@ enum ChildType {
 
 class LowererVisitor : public AstVisitor {
  public:
-  LowererVisitor() : counter_() {}
+  LowererVisitor() : counter_(), currvariabletype_(RIGHTHAND) {}
 
   std::string GetOutput();
 
@@ -133,6 +133,7 @@ class LowererVisitor : public AstVisitor {
   std::set<std::string> globalset_;
   ChildType lastchildtype_;
   struct Counter counter_;
+  VariableType currvariabletype_;
 };
 
 }  // namespace backend

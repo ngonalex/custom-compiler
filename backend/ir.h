@@ -67,6 +67,11 @@ enum Scope {
   FUNCTION
 };
 
+enum VariableType {
+  LEFTHAND,
+  RIGHTHAND,
+};
+
 class Label {
  public:
   explicit Label(std::string labelname) : name_(labelname) {}
