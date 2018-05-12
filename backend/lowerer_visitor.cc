@@ -158,6 +158,11 @@ void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
   std::set<std::string> originalglobalset(globalset_);
   globalset_.clear();
 
+  // We don't really need to do this but this may change later
+  // Save the state of the totalset
+  std::set<std::string> originaltotalset(totalset_);
+  totalset_.clear();
+
   // Move arguments into the local stack
   currvariabletype_ = LEFTHAND;
   for (int i = def.parameters().size() - 1 ; i >= 0 ; --i) {
@@ -172,15 +177,14 @@ void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
   }
 
   // Check how many variables there are after
-  int numoflocalvars = globalset_.size();
+  int numoflocalvars = totalset_.size();
+  std::cerr << "SIZE: " << numoflocalvars << std::endl;
   // Modify the prologue so it can create space for ALL local
   // variables
   blocks_[prologueindex]->arg1 = Operand(numoflocalvars);
 
-  currvariabletype_ = LEFTHAND;
-  // Load the ret value into rax
+  // Eval the arithmetic expr (will get pushed to stack)
   def.retval().Visit(this);
-  currvariabletype_ = RIGHTHAND;
 
   // Create a returnblock
   CreateFunctionDefEpilogue(def.function_name());
@@ -302,11 +306,27 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
   // Restore the state of the global set
   globalset_ = originalset_;
 
-  // Check here if there's a new variable assigned in BOTH branches
-  if (localsets_[localsets_.size()-1] == localsets_[localsets_.size()-2]) {
-    // if that's the case then we can now safely copy one of the local sets
+  std::set<std::string> s1 = localsets_[localsets_.size()-1];
+  std::set<std::string> s2 = localsets_[localsets_.size()-2];
+  std::set<std::string> intersectionset(SetIntersectionHelper(s1, s2));
+  std::set<std::string> differenceset(SetDifferenceHelper(s1, s2));
+
+  std::cerr << "SIZE OF SET1: " << s1.size() << std::endl;
+  std::cerr << "SIZE OF SET2: " << s2.size() << std::endl;
+  std::cerr << "SIZE OF INTER SET: " << intersectionset.size() << std::endl;
+  std::cerr << "SIZE OF DIFF SET: " << differenceset.size() << std::endl;
+
+  totalset_.insert(intersectionset.begin(), intersectionset.end());
+  totalset_.insert(differenceset.begin(), differenceset.end());
+
+  // Check here if there's are new variable assigned in BOTH branches
+  if (differenceset.size() == 0) {
+    // we can now safely copy one of the local sets
     // as a globalset
     globalset_ = localsets_[localsets_.size()-1];
+  } else {
+    // otherwise use only the intersection set
+    globalset_ = intersectionset;
   }
 
   // Delete the last two
@@ -346,10 +366,22 @@ void LowererVisitor::VisitLoop(const Loop& loop) {
     statement->Visit(this);
   }
 
+  std::set<std::string> intersectionset(SetIntersectionHelper(originalset_,
+    globalset_));
+  std::set<std::string> differenceset(SetDifferenceHelper(originalset_,
+    globalset_));
+
+  // Add set difference to the totalset
+  totalset_.insert(intersectionset.begin(), intersectionset.end());
+  totalset_.insert(differenceset.begin(), differenceset.end());
+
   // Not as tested as the conditional version
-  if (globalset_ != originalset_) {
-    std::cerr << "Unassigned Variable Detected (Loop)\n";
-    exit(1);
+  if (differenceset.size() == 0) {
+    std::cerr << "Unassigned Variable Detected (Loop)"
+      <<" may cause problems later\n";
+
+    // reset the global set
+    globalset_ = originalset_;
   }
 
   // Jump to the loop again
@@ -364,6 +396,7 @@ void LowererVisitor::VisitAssignment(const Assignment& assignment) {
   currvariabletype_ = LEFTHAND;
   assignment.lhs().Visit(const_cast<LowererVisitor*>(this));
   currvariabletype_ = RIGHTHAND;
+
   // assign the right hand side to be equal to the left hand side
   // The latest vector addition is the final register to be set to the
   // string name
@@ -679,6 +712,23 @@ void LowererVisitor::BinaryOperatorHelper(Type type,
 
   ++counter_.variablecount;
   lastchildtype_ = INTCHILD;
+}
+
+std::set<std::string> LowererVisitor::SetDifferenceHelper(
+  std::set<std::string> set1, std::set<std::string> set2) {
+  std::set<std::string> differenceset;
+  set_symmetric_difference(set1.begin(), set1.end(), set2.begin(), set2.end(),
+    std::inserter(differenceset, differenceset.begin()));
+    return differenceset;
+}
+
+std::set<std::string> LowererVisitor::SetIntersectionHelper(
+  std::set<std::string> set1, std::set<std::string> set2) {
+    // get the intersection of the two sets
+    std::set<std::string> intersectionset;
+    set_intersection(set1.begin(), set1.end(), set2.begin(), set2.end(),
+    std::inserter(intersectionset, intersectionset.begin()));
+    return intersectionset;
 }
 
 

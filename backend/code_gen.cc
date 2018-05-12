@@ -242,7 +242,9 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
       outfile_ << "\tpop %rbx" << std::endl;
       outfile_ << "\tmov %rbx, "
         << VariableNameHelper(tac->target.reg().name()) << "" << std::endl;
-      outfile_ << "\tpush %rbx" << std::endl;
+
+      // This currently makes it work. IT SHOuLD NOT WORK
+      // outfile_ << "\tpush %rbx" << std::endl;
 
       // Add it to the set, then call the print function
       if (currscope_ == GLOBAL) {
@@ -284,13 +286,15 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
         // Add it to the map then create a spot for it (if its a function)
         symboltable_.insert(std::pair<std::string, int>(
         tac->target.reg().name(), -8+-8*(symboltable_.size()+1)));
-        if (currscope_ == FUNCTION) {
-          outfile_ << "\t# Creating space for " << tac->target.reg().name()
-            << " on the stack" << std::endl;
-          outfile_ << "\tsub $8, %rsp" << std::endl;
-          outfile_ << "\tmov %rax, -" <<
-            std::to_string(8+symboltable_.size()*8) << "(%rbp)\n" << std::endl;
-        }
+
+        // Shouldn't need this anymore
+        // if (currscope_ == FUNCTION) {
+        //   outfile_ << "\t# Creating space for " << tac->target.reg().name()
+        //     << " on the stack" << std::endl;
+        //   outfile_ << "\tsub $8, %rsp" << std::endl;
+        //   outfile_ << "\tmov %rax, -" <<
+        //   std::to_string(8+symboltable_.size()*8) << "(%rbp)\n" << std::endl;
+        // }
       }
       outfile_ << "\t# Returning from function and loading value" << std::endl;
       outfile_ << "\tmov %rax, " <<
@@ -549,30 +553,36 @@ void CodeGen::Generate(std::vector
       // Note to self abstract jumps out later
       case JUMP:
         outfile_ << "\t# JUMP\n";
-        outfile_ << "\tjmp " << code->target.label().name() << std::endl;
+        outfile_ << "\tjmp " << code->target.label().name()
+          << "\n" << std::endl;
         break;
       case JEQUAL:
         outfile_ << "\t# Jump on Equal\n";
-        outfile_ << "\tje " << code->target.label().name() << std::endl;
+        outfile_ << "\tje " << code->target.label().name() << "\n" << std::endl;
         break;
       case JNOTEQUAL:
         outfile_ << "\t# Jump on Not Equal\n";
-        outfile_ << "\tjne " << code->target.label().name() << std::endl;
+        outfile_ << "\tjne " << code->target.label().name()
+          << "\n" << std::endl;
         break;
       case JGREATER:
         outfile_ << "\t# Jump on greater than\n";
-        outfile_ << "\tjg " << code->target.label().name() << std::endl;
+        outfile_ << "\tjg " << code->target.label().name()
+          << "\n" << std::endl;
         break;
       case JGREATEREQ:
         outfile_ << "\t# Jump on greater or equal\n";
-        outfile_ << "\tjge " << code->target.label().name() << std::endl;
+        outfile_ << "\tjge " << code->target.label().name()
+          << "\n" << std::endl;
         break;
       case JLESS:
         outfile_ << "\t# Jump on less than\n";
-        outfile_ << "\tjl " << code->target.label().name() << std::endl;
+        outfile_ << "\tjl " << code->target.label().name()
+          << "\n" << std::endl;
       case JLESSEQ:
         outfile_ << "\t# Jump on less or equal\n";
-        outfile_ << "\tjle " << code->target.label().name() << std::endl;
+        outfile_ << "\tjle " << code->target.label().name()
+          << "\n" << std::endl;
         break;
       case LABEL:
         outfile_ << code->target.label().name() << ":"   << std::endl;

@@ -9,5 +9,4 @@ bazel-*
 .xcodeproj
 *.code-workspace
 *.txt
-.out
-*.out
+a.out

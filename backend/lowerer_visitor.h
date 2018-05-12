@@ -103,6 +103,10 @@ class LowererVisitor : public AstVisitor {
   // bool CheckVarFlag() {return variableflag_;}
   // void ClearVarFlag() {variableflag_ = false;}
   Register GetArgument(ChildType type);
+  std::set<std::string> SetDifferenceHelper(std::set<std::string> set1,
+    std::set<std::string> set2);
+  std::set<std::string> SetIntersectionHelper(std::set<std::string> set1,
+    std::set<std::string> set2);
 
   std::vector<std::unique_ptr<ThreeAddressCode>> GetIR() {
     return std::move(blocks_);
@@ -130,10 +134,12 @@ class LowererVisitor : public AstVisitor {
   std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks_;
   std::stack<std::string> variablestack_;
   std::vector<std::set<std::string>> localsets_;
+  std::set<std::string> totalset_;
   std::set<std::string> globalset_;
   ChildType lastchildtype_;
   struct Counter counter_;
   VariableType currvariabletype_;
+  Scope currscope_;
 };
 
 }  // namespace backend
