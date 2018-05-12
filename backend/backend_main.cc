@@ -53,7 +53,7 @@ int main() {
 
   statements.push_back(std::move(
       make_unique<const Assignment>(make_unique<const VariableExpr>("bob"),
-                                    make_unique<const IntegerExpr>(3))));
+                                    make_unique<const IntegerExpr>(5))));
 
   auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
 
@@ -64,7 +64,9 @@ int main() {
       std::move(arguments))));
 
   auto ae = make_unique<const VariableExpr>("foo_retval");
-  auto foo_retval = make_unique<const VariableExpr>("foo_retval");
+  auto foo_retval = make_unique<const AddExpr>(
+    make_unique<const VariableExpr>("foo_retval"),
+    make_unique<const IntegerExpr>(0));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
   foo_params.push_back(std::move(make_unique<const VariableExpr>("bob")));

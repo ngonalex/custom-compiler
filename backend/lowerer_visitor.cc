@@ -152,6 +152,7 @@ void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
   // mov %rsp, %rbp
   // Potentially push rbx?
   CreateFunctionDefPrologue(def.function_name());
+  int prologueindex = blocks_.size()-1;
 
   // Use a function specific stack here to keep track of variables
   std::set<std::string> originalglobalset(globalset_);
@@ -170,8 +171,14 @@ void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
     statement->Visit(this);
   }
 
+  // Check how many variables there are after
+  int numoflocalvars = globalset_.size();
+  // Modify the prologue so it can create space for ALL local
+  // variables
+  blocks_[prologueindex]->arg1 = Operand(numoflocalvars);
+
   currvariabletype_ = LEFTHAND;
-  // Load the ret value into eax
+  // Load the ret value into rax
   def.retval().Visit(this);
   currvariabletype_ = RIGHTHAND;
 
@@ -273,10 +280,10 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
     statement->Visit(this);
   }
 
-  // // Push the set into the vector to check after
-  // localsets_.push_back(globalset_);
-  // // Restore the state of the globalset
-  // globalset_ = originalset_;
+  // Push the set into the vector to check after
+  localsets_.push_back(globalset_);
+  // Restore the state of the globalset
+  globalset_ = originalset_;
 
   // Create a jump to the continue
   std::string continuelabel = ContinueLabelHelper();
@@ -290,24 +297,21 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
     statement->Visit(this);
   }
 
-  // // Push the set into the vector
-  // localsets_.push_back(globalset_);
-  // // Restore the state of the global set
+  // Push the set into the vector
+  localsets_.push_back(globalset_);
+  // Restore the state of the global set
   globalset_ = originalset_;
 
-  // // Check here if there's an issue with unassigned variables
-  // if (localsets_[localsets_.size()-1] != localsets_[localsets_.size()-2]) {
-  //   std::cerr << "Unassigned Variable Detected\n";
-  //   exit(1);
-  // } else {
-  //   // Otherwise we can now safely copy one of the local sets
-  //   // as a globalset
-  //   globalset_ = localsets_[localsets_.size()-1];
+  // Check here if there's a new variable assigned in BOTH branches
+  if (localsets_[localsets_.size()-1] == localsets_[localsets_.size()-2]) {
+    // if that's the case then we can now safely copy one of the local sets
+    // as a globalset
+    globalset_ = localsets_[localsets_.size()-1];
+  }
 
-  //   // Delete the last two
-  //   localsets_.pop_back();
-  //   localsets_.pop_back();
-  // }
+  // Delete the last two
+  localsets_.pop_back();
+  localsets_.pop_back();
 
   // TAC to jump to continue here
   CreateJumpBlock(continuelabel, JUMP);

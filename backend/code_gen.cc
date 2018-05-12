@@ -232,18 +232,10 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
       break;
     case VARASSIGNLOAD:
       if (symboltable_.count(tac->target.reg().name()) == 0) {
-        // Add it to the map then create a spot for it (if its a function)
+        // Add it to the map if its new
         symboltable_.insert(std::pair<std::string, int>(
         tac->target.reg().name(), -8+-8*(symboltable_.size()+1)));
-        if (currscope_ == FUNCTION) {
-          outfile_ << "\n\t# Creating space for " << tac->target.reg().name()
-            << " on the stack" << std::endl;
-          outfile_ << "\tsub $8, %rsp" << std::endl;
-          outfile_ << "\tmov %rax, -" <<
-            std::to_string(8+symboltable_.size()*8) << "(%rbp)\n" << std::endl;
-        }
       }
-
       outfile_ << "\t# Loading a value into variable "
         + tac->target.reg().name() << std::endl;
       ClearRegister("rbx");
@@ -257,10 +249,10 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
         assignmentset_.insert(tac->target.reg().name());
         outfile_ << "\tmov %rbx, %rax\n" << std::endl;
         // Call on correct print function
-        outfile_ << "\t# Going to print " << tac->target.reg().name() << "\n"
+        outfile_ << "\t# Going to print " << tac->target.reg().name()
           << std::endl;
         outfile_ << "\tcall print" + tac->target.reg().name() << std::endl;
-        outfile_ << "\n\t# Returning from printing "
+        outfile_ << "\t# Returning from printing "
           << tac->target.reg().name() << std::endl;
       }
       outfile_ << std::endl;
@@ -274,7 +266,6 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
         << " into the stack" << std::endl;
       outfile_ << "\tmov " << std::to_string(8+argumentnum*8) << "(%rbp), %rax"
         << std::endl;
-      outfile_ << "\tsub $8, %rsp" << std::endl;
       outfile_ << "\tmov %rax, -" << std::to_string(8+argumentnum*8)
         << "(%rbp)\n" << std::endl;
       // Include it in the symbol table
@@ -294,7 +285,7 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
         symboltable_.insert(std::pair<std::string, int>(
         tac->target.reg().name(), -8+-8*(symboltable_.size()+1)));
         if (currscope_ == FUNCTION) {
-          outfile_ << "\n\t# Creating space for " << tac->target.reg().name()
+          outfile_ << "\t# Creating space for " << tac->target.reg().name()
             << " on the stack" << std::endl;
           outfile_ << "\tsub $8, %rsp" << std::endl;
           outfile_ << "\tmov %rax, -" <<
@@ -608,7 +599,10 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tpush %rbp" << std::endl;
         outfile_ << "\tmov %rsp, %rbp" << std::endl;
         // May be unneeded
-        outfile_ << "\tpush %rbx\n" << std::endl;
+        outfile_ << "\tpush %rbx" << std::endl;
+
+        outfile_ << "\tsub $" << code->arg1.value()*8 << ", %rsp\n"
+          << std::endl;
         break;
       case FUNEPILOGUE:
 
