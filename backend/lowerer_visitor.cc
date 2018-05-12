@@ -327,7 +327,7 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
   } else {
     // otherwise use only the intersection set
     std::cerr << "A variable assignment in only one branch has been detected"
-      << " may cause problems later" << std::endl;
+      << ", may cause problems later" << std::endl;
     globalset_ = intersectionset;
   }
 
@@ -377,10 +377,9 @@ void LowererVisitor::VisitLoop(const Loop& loop) {
   totalset_.insert(intersectionset.begin(), intersectionset.end());
   totalset_.insert(differenceset.begin(), differenceset.end());
 
-  // Not as tested as the conditional version
   if (differenceset.size() == 0) {
     std::cerr << "Unassigned Variable Detected (Loop)"
-      <<" may cause problems later\n";
+      <<", may cause problems later\n";
 
     // reset the global set
     globalset_ = originalset_;
