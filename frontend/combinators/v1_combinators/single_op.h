@@ -10,4 +10,4 @@ public:
 	virtual ParseStatus parse(std::string inputProgram);
 };
 
-#endif SINGLE_OP_H_
+#endif // SINGLE_OP_H_

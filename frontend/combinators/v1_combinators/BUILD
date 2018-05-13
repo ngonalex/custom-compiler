@@ -1,8 +1,8 @@
 cc_library(
 	name = "combinators",
 	copts = ["-Wall -g"],
-	hdrs = ["single_char.h", "single_digit.h", "single_op.h"],
-	srcs = ["single_char.cc", "single_digit.cc", "single_op.cc"],
+	hdrs = ["single_char.h", "single_digit.h", "single_op.h", "ae.h", "close_paren.h", "num_parser.h", "open_paren.h"],
+	srcs = ["single_char.cc", "single_digit.cc", "single_op.cc", "ae.cc", "close_paren.cc", "num_parser.cc", "open_paren.cc"],
 	deps = ["//utility", "//frontend/combinators/basic_combinators", "//abstract_syntax:abstract_syntax",
 	"//abstract_syntax:print_visitor_v1"],
 	visibility = ["//visibility:public"],

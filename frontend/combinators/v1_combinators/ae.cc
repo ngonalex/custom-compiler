@@ -1,10 +1,10 @@
 #include "frontend/combinators/v1_combinators/ae.h"
-#include "frontend/combinator/v1_combinators/open_paren.h"
-#include "frontend/combinator/v1_combinators/close_paren.h"
-#include "frontend/combinator/v1_combinators/num_parser.h"
-#include "frontend/combinator/v1_combinators/single_op.h"
-#include "frontend/combinators/v1_combinators/and_combinator.h"
-#include "frontend/combinators/v1_combinators/or_combinator.h"
+#include "frontend/combinators/v1_combinators/open_paren.h"
+#include "frontend/combinators/v1_combinators/close_paren.h"
+#include "frontend/combinators/v1_combinators/num_parser.h"
+#include "frontend/combinators/v1_combinators/single_op.h"
+#include "frontend/combinators/basic_combinators/and_combinator.h"
+#include "frontend/combinators/basic_combinators/or_combinator.h"
 
 #define super NullParser
 

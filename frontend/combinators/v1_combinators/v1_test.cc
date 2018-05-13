@@ -8,6 +8,12 @@
 #include "frontend/combinators/v1_combinators/single_op.h"
 #include "frontend/combinators/basic_combinators/zero_or_more_combinator.h"
 #include "frontend/combinators/basic_combinators/one_or_more_combinator.h"
+#include "frontend/combinators/v1_combinators/ae.h"
+#include "frontend/combinators/v1_combinators/close_paren.h"
+#include "frontend/combinators/v1_combinators/num_parser.h"
+#include "frontend/combinators/v1_combinators/open_paren.h"
+
+
 
 
 #include "gtest/gtest.h"
@@ -160,4 +166,15 @@ TEST(Combinators, FailOneOrMoreCombinator) {
   result.remainingCharacters = "ab1cd";
 
   EXPECT_EQ(oneOrMore.parse("ab1cd"), result);
+}
+
+
+// open_paren test
+TEST(Combinators, OpenParen) {
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "abc";
+  OpenParenParser test;f
+
+  EXPECT_EQ(test.parse("(abc"), result);
 }

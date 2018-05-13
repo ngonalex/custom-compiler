@@ -8,7 +8,7 @@ ParseStatus OpenParenParser::parse(std::string inputProgram) {
 	}
 
 	ParseStatus status;
-	if ((inputProgram[0] == '(') {
+	if (inputProgram[0] == '(') {
 		status.status = true;
 		status.remainingCharacters = inputProgram.erase(0, 1);
 	} else {
