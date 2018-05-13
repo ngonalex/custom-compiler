@@ -377,7 +377,7 @@ void LowererVisitor::VisitLoop(const Loop& loop) {
   totalset_.insert(intersectionset.begin(), intersectionset.end());
   totalset_.insert(differenceset.begin(), differenceset.end());
 
-  if (differenceset.size() == 0) {
+  if (differenceset.size() > 0) {
     std::cerr << "Unassigned Variable Detected (Loop)"
       <<", may cause problems later\n";
 
