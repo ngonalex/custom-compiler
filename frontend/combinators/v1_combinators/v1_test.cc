@@ -201,3 +201,12 @@ TEST(Combinators, NumParser) {
   EXPECT_EQ(test.parse("1218391abc"), result);
 }
 
+TEST(Combinators, AE) {
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "";
+  AEParser test;
+  
+  EXPECT_EQ(test.parse("(2+3)"), result);
+}
+
