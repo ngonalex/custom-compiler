@@ -1,5 +1,5 @@
-#ifndef TERM_EXPR_H
-#define TERM_EXPR_H
+#ifndef TERM_EXPR_H_
+#define TERM_EXPR_H_
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
