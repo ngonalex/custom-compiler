@@ -112,6 +112,27 @@ TEST(Combinators, FailAddOp) {
   EXPECT_EQ(test.parse("*"), result);
 }
 
+// sub_op test
+TEST(Combinators, SubOp) {
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "";
+  AddSubOpParser test;
+
+  EXPECT_EQ(test.parse("-"), result);
+}
+
+// sub_op fail test
+TEST(Combinators, FailSubOp) {
+
+  ParseStatus result;
+  result.status = false;
+  result.remainingCharacters = "/";
+  AddSubOpParser test;
+
+  EXPECT_EQ(test.parse("/"), result);
+}
+
 // mul_op test
 TEST(Combinators, MulOp) {
   ParseStatus result;
@@ -131,6 +152,27 @@ TEST(Combinators, FailMulOp) {
   MulDivOpParser test;
 
   EXPECT_EQ(test.parse("-"), result);
+}
+
+// div_op test
+TEST(Combinators, DivOp) {
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "";
+  MulDivOpParser test;
+
+  EXPECT_EQ(test.parse("/"), result);
+}
+
+// mul_op fail test
+TEST(Combinators, FailDivOp) {
+
+  ParseStatus result;
+  result.status = false;
+  result.remainingCharacters = "+";
+  MulDivOpParser test;
+
+  EXPECT_EQ(test.parse("+"), result);
 }
 
 // Zero or more combinator test
