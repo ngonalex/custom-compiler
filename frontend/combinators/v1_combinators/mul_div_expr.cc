@@ -1,30 +1,30 @@
-#include "frontend/combinators/v1_combinators/mul_div_op.h"
+#include "frontend/combinators/v1_combinators/mul_div_expr.h"
 
 #define super NullParser
 
-ParseStatus MulDivOpParser::parse(std::string inputProgram) {
+ParseStatus MulDivExprParser::parse(std::string inputProgram) {
 	if (inputProgram.size() == 0){
 		return super::parse(inputProgram);
 	}
-	ParseResult result;
-  
+	ParseStatus result;
+
   // ae
   TermExpr lhs;
-  lhs.parse(inputProgram);
+  ParseStatus teParseStatus = lhs.parse(inputProgram);
   // Append to result's AST here
-  
+
   // op
   MulDivOpParser op;
-  op.parse(lhs.result.remainingCharacters);
-    
+	ParseStatus mdParseStatus = op.parse(teParseStatus.remainingCharacters);
+
   // ae
   // Loop through until you're not hitting any more operators
-  while (op.result.status) {
+  while (mdParseStatus.status) {
     TermExpr rhs;
-    rhs.parse(op.result.remainingChracters);
+    ParseStatus rhsParseStatus = rhs.parse(mdParseStatus.remainingCharacters);
     // Append to result's AST here
-    result = op.parse(rhs.result.remainingChracters);
+    result = op.parse(rhsParseStatus.remainingCharacters);
   }
-  
+
   return result;
 }

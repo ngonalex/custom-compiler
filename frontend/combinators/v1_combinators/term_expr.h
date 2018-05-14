@@ -6,11 +6,14 @@
 #include "frontend/combinators/v1_combinators/add_sub_op.h"
 #include "frontend/combinators/v1_combinators/num_parser.h"
 #include "frontend/combinators/v1_combinators/add_sub_expr.h"
+#include "frontend/combinators/v1_combinators/open_paren.h"
+#include "frontend/combinators/v1_combinators/close_paren.h"
 
 
-class TermParser : NullParser {
+class TermExpr : NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram); 
+   virtual ParseStatus parse(std::string inputProgram);
+
 };
 
 #endif // TERM_EXPR_H

@@ -6,25 +6,25 @@ ParseStatus AddSubParser::parse(std::string inputProgram) {
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);
 	}
-  ParseResult result;
-  
+  ParseStatus result;
+
   // ae
-  MulDivExpr lhs;
-  lhs.parse(inputProgram);
+  MulDivExprParser lhs;
+  ParseStatus lhsParseStatus = lhs.parse(inputProgram);
   // Append to result's AST here
-  
+
   // op
   AddSubOpParser op;
-  op.parse(lhs.result.remainingCharacters);
-    
+  ParseStatus opParseStatus = op.parse(lhsParseStatus.remainingCharacters);
+
   // ae
   // Loop through until you're not hitting any more operators
-  while (op.result.status) {
-    MulDivExpr rhs;
-    rhs.parse(op.result.remainingChracters);
+  while (opParseStatus.status) {
+    MulDivExprParser rhs;
+    ParseStatus rhsParseStatus = rhs.parse(opParseStatus.remainingCharacters);
     // Append to result's AST here
-    result = op.parse(rhs.result.remainingCharacters)
+    result = op.parse(rhsParseStatus.remainingCharacters);
   }
-  
+
   return result;
 }

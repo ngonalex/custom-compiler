@@ -3,7 +3,8 @@
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
-
+#include "frontend/combinators/basic_combinators/parsestatus.h"
+#include "frontend/combinators/v1_combinators/term_expr.h"
 class MulDivOpParser : NullParser
 {
 public:

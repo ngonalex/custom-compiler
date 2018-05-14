@@ -6,37 +6,37 @@ ParseStatus TermExpr::parse(std::string inputProgram) {
   if (inputProgram.size() == 0) {
     return super::parse(inputProgram);
   }
-  ParseResult result;
-  
-  
+  ParseStatus result;
+
+
   // NUM
   NumParser num;
-  num.parse(inputProgram);
-  
+  ParseStatus numParseStatus = num.parse(inputProgram);
+
   // If it succesfully parses a num, return the result containing an AST node
-  if (num.result.status) {
-    return num.result;
+  if (numParseStatus.status) {
+    return numParseStatus;
   }
-  
+
   // PAREN EXPR
-  
+
   // (
   OpenParenParser open_paren;
-  open_paren.parse(inputProgram);
-  if (open_paren.result.status) {
+  ParseStatus openParseStatus = open_paren.parse(inputProgram);
+  if (openParseStatus.status) {
     // ae
     AddSubParser ae;
-    ae.parse(open_paren.result.remainingChracters);
+    ParseStatus aeParseStatus = ae.parse(openParseStatus.remainingCharacters);
     // )
-    CloseParenParse close_paren;
-    close_paren.parse(ae.result.remainingCharacters);
-    if (close_paren.result.status) {
+    CloseParenParser close_paren;
+    ParseStatus cpParseStatus = close_paren.parse(aeParseStatus.remainingCharacters);
+    if (cpParseStatus.status) {
       // Make the AST and store in in result
       result.status = true;
     }
     result.status = false;
   }
-  
+
   // FAILURE
   return result;
 }
