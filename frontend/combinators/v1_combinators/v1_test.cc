@@ -5,7 +5,8 @@
 #include "frontend/combinators/basic_combinators/parsestatus.h"
 #include "frontend/combinators/basic_combinators/and_combinator.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
-#include "frontend/combinators/v1_combinators/single_op.h"
+#include "frontend/combinators/v1_combinators/add_sub_op.h"
+#include "frontend/combinators/v1_combinators/mul_div_op.h"
 #include "frontend/combinators/basic_combinators/zero_or_more_combinator.h"
 #include "frontend/combinators/basic_combinators/one_or_more_combinator.h"
 #include "frontend/combinators/v1_combinators/ae.h"
@@ -90,25 +91,46 @@ TEST(Combinators, DigitOrCharCombinator) {
   EXPECT_EQ(orC.parse("a"), result);
 }
 
-// single_op test
-TEST(Combinators, SingleOp) {
+// add_op test
+TEST(Combinators, AddOp) {
   ParseStatus result;
   result.status = true;
   result.remainingCharacters = "";
-  SingleOperatorParser test;
+  AddSubOpParser test;
+
+  EXPECT_EQ(test.parse("+"), result);
+}
+
+// add_op fail test
+TEST(Combinators, FailAddOp) {
+
+  ParseStatus result;
+  result.status = false;
+  result.remainingCharacters = "*";
+  AddSubOpParser test;
 
   EXPECT_EQ(test.parse("*"), result);
 }
 
-// single_op fail test
-TEST(Combinators, FailSingleOp) {
+// mul_op test
+TEST(Combinators, MulOp) {
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "";
+  MulDivOpParser test;
+
+  EXPECT_EQ(test.parse("*"), result);
+}
+
+// mul_op fail test
+TEST(Combinators, FailMulOp) {
 
   ParseStatus result;
   result.status = false;
-  result.remainingCharacters = "a";
-  SingleDigitParser test;
+  result.remainingCharacters = "-";
+  MulDivOpParser test;
 
-  EXPECT_EQ(test.parse("a"), result);
+  EXPECT_EQ(test.parse("-"), result);
 }
 
 // Zero or more combinator test

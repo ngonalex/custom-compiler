@@ -9,6 +9,11 @@
 
 #define super NullParser
 
+/*
+	ae -> num_parser  ||  ae add_sub_op ae  || open_paren ae add_sub_op ae close_paren
+                    ||  ae mul_div_op ae  || open_paren ae mul_div_op ae close_paren
+*/
+
 ParseStatus AEParser::parse(std::string inputProgram) {
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);
@@ -17,6 +22,7 @@ ParseStatus AEParser::parse(std::string inputProgram) {
 	// first: num
 	NumParser num;
 	
+	/*
 	// second: ae op ae
 	AndCombinator ae_op;
 	AndCombinator ae_op_ae;
@@ -60,4 +66,7 @@ ParseStatus AEParser::parse(std::string inputProgram) {
 	first_second_third.secondParser = reinterpret_cast<NullParser *>(&opn_ae_op_ae_cls);
 	
 	return first_second_third.parse(inputProgram);
+	*/
+
+	return num.parse(inputProgram);
 }
