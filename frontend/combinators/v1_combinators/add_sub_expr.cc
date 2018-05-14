@@ -1,4 +1,4 @@
-#include "frontend/combinators/v1_combinators/num_parser.h"
+#include "frontend/combinators/v1_combinators/add_sub_expr.h"
 
 #define super NullParser
 
@@ -6,25 +6,26 @@ ParseStatus AddSubParser::parse(std::string inputProgram) {
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);
 	}
+  ParseResult result;
+  
+  // ae
   MulDivExpr lhs;
   lhs.parse(inputProgram);
+  // Append to result's AST here
   
-  SingleOperatorParser op;
+  // op
+  AddSubOpParser op;
   op.parse(lhs.result.remainingCharacters);
-  
-  // If it cannot parse an operator, just return the result from MulDiv
-  if (op.result.status == false) {
-    // return the AST result from MulDiv
+    
+  // ae
+  // Loop through until you're not hitting any more operators
+  while (op.result.status) {
+    MulDivExpr rhs;
+    rhs.parse(op.result.remainingChracters);
+    // Append to result's AST here
+    AddSubOpParser op;
+    result = op.parse(rhs.result.remainingCharacters)
   }
   
-  firstResult =
-  ParseStatus result = 
-  NumParser leftNum;
-  NumParser rightNum;
-  
-  OneOrMoreCombinator oneOrMore;
-	
-	oneOrMore.parser = reinterpret_cast<NullParser *>(&digitParser);
-	
-  return (oneOrMore.parse(inputProgram));
+  return result;
 }
