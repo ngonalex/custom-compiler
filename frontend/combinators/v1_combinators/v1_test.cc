@@ -178,3 +178,25 @@ TEST(Combinators, OpenParen) {
 
   EXPECT_EQ(test.parse("(abc"), result);
 }
+
+
+// close_paren test
+TEST(Combinators, CloseParen) {
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "abc";
+  CloseParenParser test;
+
+  EXPECT_EQ(test.parse(")abc"), result);
+}
+
+
+// num_parser test
+TEST(Combinators, NumParser) {
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "abc";
+  NumParser test;
+
+  EXPECT_EQ(test.parse("1abc"), result);
+}
