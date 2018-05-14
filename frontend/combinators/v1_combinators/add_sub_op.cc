@@ -3,8 +3,8 @@
 
 #define super NullParser
 
-ParseStatus AddSubOpParser::parse(std::string inputProgram){
-	if (inputProgram.size() == 0){
+ParseStatus AddSubOpParser::parse(std::string inputProgram) {
+	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);
 	}
 	ParseStatus status;

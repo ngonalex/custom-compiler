@@ -21,6 +21,18 @@ ParseStatus AEParser::parse(std::string inputProgram) {
 
 	// first: num
 	NumParser num;
+
+	AndCombinator ae_op;
+	AndCombinator ae_op_ae;
+
+	NumParser lhs_num;		// Is this
+	NumParser rhs_num;		// legal??!?
+	AddSubOpParser single_second;	
+	
+	ae_op.firstParser = reinterpret_cast<NullParser *>(&lhs_num);
+	ae_op.secondParser = reinterpret_cast<NullParser *>(&single_second);
+	ae_op_ae.firstParser = reinterpret_cast<NullParser *>(&ae_op);
+	ae_op_ae.secondParser = reinterpret_cast<NullParser *>(&rhs_num);
 	
 	/*
 	// second: ae op ae
@@ -29,7 +41,7 @@ ParseStatus AEParser::parse(std::string inputProgram) {
 
 	AEParser lhs_second;		// Is this
 	AEParser rhs_second;		// legal??!?
-	SingleOperatorParser single_second;	
+	AddSubOpParser single_second;	
 	
 	ae_op.firstParser = reinterpret_cast<NullParser *>(&lhs_second);
 	ae_op.secondParser = reinterpret_cast<NullParser *>(&single_second);
@@ -56,17 +68,18 @@ ParseStatus AEParser::parse(std::string inputProgram) {
 	opn_ae_op_ae.secondParser = reinterpret_cast<NullParser *>(&rhs_third);
 	opn_ae_op_ae_cls.firstParser = reinterpret_cast<NullParser *>(&opn_ae_op_ae);
 	opn_ae_op_ae_cls.secondParser = reinterpret_cast<NullParser *>(&close_paren);
-	
+	*/
 	OrCombinator first_second;
 	OrCombinator first_second_third;
 	
 	first_second.firstParser = reinterpret_cast<NullParser *>(&num);
 	first_second.secondParser = reinterpret_cast<NullParser *>(&ae_op_ae);
-	first_second_third.firstParser = reinterpret_cast<NullParser *>(&first_second);
-	first_second_third.secondParser = reinterpret_cast<NullParser *>(&opn_ae_op_ae_cls);
+	// first_second_third.firstParser = reinterpret_cast<NullParser *>(&first_second);
+	// first_second_third.secondParser = reinterpret_cast<NullParser *>(&opn_ae_op_ae_cls);
 	
-	return first_second_third.parse(inputProgram);
-	*/
+	// return first_second_third.parse(inputProgram);
+	return first_second.parse(inputProgram);
 
-	return num.parse(inputProgram);
+	// return num.parse(inputProgram);
+	// return ae_op_ae.parse(inputProgram);
 }
