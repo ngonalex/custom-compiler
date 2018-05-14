@@ -207,6 +207,6 @@ TEST(Combinators, AE) {
   result.remainingCharacters = "";
   AEParser test;
   
-  EXPECT_EQ(test.parse("(2+3)"), result);
+  EXPECT_EQ(test.parse("23"), result);
 }
 

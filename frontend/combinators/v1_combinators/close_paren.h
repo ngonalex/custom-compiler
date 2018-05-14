@@ -1,5 +1,5 @@
-#ifndef CLOSE_PAREN_H
-#define CLOSE_PAREN_H
+#ifndef CLOSE_PAREN_H_
+#define CLOSE_PAREN_H_
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"

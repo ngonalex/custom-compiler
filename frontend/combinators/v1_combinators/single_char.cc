@@ -2,7 +2,7 @@
 
 #define super NullParser
 
-ParseStatus SingleCharParser::parse(std::string inputProgram){
+ParseStatus SingleCharParser::parse(std::string inputProgram) {
 	if (inputProgram.size() == 0){
 		return super::parse(inputProgram);
 	}
