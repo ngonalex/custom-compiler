@@ -6,7 +6,7 @@ ParseStatus AddSubParser::parse(std::string inputProgram) {
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);
 	}
-  ParseResult result;
+  ParseStatus result;
   
   // ae
   MulDivExpr lhs;
@@ -23,7 +23,7 @@ ParseStatus AddSubParser::parse(std::string inputProgram) {
     MulDivExpr rhs;
     rhs.parse(op.result.remainingChracters);
     // Append to result's AST here
-    result = op.parse(rhs.result.remainingCharacters)
+    result = op.parse(rhs.result.remainingCharacters);
   }
   
   return result;

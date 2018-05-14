@@ -13,5 +13,9 @@ ParseStatus NumParser::parse(std::string inputProgram) {
 	
 	oneOrMore.parser = reinterpret_cast<NullParser *>(&digitParser);
 	
-  return (oneOrMore.parse(inputProgram));
+	// Parse the integer
+  ParseResult result = oneOrMore.parse(inputProgram);
+	// Make an Integer expression
+	result.ast = std::move(make_unique<IntegerExpr>(result.stoi(parsedCharacters)));
+	return result;
 }
