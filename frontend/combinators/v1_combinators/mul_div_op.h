@@ -4,7 +4,7 @@
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
 
-class SingleOperatorParser : NullParser
+class MulDivOpParser : NullParser
 {
 public:
 	virtual ParseStatus parse(std::string inputProgram);
