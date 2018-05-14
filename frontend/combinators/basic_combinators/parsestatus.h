@@ -19,4 +19,4 @@ public:
 	bool operator!=(const ParseStatus &b) const;
 };
 
-#endif PARSESTATUS_HJ
+#endif // PARSESTATUS_HJ

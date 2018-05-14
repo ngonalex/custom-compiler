@@ -12,4 +12,4 @@ public:
 	virtual ParseStatus parse(std::string inputProgram);
 };
 
-#endif ZERO_OR_MORE_COMBINATOR_H_
+#endif // ZERO_OR_MORE_COMBINATOR_H_

@@ -14,7 +14,7 @@ ParseStatus AEParser::parse(std::string inputProgram) {
 	}
 
 	// first: num
-	NumCombinator num;
+	NumParser num;
 	
 	// second: ae op ae
 	AndCombinator ae_op;
@@ -33,7 +33,7 @@ ParseStatus AEParser::parse(std::string inputProgram) {
 	AndCombinator opn_ae;
 	AndCombinator opn_ae_op;
 	AndCombinator opn_ae_op_ae;
-	AndCombiantor opn_ae_op_ae_cls;
+	AndCombinator opn_ae_op_ae_cls;
 	
 	OpenParenParser open_paren;
 	CloseParenParser close_paren;
@@ -51,7 +51,7 @@ ParseStatus AEParser::parse(std::string inputProgram) {
 	opn_ae_op_ae_cls.secondParser = reinterpret_cast<NullParser *>(&close_paren);
 	
 	OrCombinator first_second;
-	OrCombiantor first_second_third;
+	OrCombinator first_second_third;
 	
 	first_second.firstParser = reinterpret_cast<NullParser *>(&num);
 	first_second.secondParser = reinterpret_cast<NullParser *>(&ae_op_ae);

@@ -13,4 +13,4 @@ public:
 	virtual ParseStatus parse(std::string inputProgram);
 };
 
-#endif AND_COMBINATOR_H_
+#endif // AND_COMBINATOR_H_

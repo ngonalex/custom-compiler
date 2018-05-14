@@ -174,7 +174,7 @@ TEST(Combinators, OpenParen) {
   ParseStatus result;
   result.status = true;
   result.remainingCharacters = "abc";
-  OpenParenParser test;f
+  OpenParenParser test;
 
   EXPECT_EQ(test.parse("(abc"), result);
 }

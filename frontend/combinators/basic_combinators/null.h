@@ -10,4 +10,4 @@ public:
 	virtual ParseStatus parse(std::string inputProgram);
 };
 
-#endif NULL_PARSER_H
+#endif // NULL_PARSER_H

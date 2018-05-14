@@ -11,5 +11,5 @@ ParseStatus NumParser::parse(std::string inputProgram) {
   SingleDigitParser digitParser;
   OneOrMoreCombinator oneOrMore;
 
-  return (oneOrMore.parser);
+  return (oneOrMore.parse(inputProgram));
 }
