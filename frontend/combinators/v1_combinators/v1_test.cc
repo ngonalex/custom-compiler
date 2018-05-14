@@ -198,5 +198,6 @@ TEST(Combinators, NumParser) {
   result.remainingCharacters = "abc";
   NumParser test;
 
-  EXPECT_EQ(test.parse("1abc"), result);
+  EXPECT_EQ(test.parse("1218391abc"), result);
 }
+

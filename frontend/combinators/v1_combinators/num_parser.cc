@@ -10,6 +10,8 @@ ParseStatus NumParser::parse(std::string inputProgram) {
 	}
   SingleDigitParser digitParser;
   OneOrMoreCombinator oneOrMore;
-
+	
+	oneOrMore.parser = reinterpret_cast<NullParser *>(&digitParser);
+	
   return (oneOrMore.parse(inputProgram));
 }
