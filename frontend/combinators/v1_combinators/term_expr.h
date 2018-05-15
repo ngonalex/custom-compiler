@@ -8,12 +8,11 @@
 #include "frontend/combinators/v1_combinators/add_sub_expr.h"
 #include "frontend/combinators/v1_combinators/open_paren.h"
 #include "frontend/combinators/v1_combinators/close_paren.h"
+#include "frontend/combinators/v1_combinators/negative_sign.h"
 
-
-class TermExpr : NullParser {
+class TermExprParser : NullParser {
  public:
    virtual ParseStatus parse(std::string inputProgram);
-
 };
 
 #endif // TERM_EXPR_H

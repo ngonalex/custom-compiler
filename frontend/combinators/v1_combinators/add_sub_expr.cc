@@ -2,29 +2,46 @@
 
 #define super NullParser
 
-ParseStatus AddSubParser::parse(std::string inputProgram) {
+ParseStatus AddSubExprParser::parse(std::string inputProgram) {
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);
 	}
-  ParseStatus result;
-
   // ae
   MulDivExprParser lhs;
-  ParseStatus lhsParseStatus = lhs.parse(inputProgram);
-  // Append to result's AST here
+  ParseStatus mdParseStatus = lhs.parse(inputProgram);
+	if (mdParseStatus.status) {
+		// op
+	  AddSubOpParser op;
+		ParseStatus asParseStatus = op.parse(mdParseStatus.remainingCharacters);
+		ParseStatus result = mdParseStatus;
+		while (asParseStatus.status) {
+	    TermExpr rhs;
+	    ParseStatus rhsParseStatus = rhs.parse(asParseStatus.remainingCharacters);
+	    result.ast = std::move(make_node((asParseStatus.parsedChracters), 
+														 std::move(result.ast), 
+														 std::move(rhsParseStatus.ast)));
+	    asParseStatus = op.parse(rhsParseStatus.remainingCharacters);
+	  }
+		return result;	// Returning Sucess on MulDivExpr or AddSubExpr
+	}
+	return lhsParseStatus;	// Returning Failure on MulDivExpr
+}
 
-  // op
-  AddSubOpParser op;
-  ParseStatus opParseStatus = op.parse(lhsParseStatus.remainingCharacters);
-
-  // ae
-  // Loop through until you're not hitting any more operators
-  while (opParseStatus.status) {
-    MulDivExprParser rhs;
-    ParseStatus rhsParseStatus = rhs.parse(opParseStatus.remainingCharacters);
-    // Append to result's AST here
-    result = op.parse(rhsParseStatus.remainingCharacters);
+// Creating the AST Node
+std::unique_ptr<const AstNode> AddSubExprParser::make_node(std::string op, 
+  std::unique_ptr<const AstNode> first_leaf,
+  std::unique_ptr<const AstNode> second_leaf) {
+  switch(op) {
+    case "+": {
+      return make_unique<AddExpr>(std::move(first_leaf), 
+																			 std::move(second_leaf));
+    }
+    case "-": {
+      return make_unique<SubtractExpr>(std::move(first_leaf), 
+																	   std::move(second_leaf));
+    }
+    default: {
+      return nullptr;
+    }
   }
-
-  return result;
 }

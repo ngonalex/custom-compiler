@@ -4,7 +4,7 @@
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
 
-class AEParser : NullParser {
+class ArithExprParser : NullParser {
  public:
    virtual ParseStatus parse(std::string inputProgram); 
 };
