@@ -6,7 +6,7 @@
 
 class AEParser : NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram); 
+   virtual ParseStatus parse(std::string inputProgram);
 };
 
 #endif // AE_H_
