@@ -2,6 +2,8 @@
 
 #define super NullParser
 
+using namespace cs160::frontend::AndCombinator;
+
 ParseStatus AndCombinator::parse(std::string inputProgram){
 	ParseStatus firstStatus = firstParser->parse(inputProgram);
 	if (!firstStatus.status){

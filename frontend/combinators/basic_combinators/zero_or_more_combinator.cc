@@ -2,6 +2,8 @@
 
 #define super NullParser
 
+using namespace cs160::frontend::CloseParenParser;
+
 ParseStatus ZeroOrMoreCombinator::parse(std::string inputProgram){
 
 	ParseStatus pStatus;

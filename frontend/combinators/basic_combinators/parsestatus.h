@@ -6,6 +6,11 @@
 
 #include <string>
 
+using namespace cs160::abstract_syntax::frontend;
+
+namespace cs160 {
+namespace frontend {
+
 class ParseStatus { // Super class
  public:
 	bool status;
@@ -24,4 +29,9 @@ class ParseStatus { // Super class
 	bool operator!=(const ParseStatus &b) const;
 };
 
+} // namespace frontend
+} // namespace cs160
+
 #endif // PARSESTATUS_H_
+
+
