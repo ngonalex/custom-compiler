@@ -113,7 +113,7 @@ TEST_F(LowererTest, NestedIntVisitationsWorkProperly) {
 }
 
 TEST_F(LowererTest, SimpleAssignmentTest) {
-  auto expr = make_unique<Assignment>(
+  auto expr = make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("x"),
     make_unique<IntegerExpr>(5));
 
@@ -124,7 +124,7 @@ TEST_F(LowererTest, SimpleAssignmentTest) {
 }
 
 TEST_F(LowererTest, AssignmentTest) {
-  auto expr = make_unique<Assignment>(
+  auto expr = make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("x"),
     make_unique<AddExpr>(
       make_unique<VariableExpr>("x"),
@@ -138,7 +138,7 @@ TEST_F(LowererTest, AssignmentTest) {
 }
 
 TEST_F(LowererTest, DoubleIntAssignmentTest) {
-  auto expr = make_unique<Assignment>(
+  auto expr = make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("x"),
     make_unique<AddExpr>(
       make_unique<IntegerExpr>(5),
@@ -157,7 +157,7 @@ TEST_F(LowererTest, DoubleIntAssignmentTest) {
 TEST_F(LowererTest, BasicProgramCreation) {
   Statement::Block statements;
 
-  statements.push_back(std::move(make_unique<Assignment>(
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("x"),
     make_unique<AddExpr>(
       make_unique<IntegerExpr>(5),
@@ -243,13 +243,13 @@ TEST_F(LowererTest, NestedLogicalsWithInts) {
 TEST_F(LowererTest, VariabletoVariableAssignmentTest) {
   Statement::Block statements;
 
-  statements.push_back(std::move(make_unique<Assignment>(
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("x"),
     make_unique<AddExpr>(
       make_unique<IntegerExpr>(5),
       make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(make_unique<Assignment>(
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("y"),
     make_unique<SubtractExpr>(
       make_unique<VariableExpr>("x"),
@@ -282,19 +282,19 @@ TEST_F(LowererTest, VariabletoVariableAssignmentTest) {
 TEST_F(LowererTest, ConditionalWithNestedLogicalsWithVariables) {
   Statement::Block statements;
 
-  statements.push_back(std::move(make_unique<Assignment>(
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("x"),
     make_unique<AddExpr>(
       make_unique<IntegerExpr>(5),
       make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(make_unique<Assignment>(
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("y"),
     make_unique<SubtractExpr>(
       make_unique<IntegerExpr>(5),
       make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(make_unique<Assignment>(
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("bob"),
     make_unique<AddExpr>(
       make_unique<VariableExpr>("y"),
@@ -368,19 +368,19 @@ TEST_F(LowererTest, ConditionalWithNestedLogicalsWithVariables) {
 TEST_F(LowererTest, LoopWithNestedLogicalsWithVariables) {
   Statement::Block statements;
 
-  statements.push_back(std::move(make_unique<Assignment>(
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("x"),
     make_unique<AddExpr>(
       make_unique<IntegerExpr>(5),
       make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(make_unique<Assignment>(
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("y"),
     make_unique<SubtractExpr>(
       make_unique<IntegerExpr>(5),
       make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(make_unique<Assignment>(
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("bob"),
     make_unique<AddExpr>(
       make_unique<VariableExpr>("y"),
@@ -453,25 +453,25 @@ TEST_F(LowererTest, ConditionalsWithTrueBranch) {
   Statement::Block statements;
   Statement::Block trueblock;
 
-  statements.push_back(std::move(make_unique<Assignment>(
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("x"),
     make_unique<AddExpr>(
       make_unique<IntegerExpr>(5),
       make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(make_unique<Assignment>(
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("y"),
     make_unique<SubtractExpr>(
       make_unique<IntegerExpr>(5),
       make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(make_unique<Assignment>(
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("bob"),
     make_unique<AddExpr>(
       make_unique<VariableExpr>("y"),
       make_unique<VariableExpr>("x")))));
 
-  trueblock.push_back(std::move(make_unique<Assignment>(
+  trueblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("bob"),
       make_unique<AddExpr>(
       make_unique<VariableExpr>("y"),
@@ -548,25 +548,25 @@ TEST_F(LowererTest, ConditionalsWithFalseBranch) {
   Statement::Block statements;
   Statement::Block falseblock;
 
-  statements.push_back(std::move(make_unique<Assignment>(
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("x"),
     make_unique<AddExpr>(
       make_unique<IntegerExpr>(5),
       make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(make_unique<Assignment>(
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("y"),
     make_unique<SubtractExpr>(
       make_unique<IntegerExpr>(5),
       make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(make_unique<Assignment>(
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("bob"),
     make_unique<AddExpr>(
       make_unique<VariableExpr>("y"),
       make_unique<VariableExpr>("x")))));
 
-  falseblock.push_back(std::move(make_unique<Assignment>(
+  falseblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("bob"),
       make_unique<AddExpr>(
       make_unique<VariableExpr>("y"),
@@ -644,31 +644,31 @@ TEST_F(LowererTest, ConditionalsWithBothBranch) {
   Statement::Block trueblock;
   Statement::Block falseblock;
 
-  statements.push_back(std::move(make_unique<Assignment>(
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("x"),
     make_unique<AddExpr>(
       make_unique<IntegerExpr>(5),
       make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(make_unique<Assignment>(
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("y"),
     make_unique<SubtractExpr>(
       make_unique<IntegerExpr>(5),
       make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(make_unique<Assignment>(
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("bob"),
     make_unique<AddExpr>(
       make_unique<VariableExpr>("y"),
       make_unique<VariableExpr>("x")))));
 
-  trueblock.push_back(std::move(make_unique<Assignment>(
+  trueblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("bob"),
       make_unique<AddExpr>(
       make_unique<VariableExpr>("y"),
       make_unique<VariableExpr>("x")))));
 
-  falseblock.push_back(std::move(make_unique<Assignment>(
+  falseblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("bob"),
       make_unique<SubtractExpr>(
       make_unique<VariableExpr>("y"),
@@ -748,25 +748,25 @@ TEST_F(LowererTest, LoopWithBody) {
   Statement::Block statements;
   Statement::Block loopbody;
 
-  statements.push_back(std::move(make_unique<Assignment>(
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("x"),
     make_unique<AddExpr>(
       make_unique<IntegerExpr>(5),
       make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(make_unique<Assignment>(
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("y"),
     make_unique<SubtractExpr>(
       make_unique<IntegerExpr>(5),
       make_unique<IntegerExpr>(10)))));
 
-  statements.push_back(std::move(make_unique<Assignment>(
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("bob"),
     make_unique<AddExpr>(
       make_unique<VariableExpr>("y"),
       make_unique<VariableExpr>("x")))));
 
-  loopbody.push_back(std::move(make_unique<Assignment>(
+  loopbody.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("bob"),
       make_unique<SubtractExpr>(
       make_unique<VariableExpr>("y"),

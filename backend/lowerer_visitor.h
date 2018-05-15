@@ -20,7 +20,6 @@ using cs160::abstract_syntax::backend::AddExpr;
 using cs160::abstract_syntax::backend::SubtractExpr;
 using cs160::abstract_syntax::backend::MultiplyExpr;
 using cs160::abstract_syntax::backend::DivideExpr;
-using cs160::abstract_syntax::backend::Assignment;
 using cs160::abstract_syntax::backend::Program;
 using cs160::abstract_syntax::backend::VariableExpr;
 using cs160::abstract_syntax::backend::LessThanExpr;
@@ -36,6 +35,9 @@ using cs160::abstract_syntax::backend::Loop;
 using cs160::abstract_syntax::backend::Conditional;
 using cs160::abstract_syntax::backend::FunctionCall;
 using cs160::abstract_syntax::backend::FunctionDef;
+using cs160::abstract_syntax::backend::Dereference;
+using cs160::abstract_syntax::version_5::AssignmentFromArithExp;
+using cs160::abstract_syntax::version_5::AssignmentFromNewTuple;
 using cs160::make_unique;
 
 namespace cs160 {
@@ -52,6 +54,11 @@ class LowererVisitor : public AstVisitor {
   LowererVisitor() : counter_(), currvariabletype_(RIGHTHAND) {}
 
   std::string GetOutput();
+
+  // V5
+  void VisitDereference(const Dereference& exp);
+  void VisitAssignmentFromArithExp(const AssignmentFromArithExp& assignment);
+  void VisitAssignmentFromNewTuple(const AssignmentFromNewTuple& assignment);
 
   // V4 (Program Updated)
   void VisitFunctionCall(const FunctionCall& call);
@@ -71,7 +78,7 @@ class LowererVisitor : public AstVisitor {
   void VisitLoop(const Loop& loop);
 
   // V2
-  void VisitAssignment(const Assignment& assignment);
+  // void VisitAssignment(const Assignment& assignment); 
   void VisitProgram(const Program& program);
   void VisitVariableExpr(const VariableExpr& exp);
 

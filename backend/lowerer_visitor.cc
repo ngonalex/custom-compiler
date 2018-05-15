@@ -110,6 +110,14 @@ std::string LowererVisitor::GetOutput() {
   return output;
 }
 
+void VisitDereference(const Dereference& exp){
+}
+
+
+void VisitAssignmentFromNewTuple(const AssignmentFromNewTuple& assignment){
+  
+}
+
 void LowererVisitor::VisitFunctionCall(const FunctionCall& call) {
   // - This DOES NOT Signal to code gen
   // CreateFunctionCallSignal(call.callee_name()));
@@ -392,7 +400,8 @@ void LowererVisitor::VisitLoop(const Loop& loop) {
   CreateLabelBlock(continuelabel);
 }
 
-void LowererVisitor::VisitAssignment(const Assignment& assignment) {
+void LowererVisitor::VisitAssignmentFromArithExp(
+  const AssignmentFromArithExp& assignment) {
   // Visit the left which will add its variable name to the stack
   currvariabletype_ = LEFTHAND;
   assignment.lhs().Visit(const_cast<LowererVisitor*>(this));
