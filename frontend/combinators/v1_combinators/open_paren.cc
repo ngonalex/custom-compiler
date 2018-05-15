@@ -2,6 +2,8 @@
 
 #define super NullParser
 
+using namespace cs160::frontend::OpenParenParser;
+
 ParseStatus OpenParenParser::parse(std::string inputProgram) {
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);

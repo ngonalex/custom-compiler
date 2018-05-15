@@ -2,6 +2,10 @@
 
 #define super NullParser
 
+using namespace cs160::frontend::ParseResult;
+using namespace cs160::frontend::TermExprParser;
+using namespace cs160::frontend::MulDivOpParser;
+
 ParseStatus MulDivExprParser::parse(std::string inputProgram) {
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);

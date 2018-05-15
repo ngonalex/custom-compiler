@@ -1,5 +1,5 @@
-#ifndef NEGATIVE_SIGN_PARSER_
-#define NEGATIVE_SIGN_PARSER_
+#ifndef NEGATIVE_SIGN_H_
+#define NEGATIVE_SIGN_H_
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
@@ -15,4 +15,4 @@ public:
 } // namespace frontend
 } // namespace cs160
 
-#endif // NEGATIVE_SIGN_PARSER_
+#endif // NEGATIVE_SIGN_H_
