@@ -5,10 +5,17 @@
 #include "frontend/combinators/basic_combinators/null.h"
 #include "frontend/combinators/basic_combinators/parsestatus.h"
 #include "frontend/combinators/v1_combinators/term_expr.h"
+
+namespace cs160 {
+namespace frontend {
+	
 class MulDivOpParser : NullParser
 {
 public:
 	virtual ParseStatus parse(std::string inputProgram);
 };
+
+} // namespace frontend
+} // namespace cs160
 
 #endif // MUL_DIV_OP_H_

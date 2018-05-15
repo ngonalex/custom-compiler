@@ -7,6 +7,9 @@
 #include "frontend/combinators/v1_combinators/mul_div_op.h"
 #include "frontend/combinators/v1_combinators/term_expr.h"
 
+namespace cs160 {
+namespace frontend {
+
 class MulDivExprParser : NullParser {
  public:
    virtual ParseStatus parse(std::string inputProgram);
@@ -14,5 +17,8 @@ class MulDivExprParser : NullParser {
      std::unique_ptr<const AstNode> first_leaf,
      std::unique_ptr<const AstNode> second_leaf); 
 };
+
+} // namespace frontend
+} // namespace cs160
 
 #endif // MUL_DIV_EXPR_H_
