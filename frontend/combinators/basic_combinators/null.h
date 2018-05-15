@@ -4,10 +4,15 @@
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/parsestatus.h"
 
-class NullParser
-{
-public:
+namespace cs160 {
+namespace frontend {
+	
+class NullParser {
+ public:
 	virtual ParseStatus parse(std::string inputProgram);
 };
+
+}	// namespace frontend
+}	// namespace cs160
 
 #endif // NULL_PARSER_H
