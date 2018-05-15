@@ -1,14 +1,19 @@
-#ifndef PARSESTATUS_H
-#define PARSESTATUS_H
+#ifndef PARSESTATUS_H_
+#define PARSESTATUS_H_
+
+#include "abstract_syntax/abstract_syntax.h"
+#include "utility/memory.h"
+
 #include <string>
 
 class ParseStatus { // Super class
-public:
+ public:
 	bool status;
 	std::string remainingCharacters;
 	std::string parsedCharacters;
 
 	// Only for the success case
+	std::unique_ptr<const AstNode> ast;
 
 	// Only for the failed case
 	std::string expectedCharacters;
@@ -19,4 +24,4 @@ public:
 	bool operator!=(const ParseStatus &b) const;
 };
 
-#endif // PARSESTATUS_HJ
+#endif // PARSESTATUS_H_

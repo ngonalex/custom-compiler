@@ -11,3 +11,4 @@ ParseStatus AndCombinator::parse(std::string inputProgram){
 	ParseStatus secondStatus = secondParser->parse(firstStatus.remainingCharacters);
 	return secondStatus;
 }
+
