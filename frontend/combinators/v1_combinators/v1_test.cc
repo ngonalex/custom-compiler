@@ -278,7 +278,7 @@ TEST(Combinators, AE) {
   ParseStatus result;
   result.status = true;
   result.remainingCharacters = "";
-  AEParser test;
+  ArithExprParser test;
 
   EXPECT_EQ(test.parse("2+3"), result);
 }

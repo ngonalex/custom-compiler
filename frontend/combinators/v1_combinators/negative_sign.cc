@@ -1,17 +1,17 @@
-#include "frontend/combinators/v1_combinators/mul_div_op.h"
+#include "frontend/combinators/v1_combinators/negative_sign.h"
 #include <string>
 
 #define super NullParser
 
-using namespace cs160::frontend::MulDivOpParser;
+using namespace cs160::frontend::NegativeParser;
 
-ParseStatus MulDivOpParser::parse(std::string inputProgram) {
+ParseStatus NegativeParser::parse(std::string inputProgram) {
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);
 	}
 	ParseStatus status;
 
-	if (inputProgram[0] == '*' || inputProgram[0] == '/') {
+	if (inputProgram[0] == '-') {
 		status.status = true;
 		status.remainingCharacters = inputProgram.erase(0, 1);
 	} else {

@@ -8,12 +8,17 @@
 #include "frontend/combinators/v1_combinators/add_sub_expr.h"
 #include "frontend/combinators/v1_combinators/open_paren.h"
 #include "frontend/combinators/v1_combinators/close_paren.h"
+#include "frontend/combinators/v1_combinators/negative_sign.h"
 
+namespace cs160 {
+namespace frontend {
 
-class TermExpr : NullParser {
+class TermExprParser : NullParser {
  public:
    virtual ParseStatus parse(std::string inputProgram);
-
 };
+
+} // namespace frontend
+} // namespace cs160
 
 #endif // TERM_EXPR_H
