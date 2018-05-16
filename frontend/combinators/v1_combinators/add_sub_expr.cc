@@ -32,9 +32,9 @@ std::unique_ptr<const AstNode> AddSubExprParser::make_node(std::string op,
   std::unique_ptr<const AstNode> first_leaf,
   std::unique_ptr<const AstNode> second_leaf) {
 		if(op == "+")
-            return std::make_unique<AddExpr>(std::move(first_leaf), std::move(second_leaf));
+            return make_unique<AddExpr>(std::move(first_leaf), std::move(second_leaf));
   	else if(op == "-"){
-        return std::make_unique<SubtractExpr>(std::move(first_leaf),
+        return make_unique<SubtractExpr>(std::move(first_leaf),
 																	   std::move(second_leaf));
     }
 		else{

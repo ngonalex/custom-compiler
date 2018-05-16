@@ -6,13 +6,19 @@
 #include "frontend/combinators/basic_combinators/and_combinator.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 #include "frontend/combinators/v1_combinators/add_sub_op.h"
-// #include "frontend/combinators/v1_combinators/mul_div_op.h"
+#include "frontend/combinators/v1_combinators/mul_div_op.h"
 // #include "frontend/combinators/basic_combinators/zero_or_more_combinator.h"
 // #include "frontend/combinators/basic_combinators/one_or_more_combinator.h"
 // #include "frontend/combinators/v1_combinators/ae.h"
-// #include "frontend/combinators/v1_combinators/close_paren.h"
+#include "frontend/combinators/v1_combinators/close_paren.h"
 #include "frontend/combinators/v1_combinators/num_parser.h"
-// #include "frontend/combinators/v1_combinators/open_paren.h"
+#include "frontend/combinators/v1_combinators/open_paren.h"
+
+// #include "frontend/combinators/v1_combinators/add_sub_expr.h"
+// #include "frontend/combinators/v1_combinators/mul_div_expr.h"
+// #include "frontend/combinators/v1_combinators/term_expr.h"
+// #include "frontend/combinators/v1_combinators/negative_sign.h"
+
 
 #include "gtest/gtest.h"
 
@@ -95,7 +101,6 @@ TEST(Combinators, DigitOrCharCombinator) {
 // add_op test
 TEST(Combinators, AddOp) {
   AddSubOpParser test;
-
   ParseStatus result = test.parse("+");
 
   EXPECT_EQ(result.status, true);
@@ -104,157 +109,92 @@ TEST(Combinators, AddOp) {
 }
 
 // // add_op fail test
-// TEST(Combinators, FailAddOp) {
+TEST(Combinators, FailAddOp) {
+  AddSubOpParser test;
+  ParseStatus result = test.parse("*");
 
-//   ParseStatus result;
-//   result.status = false;
-//   result.remainingCharacters = "*";
-//   AddSubOpParser test;
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.remainingCharacters, "*");
+  EXPECT_EQ(result.parsedCharacters, "");
+}
 
-//   EXPECT_EQ(test.parse("*"), result);
-// }
+// sub_op test
+TEST(Combinators, SubOp) {
+  AddSubOpParser test;
+  ParseStatus result = test.parse("-");
 
-// // sub_op test
-// TEST(Combinators, SubOp) {
-//   ParseStatus result;
-//   result.status = true;
-//   result.remainingCharacters = "";
-//   AddSubOpParser test;
-
-//   EXPECT_EQ(test.parse("-"), result);
-// }
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "-");
+}
 
 // // sub_op fail test
-// TEST(Combinators, FailSubOp) {
+TEST(Combinators, FailSubOp) {
+  AddSubOpParser test;
+  ParseStatus result = test.parse("/");
 
-//   ParseStatus result;
-//   result.status = false;
-//   result.remainingCharacters = "/";
-//   AddSubOpParser test;
-
-//   EXPECT_EQ(test.parse("/"), result);
-// }
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.remainingCharacters, "/");
+  EXPECT_EQ(result.parsedCharacters, "");
+}
 
 // // mul_op test
-// TEST(Combinators, MulOp) {
-//   ParseStatus result;
-//   result.status = true;
-//   result.remainingCharacters = "";
-//   MulDivOpParser test;
+TEST(Combinators, MulOp) {
+  MulDivOpParser test;
+  ParseStatus result = test.parse("*");
 
-//   EXPECT_EQ(test.parse("*"), result);
-// }
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "*");
+}
 
 // // mul_op fail test
-// TEST(Combinators, FailMulOp) {
+TEST(Combinators, FailMulOp) {
+  MulDivOpParser test;
+  ParseStatus result = test.parse("0");
 
-//   ParseStatus result;
-//   result.status = false;
-//   result.remainingCharacters = "-";
-//   MulDivOpParser test;
-
-//   EXPECT_EQ(test.parse("-"), result);
-// }
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.remainingCharacters, "0");
+  EXPECT_EQ(result.parsedCharacters, "");
+}
 
 // // div_op test
-// TEST(Combinators, DivOp) {
-//   ParseStatus result;
-//   result.status = true;
-//   result.remainingCharacters = "";
-//   MulDivOpParser test;
+TEST(Combinators, DivOp) {
+  MulDivOpParser test;
+  ParseStatus result = test.parse("/");
 
-//   EXPECT_EQ(test.parse("/"), result);
-// }
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "/");
+}
 
 // // mul_op fail test
-// TEST(Combinators, FailDivOp) {
+TEST(Combinators, FailDivOp) {
+  MulDivOpParser test;
+  ParseStatus result = test.parse("0");
 
-//   ParseStatus result;
-//   result.status = false;
-//   result.remainingCharacters = "+";
-//   MulDivOpParser test;
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.remainingCharacters, "0");
+  EXPECT_EQ(result.parsedCharacters, "");
+}
 
-//   EXPECT_EQ(test.parse("+"), result);
-// }
+// open_paren test
+TEST(Combinators, OpenParen) {
+  OpenParenParser test;
+  ParseStatus result = test.parse("(abc");
 
-// // Zero or more combinator test
-// TEST(Combinators, ZeroOrMoreCombinator) {
-//   SingleDigitParser digitParser;
-//   ZeroOrMoreCombinator zeroOrMore;
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.remainingCharacters, "abc");
+}
 
-//   zeroOrMore.parser = reinterpret_cast<NullParser *>(&digitParser);
+// close_paren test
+TEST(Combinators, CloseParen) {
+  CloseParenParser test;
+  ParseStatus result = test.parse(")abc");
 
-//   ParseStatus result;
-//   result.status = true;
-//   result.remainingCharacters = "ab";
-
-//   EXPECT_EQ(zeroOrMore.parse("123ab"), result);
-// }
-
-// // Passing in nothing for Zero or more combinator test
-// TEST(Combinators, NoMatchZeroOrMoreCombinator) {
-//   SingleDigitParser digitParser;
-//   ZeroOrMoreCombinator zeroOrMore;
-
-//   zeroOrMore.parser = reinterpret_cast<NullParser *>(&digitParser);
-
-//   ParseStatus result;
-//   result.status = true;
-//   result.remainingCharacters = "ab";
-
-//   EXPECT_EQ(zeroOrMore.parse("ab"), result);
-// }
-
-
-// // One or more combinator test
-// TEST(Combinators, OneOrMoreCombinator) {
-//   SingleCharParser charParser;
-//   OneOrMoreCombinator oneOrMore;
-
-//   oneOrMore.parser = reinterpret_cast<NullParser *>(&charParser);
-
-//   ParseStatus result;
-//   result.status = true;
-//   result.remainingCharacters = "1cd";
-
-//   EXPECT_EQ(oneOrMore.parse("ab1cd"), result);
-// }
-
-// // Fail Case for One or more combinator test
-// TEST(Combinators, FailOneOrMoreCombinator) {
-//   SingleDigitParser digitParser;
-//   OneOrMoreCombinator oneOrMore;
-
-//   oneOrMore.parser = reinterpret_cast<NullParser *>(&digitParser);
-
-//   ParseStatus result;
-//   result.status = false;
-//   result.remainingCharacters = "ab1cd";
-
-//   EXPECT_EQ(oneOrMore.parse("ab1cd"), result);
-// }
-
-
-// // open_paren test
-// TEST(Combinators, OpenParen) {
-//   ParseStatus result;
-//   result.status = true;
-//   result.remainingCharacters = "abc";
-//   OpenParenParser test;
-
-//   EXPECT_EQ(test.parse("(abc"), result);
-// }
-
-
-// // close_paren test
-// TEST(Combinators, CloseParen) {
-//   ParseStatus result;
-//   result.status = true;
-//   result.remainingCharacters = "abc";
-//   CloseParenParser test;
-
-//   EXPECT_EQ(test.parse(")abc"), result);
-// }
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.remainingCharacters, "abc");
+}
 
 TEST(Combinators, FailedDigit) {
   NumParser test;
@@ -277,6 +217,42 @@ TEST(Combinators, MultiDigitNumber) {
   EXPECT_EQ(result.remainingCharacters, "abasdf");
   EXPECT_EQ(output, "101281510");
 }
+
+// TEST(Combinators, SimpleNumTerm) {
+//   TermExprParser test;
+//   ParseStatus result = test.parse("101281510abasdf");
+
+//   // Traversing the AST created from the number
+//   PrintVisitor *a = new PrintVisitor();
+//   result.ast->Visit(a);
+//   std::string output = a->GetOutput();
+
+//   EXPECT_EQ(result.status, true);
+//   EXPECT_EQ(result.remainingCharacters, "abasdf");
+//   EXPECT_EQ(output, "101281510");
+// }
+
+// TEST(Combinators, FailedDigit) {
+//   NumParser test;
+//   ParseStatus result = test.parse("fa10abasdf");
+
+//   EXPECT_EQ(result.status, false);
+//   EXPECT_EQ(result.remainingCharacters, "fa10abasdf");
+// }
+
+// TEST(Combinators, MultiDigitNumber) {
+//   NumParser test;
+//   ParseStatus result = test.parse("101281510abasdf");
+
+//   // Traversing the AST created from the number
+//   PrintVisitor *a = new PrintVisitor();
+//   result.ast->Visit(a);
+//   std::string output = a->GetOutput();
+
+//   EXPECT_EQ(result.status, true);
+//   EXPECT_EQ(result.remainingCharacters, "abasdf");
+//   EXPECT_EQ(output, "101281510");
+// }
 // /*
 // // TEST(Combinators, AE) {
 // //   ParseStatus result;
