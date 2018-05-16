@@ -78,7 +78,7 @@ class LowererVisitor : public AstVisitor {
   void VisitLoop(const Loop& loop);
 
   // V2
-  // void VisitAssignment(const Assignment& assignment); 
+  // void VisitAssignment(const Assignment& assignment);
   void VisitProgram(const Program& program);
   void VisitVariableExpr(const VariableExpr& exp);
 

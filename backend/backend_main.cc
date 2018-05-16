@@ -53,8 +53,9 @@ int main() {
     make_unique<IntegerExpr>(7), make_unique<IntegerExpr>(5));
 
   statements.push_back(std::move(
-      make_unique<const AssignmentFromArithExp>(make_unique<const VariableExpr>("bob"),
-                                    make_unique<const IntegerExpr>(5))));
+      make_unique<const AssignmentFromArithExp>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(5))));
 
   auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
 

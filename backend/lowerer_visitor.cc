@@ -110,12 +110,12 @@ std::string LowererVisitor::GetOutput() {
   return output;
 }
 
-void VisitDereference(const Dereference& exp){
+void LowererVisitor::VisitDereference(const Dereference& exp) {
 }
 
 
-void VisitAssignmentFromNewTuple(const AssignmentFromNewTuple& assignment){
-  
+void LowererVisitor::VisitAssignmentFromNewTuple(
+  const AssignmentFromNewTuple& assignment) {
 }
 
 void LowererVisitor::VisitFunctionCall(const FunctionCall& call) {
