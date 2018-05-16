@@ -2,7 +2,7 @@
 
 #define super NullParser
 
-using namespace cs160::frontend::SingleDigitParser;
+using namespace cs160::frontend;
 
 ParseStatus SingleDigitParser::parse(std::string inputProgram) {
 	if (inputProgram.size() == 0){

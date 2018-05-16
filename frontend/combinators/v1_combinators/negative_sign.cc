@@ -3,7 +3,7 @@
 
 #define super NullParser
 
-using namespace cs160::frontend::NegativeParser;
+using namespace cs160::frontend;
 
 ParseStatus NegativeParser::parse(std::string inputProgram) {
 	if (inputProgram.size() == 0) {

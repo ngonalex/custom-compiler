@@ -2,11 +2,7 @@
 
 #define super NullParser
 
-using namespace cs160::frontend::NumParser;
-using namespace cs160::frontend::AddSubExprParser;
-using namespace cs160::frontend::OpenParenParser;
-using namespace cs160::frontend::CloseParenParser;
-using namespace cs160::frontend::NegativeParser;
+using namespace cs160::frontend;
 
 ParseStatus TermExprParser::parse(std::string inputProgram) {
   if (inputProgram.size() == 0) {

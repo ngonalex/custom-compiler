@@ -3,7 +3,7 @@
 
 #define super NullParser
 
-using namespace cs160::frontend::MulDivOpParser;
+using namespace cs160::frontend;
 
 ParseStatus MulDivOpParser::parse(std::string inputProgram) {
 	if (inputProgram.size() == 0) {

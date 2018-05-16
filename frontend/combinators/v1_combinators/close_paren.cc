@@ -2,7 +2,7 @@
 
 #define super NullParser
 
-using namespace cs160::frontend::CloseParenParser;
+using namespace cs160::frontend;
 
 ParseStatus CloseParenParser::parse(std::string inputProgram) {
 	if (inputProgram.size() == 0) {

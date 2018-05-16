@@ -9,6 +9,8 @@
 
 #define super NullParser
 
+using namespace cs160::frontend;
+
 /*
 	ae -> num_parser  ||  ae add_sub_op ae  || open_paren ae add_sub_op ae close_paren
                     ||  ae mul_div_op ae  || open_paren ae mul_div_op ae close_paren
@@ -19,9 +21,9 @@ ParseStatus ArithExprParser::parse(std::string inputProgram) {
 		return super::parse(inputProgram);
 	}
 	AddSubExprParser ae;
-	ParseResult aeParseResult = ae.parse(inputProgram);
+	ParseStatus aeParseResult = ae.parse(inputProgram);
 	if (aeParseResult.status) {
-		return std::move(aeParseResult.ast);
+		return aeParseResult;
 	} else {
 		printf("Error Parsing");
 	}

@@ -1,7 +1,7 @@
 #include "frontend/combinators/basic_combinators/null.h"
 #include "frontend/combinators/basic_combinators/parsestatus.h"
 
-using namespace cs160::frontend::NullParser;
+using namespace cs160::frontend;
 
 ParseStatus NullParser::parse(std::string inputProgram) {
 	ParseStatus status;

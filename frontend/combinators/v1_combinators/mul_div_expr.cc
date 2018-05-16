@@ -2,9 +2,7 @@
 
 #define super NullParser
 
-using namespace cs160::frontend::ParseResult;
-using namespace cs160::frontend::TermExprParser;
-using namespace cs160::frontend::MulDivOpParser;
+using namespace cs160::frontend;
 
 ParseStatus MulDivExprParser::parse(std::string inputProgram) {
 	if (inputProgram.size() == 0) {
@@ -19,33 +17,31 @@ ParseStatus MulDivExprParser::parse(std::string inputProgram) {
 		ParseStatus mdParseStatus = op.parse(teParseStatus.remainingCharacters);
 		ParseStatus result = teParseStatus;
 		while (mdParseStatus.status) {
-	    TermExpr rhs;
+	    TermExprParser rhs;
 	    ParseStatus rhsParseStatus = rhs.parse(mdParseStatus.remainingCharacters);
-	    result.ast = std::move(make_node((mdParseStatus.parsedChracters), 
+	    result.ast = std::move(make_node((mdParseStatus.parsedCharacters), 
 														 std::move(result.ast), 
 														 std::move(rhsParseStatus.ast)));
 	    mdParseStatus = op.parse(rhsParseStatus.remainingCharacters);
 	  }
 		return result; // Return Sucess for TermExpr or MultExpr
 	}
-	return lhsParseStatus;	// Returning Failure on TermExpr
+	return teParseStatus;	// Returning Failure on TermExpr
 }
 
 // Creating the AST Node
 std::unique_ptr<const AstNode> MulDivExprParser::make_node(std::string op, 
   std::unique_ptr<const AstNode> first_leaf,
   std::unique_ptr<const AstNode> second_leaf) {
-  switch(op) {
-    case "*": {
-      return make_unique<MultiplyExpr>(std::move(first_leaf), 
-																			 std::move(second_leaf));
-    }
-    case "/": {
-      return make_unique<DivideExpr>(std::move(first_leaf), 
-																	   std::move(second_leaf));
-    }
-    default: {
-      return nullptr;
-    }
+  if (op == "*":) {
+    return make_unique<MultiplyExpr>(std::move(first_leaf), 
+																		 std::move(second_leaf));
+  }
+  else if (op == "/") {
+    return make_unique<DivideExpr>(std::move(first_leaf), 
+																   std::move(second_leaf));
+  }
+  default: {
+    return nullptr;
   }
 }

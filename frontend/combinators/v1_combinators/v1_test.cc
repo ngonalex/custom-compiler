@@ -19,6 +19,8 @@
 
 #include "gtest/gtest.h"
 
+using namespace cs160::frontend;
+
 // Success case for Single Character test :: single_char.cc
 TEST(Combinators, SingleCharTest) {
   SingleCharParser test;

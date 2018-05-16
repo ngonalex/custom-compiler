@@ -2,7 +2,7 @@
 
 #define super NullParser
 
-using namespace cs160::frontend::OneOrMoreCombinator;
+using namespace cs160::frontend;
 
 ParseStatus OneOrMoreCombinator::parse(std::string inputProgram){
 
