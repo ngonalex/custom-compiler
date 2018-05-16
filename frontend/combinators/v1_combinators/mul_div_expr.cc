@@ -23,6 +23,7 @@ ParseStatus MulDivExprParser::parse(std::string inputProgram) {
 														 std::move(rhsParseStatus.ast)));
 	    mdParseStatus = op.parse(rhsParseStatus.remainingCharacters);
 	  }
+		result.remainingCharacters = mdParseStatus.remainingCharacters;
 	}
 	return result;	// Returning Success/Failure on TermExpr
 }
@@ -34,12 +35,10 @@ std::unique_ptr<const AstNode> MulDivExprParser::make_node(std::string op,
   if (op == "*") {
       return make_unique<MultiplyExpr>(std::move(first_leaf),
 																		 std::move(second_leaf));
-  }
-  else if (op == "/") {
+   } else if (op == "/") {
       return make_unique<DivideExpr>(std::move(first_leaf),
 																   std::move(second_leaf));
-  }
-  else {
+  } else {
     return nullptr;
   }
 }

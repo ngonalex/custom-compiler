@@ -23,6 +23,7 @@ ParseStatus AddSubExprParser::parse(std::string inputProgram) {
 														 std::move(rhsParseStatus.ast)));
 	    asParseStatus = op.parse(rhsParseStatus.remainingCharacters);
 	  }
+		result.remainingCharacters = asParseStatus.remainingCharacters;
 	}
 	return result;	// Returning Success/Failure on MulDivExpr
 }
@@ -31,13 +32,12 @@ ParseStatus AddSubExprParser::parse(std::string inputProgram) {
 std::unique_ptr<const AstNode> AddSubExprParser::make_node(std::string op,
   std::unique_ptr<const AstNode> first_leaf,
   std::unique_ptr<const AstNode> second_leaf) {
-		if(op == "+")
+		if (op == "+") {
             return make_unique<AddExpr>(std::move(first_leaf), std::move(second_leaf));
-  	else if(op == "-"){
+		} else if (op == "-") {
         return make_unique<SubtractExpr>(std::move(first_leaf),
 																	   std::move(second_leaf));
-    }
-		else{
+    } else {
 			return nullptr;
 		}
 }

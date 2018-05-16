@@ -14,10 +14,10 @@
 #include "frontend/combinators/v1_combinators/num_parser.h"
 #include "frontend/combinators/v1_combinators/open_paren.h"
 
-// #include "frontend/combinators/v1_combinators/add_sub_expr.h"
-// #include "frontend/combinators/v1_combinators/mul_div_expr.h"
-// #include "frontend/combinators/v1_combinators/term_expr.h"
-// #include "frontend/combinators/v1_combinators/negative_sign.h"
+#include "frontend/combinators/v1_combinators/add_sub_expr.h"
+#include "frontend/combinators/v1_combinators/mul_div_expr.h"
+#include "frontend/combinators/v1_combinators/term_expr.h"
+#include "frontend/combinators/v1_combinators/negative_sign.h"
 
 
 #include "gtest/gtest.h"
@@ -218,9 +218,54 @@ TEST(Combinators, MultiDigitNumber) {
   EXPECT_EQ(output, "101281510");
 }
 
-// TEST(Combinators, SimpleNumTerm) {
-//   TermExprParser test;
-//   ParseStatus result = test.parse("101281510abasdf");
+TEST(Combinators, SimpleNumTerm) {
+  TermExprParser test;
+  ParseStatus result = test.parse("101281510abasdf");
+
+  // Traversing the AST created from the number
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
+
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.remainingCharacters, "abasdf");
+  EXPECT_EQ(output, "101281510");
+}
+
+
+TEST(Combinators, SimplyAddition) {
+  AddSubExprParser test;
+  ParseStatus result = test.parse("5+77");
+
+  // Traversing the AST created from the number
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
+
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(output, "(+ 5 77)");
+}
+
+TEST(Combinators, SimpleMul) {
+  MulDivExprParser test;
+  ParseStatus result = test.parse("225*335");
+
+  // Traversing the AST created from the number
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
+
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(output, "(* 225 335)");
+}
+
+
+// TODO: FIX THESE
+// TEST(Combinators, SimpleParen) {
+//   MulDivExprParser test;
+//   ParseStatus result = test.parse("(225*335)");
 
 //   // Traversing the AST created from the number
 //   PrintVisitor *a = new PrintVisitor();
@@ -228,40 +273,26 @@ TEST(Combinators, MultiDigitNumber) {
 //   std::string output = a->GetOutput();
 
 //   EXPECT_EQ(result.status, true);
-//   EXPECT_EQ(result.remainingCharacters, "abasdf");
-//   EXPECT_EQ(output, "101281510");
+//   EXPECT_EQ(result.remainingCharacters, "");
+//   EXPECT_EQ(output, "(* 225 335)");
 // }
 
-// TEST(Combinators, FailedDigit) {
-//   NumParser test;
-//   ParseStatus result = test.parse("fa10abasdf");
+// TEST(Combinators, NegativeNumber) {
+  // TermExprParser test;
+  // ParseStatus result = test.parse("-101281510abasdf");
 
-//   EXPECT_EQ(result.status, false);
-//   EXPECT_EQ(result.remainingCharacters, "fa10abasdf");
+  // // Traversing the AST created from the number
+  // PrintVisitor *a = new PrintVisitor();
+  // result.ast->Visit(a);
+  // std::string output = a->GetOutput();
+
+  // EXPECT_EQ(result.status, true);
+  // EXPECT_EQ(result.remainingCharacters, "abasdf");
+  // EXPECT_EQ(output, "0-101281510");
 // }
 
-// TEST(Combinators, MultiDigitNumber) {
-//   NumParser test;
-//   ParseStatus result = test.parse("101281510abasdf");
-
-//   // Traversing the AST created from the number
-//   PrintVisitor *a = new PrintVisitor();
-//   result.ast->Visit(a);
-//   std::string output = a->GetOutput();
-
-//   EXPECT_EQ(result.status, true);
-//   EXPECT_EQ(result.remainingCharacters, "abasdf");
-//   EXPECT_EQ(output, "101281510");
+//   EXPECT_EQ(test.parse("23"), result);
 // }
-// /*
-// // TEST(Combinators, AE) {
-// //   ParseStatus result;
-// //   result.status = true;
-// //   result.remainingCharacters = "";
-// //   AEParser test;
-
-// //   EXPECT_EQ(test.parse("23"), result);
-// // }
 // /*
 // TEST(Combinators, AE) {
 //   ParseStatus result;
