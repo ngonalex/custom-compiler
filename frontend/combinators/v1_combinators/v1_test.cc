@@ -272,16 +272,16 @@ TEST(Combinators, NumParser) {
 //   result.status = true;
 //   result.remainingCharacters = "";
 //   AEParser test;
-  
+
 //   EXPECT_EQ(test.parse("23"), result);
 // }
-
+/*
 TEST(Combinators, AE) {
   ParseStatus result;
   result.status = true;
   result.remainingCharacters = "";
   ArithExprParser test;
-  
+
   EXPECT_EQ(test.parse("2+3"), result);
 }
-
+*/
