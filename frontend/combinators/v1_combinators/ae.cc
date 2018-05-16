@@ -22,9 +22,8 @@ ParseStatus ArithExprParser::parse(std::string inputProgram) {
 	}
 	AddSubExprParser ae;
 	ParseStatus aeParseResult = ae.parse(inputProgram);
-	if (aeParseResult.status) {
-		return aeParseResult;
-	} else {
+	if (!aeParseResult.status) {
 		printf("Error Parsing");
 	}
+    return aeParseResult;
 }
