@@ -260,9 +260,8 @@ TEST(Combinators, NumParser) {
   result.status = true;
   result.remainingCharacters = "";
   NumParser test;
-  //ParseStatus result1 = test.parse("1218391abc");
 
-  EXPECT_EQ(test.parse("1"), result);
+  EXPECT_EQ(test.parse("1218391abc"), result);
 }
 /*
 // TEST(Combinators, AE) {
