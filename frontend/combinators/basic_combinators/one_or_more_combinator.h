@@ -9,6 +9,9 @@ namespace frontend {
 	
 class OneOrMoreCombinator : NullParser {
  public:
+	explicit OneOrMoreCombinator(NullParser *parser) {
+		this->parser = reinterpret_cast<NullParser *>(&parser);
+	}
 	NullParser *parser;
 	virtual ParseStatus parse(std::string inputProgram);
 };
