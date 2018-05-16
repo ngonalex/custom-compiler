@@ -13,9 +13,9 @@ ParseStatus NumParser::parse(std::string inputProgram) {
 	}
   SingleDigitParser digitParser;
   OneOrMoreCombinator oneOrMore;
-	
+
 	oneOrMore.parser = reinterpret_cast<NullParser *>(&digitParser);
-	
+
 	// Parse the integer
   ParseStatus result = oneOrMore.parse(inputProgram);
 	// Make an Integer expression
