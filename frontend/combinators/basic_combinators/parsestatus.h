@@ -20,6 +20,9 @@ class ParseStatus { // Super class
 	// Only for the success case
 	std::unique_ptr<const AstNode> ast;
 
+	// Only for And Combinator
+	std::unique_ptr<const AstNode> second_ast;
+
 	// Only for the failed case
 	std::string expectedCharacters;
 

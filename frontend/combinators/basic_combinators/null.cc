@@ -9,5 +9,6 @@ ParseStatus NullParser::parse(std::string inputProgram) {
 	status.remainingCharacters = inputProgram;
 	status.parsedCharacters = "";
 	status.ast = nullptr;
+	status.second_ast = nullptr;
 	return status;
 }
