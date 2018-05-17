@@ -2,14 +2,12 @@
 #include "abstract_syntax/print_visitor_v1.h"
 #include "frontend/combinators/v1_combinators/single_char.h"
 #include "frontend/combinators/v1_combinators/single_digit.h"
-// #include "frontend/combinators/basic_combinators/parsestatus.h"
+
 #include "frontend/combinators/basic_combinators/and_combinator.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 #include "frontend/combinators/v1_combinators/add_sub_op.h"
 #include "frontend/combinators/v1_combinators/mul_div_op.h"
-// #include "frontend/combinators/basic_combinators/zero_or_more_combinator.h"
-// #include "frontend/combinators/basic_combinators/one_or_more_combinator.h"
-// #include "frontend/combinators/v1_combinators/ae.h"
+
 #include "frontend/combinators/v1_combinators/close_paren.h"
 #include "frontend/combinators/v1_combinators/num_parser.h"
 #include "frontend/combinators/v1_combinators/open_paren.h"
@@ -19,6 +17,7 @@
 #include "frontend/combinators/v1_combinators/term_expr.h"
 #include "frontend/combinators/v1_combinators/negative_sign.h"
 
+#include "frontend/combinators/v1_combinators/ae.h"
 
 #include "gtest/gtest.h"
 
@@ -277,29 +276,31 @@ TEST(Combinators, SimpleParen) {
   EXPECT_EQ(output, "(* 225 335)");
 }
 
-// TEST(Combinators, NegativeNumber) {
-//   TermExprParser test;
-//   ParseStatus result = test.parse("-101281510abasdf");
+TEST(Combinators, NegativeNumber) {
+  TermExprParser test;
+  ParseStatus result = test.parse("-101281510abasdf");
 
-//   // Traversing the AST created from the number
-//   PrintVisitor *a = new PrintVisitor();
-//   result.ast->Visit(a);
-//   std::string output = a->GetOutput();
+  // Traversing the AST created from the number
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
 
-//   EXPECT_EQ(result.status, true);
-//   EXPECT_EQ(result.remainingCharacters, "abasdf");
-//   EXPECT_EQ(output, "0-101281510");
-// }
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.remainingCharacters, "abasdf");
+  EXPECT_EQ(output, "(- 0 101281510)");
+}
 
-//   EXPECT_EQ(test.parse("23"), result);
-// }
-// /*
-// TEST(Combinators, AE) {
-//   ParseStatus result;
-//   result.status = true;
-//   result.remainingCharacters = "";
-//   ArithExprParser test;
+TEST(Combinators, TrivialAe) {
+  ArithExprParser test;
+  ParseStatus result = test.parse("(225*335)+12/2");
 
-//   EXPECT_EQ(test.parse("2+3"), result);
-// }
-// */
+  // Traversing the AST created from the number
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
+
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(output, "(/ (+ (* 225 335) 12) 2)");
+}
+
