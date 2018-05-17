@@ -20,7 +20,7 @@ ParseStatus TermExprParser::parse(std::string inputProgram) {
   NegativeParser negativeStatus;
   ParseStatus negStatus = negativeStatus.parse(inputProgram);
   if (negStatus.status) {
-    AddSubOpParser ae;
+    AddSubExprParser ae;
     ParseStatus aeParseStatus = ae.parse(negStatus.remainingCharacters);
     if (aeParseStatus.status) {
         std::unique_ptr<const AstNode> zero = make_unique<IntegerExpr>(0);
