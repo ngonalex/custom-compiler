@@ -35,13 +35,14 @@ ParseStatus TermExprParser::parse(std::string inputProgram) {
   ParseStatus openParseStatus = open_paren.parse(inputProgram);
   if (openParseStatus.status) {
     // ae
-    AddSubOpParser ae;
+    AddSubExprParser ae;
     ParseStatus aeParseStatus = ae.parse(openParseStatus.remainingCharacters);
     if (aeParseStatus.status) {
       // )
       CloseParenParser close_paren;
       ParseStatus cpParseStatus = close_paren.parse(aeParseStatus.remainingCharacters);
       if (cpParseStatus.status) {
+        aeParseStatus.remainingCharacters = cpParseStatus.remainingCharacters;
         return aeParseStatus; // Returning Success on AE
       }
       return cpParseStatus;  // Returing Failure on AddSubExpr
