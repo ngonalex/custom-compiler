@@ -1,4 +1,5 @@
 #include "frontend/combinators/v1_combinators/term_expr.h"
+#include "iostream"
 
 #define super NullParser
 
@@ -23,8 +24,8 @@ ParseStatus TermExprParser::parse(std::string inputProgram) {
     AddSubExprParser ae;
     ParseStatus aeParseStatus = ae.parse(negStatus.remainingCharacters);
     if (aeParseStatus.status) {
-        std::unique_ptr<const AstNode> zero = make_unique<IntegerExpr>(0);
-        aeParseStatus.ast = std::move(make_unique<const SubtractExpr>(std::move(zero), std::move(aeParseStatus.ast)));
+      std::unique_ptr<const AstNode> zero = make_unique<IntegerExpr>(0);
+      aeParseStatus.ast = std::move(make_unique<const SubtractExpr>(std::move(zero), std::move(aeParseStatus.ast)));
       return aeParseStatus; // Returning Success on -AE
     }
     return aeParseStatus; // Returning Failure on -AE
@@ -43,6 +44,7 @@ ParseStatus TermExprParser::parse(std::string inputProgram) {
       ParseStatus cpParseStatus = close_paren.parse(aeParseStatus.remainingCharacters);
       if (cpParseStatus.status) {
         aeParseStatus.remainingCharacters = cpParseStatus.remainingCharacters;
+        std::cout << aeParseStatus.remainingCharacters << std::endl;
         return aeParseStatus; // Returning Success on AE
       }
       return cpParseStatus;  // Returing Failure on AddSubExpr
