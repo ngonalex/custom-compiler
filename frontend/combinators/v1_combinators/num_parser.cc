@@ -6,6 +6,7 @@
 #define super NullParser
 
 using namespace cs160::frontend;
+using namespace std;
 
 ParseStatus NumParser::parse(std::string inputProgram) {
 	if (inputProgram.size() == 0) { return super::parse(inputProgram); }

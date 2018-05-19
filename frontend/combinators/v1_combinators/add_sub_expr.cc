@@ -3,6 +3,7 @@
 #define super NullParser
 
 using namespace cs160::frontend;
+using namespace std;
 
 ParseStatus AddSubExprParser::parse(std::string inputProgram) {
 	if (inputProgram.size() == 0) {
