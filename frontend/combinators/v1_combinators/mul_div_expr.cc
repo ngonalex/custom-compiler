@@ -1,4 +1,5 @@
 #include "frontend/combinators/v1_combinators/mul_div_expr.h"
+#include "iostream"
 
 #define super NullParser
 
@@ -23,6 +24,7 @@ ParseStatus MulDivExprParser::parse(std::string inputProgram) {
 														 std::move(result.ast),
 														 std::move(rhsParseStatus.ast)));
 	    mdParseStatus = op.parse(rhsParseStatus.remainingCharacters);
+			std::cout << mdParseStatus.remainingCharacters << std::endl;
 	  }
 		result.remainingCharacters = mdParseStatus.remainingCharacters;
 	}
