@@ -110,11 +110,37 @@ std::string LowererVisitor::GetOutput() {
   return output;
 }
 
-void VisitDereference(const Dereference& exp){
+void LowererVisitor::VisitDereference(const Dereference& exp) {
+  currvariabletype_ = LEFTHAND;
+  exp.lhs().Visit(const_cast<LowererVisitor*>(this));
+  currvariabletype_ = RIGHTHAND;
+  exp.rhs().Visit(const_cast<LowererVisitor*>(this));
+  
+  auto leftvariable = variablestack_.top();
+  variablestack_.pop();
+  
+  CreateDereference(leftvariable);
 }
 
 
-void VisitAssignmentFromNewTuple(const AssignmentFromNewTuple& assignment){
+void LowererVisitor::VisitAssignmentFromNewTuple(const AssignmentFromNewTuple& assignment) {
+   // Visit the left which will add its variable name to the stack
+
+   // left hand side can't be a varaible used to hold interger cause : x or x->1 
+  currvariabletype_ = LEFTHAND;
+  assignment.lhs().Visit(const_cast<LowererVisitor*>(this));
+  currvariabletype_ = RIGHTHAND;
+
+  // assign the right hand side to be equal to the left hand side
+  // The latest vector addition is the final register to be set to the
+  // string name
+  assignment.rhs().Visit(const_cast<LowererVisitor*>(this));
+
+  Operand arg1 = Operand(blocks_[blocks_.size()-1]->target.reg());
+  auto name = variablestack_.top();
+  variablestack_.pop();
+  
+  CreateTupleAssignment(name, arg1);
   
 }
 
@@ -620,7 +646,7 @@ void LowererVisitor::CreateFunctionCallBlock(std::string funname) {
   callblock->op = Opcode(FUNCALL);
 
   blocks_.push_back(std::move(callblock));
-}
+} 
 
 void LowererVisitor::CreateFunctionCallReturnEpilogue(int numofregs) {
   auto callblock = make_unique<struct ThreeAddressCode>();
@@ -650,6 +676,23 @@ void LowererVisitor::CreateFunctionDefEpilogue(std::string name) {
   auto block = make_unique<struct ThreeAddressCode>();
   block->target = Target(Label(name));
   block->op = Opcode(FUNEPILOGUE);
+
+  blocks_.push_back(std::move(block));
+}
+
+void LowererVisitor::CreateDereference(std::string variable) {
+  auto block = make_unique<struct ThreeAddressCode>();
+  block->target = Target(Label(variable));
+  block->op = Opcode(DEREFERENCE);
+
+  blocks_.push_back(std::move(block));
+}
+
+void LowererVisitor::CreateTupleAssignment(std::string variable, Operand operand) {
+  auto block = make_unique<struct ThreeAddressCode>();
+  block->target = Target(Label(variable));
+  block->op = Opcode(DEREFERENCE);
+  block->arg1 = operand;
 
   blocks_.push_back(std::move(block));
 }

@@ -7,6 +7,7 @@
 #include <set>
 #include <iostream>
 #include <algorithm>
+#include <map>
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "backend/ir.h"
@@ -99,6 +100,8 @@ class LowererVisitor : public AstVisitor {
   void CreateComparisionBlock(Type type);
   void CreateLabelBlock(std::string labelname);
   void CreateJumpBlock(std::string jumpname, Type type);
+  void CreateDereference(std::string variable);
+  void CreateTupleAssignment(std::string variable, Operand operand);
 
   // Helpers
   std::string GetOutputArithmeticHelper(std::string output, int index,
@@ -143,6 +146,7 @@ class LowererVisitor : public AstVisitor {
   std::vector<std::set<std::string>> localsets_;
   std::set<std::string> totalset_;
   std::set<std::string> globalset_;
+  std::map<std::string, DataType> typemap_;
   ChildType lastchildtype_;
   struct Counter counter_;
   VariableType currvariabletype_;

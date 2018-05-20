@@ -21,6 +21,9 @@ using cs160::abstract_syntax::backend::LogicalAndExpr;
 using cs160::abstract_syntax::backend::LogicalBinaryOperator;
 using cs160::abstract_syntax::backend::LogicalNotExpr;
 using cs160::abstract_syntax::backend::LogicalOrExpr;
+using cs160::abstract_syntax::backend::AssignmentFromArithExp;
+using cs160::abstract_syntax::backend::AssignmentFromNewTuple;
+using cs160::abstract_syntax::backend::Dereference;
 using cs160::abstract_syntax::backend::Loop;
 using cs160::abstract_syntax::backend::Conditional;
 using cs160::abstract_syntax::backend::Statement;
@@ -39,7 +42,7 @@ TEST_F(LowererTest, IntegerExprIsVisited) {
   number->Visit(&lowerer_);
 
   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 7\n");
-}
+} 
 
 TEST_F(LowererTest, IntegerExprIsVisited_0) {
   auto number = make_unique<IntegerExpr>(0);
