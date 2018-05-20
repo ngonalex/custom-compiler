@@ -54,12 +54,18 @@ int main() {
 
   statements.push_back(std::move(
 <<<<<<< HEAD
+<<<<<<< HEAD
       make_unique<const AssignmentFromArithExp>(make_unique<const VariableExpr>("bob"),
                                     make_unique<const IntegerExpr>(5))));
 =======
       make_unique<const Assignment>(make_unique<const VariableExpr>("bob"),
                                     make_unique<const IntegerExpr>(10))));
 >>>>>>> 1f846c93af47a2166da75340fdb3cd287d2de123
+=======
+      make_unique<const AssignmentFromArithExp>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(5))));
+>>>>>>> 2b57920e91abd91947a75b2e05d5bb59f12abee4
 
   auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
 
