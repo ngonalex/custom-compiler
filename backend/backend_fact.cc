@@ -11,6 +11,7 @@ using cs160::abstract_syntax::backend::AddExpr;
 using cs160::abstract_syntax::backend::SubtractExpr;
 using cs160::abstract_syntax::backend::MultiplyExpr;
 using cs160::abstract_syntax::backend::DivideExpr;
+using cs160::abstract_syntax::backend::Assignment;
 using cs160::abstract_syntax::backend::IntegerExpr;
 using cs160::abstract_syntax::backend::LessThanExpr;
 using cs160::abstract_syntax::backend::LessThanEqualToExpr;
@@ -21,9 +22,7 @@ using cs160::abstract_syntax::backend::LogicalAndExpr;
 using cs160::abstract_syntax::backend::LogicalOrExpr;
 using cs160::abstract_syntax::backend::LogicalNotExpr;
 using cs160::abstract_syntax::backend::Statement;
-using cs160::abstract_syntax::backend::AssignmentFromArithExp;
-using cs160::abstract_syntax::backend::AssignmentFromNewTuple;
-using cs160::abstract_syntax::backend::Dereference;
+using cs160::abstract_syntax::backend::Assignment;
 using cs160::abstract_syntax::backend::Conditional;
 using cs160::abstract_syntax::backend::Loop;
 using cs160::abstract_syntax::backend::Program;
@@ -53,13 +52,8 @@ int main() {
     make_unique<IntegerExpr>(7), make_unique<IntegerExpr>(5));
 
   statements.push_back(std::move(
-<<<<<<< HEAD
-      make_unique<const AssignmentFromArithExp>(make_unique<const VariableExpr>("bob"),
-                                    make_unique<const IntegerExpr>(5))));
-=======
       make_unique<const Assignment>(make_unique<const VariableExpr>("bob"),
                                     make_unique<const IntegerExpr>(10))));
->>>>>>> 1f846c93af47a2166da75340fdb3cd287d2de123
 
   auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
 
@@ -86,7 +80,7 @@ int main() {
   arguments1.push_back(std::move(make_unique<const SubtractExpr>(
     make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(1))));
 
-  false_fact.push_back(std::move(make_unique<AssignmentFromArithExp>(
+  false_fact.push_back(std::move(make_unique<Assignment>(
     make_unique<VariableExpr>("foo_retval"),
     make_unique<IntegerExpr>(1))));
 
@@ -94,7 +88,7 @@ int main() {
       make_unique<const VariableExpr>("bobMONEY"), "fact",
       std::move(arguments1))));
 
-  true_fact.push_back(std::move(make_unique<AssignmentFromArithExp>(
+  true_fact.push_back(std::move(make_unique<Assignment>(
     make_unique<VariableExpr>("foo_retval"),
     make_unique<MultiplyExpr>(
       make_unique<VariableExpr>("bobMONEY"),

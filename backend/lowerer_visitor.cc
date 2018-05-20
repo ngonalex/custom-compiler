@@ -784,6 +784,5 @@ std::set<std::string> LowererVisitor::SetIntersectionHelper(
     return intersectionset;
 }
 
-
 }  // namespace backend
 }  // namespace cs160

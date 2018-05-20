@@ -110,8 +110,6 @@ class LowererVisitor : public AstVisitor {
   std::string JumpLabelHelper();
   std::string ContinueLabelHelper();
   std::string LoopLabelHelper();
-  // bool CheckVarFlag() {return variableflag_;}
-  // void ClearVarFlag() {variableflag_ = false;}
   Register GetArgument(ChildType type);
   std::set<std::string> SetDifferenceHelper(std::set<std::string> set1,
     std::set<std::string> set2);
@@ -121,12 +119,6 @@ class LowererVisitor : public AstVisitor {
   std::vector<std::unique_ptr<ThreeAddressCode>> GetIR() {
     return std::move(blocks_);
   }
-
-  // std::vector<std::vector<std::unique_ptr<struct ThreeAddressCode>>>
-  //   GetFuncDefs() {
-  //    return std::move(functiondefblocks_);
-  // }
-
 
   std::stack<std::string> variablestack() {
     return variablestack_;
@@ -150,7 +142,6 @@ class LowererVisitor : public AstVisitor {
   ChildType lastchildtype_;
   struct Counter counter_;
   VariableType currvariabletype_;
-  Scope currscope_;
 };
 
 }  // namespace backend
