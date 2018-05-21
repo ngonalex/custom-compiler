@@ -21,7 +21,7 @@ class ParseStatus { // Super class
 	std::unique_ptr<const AstNode> ast;
 
 	// Only for the failed case
-	std::string expectedCharacters;
+	std::string errorType;
 
 	// check if two ParseStatuses are equal
 	bool operator==(const ParseStatus &b) const;
@@ -33,5 +33,3 @@ class ParseStatus { // Super class
 } // namespace cs160
 
 #endif // PARSESTATUS_H_
-
-

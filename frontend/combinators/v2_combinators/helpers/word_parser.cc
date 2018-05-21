@@ -1,4 +1,4 @@
-#include "frontend/combinators/v2_combinators/word_parser.h"
+#include "frontend/combinators/v2_combinators/helpers/word_parser.h"
 #include "frontend/combinators/v1_combinators/single_char.h"
 #include "frontend/combinators/v1_combinators/single_digit.h"
 #include "frontend/combinators/basic_combinators/zero_or_more_combinator.h"
@@ -27,10 +27,14 @@ ParseStatus WordParser::parse(std::string inputProgram) {
 	// Parse the first character
 	ParseStatus result = charParser.parse(inputProgram);
 
-	if (result.success){
+	if (result.status){
 		ParseStatus result2 = zeroOrMore.parse(result.remainingCharacters);
 		result.parsedCharacters += result2.parsedCharacters;
 		result.remainingCharacters = result2.remainingCharacters;
+	}
+	else{
+		// Error type returned to user
+		result.errorType =  "wordParser error";
 	}
 
 	return result;
