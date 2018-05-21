@@ -53,19 +53,25 @@ int main() {
     make_unique<IntegerExpr>(7), make_unique<IntegerExpr>(5));
 
   statements.push_back(std::move(
-<<<<<<< HEAD
-<<<<<<< HEAD
-      make_unique<const AssignmentFromArithExp>(make_unique<const VariableExpr>("bob"),
-                                    make_unique<const IntegerExpr>(5))));
-=======
-      make_unique<const Assignment>(make_unique<const VariableExpr>("bob"),
-                                    make_unique<const IntegerExpr>(10))));
->>>>>>> 1f846c93af47a2166da75340fdb3cd287d2de123
-=======
       make_unique<const AssignmentFromArithExp>(
         make_unique<const VariableExpr>("bob"),
         make_unique<const IntegerExpr>(5))));
->>>>>>> 2b57920e91abd91947a75b2e05d5bb59f12abee4
+
+  statements.push_back(std::move(make_unique<const AssignmentFromNewTuple>(
+      make_unique<const VariableExpr>("x"),
+      make_unique<const IntegerExpr>(3))));
+
+  statements.push_back(std::move(make_unique<const AssignmentFromArithExp>(
+      make_unique<const Dereference>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(1)),
+      make_unique<const IntegerExpr>(10))));
+
+  statements.push_back(std::move(make_unique<const AssignmentFromArithExp>(
+    make_unique<const VariableExpr>("y"),
+    make_unique<const Dereference>(
+      make_unique<const VariableExpr>("x"),
+      make_unique<const IntegerExpr>(1)))));
 
   auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
 
@@ -130,8 +136,7 @@ int main() {
   auto test = lowerer_.GetIR();
   runner.GenerateData(lowerer_.globalset());
   runner.Generate(std::move(test));
-  std::string result = exec("gcc -g -c test.s && ld test.o && ./a.out");
-  std::cout << result << std::endl;
+  system("gcc -g -static test.s -o run && ./run");
   // CHANGE TO GENERATEEPILOGUE LATER
   return 0;
 }

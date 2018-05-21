@@ -3,108 +3,30 @@
 namespace cs160 {
 namespace backend {
 
-// For V2 We want to print out in 2 places
-// With an assignment instruction e.g. string <- register
-// Or At the end when it's an arithmetic instruction
-
-// High level wise the way this SHOULD work in the future when Generate
-// Assignment is implemented is that
-// GeneratePrinter, GeneratePrintHeader are unique
-// There will be subfunctions later for each assignment though
-// e.g x= 2+5, y = 2-10 should create 4 subfunctions
-// xascii: .ascii "Variable x is equal to"
-// yascii: .ascii "Variable y is equal to"
-// printx: (assembly code to print xascii here)
-// printy: (assembly code to print yascii here)
-// printy/x should contain a jmp/call instruction to "printstart"
-// defined in GeneratePrintHeader
-// so it just does its job of printing INTs normally
-
-// How it all links together (Unique printer described above) ->
-// call printstart: -> call intloop -> (Potentially a jump to printnegative:)
-// call printloop: -> call printnewline ->ret printloop: ... ret uniqueprinter
-// -> ret original place that called it (_start)
-// Basically this print routine should NOT affect the regular
-// assembly in anyway and is ONLY really meant for making
-// unit testing our assembly easier. Also crude implementation,
-// doesn't follow calling conventions at all , Refactor later
-// Note to self each function requires that rax has the value to be printed
-// It cannot be at the top of the stack until after the call to printstart
-
 void CodeGen::GeneratePrinter() {
-  // ASSUME RESULT IS IN RAX
-
-
-  GeneratePrintHeader();
-
-  // intloop divides the int in rax by 10
-  // and converts the remainder into a char
-  // for printing
-  // E.g 12345 -> rax: 1234, rdx: 5 -> convert + push 5 to stack
-  outfile_ << "intloop:" << std::endl;
-  outfile_ << "\tmov $10, %rcx" << std::endl;
-  outfile_ << "\txor %rdx, %rdx" << std::endl;
-
-  outfile_ << "\tdiv %rcx" << std::endl;
-  outfile_ << "\tadd $'0', %rdx" << std::endl;
-  outfile_ << "\tinc %rsi" << std::endl;
-  outfile_ << "\tpush %rdx" << std::endl;
-  outfile_ << "\tcmp $0, %rax" << std::endl;
-  outfile_ << "\tjnz intloop" << std::endl;
-
-  outfile_ << "\tmov %rsi, %rbx" << std::endl;
-  outfile_ << "\tcmp $1, %rdi" << std::endl;
-  outfile_ << "\tje printnegative" << std::endl;
-  outfile_ << "\tjmp printloop" << std::endl;
-
-  // Printloop
-  outfile_ << "printloop:" << std::endl;
-  outfile_ << "\tmov $1, %rax" << std::endl;
-  outfile_ << "\tmov $1, %rdi" << std::endl;
-  outfile_ << "\tmov %rsp, %rsi" << std::endl;
-  outfile_ << "\tmov $1, %rdx" << std::endl;
-  outfile_ << "\tsyscall" << std::endl;
-
-  outfile_ << "\tpop %rdx" << std::endl;
-  outfile_ << "\tdec %rbx" << std::endl;
-  outfile_ << "\tcmp $0, %rbx" << std::endl;
-  outfile_ << "\tjnz printloop" << std::endl;
-
-  outfile_ << "\tmov $1, %rax" << std::endl;
-  outfile_ << "\tmov $1, %rdi" << std::endl;
-  outfile_ << "\tmov $printnewline, %rsi" << std::endl;
-  outfile_ << "\tmov $1, %rdx" << std::endl;
-  outfile_ << "\tsyscall" << std::endl;
-
-  outfile_ << "\tret" << std::endl;
-
-  // printnegative:
-  outfile_ << "printnegative:" << std::endl;
-  outfile_ << "\tmov $1, %rax" << std::endl;
-  outfile_ << "\tmov $1, %rdi" << std::endl;
-  outfile_ << "\tmov $negative, %rsi" << std::endl;
-  outfile_ << "\tmov $1, %rdx" << std::endl;
-  outfile_ << "\tsyscall" << std::endl;
-  outfile_ << "\tjmp printloop" << std::endl;
-
   // negative:
   outfile_ << "negative:" << std::endl;
-  outfile_ << "\t.ascii \"-\"" << std::endl;
+  outfile_ << "\t.asciz \"-\"" << std::endl;
 
   // printresult
   outfile_ << "printresult:" << std::endl;
-  outfile_ << "\t.ascii \"The result is equal to: \"" << std::endl;
+  outfile_ << "\t.asciz \"The result is equal to: \"" << std::endl;
 
   // printfunctionresult
   outfile_ << "printfunctionresult:" << std::endl;
-  outfile_ << "\t.ascii \"The function returned: \"" << std::endl;
+  outfile_ << "\t.asciz \"The function returned: \"" << std::endl;
 
   // printnewline
   outfile_ << "printnewline:" << std::endl;
-  outfile_ << "\t.ascii \"\\n\""  << std::endl;
+  outfile_ << "\t.asciz \"\\n\""  << std::endl;
 
-  GeneratePrintResult();
-  GeneratePrintFunctionResult();
+  // printstring
+  outfile_ << "printstring:" << std::endl;
+  outfile_ << "\t.asciz \"%s\"" << std::endl;
+
+  // printint
+  outfile_ << "printint:" << std::endl;
+  outfile_ << "\t.asciz \"%d\\n\""  << std::endl;
 
   // Generate Unique Printers here
   std::set<std::string>::iterator it;
@@ -113,99 +35,45 @@ void CodeGen::GeneratePrinter() {
   }
 }
 
-void CodeGen::GeneratePrintHeader() {
-  outfile_ << "printstart:" << std::endl;
+void CodeGen::GeneratePrintCall(std::string label) {
+  outfile_ << "\t# Calling printf" << std::endl;
+  outfile_ << "\tpush %rax" << std::endl;
+  outfile_ << "\tmov $" << label << ", %rdi" << std::endl;
+  outfile_ << "\tmov $0, %rax" << std::endl;
+  outfile_ << "\tcall printf" << std::endl;
 
-  // Handle negative number here (If the number
-  // were printing out is negative then note it
-  // otherwise print normally)
-
-  // Why do we need these  2 lines, Look into later?
-  outfile_ << "\txor %rsi, %rsi" << std::endl;
-  outfile_ << "\txor %rdi, %rdi" << std::endl;
-
-  // outfile_ << "\tpop %rax" << std::endl;
-
-  outfile_ << "\tcmp $0, %rax" << std::endl;
-  outfile_ << "\tjge intloop" << std::endl;
-  outfile_ << "\tneg %rax" << std::endl;
-  outfile_ << "\tmov $1, %rdi" << std::endl;
-  outfile_ << "\tjmp intloop" << std::endl;
+  outfile_ << "\tpop %rax" << std::endl;
+  outfile_ << "\tmov $printint, %rdi" << std::endl;
+  outfile_ << "\tmov %rax, %rsi" << std::endl;
+  outfile_ << "\tmov $0, %rax" << std::endl;
+  outfile_ << "\tcall printf\n" << std::endl;
 }
 
 void CodeGen::GeneratePrintAssignment(std::string variablename) {
-  outfile_ << "print" + variablename + ":" << std::endl;
-  outfile_ << "\tpush %rax" << std::endl;
-  outfile_ << "\tmov $1, %rax" << std::endl;
-  outfile_ << "\tmov $1, %rdi" << std::endl;
-  outfile_ << "\tmov $" + variablename +"ascii, %rsi" << std::endl;
-  outfile_ << "\tmov $" + std::to_string(23+variablename.length())
-    + ", %rdx" << std::endl;
-  outfile_ << "\tsyscall" << std::endl;
-
-  outfile_ << "\txor %rsi, %rsi" << std::endl;
-  outfile_ << "\tpop %rax" << std::endl;
-
-  outfile_ << "\tjmp printstart" << std::endl;
-
-  outfile_ << "\tret" << std::endl;
-
   outfile_ << variablename + "ascii:" << std::endl;
-  outfile_ << "\t.ascii \"Variable " + variablename + " is equal to: \""
+  outfile_ << "\t.asciz \"Variable " + variablename + " is equal to: \""
     << std::endl;
 }
 
-void CodeGen::GeneratePrintFunctionResult() {
-  // printfunctionresult
-  outfile_ << "printfunctionret:" << std::endl;
-  outfile_ << "\tpush %rax" << std::endl;
-
-  outfile_ << "\tmov $1, %rax" << std::endl;
-  outfile_ << "\tmov $1, %rdi" << std::endl;
-  outfile_ << "\tmov $printfunctionresult, %rsi" << std::endl;
-  outfile_ << "\tmov $23, %rdx" << std::endl;
-  outfile_ << "\tsyscall" << std::endl;
-
-  outfile_ << "\tpop %rax" << std::endl;
-
-  outfile_ << "\tjmp printstart" << std::endl;
-  outfile_ << "\tret" << std::endl;
-}
-
-void CodeGen::GeneratePrintResult() {
-  outfile_ << "printarith:" << std::endl;
-
-  outfile_ << "\tpush %rax" << std::endl;
-
-  outfile_ << "\tmov $1, %rax" << std::endl;
-  outfile_ << "\tmov $1, %rdi" << std::endl;
-  outfile_ << "\tmov $printresult, %rsi" << std::endl;
-  outfile_ << "\tmov $24, %rdx" << std::endl;
-  outfile_ << "\tsyscall" << std::endl;
-
-  outfile_ << "\tpop %rax" << std::endl;
-
-  outfile_ << "\tjmp printstart" << std::endl;
-
-  outfile_ << "\tret" << std::endl;
-}
-
+// This needs to change
 void CodeGen::GenerateData(std::set<std::string> variableset) {
   // Creates a .data section for variables
   outfile_ << ".data " << std::endl;
   for (auto iter = variableset.begin(); iter != variableset.end(); ++iter) {
-    outfile_ << "\t" << *iter << ":\n\t\t.quad 1" << std::endl;
+    outfile_ << "\t" << *iter << ":\n\t\t.zero 16" << std::endl;
   }
 }
 
 void CodeGen::GenerateEpilogue() {
-  outfile_ << "\tmov $60, %rax\n\txor %rdi, %rdi\n\tsyscall\n" << std::endl;
+  outfile_ << "\tmov $60, %rax\n";
+  outfile_ << "\tmov $2, %rdi\n";
+  outfile_ << "\tsyscall\n" << std::endl;
 }
 
 void CodeGen::GenerateBoiler() {
-  outfile_ << "\t.global _start" << std::endl;
+  outfile_ << "\t.global main" << std::endl;
   outfile_ << "\t.text" << std::endl;
-    outfile_ << "_start:" << std::endl;
+    outfile_ << "main:" << std::endl;
 }
 
 void CodeGen::ClearRegister(std::string reg) {
@@ -216,6 +84,7 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
   Type loadtype = tac->op.opcode();
   int argumentnum;
   std::string varname;
+  std::vector<std::string> parsedstring;
 
   switch (loadtype) {
     case INTLOAD:
@@ -225,39 +94,79 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
       outfile_ << "\tpush %rcx\n" << std::endl;
       break;
     case VARLOAD:
-      outfile_ << "\t# Loading a variable" << std::endl;
-      outfile_ << "\tmov " + VariableNameHelper(tac->arg1.reg().name())
-        + ", %rcx" << std::endl;
-      outfile_ << "\tpush %rcx\n" << std::endl;
+      outfile_ << "\t# Loading from a variable" << std::endl;
+      outfile_ << "\tmov " << VariableNameHelper(tac->arg1.reg().name())
+        << ", %rbx" << std::endl;
+
+      // Error handling to check if it's actually an integer here
+      outfile_ << "\tmov %rbx, %rdi" << std::endl;
+      outfile_ << "\tmov $0, %rsi" << std::endl;
+      outfile_ << "\t# call checkifthisisanintegerornotfunction" << std::endl;
+
+      // Then load it into register
+      if (currscope_ == FUNCTION) {
+        outfile_ << "\tmov " << std::to_string(
+        symbollocations_.find(tac->arg1.reg().name())->second-8)
+          << "(%rbp), %rbx" << std::endl;
+        outfile_ << "\tpush %rbx\n" << std::endl;
+      } else {
+        outfile_ << "\tmov 8(%rbx), %rcx" << std::endl;
+        outfile_ << "\tpush %rcx\n" << std::endl;
+      }
       break;
     case VARASSIGNLOAD:
-      if (symboltable_.count(tac->target.reg().name()) == 0) {
-        // Add it to the map if its new
-        symboltable_.insert(std::pair<std::string, int>(
-        tac->target.reg().name(), -8+-8*(symboltable_.size()+1)));
-      }
-      outfile_ << "\t# Loading a value into variable "
-        + tac->target.reg().name() << std::endl;
-      ClearRegister("rbx");
-      outfile_ << "\tpop %rbx" << std::endl;
-      outfile_ << "\tmov %rbx, "
-        << VariableNameHelper(tac->target.reg().name()) << "" << std::endl;
 
-      // This currently makes it work. IT SHOuLD NOT WORK
-      // outfile_ << "\tpush %rbx" << std::endl;
+      // Two cases one of it it's a deref, other if it's a var
+      // Only add to map if it's a var
+      // Case down below is for vars
+      parsedstring = DereferenceParserHelper(tac->target.reg().name());
 
-      // Add it to the set, then call the print function
-      if (currscope_ == GLOBAL) {
-        assignmentset_.insert(tac->target.reg().name());
-        outfile_ << "\tmov %rbx, %rax\n" << std::endl;
-        // Call on correct print function
-        outfile_ << "\t# Going to print " << tac->target.reg().name()
-          << std::endl;
-        outfile_ << "\tcall print" + tac->target.reg().name() << std::endl;
-        outfile_ << "\t# Returning from printing "
-          << tac->target.reg().name() << std::endl;
+      if (parsedstring.size() == 1) {
+        if (symbollocations_.count(tac->target.reg().name()) == 0) {
+          // Add it to the map if its new
+          symbollocations_.insert(std::pair<std::string, int>(
+          tac->target.reg().name(), -16*(symbollocations_.size()+1)));
+        }
+
+        outfile_ << "\t# Loading a value into variable "
+          + tac->target.reg().name() << std::endl;
+        ClearRegister("rcx");
+        outfile_ << "\tpop %rcx" << std::endl;
+
+        if (currscope_ == FUNCTION) {
+          // Update flags
+          outfile_ << "\tmovb $0,"
+            << VariableNameHelper(tac->target.reg().name()) << std::endl;
+          int index = symbollocations_.find(tac->target.reg().name())->second;
+          outfile_ << "\tmovb $1, " << std::to_string(index-1) << "(%rbp)\n";
+          outfile_ << "\tmovl $0, " << std::to_string(index-2) << "(%rbp)\n";
+          outfile_ << "\tmovq %rcx, " << std::to_string(index-8) << "(%rbp)\n"
+            << std::endl;
+        } else {
+          outfile_ << "\tmov "
+            << VariableNameHelper(tac->target.reg().name())
+            << ", %rbx" << std::endl;
+          outfile_ << "\tmovb $0, (%rbx)" << std::endl;
+          outfile_ << "\tmovb $1, 1(%rbx)" << std::endl;
+          outfile_ << "\tmovl $0, 2(%rbx)" << std::endl;
+          outfile_ << "\tmov %rcx, 8(%rbx)\n" << std::endl;
+        }
+
+        // Add it to the set, then call the print function
+        if (currscope_ == GLOBAL) {
+          assignmentset_.insert(tac->target.reg().name());
+          outfile_ << "\tmov %rcx, %rax\n" << std::endl;
+          // Call on correct print function
+          outfile_ << "\t# Going to print " << tac->target.reg().name()
+            << std::endl;
+          GeneratePrintCall(tac->target.reg().name()+"ascii");
+          outfile_ << "\t# Returning from printing "
+            << tac->target.reg().name() << std::endl;
+          outfile_ << std::endl;
+        }
+      } else {
+        // Handle Derefs
       }
-      outfile_ << std::endl;
       break;
     case FUNARGLOAD:
       // Here we're moving arguments loaded into the stack before the
@@ -266,14 +175,21 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
       varname = tac->target.reg().name();
       outfile_ << "\t# Moving argument " << std::to_string(argumentnum)
         << " into the stack" << std::endl;
-      outfile_ << "\tmov " << std::to_string(8+argumentnum*8) << "(%rbp), %rax"
-        << std::endl;
-      outfile_ << "\tmov %rax, -" << std::to_string(8+argumentnum*8)
+      outfile_ << "\tmov " << std::to_string(8+argumentnum*8)
+        << "(%rbp), %rax" << std::endl;
+      outfile_ << "\tmov %rax, -" << std::to_string(8 + argumentnum*16)
+        << "(%rbp)" << std::endl;
+      // Remake the "Int" object
+      outfile_ << "\tmovb $0, -" << std::to_string(argumentnum*16)
+        << "(%rbp)" << std::endl;
+      outfile_ << "\tmovb $0, -" << std::to_string(1 + argumentnum*16)
+        << "(%rbp)" << std::endl;
+      outfile_ << "\tmovl $0, -" << std::to_string(2 + argumentnum*16)
         << "(%rbp)\n" << std::endl;
       // Include it in the symbol table
-      if (symboltable_.count(varname) == 0) {
-        symboltable_.insert(std::pair<std::string, int>(varname,
-          -8+-8*argumentnum));
+      if (symbollocations_.count(varname) == 0) {
+        symbollocations_.insert(std::pair<std::string, int>(varname,
+          -16*argumentnum));
       } else {
         std::cerr << "FUNARGLOAD VARIABLE ASSIGNMENT PROBLEM\n";
         exit(1);
@@ -282,23 +198,36 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
     case FUNRETLOAD:
       // All we do here is move the value from the function to the correct
       // variable
-      if (symboltable_.count(tac->target.reg().name()) == 0) {
+      if (symbollocations_.count(tac->target.reg().name()) == 0) {
         // Add it to the map then create a spot for it (if its a function)
-        symboltable_.insert(std::pair<std::string, int>(
-        tac->target.reg().name(), -8+-8*(symboltable_.size()+1)));
-
-        // Shouldn't need this anymore
-        // if (currscope_ == FUNCTION) {
-        //   outfile_ << "\t# Creating space for " << tac->target.reg().name()
-        //     << " on the stack" << std::endl;
-        //   outfile_ << "\tsub $8, %rsp" << std::endl;
-        //   outfile_ << "\tmov %rax, -" <<
-        //   std::to_string(8+symboltable_.size()*8) << "(%rbp)\n" << std::endl;
-        // }
+        symbollocations_.insert(std::pair<std::string, int>(
+        tac->target.reg().name(), -16*(symbollocations_.size()+1)));
       }
       outfile_ << "\t# Returning from function and loading value" << std::endl;
-      outfile_ << "\tmov %rax, " <<
-        VariableNameHelper(tac->target.reg().name()) << "\n" << std::endl;
+
+      // Update the whole structure with the correct type
+      // (always returns an int) Then move it into the value field
+      // Remake the "Int" object if it's a function
+      if (currscope_ == FUNCTION) {
+        outfile_ << "\tmovb $0,"
+          << VariableNameHelper(tac->target.reg().name()) << std::endl;
+        int index = symbollocations_.find(tac->target.reg().name())->second;
+        outfile_ << "\tmovb $1, " << std::to_string(index-1) << "(%rbp)\n";
+        outfile_ << "\tmovl $0, " << std::to_string(index-2) << "(%rbp)\n";
+
+        // now load the value of rax in
+        outfile_ << "\tmovq %rax, " << std::to_string(index-8) << "(%rbp)\n"
+          << std::endl;
+      } else {
+        // Update flags
+        outfile_ << "\tmov "
+          << VariableNameHelper(tac->target.reg().name())
+          << ", %rbx" << std::endl;
+        outfile_ << "\tmovb $0, (%rbx)" << std::endl;
+        outfile_ << "\tmovb $1, 1(%rbx)" << std::endl;
+        outfile_ << "\tmovl $0, 2(%rbx)" << std::endl;
+        outfile_ << "\tmov %rax, 8(%rbx)\n" << std::endl;
+      }
       break;
     default:
       break;
@@ -431,41 +360,22 @@ void CodeGen::GenerateBinaryExprHelper(
   // RegisterType arg1type = tac->arg1.reg().type();
   // RegisterType arg2type = tac->arg2.reg().type();
 
-  // if ( arg1type == VARIABLEREG && arg2type == VARIABLEREG ) {
-  //   // Do a double load from the variable names
-  //   outfile_ << " btwn two variables\n";
-  //   outfile_ << "\tmov " << VariableNameHelper(tac->arg1.reg().name())
-  //     << ", %rax" << std::endl;
-  //   outfile_ << "\tmov " << VariableNameHelper(tac->arg2.reg().name())
-  //     << ", %rbx" << std::endl;
-  // } else if ( arg1type == VARIABLEREG && arg2type == VIRTUALREG ) {
-  //     // Load from the first variable
-  //     outfile_ << " btwn var,int\n";
-  //     outfile_ << "\tmov " << VariableNameHelper(tac->arg1.reg().name())
-  //       << ", %rax" << std::endl;
-  //     outfile_ << "\tpop %rbx" << std::endl;
-  // } else if ( arg1type == VIRTUALREG && arg2type == VARIABLEREG ) {
-  //     // Load from the second variable
-  //     outfile_ << " btwn int, var\n";
-  //     outfile_ << "\tmov " << VariableNameHelper(tac->arg2.reg().name())
-  //       << ", %rbx" << std::endl;
-  //     outfile_ << "\tpop %rax" << std::endl;
-  // } else {
-      // double pop from stack
-      outfile_ << " btwn int, int\n";
-      outfile_ << "\tpop %rbx" << std::endl;  // rbx = right
-      outfile_ << "\tpop %rax" << std::endl;  // rax = left
+  // double pop from stack
+  outfile_ << " btwn int, int\n";
+  outfile_ << "\tpop %rbx" << std::endl;  // rbx = right
+  outfile_ << "\tpop %rax" << std::endl;  // rax = left
   // }
 }
 
 std::string CodeGen::VariableNameHelper(std::string variablename) {
   if (currscope_ == GLOBAL) {
-    return variablename;
+    return "$"+variablename;
   } else {
     // We're inside a function so consult the map
-    if (symboltable_.count(variablename) == 1) {
+
+    if (symbollocations_.count(variablename) == 1) {
       std::string mappedname = std::to_string(
-        symboltable_.find(variablename)->second) + "(%rbp)";
+        symbollocations_.find(variablename)->second) + "(%rbp)";
       return mappedname;
     } else {
       // something bad happened
@@ -476,10 +386,33 @@ std::string CodeGen::VariableNameHelper(std::string variablename) {
   }
 }
 
+std::vector<std::string> CodeGen::DereferenceParserHelper(
+  std::string variablename) {
+  std::istringstream issvarname(variablename);
+  std::string token;
+  std::string result = "";
+  std::vector<std::string> resultvector;
+
+  while (std::getline(issvarname, token, '-')) {
+        result = result + token;
+  }
+
+  issvarname = std::istringstream(result);
+  result = "";
+
+  while (std::getline(issvarname, token, '>')) {
+    resultvector.push_back(token);
+  }
+  return resultvector;
+}
+
 void CodeGen::Generate(std::vector
   <std::unique_ptr<struct ThreeAddressCode>> blocks) {
   // boiler code here
   GenerateBoiler();
+
+  // Belongs to LHS/RHS Deref, factor it out later
+  std::vector<std::string> parsedstring;
 
   // IR to assembly inst
   for (unsigned int i = 0; i < blocks.size(); ++i) {
@@ -594,15 +527,15 @@ void CodeGen::Generate(std::vector
         break;
       case FUNRETEP:
         outfile_ << "\t# FunctionRetEpilogue (Restore Stack)" << std::endl;
-        outfile_ << "\tadd $" << code->arg1.value() * 8 <<
+        outfile_ << "\tadd $" << code->arg1.value() * 16 <<
           ", %rsp" << std::endl;
-        outfile_ << "\tcall printfunctionret\n" << std::endl;
+        GeneratePrintCall("printfunctionresult");
         break;
       case FUNDEF:
         // Change scope
         currscope_ = FUNCTION;
         // Clear map
-        symboltable_.clear();
+        symbollocations_.clear();
         break;
       case FUNPROLOGUE:
         outfile_ << "\t# Function Prologue " << std::endl;
@@ -611,7 +544,7 @@ void CodeGen::Generate(std::vector
         // May be unneeded
         outfile_ << "\tpush %rbx" << std::endl;
 
-        outfile_ << "\tsub $" << code->arg1.value()*8 << ", %rsp\n"
+        outfile_ << "\tsub $" << code->arg1.value()*16 << ", %rsp\n"
           << std::endl;
         break;
       case FUNEPILOGUE:
@@ -627,12 +560,155 @@ void CodeGen::Generate(std::vector
         break;
       case PRINTARITH:
         outfile_ << "\tpop %rax" << std::endl;
-        outfile_ << "\tcall printarith" << std::endl;
+        GeneratePrintCall("printresult");
 
         // BAD FIX, we "know" that the last thing will be the arithmetic expr
         // So im just going to go ahead and make the exit code here
         // later on THIS SHOULD CHANGE
         GenerateEpilogue();
+        break;
+      case LHSDEREFERENCE:  // Needs to handle functions
+        parsedstring = DereferenceParserHelper(code->target.label().name());
+        outfile_ << "\t# Dereference of variable "
+            << code->target.label().name() << std::endl;
+        if (parsedstring.size() == 2) {
+          outfile_ << "\tmov " << VariableNameHelper(code->arg1.reg().name())
+            << ", %rbx" << std::endl;
+
+          // Error Handling here to check the size and if it's actually a tuple
+
+          // Get the actual object
+          outfile_ << "\tmovq 8(%rbx), %rbx" << std::endl;
+
+          // Now if you're a child deref check if the field you're accessing
+          // is actually a valid tuple (defunct)
+          if (code->arg2.reg().name().compare("Child") == 0) {
+            // error handling
+          } else {
+            // Otherwise you're the parent so there's no need to check
+            // because reassignment is possible
+          }
+
+          // Get the correct index of the object
+          outfile_ << "\tpop %rax" << std::endl;
+          outfile_ << "\tsub $1, %rax" << std::endl;
+          outfile_ << "\timul $16, %rax" << std::endl;
+          outfile_ << "\tadd %rax, %rbx" << std::endl;
+          outfile_ << "\tpush %rbx\n" << std::endl;
+        } else {
+          outfile_ << "\tpop %rcx" << std::endl;
+          outfile_ << "\tpop %rbx" << std::endl;
+          outfile_ << "\tpush %rcx" << std::endl;
+
+          // Error Handling here to check the size + if it's a tuple
+
+          // Get the actual object
+          outfile_ << "\tmovq 8(%rbx), %rbx" << std::endl;
+
+          // Now if you're a child deref check if the field you're accessing
+          // is actually a valid tuple
+          if (code->arg2.reg().name().compare("Child") == 0) {
+            // error handling
+          } else {
+            // Otherwise you're the parent so there's no need to check
+            // because reassignment is possible
+          }
+
+          // Get the correct index of the object
+          outfile_ << "\tpop %rax" << std::endl;
+          outfile_ << "\tsub $1, %rax" << std::endl;
+          outfile_ << "\timul $16, %rax" << std::endl;
+          outfile_ << "\tadd %rax, %rbx" << std::endl;
+          outfile_ << "\tpush %rbx\n" << std::endl;
+        }
+
+        break;
+      case RHSDEFERERENCE:  // Needs to handle functions
+        parsedstring = DereferenceParserHelper(code->target.label().name());
+        outfile_ << "\t# Dereference of variable "
+            << code->target.label().name() << std::endl;
+        if (parsedstring.size() == 2) {
+          outfile_ << "\tmov " << VariableNameHelper(code->arg1.reg().name())
+            << ", %rbx" << std::endl;
+
+          // Error Handling here to check the size + if you're actually an int
+
+          // Get the actual object
+          outfile_ << "\tmovq 8(%rbx), %rbx" << std::endl;
+
+          outfile_ << "\tpop %rax" << std::endl;
+          outfile_ << "\tsub $1, %rax" << std::endl;
+          outfile_ << "\timul $16, %rax" << std::endl;
+          outfile_ << "\tadd %rax, %rbx" << std::endl;
+          outfile_ << "\tpush %rbx" << std::endl;
+
+          // Now if you're a child deref check if the field you're accessing
+          // is actually a valid AE
+          if (code->arg2.reg().name().compare("Child") == 0) {
+            // Do nothing
+
+          } else {
+            // Otherwise you're the parent so
+            // get the value stored and push it on the stack
+            outfile_ << "\tpop %rbx" << std::endl;
+            outfile_ << "\tmov (%rbx), %rcx" << std::endl;
+            outfile_ << "\tpush %rcx\n" << std::endl;
+          }
+        } else {
+          outfile_ << "\tpop %rcx" << std::endl;
+          outfile_ << "\tpop %rbx" << std::endl;
+          outfile_ << "\tpush %rcx" << std::endl;
+          // Error Handling here to check the size + if you're actually an int
+
+          // Get the actual object
+          outfile_ << "\tmovq 8(%rbx), %rbx" << std::endl;
+
+          outfile_ << "\tpop %rax" << std::endl;
+          outfile_ << "\tsub $1, %rax" << std::endl;
+          outfile_ << "\timul $16, %rax" << std::endl;
+          outfile_ << "\tadd %rax, %rbx" << std::endl;
+          outfile_ << "\tpush %rbx" << std::endl;
+
+          // Now if you're a child deref check if the field you're accessing
+          // is actually a valid AE
+          if (code->arg2.reg().name().compare("Child") == 0) {
+            // Do nothing
+
+          } else {
+            // Otherwise you're the parent so
+            // get the value stored and push it on the stack
+            outfile_ << "\tpop %rbx" << std::endl;
+            outfile_ << "\tmov (%rbx), %rcx" << std::endl;
+            outfile_ << "\tpush %rcx\n" << std::endl;
+          }
+        }
+        break;
+      case NEWTUPLE:  // Needs to handle functions
+
+        outfile_ << "\t# Making a tuple " << std::endl;
+        outfile_ << "\tpop %rcx" << std::endl;
+        outfile_ << "\tpush %rcx" << std::endl;
+        outfile_ << "\timul $16, %rcx" << std::endl;
+        outfile_ << "\tmov %rcx, %rdi" << std::endl;
+        outfile_ << "\tcall malloc" << std::endl;
+
+        // Rewrite flags
+        outfile_ << "\tpop %rcx" << std::endl;
+        outfile_ << "\tpop %rbx" << std::endl;
+        outfile_ << "\tmovb $1, (%rbx)" << std::endl;
+        outfile_ << "\tmovb $1, 1(%rbx)" << std::endl;
+        outfile_ << "\tmovl %ecx, 2(%rbx)" << std::endl;
+
+        // Write pointer given by malloc into value field
+        outfile_ << "\tmovq %rax, 8(%rbx)\n" << std::endl;
+        break;
+      case VARCHILDTUPLE:  // May need to handle functions
+        outfile_ << "\t# Getting value of " << code->target.label().name()
+          << std::endl;
+        outfile_ << "\tmov " <<
+          VariableNameHelper(code->target.label().name()) << ", %rbx"
+          << std::endl;
+        outfile_ << "\tpush %rbx\n" << std::endl;
         break;
       default:
         std::cerr << "Inside Generate and something really bad happened\n";

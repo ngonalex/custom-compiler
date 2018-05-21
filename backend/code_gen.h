@@ -8,6 +8,7 @@
 #include <map>
 #include <utility>
 #include <set>
+#include <sstream>
 
 #include "backend/lowerer_visitor.h"
 
@@ -25,7 +26,7 @@ class CodeGen {
 
     // Printing functions
     void GeneratePrinter();
-    void GeneratePrintHeader();
+    void GeneratePrintCall(std::string label);
     void GeneratePrintAssignment(std::string);
     void GeneratePrintFunctionResult();
     void GeneratePrintResult();
@@ -46,12 +47,15 @@ class CodeGen {
     // offset inside the stacks
     std::string VariableNameHelper(std::string variablename);
 
+    std::vector<std::string> DereferenceParserHelper(std::string variablename);
+
  private:
   std::ofstream& outfile_;
   int printercount_;
   std::set<std::string> assignmentset_;
   Scope currscope_;
-  std::map<std::string, int> symboltable_;
+  std::map<std::string, int> symbollocations_;
+  std::map<std::string, int> symboltypes_;
 };
 
 }  // namespace backend

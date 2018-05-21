@@ -47,12 +47,14 @@ namespace backend {
 enum ChildType {
   INTCHILD,
   VARCHILD,
+  DEREFCHILD,
   NOCHILD
 };
 
 class LowererVisitor : public AstVisitor {
  public:
-  LowererVisitor() : counter_(), currvariabletype_(RIGHTHAND) {}
+  LowererVisitor() : counter_(), currvariabletype_(RIGHTHANDVAR),
+    currdereferencetype_(RHSDEFERERENCE) {}
 
   std::string GetOutput();
 
@@ -100,8 +102,9 @@ class LowererVisitor : public AstVisitor {
   void CreateComparisionBlock(Type type);
   void CreateLabelBlock(std::string labelname);
   void CreateJumpBlock(std::string jumpname, Type type);
-  void CreateDereference(std::string variable);
-  void CreateTupleAssignment(std::string variable, Operand operand);
+  void CreateDereference(std::string basevariable, std::string targetvariable,
+    int indexofchild);
+  void CreateTupleAssignment(std::string target, Operand operand);
 
   // Helpers
   std::string GetOutputArithmeticHelper(std::string output, int index,
@@ -142,6 +145,7 @@ class LowererVisitor : public AstVisitor {
   ChildType lastchildtype_;
   struct Counter counter_;
   VariableType currvariabletype_;
+  Type currdereferencetype_;
 };
 
 }  // namespace backend

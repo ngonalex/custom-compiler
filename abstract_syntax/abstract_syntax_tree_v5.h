@@ -17,7 +17,7 @@
 //
 // stmt ∈ Statement ⟵ assign | cond | loop | call
 // block ∈ Block ⟵ stmt...
-// 
+//
 // assign ∈ Assignment ⟵ lhs := ae | lhs := tuple(ae)
 //
 // cond ∈ Conditional ⟵ if re block1 block2
