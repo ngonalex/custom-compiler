@@ -12,7 +12,11 @@ Tokenizer::Tokenizer(std::string program) : input_program_(program) {
     //Looping through all characters of program and tokenize
     for (char &c : input_program_) {
         Token::Type separatorType = ExtractSeparator(c);
+<<<<<<< HEAD
         if (separatorType != Token::INCOMPLETE) {
+=======
+        if (separatorType != Token::INCOMPLETE){
+>>>>>>> master
             if (currString != "") {
             Token::Type type = ExtractType(currString);
             if (type == Token::NUM) {
@@ -25,7 +29,7 @@ Tokenizer::Tokenizer(std::string program) : input_program_(program) {
                 Token newToken(type);
                 tokens_.push_back(newToken);
             }
-            printf("Current String: %s\n", currString.c_str());
+            // printf("Current String: %s\n", currString.c_str());
             }
             if (separatorType != Token::WHITESPACE) {
                 Token newToken(separatorType);
@@ -48,7 +52,11 @@ Tokenizer::Tokenizer(std::string program) : input_program_(program) {
 }
 
 Token::Type Tokenizer::ExtractType(std::string expression) {
+<<<<<<< HEAD
     if (expression == "var") {
+=======
+    if (expression == "var"){
+>>>>>>> master
         return Token::VAR_NAME;
     } else if (expression == "func") {
         

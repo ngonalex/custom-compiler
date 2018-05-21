@@ -22,8 +22,8 @@ class Token {
     ASSERT(type != Token::Type::NUM, "Integer tokens need an integer val");
     ASSERT(type != Token::Type::IDENTIFIER, "Identifier tokens need a string identifierVal");
   }
+  
   Token() { type_ = Token::Type::NONE; }
-
     Token(Token::Type type, std::string identifierVal) : type_(type), identifierVal_(identifierVal) {
     ASSERT(type == Token::Type::IDENTIFIER, "Only identifier tokens have identifierVal declared");
   }
@@ -51,6 +51,11 @@ class Token {
   int val() const {
     ASSERT(type_ == Token::Type::NUM, "Only integer tokens have value");
     return val_;
+  }
+  
+  std::string idVal() const {
+    ASSERT(type_ == Token::Type::IDENTIFIER, "Only Identifiers have id vals");
+    return identifierVal_;
   }
 
  private:
