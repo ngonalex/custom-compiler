@@ -58,17 +58,10 @@ std::unique_ptr<const VariableExpr> Parser::ParseVariable(Token curr) {
   return nullptr;
 }
 
-<<<<<<< HEAD
-std::unique_ptr<const AstNode> Parser::ParseLine() {
-    std::unique_ptr<const AstNode> t = ParseAddSub();
-    Expect(Token::Type::END);
-    return t;
-=======
 std::unique_ptr<const ArithmeticExpr> Parser::Eparser() {
   std::unique_ptr<const ArithmeticExpr> t = ParseAddSub();
   Expect(Token::Type::END);
   return t;
->>>>>>> master
 }
 
 std::unique_ptr<const ArithmeticExpr> Parser::ParseAddSub() {
