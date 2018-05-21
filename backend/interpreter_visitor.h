@@ -16,11 +16,21 @@ using cs160::abstract_syntax::backend::AddExpr;
 using cs160::abstract_syntax::backend::SubtractExpr;
 using cs160::abstract_syntax::backend::MultiplyExpr;
 using cs160::abstract_syntax::backend::DivideExpr;
-using cs160::abstract_syntax::backend::BinaryOperatorExpr;
 using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::Assignment;
 using cs160::abstract_syntax::backend::Program;
 using cs160::abstract_syntax::backend::VariableExpr;
+using cs160::abstract_syntax::backend::LessThanExpr;
+using cs160::abstract_syntax::backend::LessThanEqualToExpr;
+using cs160::abstract_syntax::backend::GreaterThanExpr;
+using cs160::abstract_syntax::backend::GreaterThanEqualToExpr;
+using cs160::abstract_syntax::backend::EqualToExpr;
+using cs160::abstract_syntax::backend::LogicalAndExpr;
+using cs160::abstract_syntax::backend::LogicalBinaryOperator;
+using cs160::abstract_syntax::backend::LogicalNotExpr;
+using cs160::abstract_syntax::backend::LogicalOrExpr;
+using cs160::abstract_syntax::backend::Loop;
+using cs160::abstract_syntax::backend::Conditional;
 
 namespace cs160 {
 namespace backend {
@@ -42,13 +52,23 @@ class InterpreterVisitor : public AstVisitor {
     return variablemap_.find(variable)->second;
   }
 
+  // V3 (Assignment + Program updated) Fill
+  void VisitLessThanExpr(const LessThanExpr& exp) {}
+  void VisitLessThanEqualToExpr(const LessThanEqualToExpr& exp) {}
+  void VisitGreaterThanExpr(const GreaterThanExpr& exp) {}
+  void VisitGreaterThanEqualToExpr(
+      const GreaterThanEqualToExpr& exp) {}
+  void VisitEqualToExpr(const EqualToExpr& exp) {}
+  void VisitLogicalAndExpr(const LogicalAndExpr& exp) {}
+  void VisitLogicalOrExpr(const LogicalOrExpr& exp) {}
+  void VisitLogicalNotExpr(const LogicalNotExpr& exp) {}
+  void VisitConditional(const Conditional& conditional) {}
+  void VisitLoop(const Loop& loop) {}
+
   // these should be able to change members of the visitor, thus not const
   void VisitIntegerExpr(const IntegerExpr& exp) {
     // push value to stack
     opstack_.push(exp.value());
-  }
-
-  void VisitBinaryOperatorExpr(const BinaryOperatorExpr& exp) {
   }
 
   void VisitAddExpr(const AddExpr& exp) {
@@ -131,7 +151,7 @@ class InterpreterVisitor : public AstVisitor {
   }
 
   void VisitProgram(const Program& program) {
-    for (auto& assignment : program.assignments()) {
+    for (auto& assignment : program.statements()) {
       assignment->Visit(this);
     }
 

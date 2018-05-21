@@ -9,10 +9,9 @@ namespace frontend {
 	
 class AndCombinator : NullParser {
  public:
-	NullParser *firstParser;
-	NullParser *secondParser;
-
 	virtual ParseStatus parse(std::string inputProgram);
+	NullParser* firstParser;
+	NullParser* secondParser;
 };
 
 }	// namespace frontend

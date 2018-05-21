@@ -6,3 +6,5 @@ bazel-*
 .idea/
 /team-influx
 .xcodeproj
+.code-workspace
+

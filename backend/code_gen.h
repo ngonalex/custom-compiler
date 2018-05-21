@@ -7,6 +7,7 @@
 #include <vector>
 #include <map>
 #include <utility>
+#include <set>
 
 #include "backend/lowerer_visitor.h"
 
@@ -21,13 +22,26 @@ class CodeGen {
     void ClearRegister(std::string reg);
     void GenerateBoiler();
 
-    // REMOVE THIS LATER
-    void GenerateDumbTest();
-    // Have used this helper twice now think
-    // about making it apart of a class later
-    std::vector<std::string> printhelper = {"load", "+", "-", "*", "/"};
+    // Printing functions
+    void GeneratePrinter();
+    void GeneratePrintHeader();
+    void GenerateAssignment(std::string);
+    void GenerateResult();
+    void GenerateData(std::set<std::string>);
+    // Different nodes + helpers
+    void GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac);
+    void GenerateArithmeticExpr(std::unique_ptr<ThreeAddressCode> tac,
+      Type type);
+    void GenerateBinaryExprHelper(std::unique_ptr<ThreeAddressCode> tac);
+    void GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
+      Type type);
+    void GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
+      Type type);
+
  private:
   std::ofstream& outfile_;
+  int printercount_;
+  std::set<std::string> assignmentset_;
 };
 
 }  // namespace backend
