@@ -9,7 +9,7 @@ namespace cs160 {
 namespace frontend {
 	
 class MulDivOpParser : NullParser {
-public:
+ public:
 	virtual ParseStatus parse(std::string inputProgram);
 };
 

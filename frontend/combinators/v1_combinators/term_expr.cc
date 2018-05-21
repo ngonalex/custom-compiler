@@ -1,5 +1,4 @@
 #include "frontend/combinators/v1_combinators/term_expr.h"
-#include "iostream"
 
 #define super NullParser
 
@@ -45,7 +44,6 @@ ParseStatus TermExprParser::parse(std::string inputProgram) {
       ParseStatus cpParseStatus = close_paren.parse(aeParseStatus.remainingCharacters);
       if (cpParseStatus.status) {
         aeParseStatus.remainingCharacters = cpParseStatus.remainingCharacters;
-        std::cout << aeParseStatus.remainingCharacters << std::endl;
         return aeParseStatus; // Returning Success on AE
       }
       return cpParseStatus;  // Returing Failure on AddSubExpr

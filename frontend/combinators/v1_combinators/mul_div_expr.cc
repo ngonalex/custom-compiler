@@ -1,5 +1,4 @@
 #include "frontend/combinators/v1_combinators/mul_div_expr.h"
-#include "iostream"
 
 #define super NullParser
 
@@ -24,7 +23,6 @@ ParseStatus MulDivExprParser::parse(std::string inputProgram) {
 														 std::move(result.ast),
 														 std::move(rhsParseStatus.ast)));
 	    mdParseStatus = op.parse(rhsParseStatus.remainingCharacters);
-			std::cout << mdParseStatus.remainingCharacters << std::endl;
 	  }
 		result.remainingCharacters = mdParseStatus.remainingCharacters;
 	}
@@ -36,11 +34,9 @@ std::unique_ptr<const AstNode> MulDivExprParser::make_node(std::string op,
   std::unique_ptr<const AstNode> first_leaf,
   std::unique_ptr<const AstNode> second_leaf) {
   if (op == "*") {
-      return make_unique<MultiplyExpr>(std::move(first_leaf),
-																		 std::move(second_leaf));
-   } else if (op == "/") {
-      return make_unique<DivideExpr>(std::move(first_leaf),
-																   std::move(second_leaf));
+		return make_unique<MultiplyExpr>(std::move(first_leaf), std::move(second_leaf)); 
+	} else if (op == "/") {
+		return make_unique<DivideExpr>(std::move(first_leaf), std::move(second_leaf));
   } else {
     return nullptr;
   }

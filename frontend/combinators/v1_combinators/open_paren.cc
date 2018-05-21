@@ -8,7 +8,6 @@ ParseStatus OpenParenParser::parse(std::string inputProgram) {
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);
 	}
-
 	ParseStatus status;
 	if (inputProgram[0] == '(') {
 		status.status = true;

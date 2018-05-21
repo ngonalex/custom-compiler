@@ -7,9 +7,8 @@
 namespace cs160 {
 namespace frontend {
 
-class SingleCharParser : NullParser
-{
-public:
+class SingleCharParser : NullParser {
+ public:
 	virtual ParseStatus parse(std::string inputProgram);
 };
 
