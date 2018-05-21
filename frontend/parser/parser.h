@@ -71,6 +71,13 @@ class Parser {
     
   std::unique_ptr<const ArithmeticExpr> MakeInteger(Token num);
 
+<<<<<<< HEAD
+  std::unique_ptr<const AstNode> Eparser();
+    
+  std::unique_ptr<const AstNode> ParseLine();
+    
+  std::unique_ptr<const AstNode> ParseAddSub();
+=======
   std::unique_ptr<const VariableExpr> ParseVariable(Token curr);
 
   std::unique_ptr<const ArithmeticExpr> Eparser();
@@ -80,6 +87,7 @@ class Parser {
   std::unique_ptr<const Assignment> ParseAssignment();
 
   std::unique_ptr<const ArithmeticExpr> ParseAddSub();
+>>>>>>> master
 
   std::unique_ptr<const ArithmeticExpr> ParseMulDiv();
 

@@ -65,7 +65,7 @@ TEST(Tokenizer, SingleLetterVariableName) {
   tokens.push_back(Token(Token::END));
   tokens.push_back(Token(Token::ENDOFFILE));
 
-  EXPECT_EQ(lexer.tokens(),tokens);
+  EXPECT_EQ(lexer.tokens(), tokens);
 }
 
 TEST(Tokenizer, MuliLetterVariableName) {
@@ -77,7 +77,7 @@ TEST(Tokenizer, MuliLetterVariableName) {
   tokens.push_back(Token(Token::END));
   tokens.push_back(Token(Token::ENDOFFILE));
 
-  EXPECT_EQ(lexer.tokens(),tokens);
+  EXPECT_EQ(lexer.tokens(), tokens);
 }
 
 TEST(Tokenizer, MultiSemiColons) {
@@ -88,7 +88,7 @@ TEST(Tokenizer, MultiSemiColons) {
   tokens.push_back(Token(Token::END));
   tokens.push_back(Token(Token::ENDOFFILE));
 
-  EXPECT_EQ(lexer.tokens(),tokens);
+  EXPECT_EQ(lexer.tokens(), tokens);
 }
 
 TEST(Tokenizer, VariableExpression) {
@@ -107,5 +107,5 @@ TEST(Tokenizer, VariableExpression) {
   tokens.push_back(Token(Token::END));
   tokens.push_back(Token(Token::ENDOFFILE));
 
-  EXPECT_EQ(lexer.tokens(),tokens);
+  EXPECT_EQ(lexer.tokens(), tokens);
 }
