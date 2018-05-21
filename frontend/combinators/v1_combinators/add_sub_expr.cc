@@ -17,7 +17,7 @@ ParseStatus AddSubExprParser::parse(std::string inputProgram) {
 	  AddSubOpParser op;
 		ParseStatus asParseStatus = op.parse(result.remainingCharacters);
 		while (asParseStatus.status) {
-	    TermExprParser rhs;
+	    MulDivExprParser rhs;
 	    ParseStatus rhsParseStatus = rhs.parse(asParseStatus.remainingCharacters);
 	    result.ast = std::move(make_node((asParseStatus.parsedCharacters),
 														 std::move(result.ast),
