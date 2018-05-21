@@ -215,6 +215,13 @@ void LowererVisitor::VisitAssignmentFromArithExp(
     lhstarget = variablestack_.top();
     variablestack_.pop();
     lhsbase = "";
+    globalset_.insert(lhstarget);
+
+    auto block = make_unique<struct ThreeAddressCode>();
+    block->target = Target(Label(lhstarget));
+    // Uses varchildtuple but should just do the same things
+    block->op = Opcode(VARCHILDTUPLE);
+    blocks_.push_back(std::move(block));
   }
 
   // assign the right hand side to be equal to the left hand side
@@ -222,8 +229,8 @@ void LowererVisitor::VisitAssignmentFromArithExp(
   // string name
   assignment.rhs().Visit(const_cast<LowererVisitor*>(this));
 
-  Operand arg1(Register(lhstarget, VARIABLEREG));
-  CreateLoadBlock(VARASSIGNLOAD, arg1);
+  Operand arg1 = Operand(blocks_[blocks_.size()-1]->target.reg());
+  CreateArithmeticAssignment(lhstarget, arg1);
 }
 
 void LowererVisitor::VisitVariableExpr(const VariableExpr& exp) {
@@ -616,17 +623,6 @@ void LowererVisitor::CreateLoadBlock(Type type, Operand arg1) {
 
       blocks_.push_back(std::move(newblock));
       break;
-    case VARASSIGNLOAD:  // Only for ae exprs
-
-      // Push variablename into the set (Flagging it as being assigned)
-      globalset_.insert(arg1.reg().name());
-
-      newblock->target = Target(Register(arg1.reg().name(), VARIABLEREG));
-      newblock->op = Opcode(VARASSIGNLOAD);
-      newblock->arg1 = Operand(blocks_[blocks_.size()-1]->target.reg());
-
-      blocks_.push_back(std::move(newblock));
-      break;
     case INTLOAD:
       newblock->arg1 = arg1;
       newblock->op = Opcode(INTLOAD);
@@ -761,6 +757,16 @@ void LowererVisitor::CreateTupleAssignment(std::string target,
   auto block = make_unique<struct ThreeAddressCode>();
   block->target = Target(Label(target));
   block->op = Opcode(NEWTUPLE);
+  block->arg1 = operand;
+
+  blocks_.push_back(std::move(block));
+}
+
+void LowererVisitor::CreateArithmeticAssignment(std::string target,
+  Operand operand) {
+  auto block = make_unique<struct ThreeAddressCode>();
+  block->target = Target(Label(target));
+  block->op = Opcode(VARASSIGNLOAD);
   block->arg1 = operand;
 
   blocks_.push_back(std::move(block));

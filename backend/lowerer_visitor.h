@@ -105,6 +105,7 @@ class LowererVisitor : public AstVisitor {
   void CreateDereference(std::string basevariable, std::string targetvariable,
     int indexofchild);
   void CreateTupleAssignment(std::string target, Operand operand);
+  void CreateArithmeticAssignment(std::string target, Operand operand);
 
   // Helpers
   std::string GetOutputArithmeticHelper(std::string output, int index,
