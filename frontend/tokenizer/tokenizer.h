@@ -23,10 +23,23 @@ class Tokenizer {
 
   explicit Tokenizer(std::string program);
 
-  Token::Type ExtractType(const char testChar);
+    Token::Type ExtractType(std::string expression);
+  Token::Type ExtractSeparator(const char testChar);
 
+  // TODO include negative numbers
+  /*
+    Check if it's a valid variable name
+    1) start with lowercase or uppercase letter or underscore
+    2) can have lowercase, uppercase, underscore, or numbers
+
+    if there is an int keyword before it
+  */
+  bool validVariableName(const std::stringstream variableName);
+
+  // Getter function
   std::string program() const { return input_program_; }
 
+  // Getter function
   std::vector<Token> tokens() const { return tokens_; }
 
  private:
