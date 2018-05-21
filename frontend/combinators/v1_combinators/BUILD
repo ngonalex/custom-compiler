@@ -1,7 +1,7 @@
 cc_library(
 	name = "v1_combinators",
 	copts = ["-Wall -g"],
-	hdrs = ["single_digit.h", 
+	hdrs = ["single_digit.h",
 			"num_parser.h",
 			"single_char.h",
 			"add_sub_op.h",
@@ -13,7 +13,7 @@ cc_library(
 			"mul_div_expr.h",
 			"negative_sign.h",
 			"ae.h"],
-	srcs = ["single_digit.cc", 
+	srcs = ["single_digit.cc",
 			"num_parser.cc",
 			"single_char.cc",
 			"add_sub_op.cc",
@@ -31,8 +31,8 @@ cc_library(
 )
 
 cc_test(
-	name = "basic_combinators",
-	deps = ["@gtest//:main", ":combinators", "//frontend/combinators/basic_combinators", "//abstract_syntax:abstract_syntax"],
+	name = "combinators_test",
+	deps = ["@gtest//:main", "//frontend/combinators/basic_combinators", "//abstract_syntax:abstract_syntax"],
 	srcs = ["v1_test.cc"],
 	copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
 	timeout = "short",
