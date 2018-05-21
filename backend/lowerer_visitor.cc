@@ -115,6 +115,146 @@ std::string LowererVisitor::GetOutput() {
   return output;
 }
 
+void LowererVisitor::VisitDereference(const Dereference& exp) {
+  currvariabletype_ = LEFTHANDVAR;
+  exp.lhs().Visit(const_cast<LowererVisitor*>(this));
+  ChildType lhschildtype = lastchildtype_;
+  currvariabletype_ = RIGHTHANDVAR;
+  int indexoflastchild = blocks_.size()-1;
+
+  exp.rhs().Visit(const_cast<LowererVisitor*>(this));
+
+  auto rhsvirtualreg = blocks_[blocks_.size()-1]->target.reg().name();
+  std::string leftbasevariable;
+  std::string leftderefvariable;
+
+  switch (lhschildtype) {
+    case DEREFCHILD:
+      leftderefvariable = variablestack_.top();
+      variablestack_.pop();
+      leftbasevariable = variablestack_.top();
+      variablestack_.push(leftderefvariable+"->"+rhsvirtualreg);
+      break;
+    case VARCHILD:
+      leftbasevariable = variablestack_.top();
+      leftderefvariable = leftbasevariable+"->"+rhsvirtualreg;
+      variablestack_.push(leftderefvariable);
+      indexoflastchild = -1;
+
+      break;
+    default:
+      std::cerr << "Inside Dereference Something went very wrong\n";
+      break;
+  }
+
+  CreateDereference(leftbasevariable, leftderefvariable, indexoflastchild);
+  lastchildtype_ = DEREFCHILD;
+}
+
+
+void LowererVisitor::VisitAssignmentFromNewTuple(
+  const AssignmentFromNewTuple& assignment) {
+  // Visit the left which will add its variable name to the stack
+
+  // left hand side can't be a variable used to hold integer cause : x or x->1
+  // (may not be true in the future)
+  currvariabletype_ = LEFTHANDVAR;
+  currdereferencetype_ = LHSDEREFERENCE;
+  assignment.lhs().Visit(const_cast<LowererVisitor*>(this));
+  currdereferencetype_ = RHSDEFERERENCE;
+  currvariabletype_ = RIGHTHANDVAR;
+
+  std::string lhstarget;
+  std::string lhsbase;
+  if (lastchildtype_ == DEREFCHILD) {
+    lhstarget = variablestack_.top();
+    variablestack_.pop();
+    lhsbase = variablestack_.top();
+    variablestack_.pop();
+  } else {  // It must be a varchild or somethign went really wrong
+    lhstarget = variablestack_.top();
+    variablestack_.pop();
+    lhsbase = "";
+    // Add to set
+    globalset_.insert(lhstarget);
+
+    auto block = make_unique<struct ThreeAddressCode>();
+    block->target = Target(Label(lhstarget));
+    block->op = Opcode(VARCHILDTUPLE);
+    blocks_.push_back(std::move(block));
+  }
+
+  // assign the right hand side to be equal to the left hand side
+  // The latest vector addition is the final register to be set to the
+  // string name
+  assignment.rhs().Visit(const_cast<LowererVisitor*>(this));
+
+  Operand arg1 = Operand(blocks_[blocks_.size()-1]->target.reg());
+
+  CreateTupleAssignment(lhstarget, arg1);
+}
+
+void LowererVisitor::VisitAssignmentFromArithExp(
+  const AssignmentFromArithExp& assignment) {
+  // Visit the left which will add its variable name to the stack
+  currvariabletype_ = LEFTHANDVAR;
+  currdereferencetype_ = LHSDEREFERENCE;
+  assignment.lhs().Visit(const_cast<LowererVisitor*>(this));
+  currdereferencetype_ = RHSDEFERERENCE;
+  currvariabletype_ = RIGHTHANDVAR;
+
+  std::string lhstarget;
+  std::string lhsbase;
+
+  // Handled differently to support how we used to load
+  // to variables, consider having a function for just
+  // Assignments
+  if (lastchildtype_ == DEREFCHILD) {
+    // Change this stuff later
+    lhstarget = variablestack_.top();
+    variablestack_.pop();
+    // This should be base
+    lhsbase = variablestack_.top();
+    variablestack_.pop();
+  } else {  // It must be a varchild or something went really wrong
+    lhstarget = variablestack_.top();
+    variablestack_.pop();
+    lhsbase = "";
+    globalset_.insert(lhstarget);
+
+    auto block = make_unique<struct ThreeAddressCode>();
+    block->target = Target(Label(lhstarget));
+    // Uses varchildtuple but should just do the same things
+    block->op = Opcode(VARCHILDTUPLE);
+    blocks_.push_back(std::move(block));
+  }
+
+  // assign the right hand side to be equal to the left hand side
+  // The latest vector addition is the final register to be set to the
+  // string name
+  assignment.rhs().Visit(const_cast<LowererVisitor*>(this));
+
+  Operand arg1 = Operand(blocks_[blocks_.size()-1]->target.reg());
+  CreateArithmeticAssignment(lhstarget, arg1);
+}
+
+void LowererVisitor::VisitVariableExpr(const VariableExpr& exp) {
+  // Just get the string stored in VariableExpr and push it to
+  // the stack
+  variablestack_.push(exp.name());
+  if (currvariabletype_ == LEFTHANDVAR) {
+    // It's a load into operation
+    // Var assignload will take care of it
+    lastchildtype_ = VARCHILD;
+    return;
+  } else {
+    // It's a right hand side so just access its
+    // value and put it in a virt reg
+    CreateLoadBlock(VARLOAD, Operand(0));
+    ++counter_.variablecount;
+  }
+}
+
 void LowererVisitor::VisitFunctionCall(const FunctionCall& call) {
   // - This DOES NOT Signal to code gen
   // CreateFunctionCallSignal(call.callee_name()));
@@ -133,9 +273,9 @@ void LowererVisitor::VisitFunctionCall(const FunctionCall& call) {
 
   // Function should return here, get its return value
   // lhs is a variable expr
-  currvariabletype_ = LEFTHAND;
+  currvariabletype_ = LEFTHANDVAR;
   call.lhs().Visit(this);
-  currvariabletype_ = RIGHTHAND;
+  currvariabletype_ = RIGHTHANDVAR;
 
   // Basically do an assignment here
   CreateLoadBlock(FUNRETLOAD, Operand(0));
@@ -169,12 +309,12 @@ void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
   totalset_.clear();
 
   // Move arguments into the local stack
-  currvariabletype_ = LEFTHAND;
+  currvariabletype_ = LEFTHANDVAR;
   for (int i = def.parameters().size() - 1 ; i >= 0 ; --i) {
     def.parameters()[i]->Visit(this);
     CreateLoadBlock(FUNARGLOAD, Operand(i));
   }
-  currvariabletype_ = RIGHTHAND;
+  currvariabletype_ = RIGHTHANDVAR;
 
   // Eval the body
   for (auto& statement : def.function_body()) {
@@ -397,22 +537,6 @@ void LowererVisitor::VisitLoop(const Loop& loop) {
   CreateLabelBlock(continuelabel);
 }
 
-void LowererVisitor::VisitAssignment(const Assignment& assignment) {
-  // Visit the left which will add its variable name to the stack
-  currvariabletype_ = LEFTHAND;
-  assignment.lhs().Visit(const_cast<LowererVisitor*>(this));
-  currvariabletype_ = RIGHTHAND;
-
-  // assign the right hand side to be equal to the left hand side
-  // The latest vector addition is the final register to be set to the
-  // string name
-  assignment.rhs().Visit(const_cast<LowererVisitor*>(this));
-
-  Operand arg1 = Operand(blocks_[blocks_.size()-1]->target.reg());
-
-  CreateLoadBlock(VARASSIGNLOAD, arg1);
-}
-
 void LowererVisitor::VisitProgram(const Program& program) {
   // Do all the Assignments, then the AE, then the functions
 
@@ -428,23 +552,6 @@ void LowererVisitor::VisitProgram(const Program& program) {
 
   for (auto& def : program.function_defs()) {
       def->Visit(this);
-  }
-}
-
-void LowererVisitor::VisitVariableExpr(const VariableExpr& exp) {
-  // Just get the string stored in VariableExpr and push it to
-  // the stack
-  variablestack_.push(exp.name());
-  if (currvariabletype_ == LEFTHAND) {
-    // It's a load into operation
-    // Var assignload will take care of it
-    lastchildtype_ = VARCHILD;
-    return;
-  } else {
-    // It's a right hand side so just access its
-    // value and put it in a virt reg
-    CreateLoadBlock(VARLOAD, Operand(0));
-    ++counter_.variablecount;
   }
 }
 
@@ -518,19 +625,6 @@ void LowererVisitor::CreateLoadBlock(Type type, Operand arg1) {
       newblock->op = Opcode(VARLOAD);
       // Not consistent rework later
       newblock->arg1 = Operand(Register(varname, VARIABLEREG));
-
-      blocks_.push_back(std::move(newblock));
-      break;
-    case VARASSIGNLOAD:
-      varname = variablestack_.top();
-      variablestack_.pop();
-
-      // Push variablename into the set (Flagging it as being assigned)
-      globalset_.insert(varname);
-
-      newblock->target = Target(Register(varname, VARIABLEREG));
-      newblock->op = Opcode(VARASSIGNLOAD);
-      newblock->arg1 = arg1;
 
       blocks_.push_back(std::move(newblock));
       break;
@@ -646,6 +740,39 @@ void LowererVisitor::CreateFunctionDefEpilogue(std::string name) {
   auto block = make_unique<struct ThreeAddressCode>();
   block->target = Target(Label(name));
   block->op = Opcode(FUNEPILOGUE);
+
+  blocks_.push_back(std::move(block));
+}
+
+void LowererVisitor::CreateDereference(std::string basevariable,
+  std::string targetvariable, int indexofchild) {
+  auto block = make_unique<struct ThreeAddressCode>();
+  block->target = Target(Label(targetvariable));
+  block->op = Opcode(currdereferencetype_);
+  block->arg1 = Operand(Register(basevariable, DEREFREG));
+  block->arg2 = Operand(Register("Parent", DEREFREG));
+  if (indexofchild > 0) {
+    blocks_[indexofchild]->arg2.reg().name() = "Child";
+  }
+  blocks_.push_back(std::move(block));
+}
+
+void LowererVisitor::CreateTupleAssignment(std::string target,
+  Operand operand) {
+  auto block = make_unique<struct ThreeAddressCode>();
+  block->target = Target(Label(target));
+  block->op = Opcode(NEWTUPLE);
+  block->arg1 = operand;
+
+  blocks_.push_back(std::move(block));
+}
+
+void LowererVisitor::CreateArithmeticAssignment(std::string target,
+  Operand operand) {
+  auto block = make_unique<struct ThreeAddressCode>();
+  block->target = Target(Label(target));
+  block->op = Opcode(VARASSIGNLOAD);
+  block->arg1 = operand;
 
   blocks_.push_back(std::move(block));
 }

@@ -7,6 +7,28 @@
 namespace cs160 {
 namespace backend {
 
+enum TypeOfDataType {
+  INTEGER,
+  TUPLE
+};
+
+struct Int {
+  // TypeOfDataType type = INTEGER;
+  int value;
+};
+
+struct Tuple {
+  // TypeOfDataType type = TUPLE;
+  int size;
+  // void *next;
+};
+
+struct DataType {
+  TypeOfDataType type;
+  Int intvalue;
+  Tuple tuplevalue;
+};
+
 // Somewhat unwieldy and long is there a better way to do this?
 enum Type {
   INTLOAD,
@@ -42,13 +64,18 @@ enum Type {
   FUNPROLOGUE,
   FUNEPILOGUE,
   PRINTARITH,
-  NOTYPE
+  NOTYPE,
+  LHSDEREFERENCE,
+  RHSDEFERERENCE,
+  NEWTUPLE,
+  VARCHILDTUPLE,  // change this later
 };
 
 enum OperandType {
   OPREGISTER,
-  INT
+  INT,
 };
+
 
 enum TargetType {
   TARGETREGISTER,
@@ -58,6 +85,7 @@ enum TargetType {
 enum RegisterType {
   VIRTUALREG,
   VARIABLEREG,
+  DEREFREG,
   NOREG
 };
 
@@ -68,8 +96,8 @@ enum Scope {
 };
 
 enum VariableType {
-  LEFTHAND,
-  RIGHTHAND,
+  LEFTHANDVAR,
+  RIGHTHANDVAR,
 };
 
 class Label {

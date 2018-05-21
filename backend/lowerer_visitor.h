@@ -7,6 +7,7 @@
 #include <set>
 #include <iostream>
 #include <algorithm>
+#include <map>
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "backend/ir.h"
@@ -20,7 +21,6 @@ using cs160::abstract_syntax::backend::AddExpr;
 using cs160::abstract_syntax::backend::SubtractExpr;
 using cs160::abstract_syntax::backend::MultiplyExpr;
 using cs160::abstract_syntax::backend::DivideExpr;
-using cs160::abstract_syntax::backend::Assignment;
 using cs160::abstract_syntax::backend::Program;
 using cs160::abstract_syntax::backend::VariableExpr;
 using cs160::abstract_syntax::backend::LessThanExpr;
@@ -36,6 +36,9 @@ using cs160::abstract_syntax::backend::Loop;
 using cs160::abstract_syntax::backend::Conditional;
 using cs160::abstract_syntax::backend::FunctionCall;
 using cs160::abstract_syntax::backend::FunctionDef;
+using cs160::abstract_syntax::backend::Dereference;
+using cs160::abstract_syntax::version_5::AssignmentFromArithExp;
+using cs160::abstract_syntax::version_5::AssignmentFromNewTuple;
 using cs160::make_unique;
 
 namespace cs160 {
@@ -44,14 +47,21 @@ namespace backend {
 enum ChildType {
   INTCHILD,
   VARCHILD,
+  DEREFCHILD,
   NOCHILD
 };
 
 class LowererVisitor : public AstVisitor {
  public:
-  LowererVisitor() : counter_(), currvariabletype_(RIGHTHAND) {}
+  LowererVisitor() : counter_(), currvariabletype_(RIGHTHANDVAR),
+    currdereferencetype_(RHSDEFERERENCE) {}
 
   std::string GetOutput();
+
+  // V5
+  void VisitDereference(const Dereference& exp);
+  void VisitAssignmentFromArithExp(const AssignmentFromArithExp& assignment);
+  void VisitAssignmentFromNewTuple(const AssignmentFromNewTuple& assignment);
 
   // V4 (Program Updated)
   void VisitFunctionCall(const FunctionCall& call);
@@ -71,7 +81,7 @@ class LowererVisitor : public AstVisitor {
   void VisitLoop(const Loop& loop);
 
   // V2
-  void VisitAssignment(const Assignment& assignment);
+  // void VisitAssignment(const Assignment& assignment);
   void VisitProgram(const Program& program);
   void VisitVariableExpr(const VariableExpr& exp);
 
@@ -92,6 +102,10 @@ class LowererVisitor : public AstVisitor {
   void CreateComparisionBlock(Type type);
   void CreateLabelBlock(std::string labelname);
   void CreateJumpBlock(std::string jumpname, Type type);
+  void CreateDereference(std::string basevariable, std::string targetvariable,
+    int indexofchild);
+  void CreateTupleAssignment(std::string target, Operand operand);
+  void CreateArithmeticAssignment(std::string target, Operand operand);
 
   // Helpers
   std::string GetOutputArithmeticHelper(std::string output, int index,
@@ -128,9 +142,11 @@ class LowererVisitor : public AstVisitor {
   std::vector<std::set<std::string>> localsets_;
   std::set<std::string> totalset_;
   std::set<std::string> globalset_;
+  std::map<std::string, DataType> typemap_;
   ChildType lastchildtype_;
   struct Counter counter_;
   VariableType currvariabletype_;
+  Type currdereferencetype_;
 };
 
 }  // namespace backend
