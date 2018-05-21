@@ -12,10 +12,10 @@ Tokenizer::Tokenizer(std::string program) : input_program_(program) {
     //Looping through all characters of program and tokenize
     for (char &c : input_program_) {
         Token::Type separatorType = ExtractSeparator(c);
-        if (separatorType != Token::INCOMPLETE){
-            if (currString != ""){
+        if (separatorType != Token::INCOMPLETE) {
+            if (currString != "") {
             Token::Type type = ExtractType(currString);
-            if (type == Token::NUM){
+            if (type == Token::NUM) {
                 Token newToken(Token::NUM, atoi(currString.c_str()));
                 tokens_.push_back(newToken);
             } else if (type == Token::IDENTIFIER) {
@@ -27,7 +27,7 @@ Tokenizer::Tokenizer(std::string program) : input_program_(program) {
             }
             printf("Current String: %s\n", currString.c_str());
             }
-            if (separatorType != Token::WHITESPACE){
+            if (separatorType != Token::WHITESPACE) {
                 Token newToken(separatorType);
                 tokens_.push_back(newToken);
             }
@@ -41,23 +41,23 @@ Tokenizer::Tokenizer(std::string program) : input_program_(program) {
         }
     }
     
-    if (currString == ""){
+    if (currString == "") {
         Token endToken(Token::ENDOFFILE);
         tokens_.push_back(endToken);
     }
 }
 
-Token::Type Tokenizer::ExtractType(std::string expression){
-    if (expression == "var"){
+Token::Type Tokenizer::ExtractType(std::string expression) {
+    if (expression == "var") {
         return Token::VAR_NAME;
-    } else if (expression == "func"){
+    } else if (expression == "func") {
         
     }
     
     bool is_integer = std::regex_match(expression, std::regex("^(0|[1-9][0-9]*)$"));
-    if (is_integer){
+    if (is_integer) {
         return Token::NUM;
-    } else if (!isdigit(expression[0])){
+    } else if (!isdigit(expression[0])) {
         return Token::IDENTIFIER;
     } else {
         return Token::FAILED;

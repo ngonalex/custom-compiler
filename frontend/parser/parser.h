@@ -52,7 +52,7 @@ class Parser {
 
   std::unique_ptr<const AstNode> Eparser();
     
-    std::unique_ptr<const AstNode> ParseLine();
+  std::unique_ptr<const AstNode> ParseLine();
     
   std::unique_ptr<const AstNode> ParseAddSub();
 

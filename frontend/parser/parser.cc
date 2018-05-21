@@ -37,7 +37,7 @@ std::unique_ptr<const AstNode> Parser::Eparser() {
   return t;
 }
 
-std::unique_ptr<const AstNode> Parser::ParseLine(){
+std::unique_ptr<const AstNode> Parser::ParseLine() {
     std::unique_ptr<const AstNode> t = ParseAddSub();
     Expect(Token::Type::END);
     return t;
