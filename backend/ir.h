@@ -114,6 +114,7 @@ class Register {
   Register() : name_(""), type_(NOREG) {}
   std::string name() const {return name_;}
   RegisterType type() const {return type_;}
+  void ChangeRegisterName(std::string newname) {name_ = newname;}
 
  private:
   std::string name_;

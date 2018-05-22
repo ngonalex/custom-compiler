@@ -132,6 +132,11 @@ void LowererVisitor::VisitDereference(const Dereference& exp) {
       break;
     case VARCHILD:
       leftbasevariable = variablestack_.top();
+      if ( globalset_.count(leftbasevariable) == 0 ) {
+        std::cerr << "Variable "+ leftbasevariable +" cannot be "
+        "dereferenced because it has not been assigned\n";
+        exit(1);
+      }
       leftderefvariable = leftbasevariable+"->"+rhsvirtualreg;
       variablestack_.push(leftderefvariable);
       indexoflastchild = -1;
@@ -216,12 +221,6 @@ void LowererVisitor::VisitAssignmentFromArithExp(
     variablestack_.pop();
     lhsbase = "";
     globalset_.insert(lhstarget);
-
-    auto block = make_unique<struct ThreeAddressCode>();
-    block->target = Target(Label(lhstarget));
-    // Uses varchildtuple but should just do the same things
-    block->op = Opcode(VARCHILDTUPLE);
-    blocks_.push_back(std::move(block));
   }
 
   // assign the right hand side to be equal to the left hand side
@@ -747,7 +746,7 @@ void LowererVisitor::CreateDereference(std::string basevariable,
   block->arg1 = Operand(Register(basevariable, DEREFREG));
   block->arg2 = Operand(Register("Parent", DEREFREG));
   if (indexofchild > 0) {
-    blocks_[indexofchild]->arg2.reg().name() = "Child";
+    blocks_[indexofchild]->arg2 = Operand(Register("Child", DEREFREG));
   }
   blocks_.push_back(std::move(block));
 }

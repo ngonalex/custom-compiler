@@ -4,6 +4,52 @@ namespace cs160 {
 namespace backend {
 
 void CodeGen::GeneratePrinter() {
+  GenerateTupleFlagCheck();
+  GenerateIntegerFlagCheck();
+  GenerateExistenceCheck();
+  GenerateTupleSizeCheck();
+
+  // printtupletypeerror
+  outfile_ << "printtupletypeerror:" << std::endl;
+  outfile_ << "\tmov $printstring, %rdi" << std::endl;
+  outfile_ << "\tmov $tupletypeasciz, %rsi" << std::endl;
+  outfile_ << "\tmov $0, %rax" << std::endl;
+  outfile_ << "\tcall printf" << std::endl;
+  outfile_ << "\tmov $60, %rax" << std::endl;
+  outfile_ << "\txor $2, %rdi" << std::endl;
+  outfile_ << "\tsyscall" << std::endl;
+
+  // printintegertypeerror
+  outfile_ << "printintegertypeerror:" << std::endl;
+  outfile_ << "\tmov $printstring, %rdi" << std::endl;
+  outfile_ << "\tmov $inttypeasciz, %rsi" << std::endl;
+  outfile_ << "\tmov $0, %rax" << std::endl;
+  outfile_ << "\tcall printf" << std::endl;
+  outfile_ << "\tmov $60, %rax" << std::endl;
+  outfile_ << "\txor $2, %rdi" << std::endl;
+  outfile_ << "\tsyscall" << std::endl;
+
+  // printexistenceerror
+  outfile_ << "printexistenceerror:" << std::endl;
+  outfile_ << "\tmov $printstring, %rdi" << std::endl;
+  outfile_ << "\tmov $existenceerrorasciz, %rsi" << std::endl;
+  outfile_ << "\tmov $0, %rax" << std::endl;
+  outfile_ << "\tcall printf" << std::endl;
+  outfile_ << "\tmov $60, %rax" << std::endl;
+  outfile_ << "\txor $2, %rdi" << std::endl;
+  outfile_ << "\tsyscall" << std::endl;
+
+  // printsizeerror (change this later to print out the size of the tuple
+  // and the index that tried to be access)
+  outfile_ << "printsizeerror:" << std::endl;
+  outfile_ << "\tmov $printstring, %rdi" << std::endl;
+  outfile_ << "\tmov $outofboundserrorasciz, %rsi" << std::endl;
+  outfile_ << "\tmov $0, %rax" << std::endl;
+  outfile_ << "\tcall printf" << std::endl;
+  outfile_ << "\tmov $60, %rax" << std::endl;
+  outfile_ << "\txor $2, %rdi" << std::endl;
+  outfile_ << "\tsyscall" << std::endl;
+
   // negative:
   outfile_ << "negative:" << std::endl;
   outfile_ << "\t.asciz \"-\"" << std::endl;
@@ -27,6 +73,27 @@ void CodeGen::GeneratePrinter() {
   // printint
   outfile_ << "printint:" << std::endl;
   outfile_ << "\t.asciz \"%d\\n\""  << std::endl;
+
+  // printstringint
+  outfile_ << "printstringint:" << std::endl;
+  outfile_ << "\t.asciz \"%s%d\\n\"" << std::endl;
+
+  // existenceerrorasciz
+  outfile_ << "existenceerrorasciz:" << std::endl;
+  outfile_ << "\t.asciz \"Value does not exist in the tuple\\n\""
+    << std::endl;
+
+  // tupletypeascii
+  outfile_ << "tupletypeasciz:" << std::endl;
+  outfile_ << "\t.asciz \"Invalid type must be a tuple\\n\"" << std::endl;
+
+  // inttypeascii
+  outfile_ << "inttypeasciz:" << std::endl;
+  outfile_ << "\t.asciz \"Invalid type must be a int\\n\"" << std::endl;
+
+  // outofboundserrorascii
+  outfile_ << "outofboundserrorasciz:" << std::endl;
+  outfile_ << "\t.asciz \"Out of Bounds Error\\n\"" << std::endl;
 
   // Generate Unique Printers here
   std::set<std::string>::iterator it;
@@ -98,18 +165,24 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
       outfile_ << "\tmov " << VariableNameHelper(tac->arg1.reg().name())
         << ", %rbx" << std::endl;
 
-      // Error handling to check if it's actually an integer here
-      outfile_ << "\tmov %rbx, %rdi" << std::endl;
-      outfile_ << "\tmov $0, %rsi" << std::endl;
-      outfile_ << "\t# call checkifthisisanintegerornotfunction" << std::endl;
-
       // Then load it into register
       if (currscope_ == FUNCTION) {
+        // Error handling to check if it's actually an integer here
+        outfile_ << "\tmovzx %bx, %rdi" << std::endl;
+        outfile_ << "\tpush %rbx" << std::endl;
+        outfile_ << "\tcall integerflagcheck" << std::endl;
+        outfile_ << "\tpop %rbx" << std::endl;
         outfile_ << "\tmov " << std::to_string(
         symbollocations_.find(tac->arg1.reg().name())->second-8)
           << "(%rbp), %rbx" << std::endl;
         outfile_ << "\tpush %rbx\n" << std::endl;
       } else {
+        // Error handling (Refactor first 4 lines into a function)
+        outfile_ << "\tmovb (%rbx), %al" << std::endl;
+        outfile_ << "\tmovzx %al, %rdi" << std::endl;
+        outfile_ << "\tpush %rbx" << std::endl;
+        outfile_ << "\tcall integerflagcheck" << std::endl;
+        outfile_ << "\tpop %rbx" << std::endl;
         outfile_ << "\tmov 8(%rbx), %rcx" << std::endl;
         outfile_ << "\tpush %rcx\n" << std::endl;
       }
@@ -121,8 +194,6 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
       // Case down below is for vars
       parsedstring = DereferenceParserHelper(tac->target.label().name());
 
-      outfile_ << "\t# Loading a value into variable "
-          + tac->target.reg().name() << std::endl;
       if (parsedstring.size() == 1) {
         if (symbollocations_.count(tac->target.label().name()) == 0) {
           // Add it to the map if its new
@@ -193,14 +264,14 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
       // Remake the "Int" object
       outfile_ << "\tmovb $0, -" << std::to_string(argumentnum*16)
         << "(%rbp)" << std::endl;
-      outfile_ << "\tmovb $0, -" << std::to_string(1 + argumentnum*16)
+      outfile_ << "\tmovb $1, -" << std::to_string(1 + argumentnum*16)
         << "(%rbp)" << std::endl;
       outfile_ << "\tmovl $0, -" << std::to_string(2 + argumentnum*16)
         << "(%rbp)\n" << std::endl;
       // Include it in the symbol table
       if (symbollocations_.count(varname) == 0) {
         symbollocations_.insert(std::pair<std::string, int>(varname,
-          -16*argumentnum));
+        -16*argumentnum));
       } else {
         std::cerr << "FUNARGLOAD VARIABLE ASSIGNMENT PROBLEM\n";
         exit(1);
@@ -220,11 +291,13 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
       // (always returns an int) Then move it into the value field
       // Remake the "Int" object if it's a function
       if (currscope_ == FUNCTION) {
+        // Update flags
         outfile_ << "\tmovb $0,"
           << VariableNameHelper(tac->target.reg().name()) << std::endl;
         int index = symbollocations_.find(tac->target.reg().name())->second;
         outfile_ << "\tmovb $1, " << std::to_string(index-1) << "(%rbp)\n";
         outfile_ << "\tmovl $0, " << std::to_string(index-2) << "(%rbp)\n";
+
 
         // now load the value of rax in
         outfile_ << "\tmovq %rax, " << std::to_string(index-8) << "(%rbp)\n"
@@ -417,6 +490,61 @@ std::vector<std::string> CodeGen::DereferenceParserHelper(
   return resultvector;
 }
 
+void CodeGen::GenerateTupleFlagCheck() {
+  // rdi contains the address of what to check
+  outfile_ << "tupleflagcheck:" << std::endl;
+  outfile_ << "\tcmp $1, %rdi" << std::endl;
+  outfile_ << "\tsete %dl" << std::endl;
+  outfile_ << "\tmovzx %dl, %rcx" << std::endl;
+  outfile_ << "\tcmp $0, %rcx" << std::endl;
+  outfile_ << "\tje printtupletypeerror" << std::endl;
+  outfile_ << "\tret" << std::endl;
+}
+void CodeGen::GenerateIntegerFlagCheck() {
+  // rdi contains the address of what to check
+  outfile_ << "integerflagcheck:" << std::endl;
+  outfile_ << "\tcmp $0, %rdi" << std::endl;
+  outfile_ << "\tsete %dl" << std::endl;
+  outfile_ << "\tmovzx %dl, %rcx" << std::endl;
+  outfile_ << "\tcmp $0, %rcx" << std::endl;
+  outfile_ << "\tje printintegertypeerror" << std::endl;
+  outfile_ << "\tret" << std::endl;
+}
+void CodeGen::GenerateExistenceCheck() {
+  // rdi contains the address of what to check
+  outfile_ << "existencecheck:" << std::endl;
+  outfile_ << "\tcmp $1, %rdi" << std::endl;
+  outfile_ << "\tsete %dl" << std::endl;
+  outfile_ << "\tmovzx %dl, %rcx" << std::endl;
+  outfile_ << "\tcmp $0, %rcx" << std::endl;
+  outfile_ << "\tje printexistenceerror" << std::endl;
+  outfile_ << "\tret" << std::endl;
+}
+void CodeGen::GenerateTupleSizeCheck() {
+  // rdi contains the address of what to check
+  // rsi contains the integer of the size of the rhs
+  // basically this is just a tuple out of bounds check
+  outfile_ << "tuplesizecheck:" << std::endl;
+  // Move arguments into registers so we can compare them
+  outfile_ << "\tmovl %edi, %eax" << std::endl;
+  outfile_ << "\tmovl %esi, %ebx" << std::endl;
+
+  // Check for greater than size of tuple
+  outfile_ << "\tcmp %eax, %ebx" << std::endl;
+  outfile_ << "\tsetle %dl" << std::endl;
+  outfile_ << "\tmovzx %dl, %rcx" << std::endl;
+  outfile_ << "\tcmp $0, %rcx" << std::endl;
+  outfile_ << "\tje printsizeerror" << std::endl;
+
+  // Check for less than 1
+  outfile_ << "\tcmp $1, %ebx" << std::endl;
+  outfile_ << "\tsetge %dl" << std::endl;
+  outfile_ << "\tmovzx %dl, %rcx" << std::endl;
+  outfile_ << "\tcmp $0, %rcx" << std::endl;
+  outfile_ << "\tje printsizeerror" << std::endl;
+  outfile_ << "\tret" << std::endl;
+}
+
 void CodeGen::Generate(std::vector
   <std::unique_ptr<struct ThreeAddressCode>> blocks) {
   // boiler code here
@@ -554,8 +682,7 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tmov %rsp, %rbp" << std::endl;
         // May be unneeded
         outfile_ << "\tpush %rbx" << std::endl;
-
-        outfile_ << "\tsub $" << code->arg1.value()*16 << ", %rsp\n"
+        outfile_ << "\tsub $" << 16+code->arg1.value()*16 << ", %rsp\n"
           << std::endl;
         break;
       case FUNEPILOGUE:
@@ -587,6 +714,26 @@ void CodeGen::Generate(std::vector
             << ", %rbx" << std::endl;
 
           // Error Handling here to check the size and if it's actually a tuple
+          outfile_ << "\t#Error Handling Here LHS VARCHILD" << std::endl;
+          outfile_ << "\tmovb 1(%rbx), %al" << std::endl;
+          outfile_ << "\tmovzx %al, %rdi" << std::endl;
+          outfile_ << "\tpush %rbx" << std::endl;
+          outfile_ << "\tcall existencecheck" << std::endl;
+          outfile_ << "\tpop %rbx" << std::endl;
+
+          outfile_ << "\tmovl 2(%rbx), %eax" << std::endl;
+          outfile_ << "\tmovslq %eax, %rdi" << std::endl;
+          outfile_ << "\tpop %rsi" << std::endl;
+          outfile_ << "\tpush %rsi" << std::endl;
+          outfile_ << "\tpush %rbx" << std::endl;
+          outfile_ << "\tcall tuplesizecheck" << std::endl;
+          outfile_ << "\tpop %rbx" << std::endl;
+
+          outfile_ << "\tmovb (%rbx), %al" << std::endl;
+          outfile_ << "\tmovzx %al, %rdi" << std::endl;
+          outfile_ << "\tpush %rbx" << std::endl;
+          outfile_ << "\tcall tupleflagcheck" << std::endl;
+          outfile_ << "\tpop %rbx\n" << std::endl;
 
           // Get the actual object
           outfile_ << "\tmovq 8(%rbx), %rbx" << std::endl;
@@ -612,6 +759,26 @@ void CodeGen::Generate(std::vector
           outfile_ << "\tpush %rcx" << std::endl;
 
           // Error Handling here to check the size + if it's a tuple
+          outfile_ << "\t#Error Handling Here LHSDerefChild" << std::endl;
+          outfile_ << "\tmovb 1(%rbx), %al" << std::endl;
+          outfile_ << "\tmovzx %al, %rdi" << std::endl;
+          outfile_ << "\tpush %rbx" << std::endl;
+          outfile_ << "\tcall existencecheck" << std::endl;
+          outfile_ << "\tpop %rbx" << std::endl;
+
+          outfile_ << "\tmovl 2(%rbx), %eax" << std::endl;
+          outfile_ << "\tmovslq %eax, %rdi" << std::endl;
+          outfile_ << "\tpop %rsi" << std::endl;
+          outfile_ << "\tpush %rsi" << std::endl;
+          outfile_ << "\tpush %rbx" << std::endl;
+          outfile_ << "\tcall tuplesizecheck" << std::endl;
+          outfile_ << "\tpop %rbx" << std::endl;
+
+          outfile_ << "\tmovb (%rbx), %al" << std::endl;
+          outfile_ << "\tmovzx %al, %rdi" << std::endl;
+          outfile_ << "\tpush %rbx" << std::endl;
+          outfile_ << "\tcall tupleflagcheck" << std::endl;
+          outfile_ << "\tpop %rbx\n" << std::endl;
 
           // Get the actual object
           outfile_ << "\tmovq 8(%rbx), %rbx" << std::endl;
@@ -642,27 +809,55 @@ void CodeGen::Generate(std::vector
           outfile_ << "\tmov " << VariableNameHelper(code->arg1.reg().name())
             << ", %rbx" << std::endl;
 
-          // Error Handling here to check the size + if you're actually an int
+          // Error Handling here to check the size + if you're actually an tuple
+          outfile_ << "\t#Error Handling Here RHS Varchild" << std::endl;
+          outfile_ << "\tmovb 1(%rbx), %al" << std::endl;
+          outfile_ << "\tmovzx %al, %rdi" << std::endl;
+          outfile_ << "\tpush %rbx" << std::endl;
+          outfile_ << "\tcall existencecheck" << std::endl;
+          outfile_ << "\tpop %rbx" << std::endl;
 
-          // Get the actual object
+          outfile_ << "\tmovl 2(%rbx), %eax" << std::endl;
+          outfile_ << "\tmovslq %eax, %rdi" << std::endl;
+          outfile_ << "\tpop %rsi" << std::endl;
+          outfile_ << "\tpush %rsi" << std::endl;
+          outfile_ << "\tpush %rbx" << std::endl;
+          outfile_ << "\tcall tuplesizecheck" << std::endl;
+          outfile_ << "\tpop %rbx" << std::endl;
+
+          outfile_ << "\tmovb (%rbx), %al" << std::endl;
+          outfile_ << "\tmovzx %al, %rdi" << std::endl;
+          outfile_ << "\tpush %rbx" << std::endl;
+          outfile_ << "\tcall tupleflagcheck" << std::endl;
+          outfile_ << "\tpop %rbx\n" << std::endl;
+
+          // Get the actual object (x->whatever)
           outfile_ << "\tmovq 8(%rbx), %rbx" << std::endl;
 
+          // Get the correct offset
           outfile_ << "\tpop %rax" << std::endl;
           outfile_ << "\tsub $1, %rax" << std::endl;
           outfile_ << "\timul $16, %rax" << std::endl;
-          outfile_ << "\tadd $8, %rax" << std::endl;
           outfile_ << "\tadd %rax, %rbx" << std::endl;
           outfile_ << "\tpush %rbx" << std::endl;
 
-          // Now if you're a child deref check if the field you're accessing
-          // is actually a valid AE
           if (code->arg2.reg().name().compare("Child") == 0) {
-            // Do nothing
-
+            // If you're a child don't need to do anything
           } else {
-            // Otherwise you're the parent so
+            // Otherwise you're the parent so check that what you're
+            // accessing is actually an integer
             // get the value stored and push it on the stack
+
             outfile_ << "\tpop %rbx" << std::endl;
+            // More error handling
+            outfile_ << "\t#Check if it's an int RHS DEREF" << std::endl;
+            outfile_ << "\tmovb (%rbx), %al" << std::endl;
+            outfile_ << "\tmovzx %al, %rdi" << std::endl;
+            outfile_ << "\tpush %rbx" << std::endl;
+            outfile_ << "\tcall integerflagcheck" << std::endl;
+            outfile_ << "\tpop %rbx\n" << std::endl;
+            // Get the correct offset
+            outfile_ << "\tadd $8, %rbx" << std::endl;
             outfile_ << "\tmov (%rbx), %rcx" << std::endl;
             outfile_ << "\tpush %rcx\n" << std::endl;
           }
@@ -670,34 +865,63 @@ void CodeGen::Generate(std::vector
           outfile_ << "\tpop %rcx" << std::endl;
           outfile_ << "\tpop %rbx" << std::endl;
           outfile_ << "\tpush %rcx" << std::endl;
-          // Error Handling here to check the size + if you're actually an int
+          // Error Handling here to check the size + if you're actually an tuple
+          outfile_ << "\t#Error Handling Here DerefChild" << std::endl;
+          outfile_ << "\tmovb 1(%rbx), %al" << std::endl;
+          outfile_ << "\tmovzx %al, %rdi" << std::endl;
+          outfile_ << "\tpush %rbx" << std::endl;
+          outfile_ << "\tcall existencecheck" << std::endl;
+          outfile_ << "\tpop %rbx" << std::endl;
 
-          // Get the actual object
+          outfile_ << "\tmovl 2(%rbx), %eax" << std::endl;
+          outfile_ << "\tmovslq %eax, %rdi" << std::endl;
+          outfile_ << "\tpop %rsi" << std::endl;
+          outfile_ << "\tpush %rsi" << std::endl;
+          outfile_ << "\tpush %rbx" << std::endl;
+          outfile_ << "\tcall tuplesizecheck" << std::endl;
+          outfile_ << "\tpop %rbx" << std::endl;
+
+          outfile_ << "\tmovb (%rbx), %al" << std::endl;
+          outfile_ << "\tmovzx %al, %rdi" << std::endl;
+          outfile_ << "\tpush %rbx" << std::endl;
+          outfile_ << "\tcall tupleflagcheck" << std::endl;
+          outfile_ << "\tpop %rbx\n" << std::endl;
+
+          // Get the actual object (x->whatever)
           outfile_ << "\tmovq 8(%rbx), %rbx" << std::endl;
 
+          // Get the correct offset
           outfile_ << "\tpop %rax" << std::endl;
           outfile_ << "\tsub $1, %rax" << std::endl;
           outfile_ << "\timul $16, %rax" << std::endl;
           outfile_ << "\tadd %rax, %rbx" << std::endl;
           outfile_ << "\tpush %rbx" << std::endl;
 
-          // Now if you're a child deref check if the field you're accessing
-          // is actually a valid AE
           if (code->arg2.reg().name().compare("Child") == 0) {
-            // Do nothing
-
+            // If you're a child don't need to do anything
           } else {
-            // Otherwise you're the parent so
+            // Otherwise you're the parent so check that what you're
+            // accessing is actually an integer
             // get the value stored and push it on the stack
+
             outfile_ << "\tpop %rbx" << std::endl;
+            // More error handling
+            outfile_ << "\t#Check if it's an int RHS DEREF" << std::endl;
+            outfile_ << "\tmovb (%rbx), %al" << std::endl;
+            outfile_ << "\tmovzx %al, %rdi" << std::endl;
+            outfile_ << "\tpush %rbx" << std::endl;
+            outfile_ << "\tcall integerflagcheck" << std::endl;
+            outfile_ << "\tpop %rbx\n" << std::endl;
+            // Get the correct offset
+            outfile_ << "\tadd $8, %rbx" << std::endl;
             outfile_ << "\tmov (%rbx), %rcx" << std::endl;
             outfile_ << "\tpush %rcx\n" << std::endl;
           }
         }
         break;
-      case NEWTUPLE:  // Needs to handle functions
-
-        outfile_ << "\t# Making a tuple " << std::endl;
+      case NEWTUPLE:  // Needs to handle functions (maybe unneeded)
+        outfile_ << "\t# Making a tuple for variable: "
+          << code->target.label().name() << std::endl;
         outfile_ << "\tpop %rcx" << std::endl;
         outfile_ << "\tpush %rcx" << std::endl;
         outfile_ << "\timul $16, %rcx" << std::endl;
