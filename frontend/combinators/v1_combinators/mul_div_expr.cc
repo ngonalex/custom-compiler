@@ -32,9 +32,9 @@ ParseStatus MulDivExprParser::parse(std::string inputProgram) {
 }
 
 // Creating the AST Node
-std::unique_ptr<const AstNode> MulDivExprParser::make_node(std::string op,
-  std::unique_ptr<const AstNode> first_leaf,
-  std::unique_ptr<const AstNode> second_leaf) {
+std::unique_ptr<const ArithmeticExpr> MulDivExprParser::make_node(std::string op,
+  std::unique_ptr<const ArithmeticExpr> first_leaf,
+  std::unique_ptr<const ArithmeticExpr> second_leaf) {
   if (op == "*") {
       return make_unique<MultiplyExpr>(std::move(first_leaf),
 																		 std::move(second_leaf));
