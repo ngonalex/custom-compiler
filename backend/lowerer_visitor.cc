@@ -128,7 +128,8 @@ void LowererVisitor::VisitDereference(const Dereference& exp) {
       leftderefvariable = variablestack_.top();
       variablestack_.pop();
       leftbasevariable = variablestack_.top();
-      variablestack_.push(leftderefvariable+"->"+rhsvirtualreg);
+      leftderefvariable = leftderefvariable+"->"+rhsvirtualreg;
+      variablestack_.push(leftderefvariable);
       break;
     case VARCHILD:
       leftbasevariable = variablestack_.top();
