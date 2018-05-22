@@ -1020,9 +1020,9 @@ void CodeGen::Generate(std::vector
             << VariableNameHelper(code->target.label().name()) << std::endl;
           int index =
             symbollocations_.find(code->target.label().name())->second;
-          outfile_ << "\tmovb $1, " << std::to_string(index-1) << "(%rbp)\n";
-          outfile_ << "\tmovl %ecx, " << std::to_string(index-2) << "(%rbp)\n";
-          outfile_ << "\tmovq %rax, " << std::to_string(index-8) << "(%rbp)\n"
+          outfile_ << "\tmovb $1, " << std::to_string(index+1) << "(%rbp)\n";
+          outfile_ << "\tmovl %ecx, " << std::to_string(index+2) << "(%rbp)\n";
+          outfile_ << "\tmovq %rax, " << std::to_string(index+8) << "(%rbp)\n"
             << std::endl;
         } else {
           // Rewrite flags
