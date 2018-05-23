@@ -9,10 +9,10 @@ namespace frontend {
 
 class OpenParenParser : NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram); 
+  virtual ParseStatus parse(std::string inputProgram);
 };
 
-} // namespace frontend
-} // namespace cs160
+}  // namespace frontend
+}  // namespace cs160
 
-#endif // OPEN_PAREN_H
+#endif  // OPEN_PAREN_H

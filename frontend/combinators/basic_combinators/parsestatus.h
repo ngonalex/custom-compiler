@@ -11,30 +11,28 @@ using namespace cs160::abstract_syntax::frontend;
 namespace cs160 {
 namespace frontend {
 
-class ParseStatus { // Super class
+class ParseStatus {  // Super class
  public:
-	bool status;
-	std::string remainingCharacters;
-	std::string parsedCharacters;
+  bool status;
+  std::string remainingCharacters;
+  std::string parsedCharacters;
 
-	// Only for the success case
-	std::unique_ptr<const AstNode> ast;
+  // Only for the success case
+  std::unique_ptr<const AstNode> ast;
 
-	// Only for And Combinator
-	std::unique_ptr<const AstNode> second_ast;
+  // Only for And Combinator
+  std::unique_ptr<const AstNode> second_ast;
 
-	// Only for the failed case
-	std::string expectedCharacters;
+  // Only for the failed case
+  std::string expectedCharacters;
 
-	// check if two ParseStatuses are equal
-	bool operator==(const ParseStatus &b) const;
+  // check if two ParseStatuses are equal
+  bool operator==(const ParseStatus &b) const;
 
-	bool operator!=(const ParseStatus &b) const;
+  bool operator!=(const ParseStatus &b) const;
 };
 
-} // namespace frontend
-} // namespace cs160
+}  // namespace frontend
+}  // namespace cs160
 
-#endif // PARSESTATUS_H_
-
-
+#endif  // PARSESTATUS_H_

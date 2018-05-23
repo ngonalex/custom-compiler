@@ -10,10 +10,10 @@ namespace frontend {
 
 class ArithExprParser : NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram);
+  virtual ParseStatus parse(std::string inputProgram);
 };
 
-} // namespace frontend
-} // namespace cs160
+}  // namespace frontend
+}  // namespace cs160
 
-#endif // AE_H_
+#endif  // AE_H_

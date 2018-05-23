@@ -9,10 +9,10 @@ namespace frontend {
 
 class NumParser : NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram); 
+  virtual ParseStatus parse(std::string inputProgram);
 };
 
-} // namespace frontend
-} // namespace cs160
+}  // namespace frontend
+}  // namespace cs160
 
-#endif // NUM_PARSER_H_
+#endif  // NUM_PARSER_H_

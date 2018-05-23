@@ -14,8 +14,8 @@
 
 #include "frontend/combinators/v1_combinators/add_sub_expr.h"
 #include "frontend/combinators/v1_combinators/mul_div_expr.h"
-#include "frontend/combinators/v1_combinators/term_expr.h"
 #include "frontend/combinators/v1_combinators/negative_sign.h"
+#include "frontend/combinators/v1_combinators/term_expr.h"
 
 #include "frontend/combinators/v1_combinators/ae.h"
 
@@ -48,7 +48,7 @@ TEST(Combinators, FailedSingleCharTest) {
 // Success case for Single Digit test :: single_digit.cc
 TEST(Combinators, SuccessSingleDigitTest) {
   SingleDigitParser test;
-  ParseStatus result = test.parse("1"); 
+  ParseStatus result = test.parse("1");
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "");
@@ -58,7 +58,7 @@ TEST(Combinators, SuccessSingleDigitTest) {
 // Failed case for Single Digit test :: single_digit.cc
 TEST(Combinators, FailedSingleDigitTest) {
   SingleDigitParser test;
-  ParseStatus result = test.parse("a"); 
+  ParseStatus result = test.parse("a");
 
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.remainingCharacters, "a");
@@ -231,7 +231,6 @@ TEST(Combinators, SimpleNumTerm) {
   EXPECT_EQ(output, "101281510");
 }
 
-
 TEST(Combinators, SimplyAddition) {
   AddSubExprParser test;
   ParseStatus result = test.parse("5+77");
@@ -259,7 +258,6 @@ TEST(Combinators, SimpleMul) {
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(output, "(* 225 335)");
 }
-
 
 // TODO: FIX THESE
 TEST(Combinators, SimpleParen) {
@@ -321,7 +319,6 @@ TEST(Combinators, TrivialAe1) {
   EXPECT_EQ(output, "(/ (+ (* 225 335) 12) 2)");
 }
 
-
 // New - working
 TEST(Combinators, TrivialAe2) {
   ArithExprParser test;
@@ -336,7 +333,6 @@ TEST(Combinators, TrivialAe2) {
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(output, "(+ (* 225 335) (/ 12 2))");
 }
-
 
 // New - working
 TEST(Combinators, TrivialAe3) {
@@ -353,7 +349,6 @@ TEST(Combinators, TrivialAe3) {
   EXPECT_EQ(output, "(+ (* 225 335) (/ 12 2))");
 }
 
-
 TEST(Combinators, ComplicatedAe) {
   ArithExprParser test;
   ParseStatus result = test.parse("7*10+9/3+16-8*2*3-77+12*1");
@@ -365,9 +360,10 @@ TEST(Combinators, ComplicatedAe) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(output, "(+ (- (- (+ (+ (* 7 10) (/ 9 3)) 16) (* (* 8 2) 3)) 77) (* 12 1))");
+  EXPECT_EQ(
+      output,
+      "(+ (- (- (+ (+ (* 7 10) (/ 9 3)) 16) (* (* 8 2) 3)) 77) (* 12 1))");
 }
-
 
 TEST(Combinators, NegComplicatedAe) {
   ArithExprParser test;
@@ -380,5 +376,7 @@ TEST(Combinators, NegComplicatedAe) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(output, "(- 0 (+ (- (- (+ (+ (* 7 10) (/ 9 3)) 16) (* (* 8 2) 3)) 77) (* 12 1)))");
+  EXPECT_EQ(output,
+            "(- 0 (+ (- (- (+ (+ (* 7 10) (/ 9 3)) 16) (* (* 8 2) 3)) 77) (* "
+            "12 1)))");
 }
