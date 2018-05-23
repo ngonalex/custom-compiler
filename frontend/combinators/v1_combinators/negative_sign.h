@@ -9,10 +9,10 @@ namespace frontend {
 
 class NegativeParser : NullParser {
  public:
-	virtual ParseStatus parse(std::string inputProgram);
+  virtual ParseStatus parse(std::string inputProgram);
 };
 
-} // namespace frontend
-} // namespace cs160
+}  // namespace frontend
+}  // namespace cs160
 
-#endif // NEGATIVE_SIGN_H_
+#endif  // NEGATIVE_SIGN_H_

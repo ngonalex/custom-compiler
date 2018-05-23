@@ -25,10 +25,11 @@ ParseStatus TermExprParser::parse(std::string inputProgram) {
     ParseStatus aeParseStatus = ae.parse(negStatus.remainingCharacters);
     if (aeParseStatus.status) {
       std::unique_ptr<const AstNode> zero = make_unique<IntegerExpr>(0);
-      aeParseStatus.ast = std::move(make_unique<const SubtractExpr>(std::move(zero), std::move(aeParseStatus.ast)));
-      return aeParseStatus; // Returning Success on -AE
+      aeParseStatus.ast = std::move(make_unique<const SubtractExpr>(
+          std::move(zero), std::move(aeParseStatus.ast)));
+      return aeParseStatus;  // Returning Success on -AE
     }
-    return aeParseStatus; // Returning Failure on -AE
+    return aeParseStatus;  // Returning Failure on -AE
   }
 
   // ( ae )
@@ -41,14 +42,15 @@ ParseStatus TermExprParser::parse(std::string inputProgram) {
     if (aeParseStatus.status) {
       // )
       CloseParenParser close_paren;
-      ParseStatus cpParseStatus = close_paren.parse(aeParseStatus.remainingCharacters);
+      ParseStatus cpParseStatus =
+          close_paren.parse(aeParseStatus.remainingCharacters);
       if (cpParseStatus.status) {
         aeParseStatus.remainingCharacters = cpParseStatus.remainingCharacters;
-        return aeParseStatus; // Returning Success on AE
+        return aeParseStatus;  // Returning Success on AE
       }
       return cpParseStatus;  // Returing Failure on AddSubExpr
     }
-    return aeParseStatus; // Returning Failure on CloseParen
+    return aeParseStatus;  // Returning Failure on CloseParen
   }
   return openParseStatus;  // Returning Failure on OpenParen
 }

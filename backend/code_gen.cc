@@ -34,7 +34,6 @@ namespace backend {
 void CodeGen::GeneratePrinter() {
   // ASSUME RESULT IS IN RAX
 
-
   GeneratePrintHeader();
 
   // intloop divides the int in rax by 10
@@ -97,7 +96,7 @@ void CodeGen::GeneratePrinter() {
 
   // printnewline
   outfile_ << "printnewline:" << std::endl;
-  outfile_ << "\t.ascii \"\\n\""  << std::endl;
+  outfile_ << "\t.ascii \"\\n\"" << std::endl;
 
   GenerateResult();
 
@@ -133,9 +132,9 @@ void CodeGen::GenerateAssignment(std::string variablename) {
   outfile_ << "\tpush %rax" << std::endl;
   outfile_ << "\tmov $1, %rax" << std::endl;
   outfile_ << "\tmov $1, %rdi" << std::endl;
-  outfile_ << "\tmov $" + variablename +"ascii, %rsi" << std::endl;
-  outfile_ << "\tmov $" + std::to_string(23+variablename.length())
-    + ", %rdx" << std::endl;
+  outfile_ << "\tmov $" + variablename + "ascii, %rsi" << std::endl;
+  outfile_ << "\tmov $" + std::to_string(23 + variablename.length()) + ", %rdx"
+           << std::endl;
   outfile_ << "\tsyscall" << std::endl;
 
   outfile_ << "\txor %rsi, %rsi" << std::endl;
@@ -147,7 +146,7 @@ void CodeGen::GenerateAssignment(std::string variablename) {
 
   outfile_ << variablename + "ascii:" << std::endl;
   outfile_ << "\t.ascii \"Variable " + variablename + " is equal to: \""
-    << std::endl;
+           << std::endl;
 }
 
 void CodeGen::GenerateResult() {
@@ -183,7 +182,7 @@ void CodeGen::GenerateEpilogue() {
 void CodeGen::GenerateBoiler() {
   outfile_ << "\t.global _start" << std::endl;
   outfile_ << "\t.text" << std::endl;
-    outfile_ << "_start:" << std::endl;
+  outfile_ << "_start:" << std::endl;
 }
 
 void CodeGen::ClearRegister(std::string reg) {
@@ -192,33 +191,33 @@ void CodeGen::ClearRegister(std::string reg) {
 
 void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
   if (tac->arg1.optype() == INT) {
-        outfile_ << "\t# Loading in an integer" << std::endl;
-        outfile_ << "\tmov $" + std::to_string(tac->arg1.value())
-          + ", %rcx" << std::endl;
-        outfile_ << "\tpush %rcx\n" << std::endl;
+    outfile_ << "\t# Loading in an integer" << std::endl;
+    outfile_ << "\tmov $" + std::to_string(tac->arg1.value()) + ", %rcx"
+             << std::endl;
+    outfile_ << "\tpush %rcx\n" << std::endl;
   } else {
-      outfile_ << "\t# Loading a value into variable "
-        + tac->target.reg().name() << std::endl;
-      ClearRegister("rbx");
-      outfile_ << "\tpop %rbx" << std::endl;
-      outfile_ << "\tmov %rbx, " << tac->target.reg().name()
-        << "" << std::endl;
-      outfile_ << "\tpush %rbx" << std::endl;
+    outfile_ << "\t# Loading a value into variable " + tac->target.reg().name()
+             << std::endl;
+    ClearRegister("rbx");
+    outfile_ << "\tpop %rbx" << std::endl;
+    outfile_ << "\tmov %rbx, " << tac->target.reg().name() << "" << std::endl;
+    outfile_ << "\tpush %rbx" << std::endl;
 
-      // Add it to the set, then call the print function
-      assignmentset_.insert(tac->target.reg().name());
-      outfile_ << "\tmov %rbx, %rax\n" << std::endl;
-      // Call on correct print function
-      outfile_ << "\t# Going to print " << tac->target.reg().name() << "\n"
-        << std::endl;
-      outfile_ << "\tcall print" + tac->target.reg().name() << std::endl;
-      outfile_ << "\n\t# Returning from printing "
-        << tac->target.reg().name() << "\n" << std::endl;
+    // Add it to the set, then call the print function
+    assignmentset_.insert(tac->target.reg().name());
+    outfile_ << "\tmov %rbx, %rax\n" << std::endl;
+    // Call on correct print function
+    outfile_ << "\t# Going to print " << tac->target.reg().name() << "\n"
+             << std::endl;
+    outfile_ << "\tcall print" + tac->target.reg().name() << std::endl;
+    outfile_ << "\n\t# Returning from printing " << tac->target.reg().name()
+             << "\n"
+             << std::endl;
   }
 }
 
-void CodeGen::GenerateArithmeticExpr(
-  std::unique_ptr<ThreeAddressCode> tac, Type type) {
+void CodeGen::GenerateArithmeticExpr(std::unique_ptr<ThreeAddressCode> tac,
+                                     Type type) {
   switch (type) {
     case ADD:
       outfile_ << "\t# Addition";
@@ -249,78 +248,78 @@ void CodeGen::GenerateArithmeticExpr(
       break;
     default:
       std::cerr << "Inside GenerateArithmeticExpr, something went"
-        << "went very wrong\n";
+                << "went very wrong\n";
       exit(1);
   }
 }
 
 void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
-  Type type) {
+                                     Type type) {
   // Note to self you can abstract this out even more
   switch (type) {
     case LESSTHAN:
       outfile_ << "\t# LessThan Comparision";
       GenerateBinaryExprHelper(std::move(tac));
-      outfile_ << "\tcmp %rbx, %rax" << std:: endl;
+      outfile_ << "\tcmp %rbx, %rax" << std::endl;
       outfile_ << "\tsetl %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-      outfile_ << "\tpush %rcx\n" << std:: endl;
+      outfile_ << "\tpush %rcx\n" << std::endl;
       break;
     case LESSTHANEQ:
       outfile_ << "\t# LessThanEq Comparision";
       GenerateBinaryExprHelper(std::move(tac));
-      outfile_ << "\tcmp %rbx, %rax" << std:: endl;
+      outfile_ << "\tcmp %rbx, %rax" << std::endl;
       outfile_ << "\tsetle %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-      outfile_ << "\tpush %rcx\n" << std:: endl;
+      outfile_ << "\tpush %rcx\n" << std::endl;
       break;
     case GREATERTHAN:
       outfile_ << "\t# GreaterThan Comparision";
       GenerateBinaryExprHelper(std::move(tac));
-      outfile_ << "\tcmp %rbx, %rax" << std:: endl;
+      outfile_ << "\tcmp %rbx, %rax" << std::endl;
       outfile_ << "\tsetg %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-      outfile_ << "\tpush %rcx\n" << std:: endl;
+      outfile_ << "\tpush %rcx\n" << std::endl;
       break;
     case GREATERTHANEQ:
       outfile_ << "\t# GreaterThanEq Comparision";
       GenerateBinaryExprHelper(std::move(tac));
-      outfile_ << "\tcmp %rbx, %rax" << std:: endl;
+      outfile_ << "\tcmp %rbx, %rax" << std::endl;
       outfile_ << "\tsetge %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-      outfile_ << "\tpush %rcx\n" << std:: endl;
+      outfile_ << "\tpush %rcx\n" << std::endl;
       break;
     case EQUAL:
       outfile_ << "\t# Equals Comparision";
       GenerateBinaryExprHelper(std::move(tac));
-      outfile_ << "\tcmp %rbx, %rax" << std:: endl;
+      outfile_ << "\tcmp %rbx, %rax" << std::endl;
       outfile_ << "\tsete %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-      outfile_ << "\tpush %rcx\n" << std:: endl;
+      outfile_ << "\tpush %rcx\n" << std::endl;
       break;
     default:
       std::cerr << "Inside GenerateRelationalExpr, something went"
-        << "went very wrong\n";
+                << "went very wrong\n";
       exit(1);
   }
 }
 
 void CodeGen::GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
-  Type type) {
+                                  Type type) {
   switch (type) {
     case LOGAND:
       outfile_ << "\t# LogicalAnd\n";
       outfile_ << "\tpop %rbx" << std::endl;
       outfile_ << "\tpop %rax" << std::endl;
-      outfile_ << "\tand %rbx, %rax" << std:: endl;
-      outfile_ << "\tpush %rax\n" << std:: endl;
+      outfile_ << "\tand %rbx, %rax" << std::endl;
+      outfile_ << "\tpush %rax\n" << std::endl;
       break;
     case LOGOR:
       outfile_ << "\t# LogicalOr\n";
       outfile_ << "\tpop %rbx" << std::endl;
       outfile_ << "\tpop %rax" << std::endl;
-      outfile_ << "\tor %rbx, %rax" << std:: endl;
-      outfile_ << "\tpush %rax\n" << std:: endl;
+      outfile_ << "\tor %rbx, %rax" << std::endl;
+      outfile_ << "\tpush %rax\n" << std::endl;
       break;
     case LOGNOT:
       outfile_ << "\t# LogicalNot\n";
@@ -331,47 +330,42 @@ void CodeGen::GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
       break;
     default:
       std::cerr << "Inside GenerateLogicalExpr, something went"
-        << "went very wrong\n";
+                << "went very wrong\n";
       exit(1);
   }
 }
 
-void CodeGen::GenerateBinaryExprHelper(
-  std::unique_ptr<ThreeAddressCode> tac) {
+void CodeGen::GenerateBinaryExprHelper(std::unique_ptr<ThreeAddressCode> tac) {
   // Shouldn't have to check it it's been assigned yet
   // Lowerer should have done that
   RegisterType arg1type = tac->arg1.reg().type();
   RegisterType arg2type = tac->arg2.reg().type();
 
-  if ( arg1type == VARIABLEREG && arg2type == VARIABLEREG ) {
+  if (arg1type == VARIABLEREG && arg2type == VARIABLEREG) {
     // Do a double load from the variable names
     outfile_ << " btwn two variables\n";
-    outfile_ << "\tmov " << tac->arg1.reg().name()
-      << ", %rax" << std::endl;
-    outfile_ << "\tmov " << tac->arg2.reg().name() << ", %rbx"
-      << std::endl;
-  } else if ( arg1type == VARIABLEREG && arg2type == VIRTUALREG ) {
-      // Load from the first variable
-      outfile_ << " btwn var,int\n";
-      outfile_ << "\tmov " << tac->arg1.reg().name()
-        << ", %rax" << std::endl;
-      outfile_ << "\tpop %rbx" << std::endl;
-  } else if ( arg1type == VIRTUALREG && arg2type == VARIABLEREG ) {
-      // Load from the second variable
-      outfile_ << " btwn int, var\n";
-      outfile_ << "\tmov " << tac->arg2.reg().name()
-        << ", %rbx" << std::endl;
-      outfile_ << "\tpop %rax" << std::endl;
+    outfile_ << "\tmov " << tac->arg1.reg().name() << ", %rax" << std::endl;
+    outfile_ << "\tmov " << tac->arg2.reg().name() << ", %rbx" << std::endl;
+  } else if (arg1type == VARIABLEREG && arg2type == VIRTUALREG) {
+    // Load from the first variable
+    outfile_ << " btwn var,int\n";
+    outfile_ << "\tmov " << tac->arg1.reg().name() << ", %rax" << std::endl;
+    outfile_ << "\tpop %rbx" << std::endl;
+  } else if (arg1type == VIRTUALREG && arg2type == VARIABLEREG) {
+    // Load from the second variable
+    outfile_ << " btwn int, var\n";
+    outfile_ << "\tmov " << tac->arg2.reg().name() << ", %rbx" << std::endl;
+    outfile_ << "\tpop %rax" << std::endl;
   } else {
-      // double pop from stack
-      outfile_ << " btwn int, int\n";
-      outfile_ << "\tpop %rbx" << std::endl;  // rbx = right
-      outfile_ << "\tpop %rax" << std::endl;  // rax = left
+    // double pop from stack
+    outfile_ << " btwn int, int\n";
+    outfile_ << "\tpop %rbx" << std::endl;  // rbx = right
+    outfile_ << "\tpop %rax" << std::endl;  // rax = left
   }
 }
 
-void CodeGen::Generate(std::vector
-  <std::unique_ptr<struct ThreeAddressCode>> blocks) {
+void CodeGen::Generate(
+    std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks) {
   // boiler code here
   GenerateBoiler();
 
@@ -424,13 +418,15 @@ void CodeGen::Generate(std::vector
         outfile_ << "\t# LOOP\n";
         outfile_ << "\tpop %rax" << std::endl;
         outfile_ << "\tcmp $" << std::to_string(code->arg1.value())
-          << ", %rax\n"<< std::endl;
+                 << ", %rax\n"
+                 << std::endl;
         break;
       case CONDITIONAL:
         outfile_ << "\t# CONDITIONAL\n";
         outfile_ << "\tpop %rax" << std::endl;
         outfile_ << "\tcmp $" << std::to_string(code->arg1.value())
-          << ", %rax\n" << std::endl;
+                 << ", %rax\n"
+                 << std::endl;
         break;
       // Note to self abstract jumps out later
       case JUMP:
@@ -461,7 +457,7 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tjle " << code->target.label().name() << std::endl;
         break;
       case LABEL:
-        outfile_ << code->target.label().name() << ":"   << std::endl;
+        outfile_ << code->target.label().name() << ":" << std::endl;
         break;
       default:
         std::cerr << "Inside Generate and something really bad happened\n";

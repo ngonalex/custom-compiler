@@ -6,10 +6,10 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
-#include <sstream>
 
 #include "utility/assert.h"
 
@@ -20,10 +20,9 @@ namespace frontend {
 
 class Tokenizer {
  public:
-
   explicit Tokenizer(std::string program);
 
-    Token::Type ExtractType(std::string expression);
+  Token::Type ExtractType(std::string expression);
   Token::Type ExtractSeparator(const char testChar);
 
   // TODO include negative numbers
@@ -53,7 +52,7 @@ class Tokenizer {
   int errorLine_;
 };
 
-} // namespace frontend
-} // namespace cs160
+}  // namespace frontend
+}  // namespace cs160
 
-#endif // TOKENIZER_TOKENIZER_H_
+#endif  // TOKENIZER_TOKENIZER_H_

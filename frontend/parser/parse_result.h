@@ -5,7 +5,6 @@
 
 using namespace cs160::frontend;
 
-
 namespace cs160 {
 namespace frontend {
 
@@ -14,8 +13,9 @@ class ParseResult {
   bool isSuccess;
   std::string error_message;
   std::unique_ptr<const AstNode> ast_result;
-  
-  ParseResult(bool isSuccess, std::string error_message, std::unique_ptr<const AstNode> ast_result) {
+
+  ParseResult(bool isSuccess, std::string error_message,
+              std::unique_ptr<const AstNode> ast_result) {
     this->isSuccess = isSuccess;
     this->error_message = error_message;
     this->ast_result = std::move(ast_result);
@@ -29,8 +29,7 @@ class ParseResult {
   }
 };
 
-} // namespace frontend
-} // namespace cs160
-
+}  // namespace frontend
+}  // namespace cs160
 
 #endif

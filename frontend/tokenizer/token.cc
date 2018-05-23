@@ -9,10 +9,10 @@ bool Token::operator==(const Token &b) const {
     else
       return false;
   } else if (this->type_ == IDENTIFIER) {
-      if (this->type_ == b.type_ && this->identifierVal_ == b.identifierVal_)
-          return true;
-      else
-          return false;
+    if (this->type_ == b.type_ && this->identifierVal_ == b.identifierVal_)
+      return true;
+    else
+      return false;
   } else {
     if (this->type_ == b.type_)
       return true;
@@ -21,24 +21,22 @@ bool Token::operator==(const Token &b) const {
   }
 }
 
-bool Token::operator!=(const Token &b) const {
-    return !operator==(b);
-}
+bool Token::operator!=(const Token &b) const { return !operator==(b); }
 
 void Token::Print() {
   switch (this->type_) {
-  case NUM:
-    std::cout << "Type: NUM\n" << std::endl;
-    std::cout << "\tValue: " << this->val_ << "\n" << std::endl;
-    break;
-  default:
-    std::cout << "Type: " << this->type_ << "\n" << std::endl;
-    break;
+    case NUM:
+      std::cout << "Type: NUM\n" << std::endl;
+      std::cout << "\tValue: " << this->val_ << "\n" << std::endl;
+      break;
+    default:
+      std::cout << "Type: " << this->type_ << "\n" << std::endl;
+      break;
   }
 }
 
 bool Token::isOperator() {
   Type current_type = this->type();
   return (current_type == Type::MUL_OP || current_type == Type::DIV_OP ||
-    current_type == Type::ADD_OP || current_type == Type::SUB_OP);
+          current_type == Type::ADD_OP || current_type == Type::SUB_OP);
 }

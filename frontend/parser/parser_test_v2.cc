@@ -1,8 +1,8 @@
 #include "abstract_syntax/abstract_syntax.h"
+#include "abstract_syntax/print_visitor_v2.h"
 #include "frontend/parser/parser.h"
 #include "frontend/tokenizer/token.h"
 #include "frontend/tokenizer/tokenizer.h"
-#include "abstract_syntax/print_visitor_v2.h"
 
 #include "gtest/gtest.h"
 
@@ -20,7 +20,7 @@ TEST(parser_v2_success, Assignment) {
   Token equals(Token::Type::EQUAL_SIGN);
   Token five(Token::Type::NUM, 5);
   Token end(Token::Type::END);
-  Token endfile(Token::Type::ENDOFFILE);  
+  Token endfile(Token::Type::ENDOFFILE);
   std::vector<Token> test_vector;
   test_vector.push_back(var);
   test_vector.push_back(x);
@@ -38,7 +38,7 @@ TEST(parser_v2_success, Assignment) {
   PrintVisitor *a = new PrintVisitor();
   result->Visit(a);
   std::string output = a->GetOutput();
-  // 
+  //
   EXPECT_EQ(output, "x = 5; x");
 }
 
@@ -56,7 +56,7 @@ TEST(parser_v2_success, SimpleProgram) {
   Token six(Token::Type::NUM, 6);
   Token seven(Token::Type::NUM, 7);
   Token end(Token::Type::END);
-  Token endfile(Token::Type::ENDOFFILE);  
+  Token endfile(Token::Type::ENDOFFILE);
   std::vector<Token> test_vector;
   // var x : int = 6;
   test_vector.push_back(var);
@@ -79,7 +79,7 @@ TEST(parser_v2_success, SimpleProgram) {
   test_vector.push_back(add);
   test_vector.push_back(y);
   test_vector.push_back(end);
-  
+
   test_vector.push_back(endfile);
   Parser parser(test_vector);
   std::unique_ptr<const AstNode> result = parser.ParseProgram();
@@ -87,7 +87,7 @@ TEST(parser_v2_success, SimpleProgram) {
   PrintVisitor *a = new PrintVisitor();
   result->Visit(a);
   std::string output = a->GetOutput();
-  // 
+  //
   EXPECT_EQ(output, "x = 6; y = 7; (x + y)");
 }
 
@@ -104,7 +104,7 @@ TEST(parser_v2_success, NegativeNums) {
   Token neg10(Token::Type::NUM, -10);
   Token seven(Token::Type::NUM, 7);
   Token end(Token::Type::END);
-  Token endfile(Token::Type::ENDOFFILE);  
+  Token endfile(Token::Type::ENDOFFILE);
   std::vector<Token> test_vector;
   // var x : int = -10;
   test_vector.push_back(var);
@@ -124,7 +124,7 @@ TEST(parser_v2_success, NegativeNums) {
   PrintVisitor *a = new PrintVisitor();
   result->Visit(a);
   std::string output = a->GetOutput();
-  // 
+  //
   EXPECT_EQ(output, "x = -10; x");
 }
 
@@ -134,7 +134,7 @@ TEST(parser_v2_success, RealNegation) {
   Token plus(Token::Type::ADD_OP);
   Token minus(Token::Type::SUB_OP);
   Token end(Token::Type::END);
-  Token endfile(Token::Type::ENDOFFILE);  
+  Token endfile(Token::Type::ENDOFFILE);
   std::vector<Token> test_vector;
   test_vector.push_back(five);
   test_vector.push_back(plus);
@@ -142,14 +142,14 @@ TEST(parser_v2_success, RealNegation) {
   test_vector.push_back(five);
   test_vector.push_back(end);
   test_vector.push_back(endfile);
-  
+
   Parser parser(test_vector);
   std::unique_ptr<const AstNode> result = parser.ParseProgram();
-  
+
   PrintVisitor *a = new PrintVisitor();
   result->Visit(a);
   std::string output = a->GetOutput();
-  // 
+  //
   EXPECT_EQ(output, "(5 + (0 - 5))");
 }
 
@@ -163,7 +163,7 @@ TEST(parser_v2_success, RealNegationWithParen) {
   Token open(Token::Type::OPEN_PAREN);
   Token close(Token::Type::CLOSE_PAREN);
   Token end(Token::Type::END);
-  Token endfile(Token::Type::ENDOFFILE);  
+  Token endfile(Token::Type::ENDOFFILE);
   std::vector<Token> test_vector;
   test_vector.push_back(five);
   test_vector.push_back(times);
@@ -175,14 +175,14 @@ TEST(parser_v2_success, RealNegationWithParen) {
   test_vector.push_back(close);
   test_vector.push_back(end);
   test_vector.push_back(endfile);
-  
+
   Parser parser(test_vector);
   std::unique_ptr<const AstNode> result = parser.ParseProgram();
-  
+
   PrintVisitor *a = new PrintVisitor();
   result->Visit(a);
   std::string output = a->GetOutput();
-  // 
+  //
   EXPECT_EQ(output, "(5 * (0 - (9 - 5)))");
 }
 
@@ -194,12 +194,12 @@ TEST(Parser, AltAssignment) {
   Token y(Token::Type::IDENTIFIER, "y");
   Token z(Token::Type::IDENTIFIER, "z");
   Token field(Token::Type::FIELD);
-  Token int_type(Token::Type::IDENTIFIER, "int");   
+  Token int_type(Token::Type::IDENTIFIER, "int");
   Token equals(Token::Type::EQUAL_SIGN);
-  Token zero(Token::Type::NUM, 0);   
+  Token zero(Token::Type::NUM, 0);
   Token add(Token::Type::ADD_OP);
   Token end(Token::Type::END);
-  Token endfile(Token::Type::ENDOFFILE); 
+  Token endfile(Token::Type::ENDOFFILE);
   std::vector<Token> test_vector;
 
   // x = 0 + 0;
@@ -221,17 +221,16 @@ TEST(Parser, AltAssignment) {
   PrintVisitor *a = new PrintVisitor();
   result->Visit(a);
   std::string output = a->GetOutput();
-  // 
+  //
   EXPECT_EQ(output, "x = (0 + 0); x");
 }
-
 
 // var x : int = 99;
 // var y : int = 110101;
 // var z : int = 0;
 // z = x + y;
 // z;
-// 
+//
 // x = 10 + 10;
 // x;
 
@@ -244,14 +243,14 @@ TEST(Parser, Comp) {
   Token y(Token::Type::IDENTIFIER, "y");
   Token z(Token::Type::IDENTIFIER, "z");
   Token field(Token::Type::FIELD);
-  Token int_type(Token::Type::IDENTIFIER, "int");   
+  Token int_type(Token::Type::IDENTIFIER, "int");
   Token equals(Token::Type::EQUAL_SIGN);
   Token neg9(Token::Type::NUM, -99);
   Token huge(Token::Type::NUM, 110101);
-  Token zero(Token::Type::NUM, 0);   
+  Token zero(Token::Type::NUM, 0);
   Token add(Token::Type::ADD_OP);
   Token end(Token::Type::END);
-  Token endfile(Token::Type::ENDOFFILE); 
+  Token endfile(Token::Type::ENDOFFILE);
   std::vector<Token> test_vector;
 
   // var x : int = -99;
@@ -267,7 +266,7 @@ TEST(Parser, Comp) {
   test_vector.push_back(var);
   test_vector.push_back(y);
   test_vector.push_back(field);
-  test_vector.push_back(int_type); 
+  test_vector.push_back(int_type);
   test_vector.push_back(equals);
   test_vector.push_back(huge);
   test_vector.push_back(end);
@@ -279,7 +278,7 @@ TEST(Parser, Comp) {
   test_vector.push_back(int_type);
   test_vector.push_back(equals);
   test_vector.push_back(zero);
-  test_vector.push_back(end);  
+  test_vector.push_back(end);
 
   // z = x + y;
   test_vector.push_back(z);
@@ -287,11 +286,11 @@ TEST(Parser, Comp) {
   test_vector.push_back(x);
   test_vector.push_back(add);
   test_vector.push_back(y);
-  test_vector.push_back(end);  
+  test_vector.push_back(end);
 
   // z;
   test_vector.push_back(z);
-  test_vector.push_back(end); 
+  test_vector.push_back(end);
 
   // EOF
   test_vector.push_back(endfile);
@@ -302,8 +301,6 @@ TEST(Parser, Comp) {
   PrintVisitor *a = new PrintVisitor();
   result->Visit(a);
   std::string output = a->GetOutput();
-  // 
+  //
   EXPECT_EQ(output, "x = -99; y = 110101; z = 0; z = (x + y); z");
 }
-
-

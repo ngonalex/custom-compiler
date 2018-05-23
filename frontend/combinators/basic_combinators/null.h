@@ -6,13 +6,13 @@
 
 namespace cs160 {
 namespace frontend {
-	
+
 class NullParser {
  public:
-	virtual ParseStatus parse(std::string inputProgram);
+  virtual ParseStatus parse(std::string inputProgram);
 };
 
-}	// namespace frontend
-}	// namespace cs160
+}  // namespace frontend
+}  // namespace cs160
 
-#endif // NULL_PARSER_H
+#endif  // NULL_PARSER_H

@@ -6,16 +6,16 @@
 
 namespace cs160 {
 namespace frontend {
-	
+
 class OrCombinator : NullParser {
  public:
-	NullParser *firstParser;
-	NullParser *secondParser;
+  NullParser *firstParser;
+  NullParser *secondParser;
 
-	virtual ParseStatus parse(std::string inputProgram);
+  virtual ParseStatus parse(std::string inputProgram);
 };
 
-}	// namespace frontend
-}	// namespace cs160
+}  // namespace frontend
+}  // namespace cs160
 
-#endif // OR_COMBINATOR_H_
+#endif  // OR_COMBINATOR_H_
