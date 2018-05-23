@@ -43,7 +43,7 @@ ParseStatus VariableParser::parse(std::string inputProgram) {
           result.parsedCharacters += (" " + typeStatus.parsedCharacters);
           result.remainingCharacters = typeStatus.remainingCharacters;
           result.ast = std::move(make_unique<const VariableExpr>(wordResult.parsedCharacters));
-        }
+				}
 				else {
 					result.status = typeStatus.status;
 					result.errorType = typeStatus.errorType;

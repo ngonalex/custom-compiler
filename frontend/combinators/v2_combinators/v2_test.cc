@@ -221,7 +221,13 @@ TEST(WordParserCombinator, sucessVariableParser1) {
   result.remainingCharacters = "";
   result.parsedCharacters = "var _victor : Integer";
 
+  // Traversing the AST created from the variable name
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
+
   ParseStatus testResult = parser.parse(" var _victor : Integer");
 
   EXPECT_EQ(testResult, result);
+  //EXPECT_EQ(output, "_victor");
 }
