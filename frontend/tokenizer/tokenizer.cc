@@ -8,6 +8,37 @@ Tokenizer::Tokenizer(std::string program) : input_program_(program) {
   char prevChar;
   Token::Type prevType = Token::NONE;
   std::string currString;
+<<<<<<< HEAD
+=======
+    
+    //Looping through all characters of program and tokenize
+    for (char &c : input_program_) {
+        Token::Type separatorType = ExtractSeparator(c);
+        if (separatorType != Token::INCOMPLETE){
+            if (currString != "") {
+            Token::Type type = ExtractType(currString);
+            if (type == Token::NUM) {
+                Token newToken(Token::NUM, atoi(currString.c_str()));
+                tokens_.push_back(newToken);
+            } else if (type == Token::IDENTIFIER) {
+                Token newToken(Token::IDENTIFIER, currString);
+                tokens_.push_back(newToken);
+            } else {
+                Token newToken(type);
+                tokens_.push_back(newToken);
+            }
+            // printf("Current String: %s\n", currString.c_str());
+            }
+            if (separatorType != Token::WHITESPACE) {
+                Token newToken(separatorType);
+                tokens_.push_back(newToken);
+            }
+            currString = "";
+        } else {
+            std::stringstream currStringStream;
+            currStringStream << currString;
+            currStringStream << c;
+>>>>>>> master
 
   // Looping through all characters of program and tokenize
   for (char &c : input_program_) {
