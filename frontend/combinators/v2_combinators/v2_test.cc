@@ -6,7 +6,7 @@
 
 using namespace cs160::frontend;
 
-// Success case for Single Character test :: single_char.cc
+// Fail Case WordParser
 TEST(WordParserCombinator, failWordParser1) {
   WordParser wordParser;
   ParseStatus result;
@@ -17,20 +17,102 @@ TEST(WordParserCombinator, failWordParser1) {
 
   EXPECT_EQ(testResult, result);
 }
+
+// Fail Case WordParser
+TEST(WordParserCombinator, failWordParser2) {
+  WordParser wordParser;
+  ParseStatus result;
+  result.status = false;
+  result.remainingCharacters = "()qam";
+
+  ParseStatus testResult = wordParser.parse("()qam");
+
+  EXPECT_EQ(testResult, result);
+}
+
+// Fail Case WordParser
+TEST(WordParserCombinator, failWordParser4) {
+  WordParser wordParser;
+  ParseStatus result;
+  result.status = false;
+  result.remainingCharacters = "&&qam";
+
+  ParseStatus testResult = wordParser.parse("&&qam");
+
+  EXPECT_EQ(testResult, result);
+}
+// Fail Case WordParser
+TEST(WordParserCombinator, failWordParser5) {
+  WordParser wordParser;
+  ParseStatus result;
+  result.status = false;
+  result.remainingCharacters = "%%qam";
+
+  ParseStatus testResult = wordParser.parse("%%qam");
+
+  EXPECT_EQ(testResult, result);
+}
+
+// Fail Case WordParser
+TEST(WordParserCombinator, failWordParser6) {
+  WordParser wordParser;
+  ParseStatus result;
+  result.status = false;
+  result.remainingCharacters = "123victor";
+
+  ParseStatus testResult = wordParser.parse("123victor");
+
+  EXPECT_EQ(testResult, result);
+}
+
+// Success Case WordParser
+TEST(WordParserCombinator, successWordParser1) {
+  WordParser wordParser;
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "";
+  result.parsedCharacters = "var";
+
+  ParseStatus testResult = wordParser.parse("var");
+
+  EXPECT_EQ(testResult, result);
+}
+
+// Success Case WordParser
+TEST(WordParserCombinator, successWordParser2) {
+  WordParser wordParser;
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "";
+  result.parsedCharacters = "var;35345345";
+
+  ParseStatus testResult = wordParser.parse("var;35345345");
+
+  EXPECT_EQ(testResult.status, result.status);
+}
+
+// Success Case WordParser
+TEST(WordParserCombinator, successWordParser3) {
+  WordParser wordParser;
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "";
+  result.parsedCharacters = "_victor";
+
+  ParseStatus testResult = wordParser.parse("_victor");
+
+  EXPECT_EQ(testResult, result);
+}
 /*
+// Success Case WordParser
+TEST(WordParserCombinator, successWordParser4) {
+  WordParser wordParser;
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "";
+  result.parsedCharacters = "Var abcd 42+30";
 
-Fail:
-“11fab” -> ParseStatus(successStatus = false, remainingCharacters = “1fab”)
-“()qam” -> ParseStatus(successStatus = false, remainingCharacters = “()qam”)
-“__qam” -> ParseStatus(successStatus = false, remainingCharacters = “__qam”)
-“&&qam” -> ParseStatus(successStatus = false, remainingCharacters = “&&qam”)
-“%%qam” -> ParseStatus(successStatus = false, remainingCharacters = “%%qam”)
-“123victor” -> ParseStatus(successStatus = false, remainingCharacters = “123victor”)
+  ParseStatus testResult = wordParser.parse("Var abcd 42+30");
 
-Success:
-“var” -> ParseStatus(succesStatus = true, remainingCharacters = “”, parsedCharacters=“var”)
-“var;35345345” -> ParseStatus(successStatus = true, remainingCharacters = “;35345345” parsedCharacters=“var”)
-“Var abcd 42+30” -> ParseStatus(successStatus = true, remainingCharacters = “ abcd 42+30”, parsedCharacters = “var”)
-“_victor” -> ParseStatus(successStatus = true, remainingCharacters = “”, parsedCharacters = “_victor”)
-“var35345345” -> ParseStatus(successStatus = true, remainingCharacters = “” parsedCharacters=“var35345345”)
-*/
+  EXPECT_EQ(testResult, result);
+}*/

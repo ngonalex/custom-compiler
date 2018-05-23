@@ -11,7 +11,8 @@ ParseStatus SingleCharParser::parse(std::string inputProgram) {
 
 	ParseStatus status;
 	if ((inputProgram[0] >= 'a' && inputProgram[0] <= 'z') ||
-		(inputProgram[0] >= 'A' && inputProgram[0] <= 'Z')){
+		(inputProgram[0] >= 'A' && inputProgram[0] <= 'Z') ||
+		inputProgram[0] == '_' || inputProgram[0] == ';'){
 		status.status = true;
         status.parsedCharacters = inputProgram[0];
 		status.remainingCharacters = inputProgram.erase(0, 1);

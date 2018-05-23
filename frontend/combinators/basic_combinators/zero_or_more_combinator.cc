@@ -14,6 +14,7 @@ ParseStatus ZeroOrMoreCombinator::parse(std::string inputProgram){
 		ParseStatus status2 = parser->parse(pStatus.remainingCharacters);
 		pStatus.status = status2.status;
 		if (status2.status){
+			pStatus.parsedCharacters += status2.parsedCharacters;
 			pStatus.remainingCharacters = status2.remainingCharacters;
 		}
 	}

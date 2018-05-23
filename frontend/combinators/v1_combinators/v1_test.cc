@@ -48,7 +48,7 @@ TEST(Combinators, FailedSingleCharTest) {
 // Success case for Single Digit test :: single_digit.cc
 TEST(Combinators, SuccessSingleDigitTest) {
   SingleDigitParser test;
-  ParseStatus result = test.parse("1"); 
+  ParseStatus result = test.parse("1");
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "");
@@ -58,7 +58,7 @@ TEST(Combinators, SuccessSingleDigitTest) {
 // Failed case for Single Digit test :: single_digit.cc
 TEST(Combinators, FailedSingleDigitTest) {
   SingleDigitParser test;
-  ParseStatus result = test.parse("a"); 
+  ParseStatus result = test.parse("a");
 
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.remainingCharacters, "a");

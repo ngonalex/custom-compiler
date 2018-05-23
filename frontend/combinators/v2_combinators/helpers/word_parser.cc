@@ -35,7 +35,7 @@ ParseStatus WordParser::parse(std::string inputProgram) {
 	}
 	else{
 		// Error type returned to user
-		result.errorType =  "First character needs to be a character";
+		result.errorType =  "First character needs to be a char";
 	}
 
 	return result;
