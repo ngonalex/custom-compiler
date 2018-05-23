@@ -11,6 +11,7 @@ TEST(WordParserCombinator, failWordParser1) {
   WordParser wordParser;
   ParseStatus result;
   result.status = false;
+  result.remainingCharacters = "11fab";
 
   ParseStatus testResult = wordParser.parse("11fab");
 

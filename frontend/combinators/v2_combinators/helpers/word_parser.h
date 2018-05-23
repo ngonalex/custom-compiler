@@ -1,8 +1,8 @@
 #ifndef WORD_PARSER_H_
 #define WORD_PARSER_H_
 
-#include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
+#include "abstract_syntax/abstract_syntax.h"
 
 namespace cs160 {
 namespace frontend {

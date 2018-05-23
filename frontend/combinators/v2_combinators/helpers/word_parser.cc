@@ -8,6 +8,7 @@
 #define super NullParser
 
 using namespace cs160::frontend;
+using namespace std;
 
 ParseStatus WordParser::parse(std::string inputProgram) {
 	if (inputProgram.size() == 0) {
@@ -34,7 +35,7 @@ ParseStatus WordParser::parse(std::string inputProgram) {
 	}
 	else{
 		// Error type returned to user
-		result.errorType =  "wordParser error";
+		result.errorType =  "First character needs to be a character";
 	}
 
 	return result;
