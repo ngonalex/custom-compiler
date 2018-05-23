@@ -10,15 +10,10 @@
 namespace cs160 {
 namespace abstract_syntax {
 
-<<<<<<< HEAD
 namespace frontend = version_2;
-namespace backend = version_2;
-=======
-namespace frontend = version_1;
 namespace backend = version_3;
->>>>>>> master
 
-}  // namespace abstract_syntax
-}  // namespace cs160
+} // namespace abstract_syntax
+} // namespace cs160
 
-#endif  // ABSTRACT_SYNTAX_ABSTRACT_SYNTAX_H_
+#endif // ABSTRACT_SYNTAX_ABSTRACT_SYNTAX_H_
