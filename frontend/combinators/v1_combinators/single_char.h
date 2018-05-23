@@ -12,6 +12,11 @@ class SingleCharParser : NullParser {
 	virtual ParseStatus parse(std::string inputProgram);
 };
 
+class SingleVarCharParser : NullParser {
+ public:
+	virtual ParseStatus parse(std::string inputProgram);
+};
+
 }  // namespace frontend
 }  // namespace cs160
 

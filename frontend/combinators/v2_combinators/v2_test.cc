@@ -161,3 +161,28 @@ TEST(WordParserCombinator, failColonParser1) {
   EXPECT_EQ(testResult, result);
   EXPECT_EQ(testResult.errorType, "Missing colon");
 }
+
+// Success Case ColonParser
+TEST(WordParserCombinator, successTypeParser1) {
+  TypeParser parser;
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "";
+  result.parsedCharacters = "Integer";
+
+  ParseStatus testResult = parser.parse("   Integer");
+
+  EXPECT_EQ(testResult, result);
+}
+
+// Fail Case ColonParser
+TEST(WordParserCombinator, failTypeParser1) {
+  TypeParser parser;
+  ParseStatus result;
+  result.status = false;
+
+  ParseStatus testResult = parser.parse("  _abc  "); // type can only contain a through z
+
+  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(testResult.errorType, "Check type in variable declaration");
+}

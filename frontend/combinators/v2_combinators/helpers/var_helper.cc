@@ -1,4 +1,7 @@
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
+#include "frontend/combinators/basic_combinators/one_or_more_combinator.h"
+#include "frontend/combinators/v1_combinators/single_char.h"
+
 #include <string>     // std::string, std::stoi
 
 #define super NullParser
@@ -53,16 +56,15 @@ ParseStatus TypeParser::parse(std::string inputProgram) {
 	}
 
   trim(inputProgram);
-  ParseStatus result;
+  OneOrMoreCombinator oneOrMore;
+  SingleCharParser charParser;
 
-  if(inputProgram.substr(0,1) == ":") {
-    result.status = true;
-    result.parsedCharacters = ":";
-    result.remainingCharacters = inputProgram.erase(0,1);
+	oneOrMore.parser = reinterpret_cast<NullParser *>(&charParser);
+  ParseStatus result = oneOrMore.parse(inputProgram);
+
+  if(!result.status) {
+    result.errorType = "Check type in variable declaration";
   }
-  else {
-    result.status = false;
-    result.errorType = "Missing colon";
-  }
+
   return result;
 }
