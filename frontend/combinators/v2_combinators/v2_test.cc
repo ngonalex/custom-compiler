@@ -103,16 +103,3 @@ TEST(WordParserCombinator, successWordParser3) {
 
   EXPECT_EQ(testResult, result);
 }
-/*
-// Success Case WordParser
-TEST(WordParserCombinator, successWordParser4) {
-  WordParser wordParser;
-  ParseStatus result;
-  result.status = true;
-  result.remainingCharacters = "";
-  result.parsedCharacters = "Var abcd 42+30";
-
-  ParseStatus testResult = wordParser.parse("Var abcd 42+30");
-
-  EXPECT_EQ(testResult, result);
-}*/
