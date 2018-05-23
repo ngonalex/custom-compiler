@@ -1,6 +1,7 @@
 #include "abstract_syntax/abstract_syntax.h"
 #include "abstract_syntax/print_visitor_v2.h"
 #include "frontend/combinators/v2_combinators/helpers/word_parser.h"
+#include "frontend/combinators/v2_combinators/helpers/var_keyword_parser.h"
 
 #include "gtest/gtest.h"
 
@@ -102,4 +103,29 @@ TEST(WordParserCombinator, successWordParser3) {
   ParseStatus testResult = wordParser.parse("_victor");
 
   EXPECT_EQ(testResult, result);
+}
+
+// Success Case var_keyword_parser
+TEST(WordParserCombinator, successVarKeywordParser1) {
+  VarKeywordParser varParser;
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "";
+  result.parsedCharacters = "var";
+
+  ParseStatus testResult = varParser.parse("var");
+
+  EXPECT_EQ(testResult, result);
+}
+
+// Fail Case var_keyword_parser
+TEST(WordParserCombinator, failVarKeywordParser1) {
+  VarKeywordParser varParser;
+  ParseStatus result;
+  result.status = false;
+
+  ParseStatus testResult = varParser.parse("victor");
+
+  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(testResult.errorType, "Start variable declaration with var");
 }
