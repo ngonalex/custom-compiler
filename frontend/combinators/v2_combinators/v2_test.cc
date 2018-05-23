@@ -211,3 +211,17 @@ TEST(WordParserCombinator, failEqualSignParser1) {
   EXPECT_EQ(testResult, result);
   EXPECT_EQ(testResult.errorType, "Missing equal sign in variable assignment");
 }
+
+
+// Success Case VariableParser
+TEST(WordParserCombinator, sucessVariableParser1) {
+  EqualSignParser parser;
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "";
+  result.parsedCharacters = "var _victor : Integer";
+
+  ParseStatus testResult = parser.parse(" var _victor : Integer");
+
+  EXPECT_EQ(testResult.status, result.status);
+}

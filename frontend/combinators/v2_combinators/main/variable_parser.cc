@@ -38,16 +38,26 @@ ParseStatus VariableParser::parse(std::string inputProgram) {
         result.parsedCharacters += (" " + colonStatus.parsedCharacters);
         result.remainingCharacters = colonStatus.remainingCharacters;
         ParseStatus typeStatus =
-            typeParser.parse(colonStatus.remainingCharacters);
+            typeParser.parse(result.remainingCharacters);
         if (typeStatus.status) {
           result.parsedCharacters += (" " + typeStatus.parsedCharacters);
           result.remainingCharacters = typeStatus.remainingCharacters;
           result.ast = std::move(make_unique<const VariableExpr>(wordResult.parsedCharacters));
         }
+				else {
+					result.status = typeStatus.status;
+					result.errorType = typeStatus.errorType;
+				}
       }
-			else return colonStatus;
+			else {
+				result.status = colonStatus.status;
+				result.errorType = colonStatus.errorType;
+			}
     }
-		else return wordResult;
+		else {
+			result.status = wordResult.status;
+			result.errorType = wordResult.errorType;
+		}
   }
 
   return result;
