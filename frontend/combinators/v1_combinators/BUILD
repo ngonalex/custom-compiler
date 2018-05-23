@@ -32,7 +32,7 @@ cc_library(
 
 cc_test(
 	name = "combinators_test",
-	deps = ["@gtest//:main", "//frontend/combinators/basic_combinators", "//abstract_syntax:abstract_syntax"],
+	deps = ["@gtest//:main", ":v1_combinators", "//frontend/combinators/basic_combinators", "//abstract_syntax:abstract_syntax"],
 	srcs = ["v1_test.cc"],
 	copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
 	timeout = "short",
