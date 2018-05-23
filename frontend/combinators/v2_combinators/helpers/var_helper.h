@@ -17,6 +17,12 @@ class ColonParser : NullParser {
    virtual ParseStatus parse(std::string inputProgram);
 };
 
+class TypeParser : NullParser {
+ public:
+   virtual ParseStatus parse(std::string inputProgram);
+};
+
+
 } // namespace frontend
 } // namespace cs160
 

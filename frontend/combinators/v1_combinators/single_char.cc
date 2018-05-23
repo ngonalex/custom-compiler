@@ -8,6 +8,8 @@ ParseStatus SingleCharParser::parse(std::string inputProgram) {
 	if (inputProgram.size() == 0){
 		return super::parse(inputProgram);
 	}
+	
+	trim(inputProgram);
 
 	ParseStatus status;
 	if ((inputProgram[0] >= 'a' && inputProgram[0] <= 'z') ||

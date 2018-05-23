@@ -45,3 +45,24 @@ ParseStatus ColonParser::parse(std::string inputProgram) {
   }
   return result;
 }
+
+
+ParseStatus TypeParser::parse(std::string inputProgram) {
+	if (inputProgram.size() == 0) {
+		return super::parse(inputProgram);
+	}
+
+  trim(inputProgram);
+  ParseStatus result;
+
+  if(inputProgram.substr(0,1) == ":") {
+    result.status = true;
+    result.parsedCharacters = ":";
+    result.remainingCharacters = inputProgram.erase(0,1);
+  }
+  else {
+    result.status = false;
+    result.errorType = "Missing colon";
+  }
+  return result;
+}
