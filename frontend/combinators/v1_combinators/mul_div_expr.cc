@@ -21,8 +21,8 @@ ParseStatus MulDivExprParser::parse(std::string inputProgram) {
 	    TermExprParser rhs;
 	    ParseStatus rhsParseStatus = rhs.parse(mdParseStatus.remainingCharacters);
 	    result.ast = std::move(make_node((mdParseStatus.parsedCharacters),
-														 std::move(result.ast),
-														 std::move(rhsParseStatus.ast)));
+	    	unique_cast<const ArithmeticExpr>(std::move(result.ast)),
+	    	unique_cast<const ArithmeticExpr>(std::move(rhsParseStatus.ast))));
 	    mdParseStatus = op.parse(rhsParseStatus.remainingCharacters);
 			std::cout << mdParseStatus.remainingCharacters << std::endl;
 	  }

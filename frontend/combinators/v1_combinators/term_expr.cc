@@ -26,7 +26,9 @@ ParseStatus TermExprParser::parse(std::string inputProgram) {
     ParseStatus aeParseStatus = ae.parse(negStatus.remainingCharacters);
     if (aeParseStatus.status) {
       std::unique_ptr<const ArithmeticExpr> zero = make_unique<IntegerExpr>(0);
-      aeParseStatus.ast = std::move(make_unique<const SubtractExpr>(std::move(zero), std::move(aeParseStatus.ast)));
+      aeParseStatus.ast = std::move(make_unique<const SubtractExpr>(
+        unique_cast<const ArithmeticExpr>(std::move(zero)),
+        unique_cast<const ArithmeticExpr>(std::move(aeParseStatus.ast))));
       return aeParseStatus; // Returning Success on -AE
     }
     return aeParseStatus; // Returning Failure on -AE

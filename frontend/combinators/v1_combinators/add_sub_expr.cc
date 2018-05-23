@@ -20,8 +20,8 @@ ParseStatus AddSubExprParser::parse(std::string inputProgram) {
 	    MulDivExprParser rhs;
 	    ParseStatus rhsParseStatus = rhs.parse(asParseStatus.remainingCharacters);
 	    result.ast = std::move(make_node((asParseStatus.parsedCharacters),
-														 std::move(result.ast),
-														 std::move(rhsParseStatus.ast)));
+	    	unique_cast<const ArithmeticExpr>(std::move(result.ast)),
+	    	unique_cast<const ArithmeticExpr>(std::move(rhsParseStatus.ast))));
 	    asParseStatus = op.parse(rhsParseStatus.remainingCharacters);
 	  }
 		result.remainingCharacters = asParseStatus.remainingCharacters;
