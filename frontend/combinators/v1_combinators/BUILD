@@ -26,7 +26,7 @@ cc_library(
 			"negative_sign.cc",
 			"ae.cc"],
 	deps = ["//utility", "//frontend/combinators/basic_combinators", "//abstract_syntax:abstract_syntax",
-	"//abstract_syntax:print_visitor_v1"],
+	"//abstract_syntax:print_visitor_v2"],
 	visibility = ["//visibility:public"],
 )
 
