@@ -1,9 +1,9 @@
 #include "frontend/combinators/v2_combinators/main/variable_parser.h"
+#include "frontend/combinators/basic_combinators/or_combinator.h"
+#include "frontend/combinators/basic_combinators/zero_or_more_combinator.h"
+#include "frontend/combinators/v1_combinators/single_char.h"
+#include "frontend/combinators/v1_combinators/single_digit.h"
 #include "frontend/combinators/v2_combinators/helpers/word_parser.h"
-#include "frontend/combinators/v2_combinators/helpers/var_helper.h"
-#include "frontend/combinators/v1_combinators/term_expr.h"
-
-
 #include <string> // std::string, std::stoi
 
 #define super NullParser
@@ -27,7 +27,7 @@ ParseStatus VariableParser::parse(std::string inputProgram) {
   // Parse the first character
   ParseStatus result = varParser.parse(inputProgram);
 
-  if (result.status) {
+  if (varResult.status) {
     ParseStatus wordResult = wordParser.parse(result.remainingCharacters);
     if (wordResult.status) {
       result.parsedCharacters += (" " + wordResult.parsedCharacters);
@@ -42,13 +42,19 @@ ParseStatus VariableParser::parse(std::string inputProgram) {
         if (typeStatus.status) {
           result.parsedCharacters += (" " + typeStatus.parsedCharacters);
           result.remainingCharacters = typeStatus.remainingCharacters;
-          result.ast = std::move(make_unique<const VariableExpr>(wordResult.parsedCharacters));
+
+          std::unique_ptr<const ArithmeticExpr> variableName =
+              make_unique<VariableExpr>(wordResult.parsedCharacters);
+          result.ast = std::move(make_unique<const VariableExpr>(
+              unique_cast<const ArithmeticExpr>(std::move(variableName)),
+              unique_cast<const ArithmeticExpr>(std::move(result.ast))));
         }
-      }
-			else return colonStatus;
-    }
-		else return wordResult;
-  }
+      } else
+        return colonStatus
+    } else
+      return wordResult;
+  } else
+    return varResult;
 
   return result;
 }
