@@ -793,6 +793,8 @@ TEST_F(LowererTest, LoopWithBody) {
   auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
     make_unique<IntegerExpr>(5));
 
+
+
   auto expr = make_unique<Program>(Statement::Block(), std::move(statements),
     std::move(arithexpr));
 
@@ -837,5 +839,12 @@ TEST_F(LowererTest, LoopWithBody) {
     "bob <- t_17\njmp loop0\nMkLabel continue0\nt_18 <- 7\nt_19 <- 5\n"
     "t_20 <- t_18 - t_19\n");
 }
+
+  TEST_F(LowererTest, EasyFunction) {
+    auto expr = make_unique<DivideExpr>(
+    make_unique<IntegerExpr>(7), make_unique<IntegerExpr>(5));
+
+    auto foo_def = make_unique<const FunctionDef)("fib")
+  }
 
 // To do: Nested Branches + Nested Loops + LogicalNot
