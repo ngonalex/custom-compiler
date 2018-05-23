@@ -1,15 +1,14 @@
-#include "abstract_syntax/abstract_syntax.h"
 #include "frontend/parser/parser.h"
+#include "abstract_syntax/abstract_syntax.h"
+#include "abstract_syntax/print_visitor_v2.h"
 #include "frontend/tokenizer/token.h"
 #include "frontend/tokenizer/tokenizer.h"
-#include "abstract_syntax/print_visitor_v2.h"
 
 #include "gtest/gtest.h"
 
 using namespace cs160::abstract_syntax::frontend;
 using cs160::frontend::Parser;
 using cs160::frontend::Token;
-
 
 TEST(parser_v1_success, CanParseInt) {
   // Initialize the vector
@@ -62,13 +61,13 @@ TEST(parser_v1_success, CanParseSubtraction) {
   Token secondToken(Token::Type::SUB_OP);
   Token thirdToken(Token::Type::NUM, 3);
   Token fourthToken(Token::Type::END);
-    Token endfile(Token::Type::ENDOFFILE);
+  Token endfile(Token::Type::ENDOFFILE);
   std::vector<Token> test_vector;
   test_vector.push_back(firstToken);
   test_vector.push_back(secondToken);
   test_vector.push_back(thirdToken);
   test_vector.push_back(fourthToken);
-    test_vector.push_back(endfile);
+  test_vector.push_back(endfile);
 
   // Push it through the parser
   Parser parser(test_vector);
@@ -118,7 +117,6 @@ TEST(parser_v1_success, CanParseDivision) {
   test_vector.push_back(thirdToken);
   test_vector.push_back(fourthToken);
   test_vector.push_back(endfile);
-  
 
   // Push it through the parser
   Parser parser(test_vector);
@@ -259,15 +257,17 @@ TEST(parser_v1_success, StressTest) {
   PrintVisitor *a = new PrintVisitor();
   result->Visit(a);
   std::string output = a->GetOutput();
-  
-  EXPECT_EQ(output, "((((((7 * 10) + (9 / 3)) + 16) - ((8 * 2) * 3)) - 77) + (12 * 1))");
+
+  EXPECT_EQ(
+      output,
+      "((((((7 * 10) + (9 / 3)) + 16) - ((8 * 2) * 3)) - 77) + (12 * 1))");
 }
 
 TEST(parser_v1_success, SingleParen) {
-  Token close(Token::Type::CLOSE_PAREN); 
-  Token five(Token::Type::NUM, 5); 
-  Token open(Token::Type::OPEN_PAREN); 
-  Token end(Token::Type::END); 
+  Token close(Token::Type::CLOSE_PAREN);
+  Token five(Token::Type::NUM, 5);
+  Token open(Token::Type::OPEN_PAREN);
+  Token end(Token::Type::END);
   Token endfile(Token::Type::ENDOFFILE);
   std::vector<Token> test_vector;
   test_vector.push_back(open);
@@ -283,6 +283,6 @@ TEST(parser_v1_success, SingleParen) {
   PrintVisitor *a = new PrintVisitor();
   result->Visit(a);
   std::string output = a->GetOutput();
-  
+
   EXPECT_EQ(output, "5");
 }

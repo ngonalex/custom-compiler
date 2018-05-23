@@ -2,26 +2,26 @@
 #include "gtest/gtest.h"
 #include "utility/memory.h"
 
-using cs160::abstract_syntax::version_3::AstVisitor;
 using cs160::abstract_syntax::version_3::AddExpr;
-using cs160::abstract_syntax::version_3::SubtractExpr;
-using cs160::abstract_syntax::version_3::MultiplyExpr;
-using cs160::abstract_syntax::version_3::DivideExpr;
-using cs160::abstract_syntax::version_3::IntegerExpr;
-using cs160::abstract_syntax::version_3::VariableExpr;
-using cs160::abstract_syntax::version_3::LessThanExpr;
-using cs160::abstract_syntax::version_3::LessThanEqualToExpr;
-using cs160::abstract_syntax::version_3::GreaterThanExpr;
-using cs160::abstract_syntax::version_3::GreaterThanEqualToExpr;
-using cs160::abstract_syntax::version_3::EqualToExpr;
-using cs160::abstract_syntax::version_3::LogicalAndExpr;
-using cs160::abstract_syntax::version_3::LogicalOrExpr;
-using cs160::abstract_syntax::version_3::LogicalNotExpr;
-using cs160::abstract_syntax::version_3::Statement;
 using cs160::abstract_syntax::version_3::Assignment;
+using cs160::abstract_syntax::version_3::AstVisitor;
 using cs160::abstract_syntax::version_3::Conditional;
+using cs160::abstract_syntax::version_3::DivideExpr;
+using cs160::abstract_syntax::version_3::EqualToExpr;
+using cs160::abstract_syntax::version_3::GreaterThanEqualToExpr;
+using cs160::abstract_syntax::version_3::GreaterThanExpr;
+using cs160::abstract_syntax::version_3::IntegerExpr;
+using cs160::abstract_syntax::version_3::LessThanEqualToExpr;
+using cs160::abstract_syntax::version_3::LessThanExpr;
+using cs160::abstract_syntax::version_3::LogicalAndExpr;
+using cs160::abstract_syntax::version_3::LogicalNotExpr;
+using cs160::abstract_syntax::version_3::LogicalOrExpr;
 using cs160::abstract_syntax::version_3::Loop;
+using cs160::abstract_syntax::version_3::MultiplyExpr;
 using cs160::abstract_syntax::version_3::Program;
+using cs160::abstract_syntax::version_3::Statement;
+using cs160::abstract_syntax::version_3::SubtractExpr;
+using cs160::abstract_syntax::version_3::VariableExpr;
 
 using cs160::make_unique;
 

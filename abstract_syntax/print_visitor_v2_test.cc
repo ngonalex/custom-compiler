@@ -9,14 +9,14 @@
 
 using cs160::abstract_syntax::version_2::PrintVisitor;
 
-using cs160::abstract_syntax::version_2::IntegerExpr;
-using cs160::abstract_syntax::version_2::VariableExpr;
 using cs160::abstract_syntax::version_2::AddExpr;
-using cs160::abstract_syntax::version_2::SubtractExpr;
-using cs160::abstract_syntax::version_2::MultiplyExpr;
-using cs160::abstract_syntax::version_2::DivideExpr;
 using cs160::abstract_syntax::version_2::Assignment;
+using cs160::abstract_syntax::version_2::DivideExpr;
+using cs160::abstract_syntax::version_2::IntegerExpr;
+using cs160::abstract_syntax::version_2::MultiplyExpr;
 using cs160::abstract_syntax::version_2::Program;
+using cs160::abstract_syntax::version_2::SubtractExpr;
+using cs160::abstract_syntax::version_2::VariableExpr;
 
 using cs160::make_unique;
 

@@ -16,7 +16,8 @@ std::unique_ptr<const Program> Parser::ParseProgram() {
   }
   std::unique_ptr<const ArithmeticExpr> expression = Eparser();
   Expect(Token::Type::ENDOFFILE);
-  return (make_unique<const Program>(std::move(assignments), std::move(expression)));
+  return (make_unique<const Program>(std::move(assignments),
+                                     std::move(expression)));
 }
 
 // Assignment should follow the structure of
@@ -31,7 +32,7 @@ std::unique_ptr<const Assignment> Parser::ParseAssignment() {
     Expect(Token::Type::EQUAL_SIGN);
     std::unique_ptr<const ArithmeticExpr> expr = Eparser();
     return make_unique<Assignment>(std::move(var), std::move(expr));
-  } 
+  }
   if (Next() == Token::Type::IDENTIFIER) {
     if (DoubleNext() != Token::Type::EQUAL_SIGN) {
       // printf("Not double next\n");
@@ -41,8 +42,7 @@ std::unique_ptr<const Assignment> Parser::ParseAssignment() {
     Expect(Token::Type::EQUAL_SIGN);
     std::unique_ptr<const ArithmeticExpr> expr = Eparser();
     return make_unique<Assignment>(std::move(var), std::move(expr));
-  }
-  else {
+  } else {
     // printf("Error Here\n");
     return NULL;
   }
@@ -53,7 +53,7 @@ std::unique_ptr<const VariableExpr> Parser::ParseVariable(Token curr) {
   if (curr.type() == Token::Type::IDENTIFIER && curr.idVal() != "int") {
     Consume();
     return make_unique<VariableExpr>(curr.idVal());
-  } 
+  }
   Error();
   return nullptr;
 }
@@ -80,7 +80,7 @@ std::unique_ptr<const ArithmeticExpr> Parser::ParseMulDiv() {
   std::unique_ptr<const ArithmeticExpr> t = ParseExpression();
   // auto r1 = ParseExpression()
   // if (!r1.success) return Result::failure("asdasd", tok)
-  
+
   Token::Type op = Next();
   while (op == Token::Type::MUL_OP || op == Token::Type::DIV_OP) {
     Consume();
@@ -112,12 +112,13 @@ std::unique_ptr<const ArithmeticExpr> Parser::ParseExpression() {
   else if (type == Token::Type::IDENTIFIER) {
     std::unique_ptr<const ArithmeticExpr> var = ParseVariable(program_.back());
     return var;
-  } 
+  }
   // 0 - (expr)
   else if (type == Token::Type::SUB_OP) {
     Consume();
     std::unique_ptr<const ArithmeticExpr> t = ParseExpression();
-    std::unique_ptr<const ArithmeticExpr> zero = MakeInteger(Token(Token::Type::NUM, 0));
+    std::unique_ptr<const ArithmeticExpr> zero =
+        MakeInteger(Token(Token::Type::NUM, 0));
     return make_unique<const SubtractExpr>(std::move(zero), std::move(t));
   }
   // Or an error
@@ -128,21 +129,25 @@ std::unique_ptr<const ArithmeticExpr> Parser::ParseExpression() {
 }
 
 // AST Expressions
-std::unique_ptr<const ArithmeticExpr> Parser::MakeArithmeticExpr(Token::Type op, 
-  std::unique_ptr<const ArithmeticExpr> first_leaf,
-  std::unique_ptr<const ArithmeticExpr> second_leaf) {
-  switch(op) {
+std::unique_ptr<const ArithmeticExpr> Parser::MakeArithmeticExpr(
+    Token::Type op, std::unique_ptr<const ArithmeticExpr> first_leaf,
+    std::unique_ptr<const ArithmeticExpr> second_leaf) {
+  switch (op) {
     case Token::Type::ADD_OP: {
-      return make_unique<const AddExpr>(std::move(first_leaf), std::move(second_leaf));
+      return make_unique<const AddExpr>(std::move(first_leaf),
+                                        std::move(second_leaf));
     }
     case Token::Type::SUB_OP: {
-      return make_unique<const SubtractExpr>(std::move(first_leaf), std::move(second_leaf));
+      return make_unique<const SubtractExpr>(std::move(first_leaf),
+                                             std::move(second_leaf));
     }
     case Token::Type::MUL_OP: {
-      return make_unique<const MultiplyExpr>(std::move(first_leaf), std::move(second_leaf));
+      return make_unique<const MultiplyExpr>(std::move(first_leaf),
+                                             std::move(second_leaf));
     }
     case Token::Type::DIV_OP: {
-      return make_unique<const DivideExpr>(std::move(first_leaf), std::move(second_leaf));
+      return make_unique<const DivideExpr>(std::move(first_leaf),
+                                           std::move(second_leaf));
     }
     default: {
       Error();
