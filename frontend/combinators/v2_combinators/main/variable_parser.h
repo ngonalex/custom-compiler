@@ -1,5 +1,5 @@
-#ifndef NUM_PARSER_H_
-#define NUM_PARSER_H_
+#ifndef VARIABLE_PARSER_H_
+#define VARIABLE_PARSER_H_
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
@@ -15,4 +15,4 @@ class VariableParser : NullParser {
 } // namespace frontend
 } // namespace cs160
 
-#endif // NUM_PARSER_H_
+#endif // VARIABLE_PARSER_H_

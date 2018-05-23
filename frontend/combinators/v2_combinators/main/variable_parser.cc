@@ -14,6 +14,8 @@ ParseStatus VariableParser::parse(std::string inputProgram) {
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);
 	}
+	WordParser wordParser;
+	ZeroOrMoreCombinator zeroOrMore;
 
 	// Parse the first character
 	ParseStatus result = wordParser.parse(inputProgram);

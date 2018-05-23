@@ -1,6 +1,6 @@
 #include "abstract_syntax/abstract_syntax.h"
-#include "abstract_syntax/print_visitor_v1.h"
-#include "frontend/combinators/v2_combinators/word_parser.h"
+#include "abstract_syntax/print_visitor_v2.h"
+#include "frontend/combinators/v2_combinators/helpers/word_parser.h"
 
 #include "gtest/gtest.h"
 
@@ -8,11 +8,13 @@ using namespace cs160::frontend;
 
 // Success case for Single Character test :: single_char.cc
 TEST(WordParserCombinator, failWordParser1) {
-  wordParser test;
+  WordParser wordParser;
   ParseStatus result;
   result.status = false;
 
-  EXPECT_EQ(test.parse(“11fab”), result);
+  ParseStatus testResult = wordParser.parse("11fab");
+
+  EXPECT_EQ(testResult, result);
 }
 /*
 
