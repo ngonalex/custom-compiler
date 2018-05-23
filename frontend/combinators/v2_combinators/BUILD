@@ -1,8 +1,8 @@
 cc_library(
 	name = "v2_combinators",
 	copts = ["-Wall -g"],
-	hdrs = ["helpers/word_parser.h", "main/variable_parser.h", "helpers/var_keyword_parser.h"],
-	srcs = ["helpers/word_parser.cc", "main/variable_parser.cc", "helpers/var_keyword_parser.cc"],
+	hdrs = ["helpers/word_parser.h", "main/variable_parser.h", "helpers/var_helper.h"],
+	srcs = ["helpers/word_parser.cc", "main/variable_parser.cc", "helpers/var_helper.cc"],
 	deps = ["//utility", "//frontend/combinators/basic_combinators","//frontend/combinators/v1_combinators", "//abstract_syntax:abstract_syntax",
 	"//abstract_syntax:print_visitor_v2"],
 	visibility = ["//visibility:public"],

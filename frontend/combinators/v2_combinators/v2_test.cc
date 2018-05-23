@@ -1,7 +1,7 @@
 #include "abstract_syntax/abstract_syntax.h"
 #include "abstract_syntax/print_visitor_v2.h"
 #include "frontend/combinators/v2_combinators/helpers/word_parser.h"
-#include "frontend/combinators/v2_combinators/helpers/var_keyword_parser.h"
+#include "frontend/combinators/v2_combinators/helpers/var_helper.h"
 
 #include "gtest/gtest.h"
 
@@ -105,6 +105,13 @@ TEST(WordParserCombinator, successWordParser3) {
   EXPECT_EQ(testResult, result);
 }
 
+// Success Case trim in utility
+TEST(WordParserCombinator, trimTest) {
+  std::string result = "    var    ";
+  cs160::trim(result);
+  EXPECT_EQ(result, "var");
+}
+
 // Success Case var_keyword_parser
 TEST(WordParserCombinator, successVarKeywordParser1) {
   VarKeywordParser varParser;
@@ -113,7 +120,7 @@ TEST(WordParserCombinator, successVarKeywordParser1) {
   result.remainingCharacters = "";
   result.parsedCharacters = "var";
 
-  ParseStatus testResult = varParser.parse("var");
+  ParseStatus testResult = varParser.parse("   var");
 
   EXPECT_EQ(testResult, result);
 }
@@ -128,4 +135,29 @@ TEST(WordParserCombinator, failVarKeywordParser1) {
 
   EXPECT_EQ(testResult, result);
   EXPECT_EQ(testResult.errorType, "Start variable declaration with var");
+}
+
+// Success Case ColonParser
+TEST(WordParserCombinator, sucessColonParser1) {
+  ColonParser parser;
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "  joj";
+  result.parsedCharacters = ":";
+
+  ParseStatus testResult = parser.parse("   :  joj");
+
+  EXPECT_EQ(testResult, result);
+}
+
+// Fail Case ColonParser
+TEST(WordParserCombinator, failColonParser1) {
+  ColonParser parser;
+  ParseStatus result;
+  result.status = false;
+
+  ParseStatus testResult = parser.parse("first char not colon:");
+
+  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(testResult.errorType, "Missing colon");
 }
