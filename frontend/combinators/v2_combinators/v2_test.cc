@@ -2,7 +2,7 @@
 #include "abstract_syntax/print_visitor_v2.h"
 #include "frontend/combinators/v2_combinators/helpers/word_parser.h"
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
-
+#include "frontend/combinators/v2_combinators/main/variable_parser.h"
 #include "gtest/gtest.h"
 
 using namespace cs160::frontend;
@@ -215,7 +215,7 @@ TEST(WordParserCombinator, failEqualSignParser1) {
 
 // Success Case VariableParser
 TEST(WordParserCombinator, sucessVariableParser1) {
-  EqualSignParser parser;
+  VariableParser parser;
   ParseStatus result;
   result.status = true;
   result.remainingCharacters = "";
@@ -223,5 +223,5 @@ TEST(WordParserCombinator, sucessVariableParser1) {
 
   ParseStatus testResult = parser.parse(" var _victor : Integer");
 
-  EXPECT_EQ(testResult.status, result.status);
+  EXPECT_EQ(testResult, result);
 }
