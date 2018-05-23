@@ -162,7 +162,7 @@ TEST(WordParserCombinator, failColonParser1) {
   EXPECT_EQ(testResult.errorType, "Missing colon");
 }
 
-// Success Case ColonParser
+// Success Case TypeParser
 TEST(WordParserCombinator, successTypeParser1) {
   TypeParser parser;
   ParseStatus result;
@@ -175,7 +175,7 @@ TEST(WordParserCombinator, successTypeParser1) {
   EXPECT_EQ(testResult, result);
 }
 
-// Fail Case ColonParser
+// Fail Case TypeParser
 TEST(WordParserCombinator, failTypeParser1) {
   TypeParser parser;
   ParseStatus result;
@@ -185,4 +185,29 @@ TEST(WordParserCombinator, failTypeParser1) {
 
   EXPECT_EQ(testResult, result);
   EXPECT_EQ(testResult.errorType, "Check type in variable declaration");
+}
+
+// Success Case EqualSignParser
+TEST(WordParserCombinator, sucessEqualSignParser1) {
+  EqualSignParser parser;
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "  3 + 4";
+  result.parsedCharacters = "=";
+
+  ParseStatus testResult = parser.parse("   =  3 + 4");
+
+  EXPECT_EQ(testResult, result);
+}
+
+// Fail Case EqualSignParser
+TEST(WordParserCombinator, failEqualSignParser1) {
+  EqualSignParser parser;
+  ParseStatus result;
+  result.status = false;
+
+  ParseStatus testResult = parser.parse(" _=");
+
+  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(testResult.errorType, "Missing equal sign in variable assignment");
 }

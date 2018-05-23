@@ -22,6 +22,10 @@ class TypeParser : NullParser {
    virtual ParseStatus parse(std::string inputProgram);
 };
 
+class EqualSignParser : NullParser {
+ public:
+   virtual ParseStatus parse(std::string inputProgram);
+};
 
 } // namespace frontend
 } // namespace cs160

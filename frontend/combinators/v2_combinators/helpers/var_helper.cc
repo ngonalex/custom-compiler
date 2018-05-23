@@ -68,3 +68,23 @@ ParseStatus TypeParser::parse(std::string inputProgram) {
 
   return result;
 }
+
+ParseStatus EqualSignParser::parse(std::string inputProgram) {
+	if (inputProgram.size() == 0) {
+		return super::parse(inputProgram);
+	}
+
+  trim(inputProgram);
+  ParseStatus result;
+
+  if(inputProgram.substr(0,1) == "=") {
+    result.status = true;
+    result.parsedCharacters = "=";
+    result.remainingCharacters = inputProgram.erase(0,1);
+  }
+  else {
+    result.status = false;
+    result.errorType = "Missing equal sign in variable assignment";
+  }
+  return result;
+}
