@@ -21,36 +21,54 @@ class PrintVisitor : public AstVisitor {
     output_ << exp.value();
   }
 
+  void VisitVariableExpr(const VariableExpr& exp) override {
+    output_ << exp.name();
+  }
+
   void VisitAddExpr(const AddExpr& exp) override {
-    output_ << "(+ ";
+    output_ << "(";
     exp.lhs().Visit(this);
-    output_ << " ";
+    output_ << " + ";
     exp.rhs().Visit(this);
     output_ << ")";
   }
 
   void VisitSubtractExpr(const SubtractExpr& exp) override {
-    output_ << "(- ";
+    output_ << "(";
     exp.lhs().Visit(this);
-    output_ << " ";
+    output_ << " - ";
     exp.rhs().Visit(this);
     output_ << ")";
   }
 
   void VisitMultiplyExpr(const MultiplyExpr& exp) override {
-    output_ << "(* ";
+    output_ << "(";
     exp.lhs().Visit(this);
-    output_ << " ";
+    output_ << " * ";
     exp.rhs().Visit(this);
     output_ << ")";
   }
 
   void VisitDivideExpr(const DivideExpr& exp) override {
-    output_ << "(/ ";
+    output_ << "(";
     exp.lhs().Visit(this);
-    output_ << " ";
+    output_ << " / ";
     exp.rhs().Visit(this);
     output_ << ")";
+  }
+
+  void VisitAssignment(const Assignment& assignment) override {
+    assignment.lhs().Visit(this);
+    output_ << " = ";
+    assignment.rhs().Visit(this);
+  }
+
+  void VisitProgram(const Program& program) override {
+    for (auto& assignment : program.assignments()) {
+      assignment->Visit(this);
+      output_ << "; ";
+    }
+    program.arithmetic_exp().Visit(this);
   }
 
  private:

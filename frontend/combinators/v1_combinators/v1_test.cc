@@ -243,7 +243,7 @@ TEST(Combinators, SimplyAddition) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(output, "(+ 5 77)");
+  EXPECT_EQ(output, "(5 + 77)");
 }
 
 TEST(Combinators, SimpleMul) {
@@ -257,7 +257,7 @@ TEST(Combinators, SimpleMul) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(output, "(* 225 335)");
+  EXPECT_EQ(output, "(225 * 335)");
 }
 
 
@@ -273,7 +273,7 @@ TEST(Combinators, SimpleParen) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(output, "(* 225 335)");
+  EXPECT_EQ(output, "(225 * 335)");
 }
 
 TEST(Combinators, NegativeNumber) {
@@ -287,7 +287,7 @@ TEST(Combinators, NegativeNumber) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "abasdf");
-  EXPECT_EQ(output, "(- 0 101281510)");
+  EXPECT_EQ(output, "(0 - 101281510)");
 }
 
 /* // Original - broken
@@ -318,7 +318,7 @@ TEST(Combinators, TrivialAe1) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(output, "(/ (+ (* 225 335) 12) 2)");
+  EXPECT_EQ(output, "(((225 * 335) + 12) / 2)");
 }
 
 
@@ -334,7 +334,7 @@ TEST(Combinators, TrivialAe2) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(output, "(+ (* 225 335) (/ 12 2))");
+  EXPECT_EQ(output, "((225 * 335) + (12 / 2))");
 }
 
 
@@ -350,7 +350,7 @@ TEST(Combinators, TrivialAe3) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(output, "(+ (* 225 335) (/ 12 2))");
+  EXPECT_EQ(output, "((225 * 335) + (12 / 2))");
 }
 
 
@@ -365,7 +365,7 @@ TEST(Combinators, ComplicatedAe) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(output, "(+ (- (- (+ (+ (* 7 10) (/ 9 3)) 16) (* (* 8 2) 3)) 77) (* 12 1))");
+  EXPECT_EQ(output, "((((((7 * 10) + (9 / 3)) + 16) - ((8 * 2) * 3)) - 77) + (12 * 1))");
 }
 
 
@@ -380,5 +380,5 @@ TEST(Combinators, NegComplicatedAe) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(output, "(- 0 (+ (- (- (+ (+ (* 7 10) (/ 9 3)) 16) (* (* 8 2) 3)) 77) (* 12 1)))");
+  EXPECT_EQ(output, "(0 - ((((((7 * 10) + (9 / 3)) + 16) - ((8 * 2) * 3)) - 77) + (12 * 1)))");
 }

@@ -3,16 +3,20 @@
 
 #include "gtest/gtest.h"
 
-#include "abstract_syntax/abstract_syntax_tree_v1.h"
-#include "abstract_syntax/print_visitor_v1.h"
+#include "abstract_syntax/abstract_syntax_tree_v2.h"
+#include "abstract_syntax/print_visitor_v2.h"
 #include "utility/memory.h"
 
-using cs160::abstract_syntax::version_1::AddExpr;
-using cs160::abstract_syntax::version_1::DivideExpr;
-using cs160::abstract_syntax::version_1::IntegerExpr;
-using cs160::abstract_syntax::version_1::MultiplyExpr;
-using cs160::abstract_syntax::version_1::PrintVisitor;
-using cs160::abstract_syntax::version_1::SubtractExpr;
+using cs160::abstract_syntax::version_2::PrintVisitor;
+
+using cs160::abstract_syntax::version_2::AddExpr;
+using cs160::abstract_syntax::version_2::Assignment;
+using cs160::abstract_syntax::version_2::DivideExpr;
+using cs160::abstract_syntax::version_2::IntegerExpr;
+using cs160::abstract_syntax::version_2::MultiplyExpr;
+using cs160::abstract_syntax::version_2::Program;
+using cs160::abstract_syntax::version_2::SubtractExpr;
+using cs160::abstract_syntax::version_2::VariableExpr;
 
 using cs160::make_unique;
 
@@ -21,6 +25,15 @@ class PrinterTest : public ::testing::Test {
   PrintVisitor printer_;
 };
 
+TEST_F(PrinterTest, AssignmentIsVisited) {
+  auto expr = make_unique<const Assignment>(make_unique<const VariableExpr>(a),
+                                            make_unique<const IntegerExpr>(9));
+  expr->Visit(&printer_);
+
+  EXPECT_EQ(printer_.GetOutput(), "(= a 9)");
+}
+
+/*
 TEST_F(PrinterTest, IntegerExprIsVisited) {
   auto number = make_unique<const IntegerExpr>(7);
   number->Visit(&printer_);
@@ -74,3 +87,4 @@ TEST_F(PrinterTest, NestedVisitationsWorkProperly) {
 
   EXPECT_EQ(printer_.GetOutput(), "(/ (+ 7 5) (- 2 1))");
 }
+*/

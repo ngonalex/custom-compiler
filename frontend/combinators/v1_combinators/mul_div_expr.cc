@@ -24,7 +24,6 @@ ParseStatus MulDivExprParser::parse(std::string inputProgram) {
 	    	unique_cast<const ArithmeticExpr>(std::move(result.ast)),
 	    	unique_cast<const ArithmeticExpr>(std::move(rhsParseStatus.ast))));
 	    mdParseStatus = op.parse(rhsParseStatus.remainingCharacters);
-			std::cout << mdParseStatus.remainingCharacters << std::endl;
 	  }
 		result.remainingCharacters = mdParseStatus.remainingCharacters;
 	}
