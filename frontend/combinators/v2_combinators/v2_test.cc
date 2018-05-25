@@ -232,3 +232,23 @@ TEST(WordParserCombinator, sucessVariableParser1) {
   EXPECT_EQ(testResult, result);
   EXPECT_EQ(output, "_victor");
 }
+
+// Success Case VariableParser
+TEST(WordParserCombinator, sucessVariableParser2) {
+  VariableParser parser;
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = ";";
+  result.parsedCharacters = "var _victor : Integer";
+
+  ParseStatus testResult = parser.parse(" Var _victor : Integer;");
+
+  // Traversing the AST created from the variable name
+  PrintVisitor *a = new PrintVisitor();
+  testResult.ast->Visit(a);
+  std::string output = a->GetOutput();
+
+
+  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(output, "_victor");
+}

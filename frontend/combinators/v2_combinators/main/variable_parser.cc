@@ -9,6 +9,7 @@
 #define super NullParser
 
 using namespace cs160::frontend;
+using namespace std;
 
 ParseStatus VariableParser::parse(std::string inputProgram) {
   if (inputProgram.size() == 0) {

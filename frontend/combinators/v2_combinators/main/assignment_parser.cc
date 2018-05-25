@@ -3,12 +3,15 @@
 #include "frontend/combinators/basic_combinators/zero_or_more_combinator.h"
 #include "frontend/combinators/v1_combinators/single_char.h"
 #include "frontend/combinators/v1_combinators/single_digit.h"
+#include "frontend/combinators/v1_combinators/term_expr.h"
 #include "frontend/combinators/v2_combinators/helpers/word_parser.h"
+#include "frontend/combinators/v2_combinators/helpers/var_helper.h"
 #include <string> // std::string, std::stoi
 
 #define super NullParser
 
 using namespace cs160::frontend;
+using namespace std;
 
 ParseStatus VariableParser::parse(std::string inputProgram) {
   if (inputProgram.size() == 0) {
@@ -27,7 +30,7 @@ ParseStatus VariableParser::parse(std::string inputProgram) {
   // Parse the first character
   ParseStatus result = varParser.parse(inputProgram);
 
-  if (varResult.status) {
+  if (result.status) {
     ParseStatus wordResult = wordParser.parse(result.remainingCharacters);
     if (wordResult.status) {
       result.parsedCharacters += (" " + wordResult.parsedCharacters);
@@ -50,11 +53,11 @@ ParseStatus VariableParser::parse(std::string inputProgram) {
               unique_cast<const ArithmeticExpr>(std::move(result.ast))));
         }
       } else
-        return colonStatus
+          return colonStatus;
     } else
       return wordResult;
   } else
-    return varResult;
+    return result;
 
   return result;
 }

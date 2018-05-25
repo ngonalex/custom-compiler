@@ -6,15 +6,17 @@
 #include <cctype>
 #include <locale>
 
-#if __cplusplus < 201402L
-
 namespace cs160 {
+
+#if __cplusplus < 201402L
 
 // this is missing from the C++11 library, so we implement it here
 template <typename T, typename... Args>
 std::unique_ptr<T> make_unique(Args&&... args) {
   return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
+
+#endif
 
 template<class R, class T>
 std::unique_ptr<R> unique_cast(std::unique_ptr<T> &&p) {
@@ -43,6 +45,4 @@ static inline void trim(std::string &s) {
 }
 
 }  // cs160
-
-#endif
 #endif  // UTILITY_MEMORY_H_
