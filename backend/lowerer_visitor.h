@@ -48,13 +48,14 @@ enum ChildType {
   INTCHILD,
   VARCHILD,
   DEREFCHILD,
+  BINOPCHILD,
   NOCHILD
 };
 
 class LowererVisitor : public AstVisitor {
  public:
   LowererVisitor() : counter_(), currvariabletype_(RIGHTHANDVAR),
-    currdereferencetype_(RHSDEFERERENCE) {}
+    currdereferencetype_(RHSINTDEFERENCE) {}
 
   std::string GetOutput();
 
@@ -106,6 +107,7 @@ class LowererVisitor : public AstVisitor {
     int indexofchild);
   void CreateTupleAssignment(std::string target, Operand operand);
   void CreateArithmeticAssignment(std::string target, Operand operand);
+  void CreateRHSINTDEFERENCEAssignment(std::string target, Operand operand);
 
   // Helpers
   std::string GetOutputArithmeticHelper(std::string output, int index,

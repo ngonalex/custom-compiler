@@ -45,6 +45,9 @@ class CodeGen {
     void GenerateIntegerFlagCheck();
     void GenerateExistenceCheck();
     void GenerateTupleSizeCheck();
+    void GenerateUnboxer();
+    void GenerateBoxer();
+    void GetNewMemoryLocation();
 
     // This function checks if the current scope is function or global
     // If it's global then it just returns the name of the variable

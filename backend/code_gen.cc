@@ -126,6 +126,9 @@ void CodeGen::GeneratePrintAssignment(std::string variablename) {
 void CodeGen::GenerateData(std::set<std::string> variableset) {
   // Creates a .data section for variables
   outfile_ << ".data " << std::endl;
+  outfile_ << "\theap:\n\t\t.zero 100000" << std::endl;
+  outfile_ << "\treturnobj:\n\t\t.zero 16" << std::endl;
+  outfile_ << "\tbumpptr:\n\t\t.zero 16" << std::endl;
   for (auto iter = variableset.begin(); iter != variableset.end(); ++iter) {
     outfile_ << "\t" << *iter << ":\n\t\t.zero 16" << std::endl;
   }
@@ -327,18 +330,21 @@ void CodeGen::GenerateArithmeticExpr(
       GenerateBinaryExprHelper(std::move(tac));
       ClearRegister("rcx");
       outfile_ << "\tadd %rax, %rcx\n\tadd %rbx, %rcx" << std::endl;
+      outfile_ << "\tpush %r8\n" << std::endl;
       outfile_ << "\tpush %rcx\n" << std::endl;
       break;
     case SUB:
       outfile_ << "\t# Subtraction";
       GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\tsub %rbx, %rax" << std::endl;
+      outfile_ << "\tpush %r8\n" << std::endl;
       outfile_ << "\tpush %rax\n" << std::endl;
       break;
     case MULT:
       outfile_ << "\t# Multiplication";
       GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\timul %rax, %rbx" << std::endl;
+      outfile_ << "\tpush %r8\n" << std::endl;
       outfile_ << "\tpush %rbx\n" << std::endl;
       break;
     case DIV:
@@ -347,6 +353,7 @@ void CodeGen::GenerateArithmeticExpr(
       GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\tcqto" << std::endl;  // indicating its a signed division
       outfile_ << "\tidiv %rbx" << std::endl;
+      outfile_ << "\tpush %r8\n" << std::endl;
       outfile_ << "\tpush %rax\n" << std::endl;
       break;
     default:
@@ -366,6 +373,7 @@ void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
       outfile_ << "\tcmp %rbx, %rax" << std:: endl;
       outfile_ << "\tsetl %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
+      outfile_ << "\tpush %r8\n" << std::endl;
       outfile_ << "\tpush %rcx\n" << std:: endl;
       break;
     case LESSTHANEQ:
@@ -374,6 +382,7 @@ void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
       outfile_ << "\tcmp %rbx, %rax" << std:: endl;
       outfile_ << "\tsetle %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
+      outfile_ << "\tpush %r8\n" << std::endl;
       outfile_ << "\tpush %rcx\n" << std:: endl;
       break;
     case GREATERTHAN:
@@ -382,6 +391,7 @@ void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
       outfile_ << "\tcmp %rbx, %rax" << std:: endl;
       outfile_ << "\tsetg %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
+      outfile_ << "\tpush %r8\n" << std::endl;
       outfile_ << "\tpush %rcx\n" << std:: endl;
       break;
     case GREATERTHANEQ:
@@ -390,6 +400,7 @@ void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
       outfile_ << "\tcmp %rbx, %rax" << std:: endl;
       outfile_ << "\tsetge %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
+      outfile_ << "\tpush %r8\n" << std::endl;
       outfile_ << "\tpush %rcx\n" << std:: endl;
       break;
     case EQUAL:
@@ -398,6 +409,7 @@ void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
       outfile_ << "\tcmp %rbx, %rax" << std:: endl;
       outfile_ << "\tsete %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
+      outfile_ << "\tpush %r8\n" << std::endl;
       outfile_ << "\tpush %rcx\n" << std:: endl;
       break;
     default:
@@ -412,23 +424,24 @@ void CodeGen::GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
   switch (type) {
     case LOGAND:
       outfile_ << "\t# LogicalAnd\n";
-      outfile_ << "\tpop %rbx" << std::endl;
-      outfile_ << "\tpop %rax" << std::endl;
+      GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\tand %rbx, %rax" << std:: endl;
+      outfile_ << "\tpush %r8\n" << std::endl;
       outfile_ << "\tpush %rax\n" << std:: endl;
       break;
     case LOGOR:
       outfile_ << "\t# LogicalOr\n";
-      outfile_ << "\tpop %rbx" << std::endl;
-      outfile_ << "\tpop %rax" << std::endl;
-      outfile_ << "\tor %rbx, %rax" << std:: endl;
+      GenerateBinaryExprHelper(std::move(tac));
+      outfile_ << "\tor %rbx, %rax" << std::endl;
+      outfile_ << "\tpush %r8\n" << std::endl;
       outfile_ << "\tpush %rax\n" << std:: endl;
       break;
     case LOGNOT:
       outfile_ << "\t# LogicalNot\n";
       outfile_ << "\tpop %rbx" << std::endl;
+      outfile_ << "\tpop %r8" << std::endl;
       outfile_ << "\txor $1, %rbx" << std::endl;
-      // outfile_ << "\tmovzx %bl, %rbx" << std::endl;
+      outfile_ << "\tpush %r8\n" << std::endl;
       outfile_ << "\tpush %rbx\n" << std::endl;
       break;
     default:
@@ -447,8 +460,10 @@ void CodeGen::GenerateBinaryExprHelper(
 
   // double pop from stack
   outfile_ << " btwn int, int\n";
-  outfile_ << "\tpop %rbx" << std::endl;  // rbx = right
-  outfile_ << "\tpop %rax" << std::endl;  // rax = left
+  outfile_ << "\tpop %rbx" << std::endl;  // rbx = right value
+  outfile_ << "\tpop %r8" << std::endl;  // rcx = right flag
+  outfile_ << "\tpop %rax" << std::endl;  // rax = left value
+  outfile_ << "\tpop %r9" << std::endl;  // rdx = left flag
   // }
 }
 
@@ -691,14 +706,22 @@ void CodeGen::Generate(std::vector
         outfile_ << "\t# Function Epilogue " << std::endl;
         // Do a correct load lol
         outfile_ << "\tpop %rax" << std::endl;
+        outfile_ << "\tpop %rbx" << std::endl;
+
+        // Rebuild the object into return obj
+        outfile_ << "\tmov $returnobj, %rcx" << std::endl;
+        outfile_ << "\tmov %rbx, (%rcx)" << std::endl;
+        outfile_ << "\tmov %rax, 8(%rcx)" << std::endl;
 
         outfile_ << "\tpop %rbx" << std::endl;
         outfile_ << "\tmov %rbp, %rsp" << std::endl;
         outfile_ << "\tpop %rbp" << std::endl;
         outfile_ << "\tret\n" << std::endl;
         break;
-      case PRINTARITH:
+      case PRINTARITH:  // Can be a tuple so if it's a tuple check and print it
+        // Correctly
         outfile_ << "\tpop %rax" << std::endl;
+        outfile_ << "\tpop %rbx" << std::endl;
         GeneratePrintCall("printresult");
 
         // BAD FIX, we "know" that the last thing will be the arithmetic expr
@@ -823,7 +846,7 @@ void CodeGen::Generate(std::vector
         }
 
         break;
-      case RHSDEFERERENCE:  // Needs to handle functions
+      case RHSINTDEFERENCE:  // Needs to handle functions
         parsedstring = DereferenceParserHelper(code->target.label().name());
         outfile_ << "\t#Dereference of variable "
             << code->target.label().name() << std::endl;
