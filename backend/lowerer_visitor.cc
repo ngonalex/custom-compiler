@@ -162,7 +162,7 @@ void LowererVisitor::VisitAssignmentFromNewTuple(
   currvariabletype_ = LEFTHANDVAR;
   currdereferencetype_ = LHSDEREFERENCE;
   assignment.lhs().Visit(const_cast<LowererVisitor*>(this));
-  currdereferencetype_ = RHSINTDEFERENCE;
+  currdereferencetype_ = RHSINTDEREFERENCE;
   currvariabletype_ = RIGHTHANDVAR;
 
   std::string lhstarget;
@@ -201,7 +201,7 @@ void LowererVisitor::VisitAssignmentFromArithExp(
   currvariabletype_ = LEFTHANDVAR;
   currdereferencetype_ = LHSDEREFERENCE;
   assignment.lhs().Visit(const_cast<LowererVisitor*>(this));
-  currdereferencetype_ = RHSINTDEFERENCE;
+  currdereferencetype_ = RHSINTDEREFERENCE;
   currvariabletype_ = RIGHTHANDVAR;
 
   std::string lhstarget;
@@ -231,7 +231,7 @@ void LowererVisitor::VisitAssignmentFromArithExp(
 
   Operand arg1 = Operand(blocks_[blocks_.size()-1]->target.reg());
   if (lastchildtype_ == DEREFCHILD) {
-    blocks_[blocks_.size()-1]->op = Opcode(RHSTUPLEDEREFENCE);
+    blocks_[blocks_.size()-1]->op = Opcode(RHSTUPLEDEREFERENCE);
   }
   CreateArithmeticAssignment(lhstarget, arg1);
 }
@@ -775,7 +775,7 @@ void LowererVisitor::CreateArithmeticAssignment(std::string target,
   blocks_.push_back(std::move(block));
 }
 
-// void LowererVisitor::CreateRHSINTDEFERENCEAssignment(std::string target,
+// void LowererVisitor::CreateRHSINTDEREFERENCEAssignment(std::string target,
 //   Operand operand) {
 //   auto block = make_unique<struct ThreeAddressCode>();
 //   block->target = Target(Label(target));

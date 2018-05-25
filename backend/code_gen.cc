@@ -128,7 +128,7 @@ void CodeGen::GenerateData(std::set<std::string> variableset) {
   outfile_ << ".data " << std::endl;
   outfile_ << "\theap:\n\t\t.zero 100000" << std::endl;
   outfile_ << "\treturnobj:\n\t\t.zero 16" << std::endl;
-  outfile_ << "\tbumpptr:\n\t\t.zero 16" << std::endl;
+  outfile_ << "\tbumpptr:\n\t\t.zero 8" << std::endl;
   for (auto iter = variableset.begin(); iter != variableset.end(); ++iter) {
     outfile_ << "\t" << *iter << ":\n\t\t.zero 16" << std::endl;
   }
@@ -161,31 +161,24 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
       outfile_ << "\t# Loading in an integer" << std::endl;
       outfile_ << "\tmov $" + std::to_string(tac->arg1.value())
         + ", %rcx" << std::endl;
+      outfile_ << "\tmov $0x01000000, %rax" << std::endl;
+      outfile_ << "\tpush %rax\n" << std::endl;
       outfile_ << "\tpush %rcx\n" << std::endl;
       break;
     case VARLOAD:
       outfile_ << "\t# Loading from a variable" << std::endl;
       outfile_ << "\tmov " << VariableNameHelper(tac->arg1.reg().name())
         << ", %rbx" << std::endl;
+      outfile_ << "\tpush %rbx" << std::endl;
 
       // Then load it into register
       if (currscope_ == FUNCTION) {
-        // Error handling to check if it's actually an integer here
-        outfile_ << "\tmovzx %bl, %rdi" << std::endl;
-        outfile_ << "\tpush %rbx" << std::endl;
-        outfile_ << "\tcall integerflagcheck" << std::endl;
-        outfile_ << "\tpop %rbx" << std::endl;
         outfile_ << "\tmov " << std::to_string(
         symbollocations_.find(tac->arg1.reg().name())->second+8)
           << "(%rbp), %rbx" << std::endl;
         outfile_ << "\tpush %rbx\n" << std::endl;
       } else {
         // Error handling (Refactor first 4 lines into a function)
-        outfile_ << "\tmovb (%rbx), %al" << std::endl;
-        outfile_ << "\tmovzx %al, %rdi" << std::endl;
-        outfile_ << "\tpush %rbx" << std::endl;
-        outfile_ << "\tcall integerflagcheck" << std::endl;
-        outfile_ << "\tpop %rbx" << std::endl;
         outfile_ << "\tmov 8(%rbx), %rcx" << std::endl;
         outfile_ << "\tpush %rcx\n" << std::endl;
       }
@@ -208,23 +201,21 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
           + tac->target.reg().name() << std::endl;
         ClearRegister("rcx");
         outfile_ << "\tpop %rcx" << std::endl;
+        outfile_ << "\tpop %rax" << std::endl;  // This is the FLAG
 
         if (currscope_ == FUNCTION) {
-          // Update flags
-          outfile_ << "\tmovb $0,"
-            << VariableNameHelper(tac->target.label().name()) << std::endl;
+          // lines 208 and 209 SUCK, REFACTOR VARIABLE NAME HELPER
+          VariableNameHelper(tac->target.label().name());
           int index = symbollocations_.find(tac->target.label().name())->second;
-          outfile_ << "\tmovb $1, " << std::to_string(index+1) << "(%rbp)\n";
-          outfile_ << "\tmovl $0, " << std::to_string(index+2) << "(%rbp)\n";
+          outfile_ << "\tmov %rax,"
+            << VariableNameHelper(tac->target.label().name()) << std::endl;
           outfile_ << "\tmovq %rcx, " << std::to_string(index+8) << "(%rbp)\n"
             << std::endl;
         } else {
           outfile_ << "\tmov "
             << VariableNameHelper(tac->target.label().name())
             << ", %rbx" << std::endl;
-          outfile_ << "\tmovb $0, (%rbx)" << std::endl;
-          outfile_ << "\tmovb $1, 1(%rbx)" << std::endl;
-          outfile_ << "\tmovl $0, 2(%rbx)" << std::endl;
+          outfile_ << "\tmov %rax, (%rbx)" << std::endl;
           outfile_ << "\tmov %rcx, 8(%rbx)\n" << std::endl;
         }
 
@@ -246,11 +237,14 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
           << std::endl;
 
         // Rewrite flags
+        // RCX is the RHS value to be assigned
+        // RAX is the flag of RHS
+        // RBX is the address
         outfile_ << "\tpop %rcx" << std::endl;
+        outfile_ << "\tpop %rax" << std::endl;
         outfile_ << "\tpop %rbx" << std::endl;
-        outfile_ << "\tmovb $0, (%rbx)" << std::endl;
-        outfile_ << "\tmovb $1, 1(%rbx)" << std::endl;
-        outfile_ << "\tmovl $0, 2(%rbx)" << std::endl;
+        // Copy flags into
+        outfile_ << "\tmovq %rax, (%rbx)" << std::endl;
         outfile_ << "\tmovq %rcx, 8(%rbx)\n" << std::endl;
       }
       break;
@@ -846,7 +840,7 @@ void CodeGen::Generate(std::vector
         }
 
         break;
-      case RHSINTDEFERENCE:  // Needs to handle functions
+      case RHSINTDEREFERENCE:  // Needs to handle functions
         parsedstring = DereferenceParserHelper(code->target.label().name());
         outfile_ << "\t#Dereference of variable "
             << code->target.label().name() << std::endl;
