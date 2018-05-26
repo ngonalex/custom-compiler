@@ -1,8 +1,8 @@
 cc_library(
 	name = "v3_combinators",
 	copts = ["-Wall -g"],
-	hdrs = ["helpers/equal_to_parser.h", "helpers/greater_than_or_equal_parser.h", "helpers/greater_than_parser.h", "helpers/less_than_or_equal_parser.h", "helpers/less_than_parser.h"],
-	srcs = ["helpers/equal_to_parser.cc", "helpers/greater_than_or_equal_parser.cc", "helpers/greater_than_parser.cc", "helpers/less_than_or_equal_parser.cc", "helpers/less_than_parser.cc"],
+	hdrs = ["helpers/equal_to_op_parser.h", "helpers/greater_than_or_equal_op_parser.h", "helpers/greater_than_op_parser.h", "helpers/less_than_or_equal_op_parser.h", "helpers/less_than_op_parser.h"],
+	srcs = ["helpers/equal_to_op_parser.cc", "helpers/greater_than_or_equal_op_parser.cc", "helpers/greater_than_op_parser.cc", "helpers/less_than_or_equal_op_parser.cc", "helpers/less_than_op_parser.cc"],
 	deps = ["//utility", "//frontend/combinators/basic_combinators","//frontend/combinators/v1_combinators", "//abstract_syntax:abstract_syntax",
 	"//abstract_syntax:print_visitor_v2"],
 	visibility = ["//visibility:public"],
