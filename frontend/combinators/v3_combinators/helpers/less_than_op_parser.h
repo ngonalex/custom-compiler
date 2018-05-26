@@ -9,7 +9,7 @@ namespace frontend {
 
 class LessThanParser : NullParser {
 public:
-	virtual ParseStatus parse(std::string inputProgram);
+	virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
 };
 
 } // namespace frontend

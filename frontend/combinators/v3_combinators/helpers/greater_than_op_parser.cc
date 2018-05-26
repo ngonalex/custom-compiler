@@ -5,7 +5,7 @@
 
 using namespace cs160::frontend;
 
-ParseStatus GreaterThanParser::parse(std::string inputProgram) {
+ParseStatus GreaterThanParser::parse(std::string inputProgram, std::string errorType) {
 	trim(inputProgram);
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);
