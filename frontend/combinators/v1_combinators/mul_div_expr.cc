@@ -10,6 +10,9 @@ ParseStatus MulDivExprParser::parse(std::string inputProgram) {
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);
 	}
+
+	trim(inputProgram);
+
   // ae
   TermExprParser lhs;
   ParseStatus result = lhs.parse(inputProgram);

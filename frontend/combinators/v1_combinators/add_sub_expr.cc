@@ -9,6 +9,7 @@ ParseStatus AddSubExprParser::parse(std::string inputProgram) {
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);
 	}
+	trim(inputProgram);
   // ae
   MulDivExprParser lhs;
   ParseStatus result = lhs.parse(inputProgram);

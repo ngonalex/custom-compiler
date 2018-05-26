@@ -11,6 +11,8 @@ ParseStatus AddSubOpParser::parse(std::string inputProgram) {
 	}
 	ParseStatus status;
 
+	trim(inputProgram);
+
 	if (inputProgram[0] == '+' || inputProgram[0] == '-') {
 		status.status = true;
 		status.parsedCharacters = inputProgram[0];
