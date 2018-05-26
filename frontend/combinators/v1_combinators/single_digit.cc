@@ -5,11 +5,11 @@
 using namespace cs160::frontend;
 
 ParseStatus SingleDigitParser::parse(std::string inputProgram) {
+	trim(inputProgram);
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);
 	}
 
-	trim(inputProgram);
 
 	ParseStatus status;
 	if ((inputProgram[0] >= '0' && inputProgram[0] <= '9')){

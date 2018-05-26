@@ -22,8 +22,6 @@ ParseStatus VariableParser::parse(std::string inputProgram) {
   WordParser wordParser;
   ColonParser colonParser;
   TypeParser typeParser;
-  EqualSignParser equalSignParser;  // Optional
-  TermExprParser termExprParser;   // Optional
 
   // Parse the first character
   ParseStatus result = varParser.parse(inputProgram);
@@ -47,7 +45,7 @@ ParseStatus VariableParser::parse(std::string inputProgram) {
 				}
 				else {
 					result.status = typeStatus.status;
-					result.errorType = typeStatus.errorType;
+					result.errorType = typeStatus.errorType; 
 				}
       }
 			else {

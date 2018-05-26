@@ -7,11 +7,12 @@ using namespace cs160::frontend;
 using namespace std;
 
 ParseStatus TermExprParser::parse(std::string inputProgram) {
+  trim(inputProgram);
+
   if (inputProgram.size() == 0) {
     return super::parse(inputProgram);
   }
 
-  trim(inputProgram);
 
   // num
   NumParser num;
