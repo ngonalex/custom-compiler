@@ -1,11 +1,12 @@
 #include "frontend/combinators/v2_combinators/main/assignment_parser.h"
 #include "frontend/combinators/v2_combinators/main/variable_parser.h"
-#include "frontend/combinators/v1_combinators/term_expr.h"
+#include "frontend/combinators/v1_combinators/ae.h"
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
 #include "frontend/combinators/v2_combinators/main/word_parser.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 
 #include <string> // std::string, std::stoi
+#include <stdio.h>
 
 #define super NullParser
 
@@ -26,10 +27,10 @@ ParseStatus AssignmentParser::parse(std::string inputProgram, std::string errorT
   orCombinator.secondParser = reinterpret_cast<NullParser *>(&wordParser);
 
   EqualSignParser equalSignParser;
-  TermExprParser termExprParser;
+  ArithExprParser termExprParser;
 
   ParseStatus result;
-  
+
   // Parse the first expression
   ParseStatus varResult = orCombinator.parse(inputProgram);
   

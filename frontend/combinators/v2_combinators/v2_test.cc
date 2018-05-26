@@ -371,6 +371,8 @@ TEST(AssignmentParserCombinator, successAssignmentParser1) {
   std::string output = a->GetOutput();
 
   EXPECT_EQ(testResult, result);
+    EXPECT_EQ(testResult.remainingCharacters, result.remainingCharacters);
+  EXPECT_EQ(testResult.parsedCharacters, result.parsedCharacters);
   EXPECT_EQ(output, "_victor = 490");
 }
 
@@ -390,6 +392,8 @@ TEST(AssignmentParserCombinator, successAssignmentParser2) {
   std::string output = a->GetOutput();
 
   EXPECT_EQ(testResult, result);
+  EXPECT_EQ(testResult.remainingCharacters, result.remainingCharacters);
+  EXPECT_EQ(testResult.parsedCharacters, result.parsedCharacters);
   EXPECT_EQ(output, "victor = 490");
 }
 
@@ -399,17 +403,17 @@ TEST(AssignmentParserCombinator, successAssignmentParser3) {
   ParseStatus result;
   result.status = true;
   result.remainingCharacters = ";";
-  result.parsedCharacters = "victor = 490";
+  result.parsedCharacters = "victor = (123*1+3901-2)";
 
-  ParseStatus testResult = parser.parse(" victor = 490;");
+  ParseStatus testResult = parser.parse(" victor = (123 * 1 + 3901 - 2);");
 
-  // Traversing the AST created from the variable name
+    // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
   testResult.ast->Visit(a);
   std::string output = a->GetOutput();
 
   EXPECT_EQ(testResult, result);
-  EXPECT_EQ(output, "victor = 490");
+  EXPECT_EQ(output, "victor = (((123 * 1) + 3901) - 2)");
 }
 
 // Fail Case VariableParser
@@ -429,7 +433,7 @@ TEST(AssignmentParserCombinator, failAssignmentParser2) {
   ParseStatus result;
   result.status = false;
 
-  ParseStatus testResult = parser.parse("1victor = 123;");
+  ParseStatus testResult = parser.parse("1victor = (123 * 1 + 3901 - 2);");
 
   EXPECT_EQ(testResult, result);
   EXPECT_EQ(testResult.errorType, "Declare variable names with 'var variable_name : type = expression'");

@@ -19,6 +19,7 @@ ParseStatus NegativeParser::parse(std::string inputProgram, std::string errorTyp
 	if (inputProgram[0] == '-') {
 		status.status = true;
 		status.remainingCharacters = inputProgram.erase(0, 1);
+		status.parsedCharacters = '-';
 	} else {
 		return super::parse(inputProgram, errorMessage);
 	}

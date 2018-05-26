@@ -9,7 +9,6 @@ ParseStatus MulDivOpParser::parse(std::string inputProgram, std::string errorTyp
 	trim(inputProgram);
 	std::string errorMessage = "Expecting * or /";
 
-
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram, errorMessage);
 	}

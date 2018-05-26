@@ -1,7 +1,7 @@
 
 #include "frontend/combinators/v2_combinators/main/program_parser.h"
 #include "frontend/combinators/v2_combinators/main/assignment_parser.h"
-#include "frontend/combinators/v1_combinators/term_expr.h"
+#include "frontend/combinators/v1_combinators/ae.h"
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
 #include "frontend/combinators/v2_combinators/main/word_parser.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
@@ -16,6 +16,7 @@ using namespace std;
 
 ParseStatus ProgramParser::parse(std::string inputProgram, std::string errorType) {
   trim(inputProgram);
+  /*
 
   if (inputProgram.size() == 0) {
     return super::parse(inputProgram);
@@ -26,7 +27,7 @@ ParseStatus ProgramParser::parse(std::string inputProgram, std::string errorType
   ZeroOrMoreCombinator zeroOrMore; 
   zeroOrMore.parser = assignParser;
 
-  TermExprParser termExprParser;
+  ArithExprParser termExprParser;
 
   // Parse the assignments at the beginning
   ParseStatus result = zeroOrMore.parse(inputProgram);
@@ -64,5 +65,5 @@ ParseStatus ProgramParser::parse(std::string inputProgram, std::string errorType
     result.errorType = varResult.errorType;
   }
 
-  return result;
+  return result;*/
 }

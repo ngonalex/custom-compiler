@@ -18,16 +18,18 @@ ParseStatus MulDivExprParser::parse(std::string inputProgram, std::string errorT
   ParseStatus result = lhs.parse(inputProgram);
 	if (result.status) {
 		// op
-	  MulDivOpParser op;
+	  	MulDivOpParser op;
 		ParseStatus mdParseStatus = op.parse(result.remainingCharacters);
 		while (mdParseStatus.status) {
-	    TermExprParser rhs;
-	    ParseStatus rhsParseStatus = rhs.parse(mdParseStatus.remainingCharacters);
-	    result.ast = std::move(make_node((mdParseStatus.parsedCharacters),
-	    	unique_cast<const ArithmeticExpr>(std::move(result.ast)),
-	    	unique_cast<const ArithmeticExpr>(std::move(rhsParseStatus.ast))));
-	    mdParseStatus = op.parse(rhsParseStatus.remainingCharacters);
-	  }
+			result.parsedCharacters += mdParseStatus.parsedCharacters;
+		    TermExprParser rhs;
+		    ParseStatus rhsParseStatus = rhs.parse(mdParseStatus.remainingCharacters);
+		    result.ast = std::move(make_node((mdParseStatus.parsedCharacters),
+		    	unique_cast<const ArithmeticExpr>(std::move(result.ast)),
+		    	unique_cast<const ArithmeticExpr>(std::move(rhsParseStatus.ast))));
+		    mdParseStatus = op.parse(rhsParseStatus.remainingCharacters);
+			result.parsedCharacters += (rhsParseStatus.parsedCharacters);
+	    }	  		
 		result.remainingCharacters = mdParseStatus.remainingCharacters;
 	}
 	return result;	// Returning Success/Failure on TermExpr

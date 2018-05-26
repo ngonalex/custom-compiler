@@ -1,7 +1,7 @@
 cc_library(
 	name = "v2_combinators",
 	copts = ["-Wall -g"],
-	hdrs = ["main/program_parser.h", main/word_parser.h", "main/variable_parser.h", "helpers/var_helper.h", "main/assignment_parser.h"],
+	hdrs = ["main/program_parser.h", "main/word_parser.h", "main/variable_parser.h", "helpers/var_helper.h", "main/assignment_parser.h"],
 	srcs = ["main/program_parser.cc", "main/word_parser.cc", "main/variable_parser.cc", "helpers/var_helper.cc", "main/assignment_parser.cc"],
 	deps = ["//utility", "//frontend/combinators/basic_combinators","//frontend/combinators/v1_combinators", "//abstract_syntax:abstract_syntax",
 	"//abstract_syntax:print_visitor_v2"],
