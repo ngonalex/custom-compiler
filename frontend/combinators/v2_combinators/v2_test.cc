@@ -446,3 +446,14 @@ TEST(AssignmentParserCombinator, failAssignmentParser3) {
   EXPECT_EQ(testResult, result);
   EXPECT_EQ(testResult.errorType, "Missing equal sign");
 }
+
+// Fail Case VariableParser : missing equal sign
+TEST(AssignmentParserCombinator, failAssignmentParser4) {
+  AssignmentParser parser;
+  ParseStatus result;
+  result.status = false;
+
+  ParseStatus testResult = parser.parse("138 + 3; victor");
+
+  EXPECT_EQ(testResult, result);
+}
