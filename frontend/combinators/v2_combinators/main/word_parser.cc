@@ -10,8 +10,10 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus WordParser::parse(std::string inputProgram) {
+ParseStatus WordParser::parse(std::string inputProgram, std::string errorType) {
 	trim(inputProgram);
+
+	std::string errorMessage = "Declare variable names with 'var variable_name : type = expression'";
 
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);
@@ -38,7 +40,7 @@ ParseStatus WordParser::parse(std::string inputProgram) {
 	}
 	else{
 		// Error type returned to user
-		result.errorType =  "Variable name needs to start with char";
+		result.errorType = errorMessage;
 	}
 
 	return result;

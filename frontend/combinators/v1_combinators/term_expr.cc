@@ -6,7 +6,7 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus TermExprParser::parse(std::string inputProgram) {
+ParseStatus TermExprParser::parse(std::string inputProgram, std::string errorType) {
   trim(inputProgram);
 
   if (inputProgram.size() == 0) {

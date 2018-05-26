@@ -4,10 +4,12 @@
 
 using namespace cs160::frontend;
 
-ParseStatus SingleDigitParser::parse(std::string inputProgram) {
+ParseStatus SingleDigitParser::parse(std::string inputProgram, std::string errorType) {
 	trim(inputProgram);
+	std::string errorMessage = "Digit should be between 0 and 9";
+
 	if (inputProgram.size() == 0) {
-		return super::parse(inputProgram);
+		return super::parse(inputProgram, errorMessage);
 	}
 
 
@@ -17,7 +19,7 @@ ParseStatus SingleDigitParser::parse(std::string inputProgram) {
 		status.parsedCharacters = inputProgram[0];
 		status.remainingCharacters = inputProgram.erase(0, 1);
 	} else {
-		return super::parse(inputProgram);
+		return super::parse(inputProgram, errorMessage);
 	}
 	return status;
 }

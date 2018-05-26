@@ -11,7 +11,7 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus VariableParser::parse(std::string inputProgram) {
+ParseStatus VariableParser::parse(std::string inputProgram, std::string errorType) {
   trim(inputProgram);
 
   if (inputProgram.size() == 0) {

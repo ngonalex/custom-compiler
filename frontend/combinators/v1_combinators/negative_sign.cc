@@ -5,11 +5,13 @@
 
 using namespace cs160::frontend;
 
-ParseStatus NegativeParser::parse(std::string inputProgram) {
+ParseStatus NegativeParser::parse(std::string inputProgram, std::string errorType) {
 	trim(inputProgram);
+	std::string errorMessage = "Expecting -";
+
 
 	if (inputProgram.size() == 0) {
-		return super::parse(inputProgram);
+		return super::parse(inputProgram, errorMessage);
 	}
 
 	ParseStatus status;
@@ -18,7 +20,7 @@ ParseStatus NegativeParser::parse(std::string inputProgram) {
 		status.status = true;
 		status.remainingCharacters = inputProgram.erase(0, 1);
 	} else {
-		return super::parse(inputProgram);
+		return super::parse(inputProgram, errorMessage);
 	}
 	return status;
 }

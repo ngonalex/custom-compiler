@@ -10,7 +10,7 @@ using namespace cs160::frontend;
                     ||  ae mul_div_op ae  || open_paren ae mul_div_op ae close_paren
 */
 
-ParseStatus ArithExprParser::parse(std::string inputProgram) {
+ParseStatus ArithExprParser::parse(std::string inputProgram, std::string errorType) {
 	trim(inputProgram);
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);

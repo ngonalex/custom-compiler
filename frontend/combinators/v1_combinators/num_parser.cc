@@ -8,20 +8,25 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus NumParser::parse(std::string inputProgram) {
+ParseStatus NumParser::parse(std::string inputProgram, std::string errorType) {
+	std::string errorMessage = "Number should only have digits (0-9)";
+
 	trim(inputProgram);
 
-	if (inputProgram.size() == 0) { return super::parse(inputProgram); }
+	if (inputProgram.size() == 0) { return super::parse(inputProgram, errorMessage); }
 
 	SingleDigitParser digitParser;
-  OneOrMoreCombinator oneOrMore;
+  	OneOrMoreCombinator oneOrMore;
 
 	oneOrMore.parser = reinterpret_cast<NullParser *>(&digitParser);	// Feels bad
 	// Parse the integer
-  ParseStatus result = oneOrMore.parse(inputProgram);
+  	ParseStatus result = oneOrMore.parse(inputProgram);
 	if (result.status) {
 		// Make an Integer expression
 		result.ast = std::move(make_unique<IntegerExpr>(stoi(result.parsedCharacters)));
+	}
+	else { 
+		return super::parse(inputProgram, errorMessage);
 	}
 	return result;
 }

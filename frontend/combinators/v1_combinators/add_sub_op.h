@@ -10,7 +10,7 @@ namespace frontend {
 class AddSubOpParser : NullParser
 {
 public:
-	virtual ParseStatus parse(std::string inputProgram);
+	virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
 };
 
 } // namespace frontend

@@ -77,7 +77,7 @@ TEST(WordParserCombinator, successWordParser1) {
 
   ParseStatus testResult = wordParser.parse("var");
 
-  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(testResult.remainingCharacters, result.remainingCharacters);
 }
 
 // Success Case WordParser
@@ -191,7 +191,7 @@ TEST(WordParserCombinator, failTypeParser1) {
   ParseStatus testResult = parser.parse("  _abc  "); // type can only contain a through z
 
   EXPECT_EQ(testResult, result);
-  EXPECT_EQ(testResult.errorType, "Check type in variable declaration");
+  EXPECT_EQ(testResult.errorType, "Incorrect type in variable declaration");
 }
 
 // Success Case EqualSignParser
@@ -317,7 +317,7 @@ TEST(VariableParserCombinator, failVariableParser2) {
   ParseStatus testResult = parser.parse("var _victor : ;");
 
   EXPECT_EQ(testResult, result);
-  EXPECT_EQ(testResult.errorType, "Check type in variable declaration");
+  EXPECT_EQ(testResult.errorType, "Incorrect type in variable declaration");
 }
 
 // Fail Case VariableParser
@@ -341,7 +341,7 @@ TEST(VariableParserCombinator, failVariableParser4) {
   ParseStatus testResult = parser.parse("var 1victor : Integer");
 
   EXPECT_EQ(testResult, result);
-  EXPECT_EQ(testResult.errorType, "Variable name needs to start with char");
+  EXPECT_EQ(testResult.errorType, "Declare variable names with 'var variable_name : type = expression'");
 }
 
 // Fail Case VariableParser : colon missing
@@ -432,7 +432,7 @@ TEST(AssignmentParserCombinator, failAssignmentParser2) {
   ParseStatus testResult = parser.parse("1victor = 123;");
 
   EXPECT_EQ(testResult, result);
-  EXPECT_EQ(testResult.errorType, "Variable name needs to start with char");
+  EXPECT_EQ(testResult.errorType, "Declare variable names with 'var variable_name : type = expression'");
 }
 
 // Fail Case VariableParser : missing equal sign
@@ -444,4 +444,5 @@ TEST(AssignmentParserCombinator, failAssignmentParser3) {
   ParseStatus testResult = parser.parse("victor");
 
   EXPECT_EQ(testResult, result);
+  EXPECT_EQ(testResult.errorType, "Missing equal sign");
 }

@@ -4,14 +4,14 @@
 
 using namespace cs160::frontend;
 
-ParseStatus ZeroOrMoreCombinator::parse(std::string inputProgram){
+ParseStatus ZeroOrMoreCombinator::parse(std::string inputProgram, std::string errorType){
 
 	ParseStatus pStatus;
 	pStatus.status = true;
 	pStatus.remainingCharacters = inputProgram;
 
 	while (pStatus.status){
-		ParseStatus status2 = parser->parse(pStatus.remainingCharacters);
+        ParseStatus status2 = parser->parse(pStatus.remainingCharacters);
 		pStatus.status = status2.status;
 		if (status2.status){
 			pStatus.parsedCharacters += status2.parsedCharacters;

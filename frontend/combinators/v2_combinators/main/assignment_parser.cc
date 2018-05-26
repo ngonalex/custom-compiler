@@ -12,7 +12,7 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus AssignmentParser::parse(std::string inputProgram) {
+ParseStatus AssignmentParser::parse(std::string inputProgram, std::string errorType) {
   trim(inputProgram);
 
   if (inputProgram.size() == 0) {
@@ -36,12 +36,14 @@ ParseStatus AssignmentParser::parse(std::string inputProgram) {
     if(varResult.status)
       break;
   }
+
   result.status = varResult.status;
 
   if(varResult.status) {
     result.parsedCharacters += varResult.parsedCharacters;
     result.remainingCharacters = varResult.remainingCharacters;
     ParseStatus equalSignStatus = equalSignParser.parse(result.remainingCharacters);
+
     if(equalSignStatus.status) {
       result.parsedCharacters += (" " + equalSignStatus.parsedCharacters);
       result.remainingCharacters = equalSignStatus.remainingCharacters;
@@ -62,7 +64,6 @@ ParseStatus AssignmentParser::parse(std::string inputProgram) {
     else {
       result.status = equalSignStatus.status;
       result.errorType = equalSignStatus.errorType;
-      result.errorType = "SQUIWEOIJFOWEF";
     }
   }
   else {

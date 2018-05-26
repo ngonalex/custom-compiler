@@ -4,7 +4,7 @@
 
 using namespace cs160::frontend;
 
-ParseStatus AndCombinator::parse(std::string inputProgram){
+ParseStatus AndCombinator::parse(std::string inputProgram, std::string errorType){
 	ParseStatus firstStatus = firstParser->parse(inputProgram);
 
 	if (!firstStatus.status) { return firstStatus; }
