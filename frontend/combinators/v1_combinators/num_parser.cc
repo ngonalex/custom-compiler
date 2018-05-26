@@ -10,6 +10,8 @@ using namespace std;
 
 ParseStatus NumParser::parse(std::string inputProgram) {
 	if (inputProgram.size() == 0) { return super::parse(inputProgram); }
+
+	trim(inputProgram);
 	
 	SingleDigitParser digitParser;
   OneOrMoreCombinator oneOrMore;

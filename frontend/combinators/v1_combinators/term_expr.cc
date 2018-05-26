@@ -11,6 +11,8 @@ ParseStatus TermExprParser::parse(std::string inputProgram) {
     return super::parse(inputProgram);
   }
 
+  trim(inputProgram);
+
   // num
   NumParser num;
   ParseStatus numParseStatus = num.parse(inputProgram);

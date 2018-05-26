@@ -10,7 +10,7 @@ ParseStatus SingleDigitParser::parse(std::string inputProgram) {
 	}
 
 	trim(inputProgram);
-	
+
 	ParseStatus status;
 	if ((inputProgram[0] >= '0' && inputProgram[0] <= '9')){
 		status.status = true;

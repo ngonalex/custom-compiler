@@ -1,5 +1,5 @@
 #include "frontend/combinators/v2_combinators/main/variable_parser.h"
-#include "frontend/combinators/v2_combinators/helpers/word_parser.h"
+#include "frontend/combinators/v2_combinators/main/word_parser.h"
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
 #include "frontend/combinators/v1_combinators/term_expr.h"
 

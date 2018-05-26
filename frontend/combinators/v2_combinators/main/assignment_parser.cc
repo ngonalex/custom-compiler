@@ -2,7 +2,7 @@
 #include "frontend/combinators/v2_combinators/main/variable_parser.h"
 #include "frontend/combinators/v1_combinators/term_expr.h"
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
-#include "frontend/combinators/v2_combinators/helper/word_parser.h"
+#include "frontend/combinators/v2_combinators/main/word_parser.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 
 #include <string> // std::string, std::stoi
@@ -22,20 +22,24 @@ ParseStatus AssignmentParser::parse(std::string inputProgram) {
   VariableParser varParser;
   WordParser wordParser;
   OrCombinator orCombinator; // Left of equal can be variable instantiation or variable_name
-  orCombinator->firstParser = varParser;
-  orCombinator->secondParser = wordParser;
+  orCombinator.firstParser = reinterpret_cast<NullParser *>(&varParser);
+  orCombinator.secondParser = reinterpret_cast<NullParser *>(&wordParser);
 
   EqualSignParser equalSignParser;
   TermExprParser termExprParser;
 
+  ParseStatus result;
+  ParseStatus varResult;
   // Parse the first expression
-  for(int i = 0; i < inputProgram.length; i++) {
-    ParseStatus result = orCombinator.parse(inputProgram);
+  for(int i = 0; i < inputProgram.length(); i++) {
+    varResult = orCombinator.parse(inputProgram);
     if(result.status)
       break;
   }
 
-  if(result.status) {
+  if(varResult.status) {
+    result.parsedCharacters += varResult.parsedCharacters;
+    result.remainingCharacters = varResult.remainingCharacters;
     ParseStatus equalSignStatus = equalSignParser.parse(result.remainingCharacters);
     if(equalSignStatus.status) {
       result.parsedCharacters += (" " + equalSignStatus.parsedCharacters);
@@ -44,6 +48,10 @@ ParseStatus AssignmentParser::parse(std::string inputProgram) {
       if(termStatus.status) {
         result.parsedCharacters += (" " + termStatus.parsedCharacters);
         result.remainingCharacters = termStatus.remainingCharacters;
+
+        result.ast = std::move(make_unique<const Assignment>(
+          unique_cast<const VariableExpr>(std::move(varResult.ast)),
+          unique_cast<const ArithmeticExpr>(std::move(termStatus.ast))));
       }
       else {
         result.status = termStatus.status;
@@ -54,6 +62,10 @@ ParseStatus AssignmentParser::parse(std::string inputProgram) {
       result.status = equalSignStatus.status;
       result.errorType = equalSignStatus.errorType;
     }
+  }
+  else {
+    result.status = varResult.status;
+    result.errorType = varResult.errorType;
   }
 
   return result;
