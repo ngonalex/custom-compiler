@@ -214,7 +214,7 @@ TEST(WordParserCombinator, failEqualSignParser1) {
 
 
 // Success Case VariableParser
-TEST(WordParserCombinator, sucessVariableParser1) {
+TEST(VariableParserCombinator, sucessVariableParser1) {
   VariableParser parser;
   ParseStatus result;
   result.status = true;
@@ -228,27 +228,122 @@ TEST(WordParserCombinator, sucessVariableParser1) {
   testResult.ast->Visit(a);
   std::string output = a->GetOutput();
 
-
   EXPECT_EQ(testResult, result);
   EXPECT_EQ(output, "_victor");
 }
 
 // Success Case VariableParser
-TEST(WordParserCombinator, sucessVariableParser2) {
+TEST(VariableParserCombinator, sucessVariableParser2) {
   VariableParser parser;
   ParseStatus result;
   result.status = true;
   result.remainingCharacters = ";";
   result.parsedCharacters = "var _victor : Integer";
 
-  ParseStatus testResult = parser.parse(" Var _victor : Integer;");
+  ParseStatus testResult = parser.parse(" var _victor : Integer;");
 
   // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
   testResult.ast->Visit(a);
   std::string output = a->GetOutput();
 
+  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(output, "_victor");
+}
+
+// Success Case VariableParser
+TEST(VariableParserCombinator, sucessVariableParser3) {
+  VariableParser parser;
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = " = (593 + 912) * 12;";
+  result.parsedCharacters = "var _victor : Integer";
+
+  ParseStatus testResult = parser.parse("var _victor : Integer = (593 + 912) * 12;");
+
+  // Traversing the AST created from the variable name
+  PrintVisitor *a = new PrintVisitor();
+  testResult.ast->Visit(a);
+  std::string output = a->GetOutput();
 
   EXPECT_EQ(testResult, result);
   EXPECT_EQ(output, "_victor");
+}
+
+// Success Case VariableParser
+TEST(VariableParserCombinator, sucessVariableParser4) {
+  VariableParser parser;
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = " = ‘let’s go’";
+  result.parsedCharacters = "var _victor : Integer";
+
+  ParseStatus testResult = parser.parse("var _victor : Integer = ‘let’s go’");
+
+  // Traversing the AST created from the variable name
+  PrintVisitor *a = new PrintVisitor();
+  testResult.ast->Visit(a);
+  std::string output = a->GetOutput();
+
+  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(output, "_victor");
+}
+
+// Fail Case VariableParser
+TEST(VariableParserCombinator, failVariableParser1) {
+  VariableParser parser;
+  ParseStatus result;
+  result.status = false;
+
+  ParseStatus testResult = parser.parse("_victor:Integer;");
+
+  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(testResult.errorType, "Start variable declaration with var");
+}
+
+// Fail Case VariableParser
+TEST(VariableParserCombinator, failVariableParser2) {
+  VariableParser parser;
+  ParseStatus result;
+  result.status = false;
+
+  ParseStatus testResult = parser.parse("var _victor : ;");
+
+  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(testResult.errorType, "Check type in variable declaration");
+}
+
+// Fail Case VariableParser
+TEST(VariableParserCombinator, failVariableParser3) {
+  VariableParser parser;
+  ParseStatus result;
+  result.status = false;
+
+  ParseStatus testResult = parser.parse("Var _victor Integer");
+
+  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(testResult.errorType, "Start variable declaration with var");
+}
+
+// Fail Case VariableParser
+TEST(VariableParserCombinator, failVariableParser4) {
+  VariableParser parser;
+  ParseStatus result;
+  result.status = false;
+
+  ParseStatus testResult = parser.parse("var 1victor : Integer");
+
+  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(testResult.errorType, "variable name needs to start with char");
+}
+
+// Fail Case VariableParser : colon missing
+TEST(VariableParserCombinator, failVariableParser5) {
+  VariableParser parser;
+  ParseStatus result;
+  result.status = false;
+
+  ParseStatus testResult = parser.parse(" var _victor Integer");
+
+  EXPECT_EQ(testResult, result);
 }

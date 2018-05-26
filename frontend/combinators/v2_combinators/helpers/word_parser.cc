@@ -35,7 +35,7 @@ ParseStatus WordParser::parse(std::string inputProgram) {
 	}
 	else{
 		// Error type returned to user
-		result.errorType =  "First character needs to be a char";
+		result.errorType =  "variable name needs to start with char";
 	}
 
 	return result;
