@@ -216,7 +216,7 @@ TEST(WordParserCombinator, failEqualSignParser1) {
   ParseStatus testResult = parser.parse(" _=");
 
   EXPECT_EQ(testResult, result);
-  EXPECT_EQ(testResult.errorType, "Missing equal sign in variable assignment");
+  EXPECT_EQ(testResult.errorType, "Missing equal sign");
 }
 
 
@@ -341,7 +341,7 @@ TEST(VariableParserCombinator, failVariableParser4) {
   ParseStatus testResult = parser.parse("var 1victor : Integer");
 
   EXPECT_EQ(testResult, result);
-  EXPECT_EQ(testResult.errorType, "variable name needs to start with char");
+  EXPECT_EQ(testResult.errorType, "Variable name needs to start with char");
 }
 
 // Fail Case VariableParser : colon missing
@@ -410,4 +410,39 @@ TEST(AssignmentParserCombinator, successAssignmentParser3) {
 
   EXPECT_EQ(testResult, result);
   EXPECT_EQ(output, "victor = 490");
+}
+
+// Fail Case VariableParser
+TEST(AssignmentParserCombinator, failAssignmentParser1) {
+  AssignmentParser parser;
+  ParseStatus result;
+  result.status = false;
+
+  ParseStatus testResult = parser.parse("_victor = ;");
+
+  EXPECT_EQ(testResult, result);
+}
+
+// Fail Case VariableParser
+TEST(AssignmentParserCombinator, failAssignmentParser2) {
+  AssignmentParser parser;
+  ParseStatus result;
+  result.status = false;
+
+  ParseStatus testResult = parser.parse("1victor = 123;");
+
+  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(testResult.errorType, "Variable name needs to start with char");
+}
+
+// Fail Case VariableParser
+TEST(AssignmentParserCombinator, failAssignmentParser3) {
+  AssignmentParser parser;
+  ParseStatus result;
+  result.status = false;
+
+  ParseStatus testResult = parser.parse("victor");
+
+  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(testResult.errorType, "Missing equal sign");
 }

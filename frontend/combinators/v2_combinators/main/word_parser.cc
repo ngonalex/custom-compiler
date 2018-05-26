@@ -11,11 +11,11 @@ using namespace cs160::frontend;
 using namespace std;
 
 ParseStatus WordParser::parse(std::string inputProgram) {
+	trim(inputProgram);
+
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);
 	}
-
-	trim(inputProgram);
 
 	SingleVarCharParser charParser;
 	SingleDigitParser digitParser;
@@ -38,7 +38,7 @@ ParseStatus WordParser::parse(std::string inputProgram) {
 	}
 	else{
 		// Error type returned to user
-		result.errorType =  "variable name needs to start with char";
+		result.errorType =  "Variable name needs to start with char";
 	}
 
 	return result;

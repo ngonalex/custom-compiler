@@ -7,11 +7,11 @@ using namespace cs160::frontend;
 using namespace std;
 
 ParseStatus MulDivExprParser::parse(std::string inputProgram) {
+	trim(inputProgram);
+
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);
 	}
-
-	trim(inputProgram);
 
   // ae
   TermExprParser lhs;

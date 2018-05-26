@@ -6,10 +6,11 @@
 using namespace cs160::frontend;
 
 ParseStatus NegativeParser::parse(std::string inputProgram) {
+	trim(inputProgram);
+
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);
 	}
-	trim(inputProgram);
 
 	ParseStatus status;
 

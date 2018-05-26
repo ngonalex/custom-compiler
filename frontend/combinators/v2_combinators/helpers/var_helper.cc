@@ -9,11 +9,12 @@
 using namespace cs160::frontend;
 
 ParseStatus VarKeywordParser::parse(std::string inputProgram) {
+	trim(inputProgram);
+
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);
 	}
 
-  trim(inputProgram);
   ParseStatus result;
 
   if(inputProgram.substr(0,3) == "var") {
@@ -30,11 +31,12 @@ ParseStatus VarKeywordParser::parse(std::string inputProgram) {
 
 
 ParseStatus ColonParser::parse(std::string inputProgram) {
+	trim(inputProgram);
+
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);
 	}
 
-  trim(inputProgram);
   ParseStatus result;
 
   if(inputProgram.substr(0,1) == ":") {
@@ -51,11 +53,12 @@ ParseStatus ColonParser::parse(std::string inputProgram) {
 
 
 ParseStatus TypeParser::parse(std::string inputProgram) {
+	trim(inputProgram);
+
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);
 	}
 
-  trim(inputProgram);
   OneOrMoreCombinator oneOrMore;
   SingleCharParser charParser;
 
@@ -70,11 +73,11 @@ ParseStatus TypeParser::parse(std::string inputProgram) {
 }
 
 ParseStatus EqualSignParser::parse(std::string inputProgram) {
+	trim(inputProgram);
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);
 	}
 
-  trim(inputProgram);
   ParseStatus result;
 
   if(inputProgram.substr(0,1) == "=") {
@@ -84,7 +87,7 @@ ParseStatus EqualSignParser::parse(std::string inputProgram) {
   }
   else {
     result.status = false;
-    result.errorType = "Missing equal sign in variable assignment";
+    result.errorType = "Missing equal sign";
   }
   return result;
 }

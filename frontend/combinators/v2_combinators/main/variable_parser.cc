@@ -12,11 +12,11 @@ using namespace cs160::frontend;
 using namespace std;
 
 ParseStatus VariableParser::parse(std::string inputProgram) {
+  trim(inputProgram);
+
   if (inputProgram.size() == 0) {
     return super::parse(inputProgram);
   }
-
-  trim(inputProgram);
 
   VarKeywordParser varParser;
   WordParser wordParser;

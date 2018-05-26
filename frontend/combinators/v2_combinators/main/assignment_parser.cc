@@ -13,11 +13,11 @@ using namespace cs160::frontend;
 using namespace std;
 
 ParseStatus AssignmentParser::parse(std::string inputProgram) {
+  trim(inputProgram);
+
   if (inputProgram.size() == 0) {
     return super::parse(inputProgram);
   }
-
-  trim(inputProgram);
 
   VariableParser varParser;
   WordParser wordParser;
@@ -62,6 +62,7 @@ ParseStatus AssignmentParser::parse(std::string inputProgram) {
     else {
       result.status = equalSignStatus.status;
       result.errorType = equalSignStatus.errorType;
+      result.errorType = "SQUIWEOIJFOWEF";
     }
   }
   else {

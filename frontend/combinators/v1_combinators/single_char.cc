@@ -5,13 +5,13 @@
 using namespace cs160::frontend;
 
 ParseStatus SingleCharParser::parse(std::string inputProgram) {
+	trim(inputProgram);
+
 	if (inputProgram.size() == 0){
 		return super::parse(inputProgram);
 	}
 
-	trim(inputProgram);
-
-	ParseStatus status;
+	ParseStatus status
 	if ((inputProgram[0] >= 'a' && inputProgram[0] <= 'z') ||
 		(inputProgram[0] >= 'A' && inputProgram[0] <= 'Z')){
 		status.status = true;
