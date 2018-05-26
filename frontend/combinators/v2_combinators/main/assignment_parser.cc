@@ -29,7 +29,7 @@ ParseStatus AssignmentParser::parse(std::string inputProgram, std::string errorT
   TermExprParser termExprParser;
 
   ParseStatus result;
-  ParseStatus varResult;
+  
   // Parse the first expression
   ParseStatus varResult = orCombinator.parse(inputProgram);
   

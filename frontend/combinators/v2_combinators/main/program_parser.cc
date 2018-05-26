@@ -31,9 +31,9 @@ ParseStatus ProgramParser::parse(std::string inputProgram, std::string errorType
   // Parse the assignments at the beginning
   ParseStatus result = zeroOrMore.parse(inputProgram);
 
-  
 
-  if(varResult.status) {
+
+  if(result.status) {
     result.parsedCharacters += varResult.parsedCharacters;
     result.remainingCharacters = varResult.remainingCharacters;
     ParseStatus equalSignStatus = equalSignParser.parse(result.remainingCharacters);
