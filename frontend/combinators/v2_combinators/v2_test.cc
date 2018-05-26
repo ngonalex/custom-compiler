@@ -373,3 +373,41 @@ TEST(AssignmentParserCombinator, successAssignmentParser1) {
   EXPECT_EQ(testResult, result);
   EXPECT_EQ(output, "_victor = 490");
 }
+
+// Success Case VariableParser
+TEST(AssignmentParserCombinator, successAssignmentParser2) {
+  AssignmentParser parser;
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "";
+  result.parsedCharacters = "victor = 490";
+
+  ParseStatus testResult = parser.parse(" victor = 490");
+
+  // Traversing the AST created from the variable name
+  PrintVisitor *a = new PrintVisitor();
+  testResult.ast->Visit(a);
+  std::string output = a->GetOutput();
+
+  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(output, "victor = 490");
+}
+
+// Success Case VariableParser
+TEST(AssignmentParserCombinator, successAssignmentParser3) {
+  AssignmentParser parser;
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = ";";
+  result.parsedCharacters = "victor = 490";
+
+  ParseStatus testResult = parser.parse(" victor = 490;");
+
+  // Traversing the AST created from the variable name
+  PrintVisitor *a = new PrintVisitor();
+  testResult.ast->Visit(a);
+  std::string output = a->GetOutput();
+
+  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(output, "victor = 490");
+}

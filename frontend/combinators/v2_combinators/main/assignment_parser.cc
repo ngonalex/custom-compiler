@@ -33,9 +33,10 @@ ParseStatus AssignmentParser::parse(std::string inputProgram) {
   // Parse the first expression
   for(int i = 0; i < inputProgram.length(); i++) {
     varResult = orCombinator.parse(inputProgram);
-    if(result.status)
+    if(varResult.status)
       break;
   }
+  result.status = varResult.status;
 
   if(varResult.status) {
     result.parsedCharacters += varResult.parsedCharacters;
@@ -64,7 +65,6 @@ ParseStatus AssignmentParser::parse(std::string inputProgram) {
     }
   }
   else {
-    result.status = varResult.status;
     result.errorType = varResult.errorType;
   }
 

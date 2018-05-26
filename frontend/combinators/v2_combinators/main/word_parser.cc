@@ -15,6 +15,8 @@ ParseStatus WordParser::parse(std::string inputProgram) {
 		return super::parse(inputProgram);
 	}
 
+	trim(inputProgram);
+
 	SingleVarCharParser charParser;
 	SingleDigitParser digitParser;
 
