@@ -6,10 +6,13 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus MulDivExprParser::parse(std::string inputProgram) {
+ParseStatus MulDivExprParser::parse(std::string inputProgram, std::string errorType) {
+	trim(inputProgram);
+
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);
 	}
+
   // ae
   TermExprParser lhs;
   ParseStatus result = lhs.parse(inputProgram);

@@ -1,9 +1,11 @@
+
+#include "frontend/combinators/v2_combinators/main/program_parser.h"
 #include "frontend/combinators/v2_combinators/main/assignment_parser.h"
-#include "frontend/combinators/v2_combinators/main/variable_parser.h"
 #include "frontend/combinators/v1_combinators/term_expr.h"
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
 #include "frontend/combinators/v2_combinators/main/word_parser.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
+#include "frontend/combinators/basic_combinators/zero_or_more_combinator.h"
 
 #include <string> // std::string, std::stoi
 
@@ -12,28 +14,24 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus AssignmentParser::parse(std::string inputProgram, std::string errorType) {
+ParseStatus ProgramParser::parse(std::string inputProgram, std::string errorType) {
   trim(inputProgram);
 
   if (inputProgram.size() == 0) {
     return super::parse(inputProgram);
   }
 
-  VariableParser varParser;
-  WordParser wordParser;
-  OrCombinator orCombinator; // Left of equal can be variable instantiation or variable_name
-  orCombinator.firstParser = reinterpret_cast<NullParser *>(&varParser);
-  orCombinator.secondParser = reinterpret_cast<NullParser *>(&wordParser);
+  AssignmentParser assignParser;
 
-  EqualSignParser equalSignParser;
+  ZeroOrMoreCombinator zeroOrMore; 
+  zeroOrMore.parser = assignParser;
+
   TermExprParser termExprParser;
 
-  ParseStatus result;
-  ParseStatus varResult;
-  // Parse the first expression
-  ParseStatus varResult = orCombinator.parse(inputProgram);
+  // Parse the assignments at the beginning
+  ParseStatus result = zeroOrMore.parse(inputProgram);
+
   
-  result.status = varResult.status;
 
   if(varResult.status) {
     result.parsedCharacters += varResult.parsedCharacters;

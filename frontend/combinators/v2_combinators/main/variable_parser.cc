@@ -1,5 +1,5 @@
 #include "frontend/combinators/v2_combinators/main/variable_parser.h"
-#include "frontend/combinators/v2_combinators/helpers/word_parser.h"
+#include "frontend/combinators/v2_combinators/main/word_parser.h"
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
 #include "frontend/combinators/v1_combinators/term_expr.h"
 
@@ -11,19 +11,17 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus VariableParser::parse(std::string inputProgram) {
+ParseStatus VariableParser::parse(std::string inputProgram, std::string errorType) {
+  trim(inputProgram);
+
   if (inputProgram.size() == 0) {
     return super::parse(inputProgram);
   }
-
-  trim(inputProgram);
 
   VarKeywordParser varParser;
   WordParser wordParser;
   ColonParser colonParser;
   TypeParser typeParser;
-  EqualSignParser equalSignParser;  // Optional
-  TermExprParser termExprParser;   // Optional
 
   // Parse the first character
   ParseStatus result = varParser.parse(inputProgram);
@@ -47,7 +45,7 @@ ParseStatus VariableParser::parse(std::string inputProgram) {
 				}
 				else {
 					result.status = typeStatus.status;
-					result.errorType = typeStatus.errorType;
+					result.errorType = typeStatus.errorType; 
 				}
       }
 			else {

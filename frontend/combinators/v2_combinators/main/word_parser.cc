@@ -1,4 +1,4 @@
-#include "frontend/combinators/v2_combinators/helpers/word_parser.h"
+#include "frontend/combinators/v2_combinators/main/word_parser.h"
 #include "frontend/combinators/v1_combinators/single_char.h"
 #include "frontend/combinators/v1_combinators/single_digit.h"
 #include "frontend/combinators/basic_combinators/zero_or_more_combinator.h"
@@ -10,7 +10,11 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus WordParser::parse(std::string inputProgram) {
+ParseStatus WordParser::parse(std::string inputProgram, std::string errorType) {
+	trim(inputProgram);
+
+	std::string errorMessage = "Declare variable names with 'var variable_name : type = expression'";
+
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram);
 	}
@@ -32,10 +36,11 @@ ParseStatus WordParser::parse(std::string inputProgram) {
 		ParseStatus result2 = zeroOrMore.parse(result.remainingCharacters);
 		result.parsedCharacters += result2.parsedCharacters;
 		result.remainingCharacters = result2.remainingCharacters;
+		result.ast = std::move(make_unique<const VariableExpr>(result.parsedCharacters));
 	}
 	else{
 		// Error type returned to user
-		result.errorType =  "variable name needs to start with char";
+		result.errorType = errorMessage;
 	}
 
 	return result;
