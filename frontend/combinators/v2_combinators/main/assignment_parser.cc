@@ -1,5 +1,4 @@
 #include "frontend/combinators/v2_combinators/main/assignment_parser.h"
-#include "frontend/combinators/v2_combinators/main/variable_parser.h"
 #include "frontend/combinators/v1_combinators/ae.h"
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
 #include "frontend/combinators/v2_combinators/main/word_parser.h"
@@ -20,7 +19,7 @@ ParseStatus AssignmentParser::parse(std::string inputProgram, std::string errorT
     return super::parse(inputProgram);
   }
 
-  VariableParser varParser;
+  HelperVariableParser varParser;
   WordParser wordParser;
   OrCombinator orCombinator; // Left of equal can be variable instantiation or variable_name
   orCombinator.firstParser = reinterpret_cast<NullParser *>(&varParser);

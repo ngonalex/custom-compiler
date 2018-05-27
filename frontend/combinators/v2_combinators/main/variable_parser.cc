@@ -2,6 +2,7 @@
 #include "frontend/combinators/v2_combinators/main/word_parser.h"
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
 #include "frontend/combinators/v1_combinators/term_expr.h"
+#include "frontend/combinators/v1_combinators/semicolon_parser.h"
 
 
 #include <string> // std::string, std::stoi
@@ -22,6 +23,7 @@ ParseStatus VariableParser::parse(std::string inputProgram, std::string errorTyp
   WordParser wordParser;
   ColonParser colonParser;
   TypeParser typeParser;
+  SemiColonParser semiColonP;
 
   // Parse the first character
   ParseStatus result = varParser.parse(inputProgram);
@@ -41,7 +43,17 @@ ParseStatus VariableParser::parse(std::string inputProgram, std::string errorTyp
         if (typeStatus.status) {
           result.parsedCharacters += (" " + typeStatus.parsedCharacters);
           result.remainingCharacters = typeStatus.remainingCharacters;
-          result.ast = std::move(make_unique<const VariableExpr>(wordResult.parsedCharacters));
+
+          ParseStatus semiColonResult = semiColonP.parse(result.remainingCharacters);
+          result.status = semiColonResult.status;    
+          if(semiColonResult.status) {
+            result.remainingCharacters = semiColonResult.remainingCharacters;
+            result.parsedCharacters += semiColonResult.parsedCharacters;
+            result.ast = std::move(make_unique<const VariableExpr>(wordResult.parsedCharacters));
+          }
+          else {
+            result.errorType = semiColonResult.errorType; 
+          }
 				}
 				else {
 					result.status = typeStatus.status;

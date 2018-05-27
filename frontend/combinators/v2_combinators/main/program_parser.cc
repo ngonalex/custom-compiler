@@ -17,7 +17,7 @@ using namespace std;
 ParseStatus ProgramParser::parse(std::string inputProgram, std::string errorType) {
   trim(inputProgram);
   
-
+/*
   if (inputProgram.size() == 0) {
     return super::parse(inputProgram);
   }
@@ -25,16 +25,18 @@ ParseStatus ProgramParser::parse(std::string inputProgram, std::string errorType
   AssignmentParser assignParser;
 
   ZeroOrMoreCombinator zeroOrMore; 
-  zeroOrMore.parser = assignParser;
+  zeroOrMore.parser = &assignParser;
 
   ArithExprParser termExprParser;
 
   // Parse the assignments at the beginning
-  ParseStatus result = zeroOrMore.parse(inputProgram);
+  ParseStatus assignResult = zeroOrMore.parse(inputProgram);
+
+  result.status = assignResult.status;
 
   if(result.status) {
-    result.parsedCharacters += varResult.parsedCharacters;
-    result.remainingCharacters = varResult.remainingCharacters;
+    result.parsedCharacters += assignResult.parsedCharacters;
+    result.remainingCharacters = assignResult.remainingCharacters;
     ParseStatus equalSignStatus = equalSignParser.parse(result.remainingCharacters);
 
     if(equalSignStatus.status) {
@@ -46,7 +48,7 @@ ParseStatus ProgramParser::parse(std::string inputProgram, std::string errorType
         result.remainingCharacters = termStatus.remainingCharacters;
 
         result.ast = std::move(make_unique<const Assignment>(
-          unique_cast<const VariableExpr>(std::move(varResult.ast)),
+          unique_cast<const VariableExpr>(std::move(assignResult.ast)),
           unique_cast<const ArithmeticExpr>(std::move(termStatus.ast))));
       }
       else {
@@ -63,5 +65,5 @@ ParseStatus ProgramParser::parse(std::string inputProgram, std::string errorType
     result.errorType = varResult.errorType;
   }
 
-  return result;
+  return result;*/
 }

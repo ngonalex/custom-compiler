@@ -220,33 +220,13 @@ TEST(WordParserCombinator, failEqualSignParser1) {
   EXPECT_EQ(testResult.errorType, "Missing equal sign");
 }
 
-
 // Success Case VariableParser
-TEST(VariableParserCombinator, sucessVariableParser1) {
+TEST(VariableParserCombinator, successVariableParser1) {
   VariableParser parser;
   ParseStatus result;
   result.status = true;
   result.remainingCharacters = "";
-  result.parsedCharacters = "var _victor : Integer";
-
-  ParseStatus testResult = parser.parse(" var _victor : Integer");
-
-  // Traversing the AST created from the variable name
-  PrintVisitor *a = new PrintVisitor();
-  testResult.ast->Visit(a);
-  std::string output = a->GetOutput();
-
-  EXPECT_EQ(testResult, result);
-  EXPECT_EQ(output, "_victor");
-}
-
-// Success Case VariableParser
-TEST(VariableParserCombinator, sucessVariableParser2) {
-  VariableParser parser;
-  ParseStatus result;
-  result.status = true;
-  result.remainingCharacters = ";";
-  result.parsedCharacters = "var _victor : Integer";
+  result.parsedCharacters = "var _victor : Integer;";
 
   ParseStatus testResult = parser.parse(" var _victor : Integer;");
 
@@ -260,33 +240,14 @@ TEST(VariableParserCombinator, sucessVariableParser2) {
 }
 
 // Success Case VariableParser
-TEST(VariableParserCombinator, sucessVariableParser3) {
+TEST(VariableParserCombinator, successVariableParser2) {
   VariableParser parser;
   ParseStatus result;
   result.status = true;
-  result.remainingCharacters = " = (593 + 912) * 12;";
-  result.parsedCharacters = "var _victor : Integer";
+  result.remainingCharacters = "";
+  result.parsedCharacters = "var _victor : Integer;";
 
-  ParseStatus testResult = parser.parse("var _victor : Integer = (593 + 912) * 12;");
-
-  // Traversing the AST created from the variable name
-  PrintVisitor *a = new PrintVisitor();
-  testResult.ast->Visit(a);
-  std::string output = a->GetOutput();
-
-  EXPECT_EQ(testResult, result);
-  EXPECT_EQ(output, "_victor");
-}
-
-// Success Case VariableParser
-TEST(VariableParserCombinator, sucessVariableParser4) {
-  VariableParser parser;
-  ParseStatus result;
-  result.status = true;
-  result.remainingCharacters = " = ‘let’s go’";
-  result.parsedCharacters = "var _victor : Integer";
-
-  ParseStatus testResult = parser.parse("var _victor : Integer = ‘let’s go’");
+  ParseStatus testResult = parser.parse(" var _victor : Integer;");
 
   // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
@@ -354,7 +315,22 @@ TEST(VariableParserCombinator, failVariableParser5) {
   ParseStatus testResult = parser.parse(" var _victor Integer");
 
   EXPECT_EQ(testResult, result);
+  //TODO FIX
+  //EXPECT_EQ(testResult.errorType, )
 }
+
+// Fail Case Missing semicolon
+TEST(WordParserCombinator, failVariableParser6) {
+  VariableParser parser;
+  ParseStatus result;
+  result.status = false;
+
+  ParseStatus testResult = parser.parse(" var _victor : Integer");
+
+  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(testResult.errorType, "Missing semicolon");
+}
+
 
 // Success Case VariableParser
 TEST(AssignmentParserCombinator, successAssignmentParser1) {
@@ -362,9 +338,9 @@ TEST(AssignmentParserCombinator, successAssignmentParser1) {
   ParseStatus result;
   result.status = true;
   result.remainingCharacters = "";
-  result.parsedCharacters = "var _victor : Integer = 490";
+  result.parsedCharacters = "var _victor : Integer = 490;";
 
-  ParseStatus testResult = parser.parse("var _victor : Integer = 490");
+  ParseStatus testResult = parser.parse("var _victor : Integer = 490;");
 
   // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
@@ -372,8 +348,6 @@ TEST(AssignmentParserCombinator, successAssignmentParser1) {
   std::string output = a->GetOutput();
 
   EXPECT_EQ(testResult, result);
-    EXPECT_EQ(testResult.remainingCharacters, result.remainingCharacters);
-  EXPECT_EQ(testResult.parsedCharacters, result.parsedCharacters);
   EXPECT_EQ(output, "_victor = 490");
 }
 
@@ -383,9 +357,9 @@ TEST(AssignmentParserCombinator, successAssignmentParser2) {
   ParseStatus result;
   result.status = true;
   result.remainingCharacters = "";
-  result.parsedCharacters = "victor = 490";
+  result.parsedCharacters = "victor = 490;";
 
-  ParseStatus testResult = parser.parse(" victor = 490");
+  ParseStatus testResult = parser.parse(" victor = 490;");
 
   // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
@@ -393,8 +367,6 @@ TEST(AssignmentParserCombinator, successAssignmentParser2) {
   std::string output = a->GetOutput();
 
   EXPECT_EQ(testResult, result);
-  EXPECT_EQ(testResult.remainingCharacters, result.remainingCharacters);
-  EXPECT_EQ(testResult.parsedCharacters, result.parsedCharacters);
   EXPECT_EQ(output, "victor = 490");
 }
 
@@ -403,8 +375,8 @@ TEST(AssignmentParserCombinator, successAssignmentParser3) {
   AssignmentParser parser;
   ParseStatus result;
   result.status = true;
-  result.remainingCharacters = ";";
-  result.parsedCharacters = "victor = (123*1+3901-2)";
+  result.remainingCharacters = "";
+  result.parsedCharacters = "victor = (123*1+3901-2);";
 
   ParseStatus testResult = parser.parse(" victor = (123 * 1 + 3901 - 2);");
 
@@ -468,7 +440,7 @@ TEST(AssignmentParserCombinator, successProgramParser1) {
   ProgramParser parser;
   ParseStatus result;
   result.status = true;
-  result.remainingCharacters = ";";
+  result.remainingCharacters = "";
   result.parsedCharacters = "victor = (123*1+3901-2)";
 
   ParseStatus testResult = parser.parse(" victor = (123 * 1 + 3901 - 2);");

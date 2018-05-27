@@ -25,6 +25,9 @@ ParseStatus ArithExprParser::parse(std::string inputProgram, std::string errorTy
 			aeParseResult.remainingCharacters = semiColonResult.remainingCharacters;
 			aeParseResult.parsedCharacters += semiColonResult.parsedCharacters;
 		}
+		else {
+			aeParseResult.errorType = semiColonResult.errorType;
+		}
 	}
 	 return aeParseResult;
 }
