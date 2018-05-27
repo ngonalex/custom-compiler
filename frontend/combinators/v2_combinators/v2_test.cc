@@ -4,6 +4,7 @@
 #include "frontend/combinators/v2_combinators/main/word_parser.h"
 #include "frontend/combinators/v2_combinators/main/variable_parser.h"
 #include "frontend/combinators/v2_combinators/main/assignment_parser.h"
+#include "frontend/combinators/v2_combinators/main/program_parser.h"
 #include "gtest/gtest.h"
 
 using namespace cs160::frontend;
@@ -461,3 +462,23 @@ TEST(AssignmentParserCombinator, failAssignmentParser4) {
 
   EXPECT_EQ(testResult, result);
 }
+/*
+// Success Case VariableParser
+TEST(AssignmentParserCombinator, successProgramParser1) {
+  ProgramParser parser;
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = ";";
+  result.parsedCharacters = "victor = (123*1+3901-2)";
+
+  ParseStatus testResult = parser.parse(" victor = (123 * 1 + 3901 - 2);");
+
+    // Traversing the AST created from the variable name
+  PrintVisitor *a = new PrintVisitor();
+  testResult.ast->Visit(a);
+  std::string output = a->GetOutput();
+
+  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(output, "victor = (((123 * 1) + 3901) - 2)");
+}
+*/

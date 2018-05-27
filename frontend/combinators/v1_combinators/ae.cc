@@ -1,5 +1,5 @@
 #include "frontend/combinators/v1_combinators/ae.h"
-
+#include "frontend/combinators/v1_combinators/semicolon_parser.h"
 
 #define super NullParser
 
@@ -16,6 +16,15 @@ ParseStatus ArithExprParser::parse(std::string inputProgram, std::string errorTy
 		return super::parse(inputProgram);
 	}
 	AddSubExprParser ae;
+	SemiColonParser semiColonP;
 	ParseStatus aeParseResult = ae.parse(inputProgram);
-    return aeParseResult;
+	if(aeParseResult.status) {
+		ParseStatus semiColonResult = semiColonP.parse(aeParseResult.remainingCharacters);
+		aeParseResult.status = semiColonResult.status;		
+		if(semiColonResult.status) {
+			aeParseResult.remainingCharacters = semiColonResult.remainingCharacters;
+			aeParseResult.parsedCharacters += semiColonResult.parsedCharacters;
+		}
+	}
+	 return aeParseResult;
 }

@@ -309,7 +309,7 @@ TEST(Combinators, TrivialAe) {
 // New - working
 TEST(Combinators, TrivialAe1) {
   ArithExprParser test;
-  ParseStatus result = test.parse("((225*335)+12)/2");
+  ParseStatus result = test.parse("((225*335)+12)/2;");
 
   // Traversing the AST created from the number
   PrintVisitor *a = new PrintVisitor();
@@ -325,7 +325,7 @@ TEST(Combinators, TrivialAe1) {
 // New - working
 TEST(Combinators, TrivialAe2) {
   ArithExprParser test;
-  ParseStatus result = test.parse("(225*335)+(12/2)");
+  ParseStatus result = test.parse("(225*335)+(12/2);");
 
   // Traversing the AST created from the number
   PrintVisitor *a = new PrintVisitor();
@@ -341,7 +341,7 @@ TEST(Combinators, TrivialAe2) {
 // New - working
 TEST(Combinators, TrivialAe3) {
   ArithExprParser test;
-  ParseStatus result = test.parse("(225*335)+12/2");
+  ParseStatus result = test.parse("(225*335)+12/2;");
 
   // Traversing the AST created from the number
   PrintVisitor *a = new PrintVisitor();
@@ -356,7 +356,7 @@ TEST(Combinators, TrivialAe3) {
 
 TEST(Combinators, ComplicatedAe) {
   ArithExprParser test;
-  ParseStatus result = test.parse("7*10+9/3+16-8*2*3-77+12*1");
+  ParseStatus result = test.parse("7*10+9/3+16-8*2*3-77+12*1;");
 
   // Traversing the AST created from the number
   PrintVisitor *a = new PrintVisitor();
@@ -371,7 +371,7 @@ TEST(Combinators, ComplicatedAe) {
 
 TEST(Combinators, NegComplicatedAe) {
   ArithExprParser test;
-  ParseStatus result = test.parse("-(7*10+9/3+16-8*2*3-77+12*1)");
+  ParseStatus result = test.parse("-(7*10+9/3+16-8*2*3-77+12*1);");
 
   // Traversing the AST created from the number
   PrintVisitor *a = new PrintVisitor();

@@ -16,7 +16,7 @@ using namespace std;
 
 ParseStatus ProgramParser::parse(std::string inputProgram, std::string errorType) {
   trim(inputProgram);
-  /*
+  
 
   if (inputProgram.size() == 0) {
     return super::parse(inputProgram);
@@ -31,8 +31,6 @@ ParseStatus ProgramParser::parse(std::string inputProgram, std::string errorType
 
   // Parse the assignments at the beginning
   ParseStatus result = zeroOrMore.parse(inputProgram);
-
-
 
   if(result.status) {
     result.parsedCharacters += varResult.parsedCharacters;
@@ -65,5 +63,5 @@ ParseStatus ProgramParser::parse(std::string inputProgram, std::string errorType
     result.errorType = varResult.errorType;
   }
 
-  return result;*/
+  return result;
 }
