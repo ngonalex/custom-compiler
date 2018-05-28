@@ -4,6 +4,7 @@
 #include "abstract_syntax/abstract_syntax.h"
 #include "utility/memory.h"
 
+#include <vector>
 #include <string>
 
 using namespace cs160::abstract_syntax::frontend;
@@ -22,6 +23,9 @@ class ParseStatus { // Super class
 
 	// Only for And Combinator
 	std::unique_ptr<const AstNode> second_ast;
+
+	// Only for zero_or_more and one_or_more case when returning multiple ast nodes
+	std::vector<std::unique_ptr<const AstNode>> astNodes;
 
 	// Only for the failed case
 	std::string errorType;

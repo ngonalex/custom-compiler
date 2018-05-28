@@ -434,23 +434,25 @@ TEST(AssignmentParserCombinator, failAssignmentParser4) {
 
   EXPECT_EQ(testResult, result);
 }
-/*
+
 // Success Case VariableParser
 TEST(AssignmentParserCombinator, successProgramParser1) {
   ProgramParser parser;
   ParseStatus result;
   result.status = true;
   result.remainingCharacters = "";
-  result.parsedCharacters = "victor = (123*1+3901-2)";
+  result.parsedCharacters = "victor = (123*1+3901-2);j=4;j+victor";
 
-  ParseStatus testResult = parser.parse(" victor = (123 * 1 + 3901 - 2);");
+  ParseStatus testResult = parser.parse(" victor = (123 * 1 + 3901 - 2); j = 4; 3 + 4;");
 
     // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
   testResult.ast->Visit(a);
   std::string output = a->GetOutput();
 
-  EXPECT_EQ(testResult, result);
-  EXPECT_EQ(output, "victor = (((123 * 1) + 3901) - 2)");
+  //EXPECT_EQ(testResult, result);
+    EXPECT_EQ(testResult.status, result.status);
+  EXPECT_EQ(testResult.remainingCharacters, result.remainingCharacters);
+  EXPECT_EQ(testResult.parsedCharacters, result.parsedCharacters);
+  EXPECT_EQ(output, "victor = (((123 * 1) + 3901) - 2);j=4;j+victor");
 }
-*/

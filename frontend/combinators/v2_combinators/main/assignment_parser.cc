@@ -26,7 +26,7 @@ ParseStatus AssignmentParser::parse(std::string inputProgram, std::string errorT
   orCombinator.secondParser = reinterpret_cast<NullParser *>(&wordParser);
 
   EqualSignParser equalSignParser;
-  ArithExprParser termExprParser;
+  ArithExprParser arithExprParser;
 
   ParseStatus result;
 
@@ -43,7 +43,7 @@ ParseStatus AssignmentParser::parse(std::string inputProgram, std::string errorT
     if(equalSignStatus.status) {
       result.parsedCharacters += (" " + equalSignStatus.parsedCharacters);
       result.remainingCharacters = equalSignStatus.remainingCharacters;
-      ParseStatus termStatus = termExprParser.parse(result.remainingCharacters);
+      ParseStatus termStatus = arithExprParser.parse(result.remainingCharacters);
       if(termStatus.status) {
         result.parsedCharacters += (" " + termStatus.parsedCharacters);
         result.remainingCharacters = termStatus.remainingCharacters;
