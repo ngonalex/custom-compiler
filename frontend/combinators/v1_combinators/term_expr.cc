@@ -1,4 +1,6 @@
 #include "frontend/combinators/v1_combinators/term_expr.h"
+#include "frontend/combinators/basic_combinators/or_combinator.h"
+#include "frontend/combinators/v2_combinators/main/word_parser.h"
 #include "iostream"
 
 #define super NullParser
@@ -14,8 +16,14 @@ ParseStatus TermExprParser::parse(std::string inputProgram, std::string errorTyp
   }
 
   // num
+  OrCombinator orC;
+  WordParser wordP;
   NumParser num;
-  ParseStatus numParseStatus = num.parse(inputProgram);
+  orC.firstParser = reinterpret_cast<NullParser *>(&wordP);
+  orC.secondParser = reinterpret_cast<NullParser *>(&num);
+
+  ParseStatus numParseStatus = orC.parse(inputProgram);
+  //ParseStatus numParseStatus = num.parse(inputProgram);
 
   if (numParseStatus.status) {
     return numParseStatus;  // Returning Success on Num

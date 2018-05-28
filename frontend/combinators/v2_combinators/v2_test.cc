@@ -1,5 +1,6 @@
 #include "abstract_syntax/abstract_syntax.h"
 #include "abstract_syntax/print_visitor_v2.h"
+#include "frontend/combinators/v1_combinators/ae.h"
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
 #include "frontend/combinators/v2_combinators/main/word_parser.h"
 #include "frontend/combinators/v2_combinators/main/variable_parser.h"
@@ -435,6 +436,25 @@ TEST(AssignmentParserCombinator, failAssignmentParser4) {
   EXPECT_EQ(testResult, result);
 }
 
+TEST(BinaryOperatorExpr, successBinaryOperatorExpr1) {
+  ArithExprParser parser;
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "";
+  result.parsedCharacters = "victor+490;";
+
+  ParseStatus testResult = parser.parse(" victor + 490;");
+
+  // Traversing the AST created from the variable name
+  PrintVisitor *a = new PrintVisitor();
+  testResult.ast->Visit(a);
+  std::string output = a->GetOutput();
+
+  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(output, "(victor + 490)");
+}
+
+/*
 // Success Case VariableParser
 TEST(AssignmentParserCombinator, successProgramParser1) {
   ProgramParser parser;
@@ -455,4 +475,4 @@ TEST(AssignmentParserCombinator, successProgramParser1) {
   EXPECT_EQ(testResult.remainingCharacters, result.remainingCharacters);
   EXPECT_EQ(testResult.parsedCharacters, result.parsedCharacters);
   EXPECT_EQ(output, "victor = (((123 * 1) + 3901) - 2);j=4;j+victor");
-}
+}*/

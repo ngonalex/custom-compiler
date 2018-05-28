@@ -15,7 +15,7 @@ using namespace std;
 
 ParseStatus ProgramParser::parse(std::string inputProgram, std::string errorType) {
   trim(inputProgram);
-  
+  /*
 
   if (inputProgram.size() == 0) {
     return super::parse(inputProgram);
@@ -44,7 +44,12 @@ ParseStatus ProgramParser::parse(std::string inputProgram, std::string errorType
   if(arithResult.status) {
     result.parsedCharacters += (" " + assignResult.parsedCharacters);
     result.remainingCharacters = assignResult.remainingCharacters;
-      result.ast = std::move(make_unique<const Program>(assignResult.ast,
+    /*
+    std::vector<std::unique_ptr<const Assignment>> temporaryAssign;    
+    for(auto i : assignResult.astNodes) {
+      temporaryAssign.push_back(std::move(unique_cast<const Assignment>(std::move(i))));
+    }
+      result.ast = std::move(make_unique<const Program>(assignResult.astNodes,
     unique_cast<const ArithmeticExpr>(std::move(arithResult.ast))));
     return result;
   }
@@ -52,6 +57,6 @@ ParseStatus ProgramParser::parse(std::string inputProgram, std::string errorType
     // Cannot parse any arithmetic expressions
     assignResult.errorType = arithResult.errorType;
     return assignResult;
-  }
+  }*/
 }
 

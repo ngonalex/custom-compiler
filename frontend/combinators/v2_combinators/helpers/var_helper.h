@@ -31,6 +31,11 @@ class HelperVariableParser : NullParser {
  public:
    virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
 };
+/*
+class BOExpr : NullParser {
+ public:
+   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
+};*/
 
 } // namespace frontend
 } // namespace cs160

@@ -30,6 +30,15 @@ cc_library(
 	visibility = ["//visibility:public"],
 )
 
+cc_library(
+	name = "word_parser",
+	copts = ["-Wall -g"],
+	hdrs = ["main/word_parser.h"],
+	srcs = ["main/word_parser.cc"],
+	deps = ["//utility", "//frontend/combinators/v1_combinators:single_char", "//frontend/combinators/v1_combinators:single_digit", "//frontend/combinators/basic_combinators"],
+	visibility = ["//visibility:public"],
+)
+
 cc_test(
 	name = "combinators_test",
 
