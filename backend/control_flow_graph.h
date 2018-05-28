@@ -25,6 +25,11 @@ class ControlFlowGraph {
 };
 
 
+enum BlockType {
+  CONDITIONAL_BLOCK, LOOP_BLOCK,
+  FUNCTION_BLOCK, NO_TYPE
+};
+
 // Individual nodes in the CGF
 // leftnode_ will be true branches
 // rightnode_ will be false branches
@@ -42,12 +47,26 @@ class ControlFlowGraphNode {
   std::unique_ptr<ControlFlowGraphNode> GetRightNode() {
     return std::move(rightnode_); 
   }
+  int GetCreationOrder() {
+    return creation_order;
+  }
+  BlockType GetBlcokType() {
+    return blockttype_;
+  }
   ControlFlowGraphNode operator=(ControlFlowGraphNode);
   void SetLocalBlock(std::vector<std::unique_ptr<struct ThreeAddressCode>>);
   void SetLeftNode(std::unique_ptr<ControlFlowGraphNode>);
   void SetRightNode(std::unique_ptr<ControlFlowGraphNode>);
+  void SetCreationOrder(int order) {
+    creation_order = order;
+  }
+  void SetBlockType(BlockType settype) {
+    blocktype_ = settype;
+  }
 
  private:
+  BlockType blocktype_
+  int creation_order;
   std::vector<std::unique_ptr<struct ThreeAddressCode>> localblock_;
   std::unique_ptr<ControlFlowGraphNode> leftnode_; 
   std::unique_ptr<ControlFlowGraphNode> rightnode_;
