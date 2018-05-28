@@ -14,7 +14,7 @@ class ControlFlowGraph {
  public:
   ControlFlowGraph(std::vector<std::unique_ptr<struct ThreeAddressCode>>);
   ControlFlowGraphNode GetRoot() {
-   return std::move(root_);
+   return root_;
   }
   void CreateCFG(std::vector<std::unique_ptr<struct ThreeAddressCode>>);
   void Optimize();
@@ -35,6 +35,7 @@ class ControlFlowGraphNode {
   std::vector<std::unique_ptr<struct ThreeAddressCode>> GetLocalBlock() {
    return localblock_;
   }
+  ControlFlowGraphNode(ControlFlowGraphNode &copy);
   std::unique_ptr<ControlFlowGraphNode> GetLeftNode() {
     return std::move(leftnode_); 
   }
