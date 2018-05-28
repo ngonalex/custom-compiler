@@ -248,7 +248,7 @@ TEST(VariableParserCombinator, successVariableParser2) {
   result.remainingCharacters = "";
   result.parsedCharacters = "var _victor : Integer;";
 
-  ParseStatus testResult = parser.parse(" var _victor : Integer;");
+  ParseStatus testResult = parser.parse(" var    _victor :   Integer;");
 
   // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
@@ -441,9 +441,9 @@ TEST(BinaryOperatorExpr, successBinaryOperatorExpr1) {
   ParseStatus result;
   result.status = true;
   result.remainingCharacters = "";
-  result.parsedCharacters = "victor+490;";
+  result.parsedCharacters = "(victor+490)-_foo+3;";
 
-  ParseStatus testResult = parser.parse(" victor + 490;");
+  ParseStatus testResult = parser.parse(" (victor + 490) - _foo + 3;");
 
   // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
@@ -451,7 +451,7 @@ TEST(BinaryOperatorExpr, successBinaryOperatorExpr1) {
   std::string output = a->GetOutput();
 
   EXPECT_EQ(testResult, result);
-  EXPECT_EQ(output, "(victor + 490)");
+  EXPECT_EQ(output, "(((victor + 490) - _foo) + 3)");
 }
 
 /*
