@@ -32,6 +32,21 @@ class LessThanOrEqualToOpParser : NullParser {
    virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
 };
 
+class AndOpParser : NullParser {
+ public:
+   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
+};
+
+class OrOpParser : NullParser {
+ public:
+   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
+};
+
+class NotOpParser : NullParser {
+ public:
+   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
+};
+
 } // namespace frontend
 } // namespace cs160
 
