@@ -162,7 +162,7 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
       outfile_ << "\t# Loading in an integer" << std::endl;
       outfile_ << "\tmov $" + std::to_string(tac->arg1.value())
         + ", %rcx" << std::endl;
-      outfile_ << "\tmov $0x01000000, %rax" << std::endl;
+      outfile_ << "\tmov $0x100, %rax" << std::endl;
       outfile_ << "\tpush %rax" << std::endl;
       outfile_ << "\tpush %rcx\n" << std::endl;
       break;
@@ -264,7 +264,7 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
       outfile_ << "\tmov " << std::to_string(16+argumentnum*8)
         << "(%rbp), %rax" << std::endl;
       outfile_ << "\tmov %rax, -" << std::to_string(argumentnum*32)
-        << "(%rbp)" << std::endl;
+        << "(%rbp)\n" << std::endl;
       // Include it in the symbol table
       if (symbollocations_.count(varname) == 0) {
         symbollocations_.insert(std::pair<std::string, int>(varname,
@@ -319,21 +319,21 @@ void CodeGen::GenerateArithmeticExpr(
       GenerateBinaryExprHelper(std::move(tac));
       ClearRegister("rcx");
       outfile_ << "\tadd %rax, %rcx\n\tadd %rbx, %rcx" << std::endl;
-      outfile_ << "\tpush %r8\n" << std::endl;
+      outfile_ << "\tpush %rdx\n" << std::endl;
       outfile_ << "\tpush %rcx\n" << std::endl;
       break;
     case SUB:
       outfile_ << "\t# Subtraction";
       GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\tsub %rbx, %rax" << std::endl;
-      outfile_ << "\tpush %r8\n" << std::endl;
+      outfile_ << "\tpush %rcx\n" << std::endl;
       outfile_ << "\tpush %rax\n" << std::endl;
       break;
     case MULT:
       outfile_ << "\t# Multiplication";
       GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\timul %rax, %rbx" << std::endl;
-      outfile_ << "\tpush %r8\n" << std::endl;
+      outfile_ << "\tpush %rcx\n" << std::endl;
       outfile_ << "\tpush %rbx\n" << std::endl;
       break;
     case DIV:
@@ -342,7 +342,7 @@ void CodeGen::GenerateArithmeticExpr(
       GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\tcqto" << std::endl;  // indicating its a signed division
       outfile_ << "\tidiv %rbx" << std::endl;
-      outfile_ << "\tpush %r8\n" << std::endl;
+      outfile_ << "\tpush %rcx\n" << std::endl;
       outfile_ << "\tpush %rax\n" << std::endl;
       break;
     default:
@@ -359,46 +359,46 @@ void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
     case LESSTHAN:
       outfile_ << "\t# LessThan Comparision";
       GenerateBinaryExprHelper(std::move(tac));
+      outfile_ << "\tpush %rdx\n" << std::endl;
       outfile_ << "\tcmp %rbx, %rax" << std:: endl;
       outfile_ << "\tsetl %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-      outfile_ << "\tpush %r8\n" << std::endl;
       outfile_ << "\tpush %rcx\n" << std:: endl;
       break;
     case LESSTHANEQ:
       outfile_ << "\t# LessThanEq Comparision";
       GenerateBinaryExprHelper(std::move(tac));
+      outfile_ << "\tpush %rdx\n" << std::endl;
       outfile_ << "\tcmp %rbx, %rax" << std:: endl;
       outfile_ << "\tsetle %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-      outfile_ << "\tpush %r8\n" << std::endl;
       outfile_ << "\tpush %rcx\n" << std:: endl;
       break;
     case GREATERTHAN:
       outfile_ << "\t# GreaterThan Comparision";
       GenerateBinaryExprHelper(std::move(tac));
+      outfile_ << "\tpush %rdx\n" << std::endl;
       outfile_ << "\tcmp %rbx, %rax" << std:: endl;
       outfile_ << "\tsetg %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-      outfile_ << "\tpush %r8\n" << std::endl;
       outfile_ << "\tpush %rcx\n" << std:: endl;
       break;
     case GREATERTHANEQ:
       outfile_ << "\t# GreaterThanEq Comparision";
       GenerateBinaryExprHelper(std::move(tac));
+      outfile_ << "\tpush %rdx\n" << std::endl;
       outfile_ << "\tcmp %rbx, %rax" << std:: endl;
       outfile_ << "\tsetge %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-      outfile_ << "\tpush %r8\n" << std::endl;
       outfile_ << "\tpush %rcx\n" << std:: endl;
       break;
     case EQUAL:
       outfile_ << "\t# Equals Comparision";
       GenerateBinaryExprHelper(std::move(tac));
+      outfile_ << "\tpush %rdx\n" << std::endl;
       outfile_ << "\tcmp %rbx, %rax" << std:: endl;
       outfile_ << "\tsete %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-      outfile_ << "\tpush %r8\n" << std::endl;
       outfile_ << "\tpush %rcx\n" << std:: endl;
       break;
     default:
@@ -415,22 +415,22 @@ void CodeGen::GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
       outfile_ << "\t# LogicalAnd\n";
       GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\tand %rbx, %rax" << std:: endl;
-      outfile_ << "\tpush %r8\n" << std::endl;
+      outfile_ << "\tpush %rdx\n" << std::endl;
       outfile_ << "\tpush %rax\n" << std:: endl;
       break;
     case LOGOR:
       outfile_ << "\t# LogicalOr\n";
       GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\tor %rbx, %rax" << std::endl;
-      outfile_ << "\tpush %r8\n" << std::endl;
+      outfile_ << "\tpush %rdx\n" << std::endl;
       outfile_ << "\tpush %rax\n" << std:: endl;
       break;
     case LOGNOT:
       outfile_ << "\t# LogicalNot\n";
       outfile_ << "\tpop %rbx" << std::endl;
-      outfile_ << "\tpop %r8" << std::endl;
+      outfile_ << "\tpop %rdx" << std::endl;
       outfile_ << "\txor $1, %rbx" << std::endl;
-      outfile_ << "\tpush %r8\n" << std::endl;
+      outfile_ << "\tpush %rdx\n" << std::endl;
       outfile_ << "\tpush %rbx\n" << std::endl;
       break;
     default:
@@ -459,7 +459,6 @@ void CodeGen::GenerateBinaryExprHelper(
   outfile_ << "\tpush %rcx" << std::endl;
   outfile_ << "\tpush %rbx" << std::endl;
 
-  outfile_ << "\tshr $56, %rcx" << std::endl;
   outfile_ << "\tmovzbl %cl, %rdi" << std::endl;
 
   // Error Handling here
@@ -477,7 +476,6 @@ void CodeGen::GenerateBinaryExprHelper(
   outfile_ << "\tpush %rcx" << std::endl;
   outfile_ << "\tpush %rbx" << std::endl;
 
-  outfile_ << "\tshr $56, %rdx" << std::endl;
   outfile_ << "\tmovzbl %dl, %rdi" << std::endl;
   outfile_ << "\tcall integerflagcheck" << std::endl;
   outfile_ << "\tpop %rbx" << std::endl;  // rbx = right value
@@ -777,11 +775,11 @@ void CodeGen::Generate(std::vector
             // Error Handling here to check the size
             // and if it's actually a tuple
             outfile_ << "\t#Error Handling Here LHS VARCHILD" << std::endl;
-            outfile_ << "\tmovb 1(%rbx), %al" << std::endl;
+            outfile_ << "\tmovb (%rbx), %al" << std::endl;
             outfile_ << "\tmovzx %al, %rdi" << std::endl;
             outfile_ << "\tpush %rbx" << std::endl;
-            outfile_ << "\tcall existencecheck" << std::endl;
-            outfile_ << "\tpop %rbx" << std::endl;
+            outfile_ << "\tcall tupleflagcheck" << std::endl;
+            outfile_ << "\tpop %rbx\n" << std::endl;
 
             outfile_ << "\tmovl 2(%rbx), %eax" << std::endl;
             outfile_ << "\tmovslq %eax, %rdi" << std::endl;
@@ -790,12 +788,6 @@ void CodeGen::Generate(std::vector
             outfile_ << "\tpush %rbx" << std::endl;
             outfile_ << "\tcall tuplesizecheck" << std::endl;
             outfile_ << "\tpop %rbx" << std::endl;
-
-            outfile_ << "\tmovb (%rbx), %al" << std::endl;
-            outfile_ << "\tmovzx %al, %rdi" << std::endl;
-            outfile_ << "\tpush %rbx" << std::endl;
-            outfile_ << "\tcall tupleflagcheck" << std::endl;
-            outfile_ << "\tpop %rbx\n" << std::endl;
 
             // Get the actual object
             outfile_ << "\tmovq 8(%rbx), %rbx" << std::endl;
@@ -817,11 +809,6 @@ void CodeGen::Generate(std::vector
 
             int index =
             symbollocations_.find(code->arg1.reg().name())->second;
-
-            outfile_ << "\tmovb " << std::to_string(index+1) <<
-              "(%rbp), %al" << std::endl;
-            outfile_ << "\tmovzx %al, %rdi" << std::endl;
-            outfile_ << "\tcall existencecheck" << std::endl;
 
             outfile_ << "\tmovl " << std::to_string(index+2) <<
               "(%rbp), %eax" << std::endl;
@@ -849,11 +836,11 @@ void CodeGen::Generate(std::vector
 
           // Error Handling here to check the size + if it's a tuple
           outfile_ << "\t#Error Handling Here LHSDerefChild" << std::endl;
-          outfile_ << "\tmovb 1(%rbx), %al" << std::endl;
+          outfile_ << "\tmovb (%rbx), %al" << std::endl;
           outfile_ << "\tmovzx %al, %rdi" << std::endl;
           outfile_ << "\tpush %rbx" << std::endl;
-          outfile_ << "\tcall existencecheck" << std::endl;
-          outfile_ << "\tpop %rbx" << std::endl;
+          outfile_ << "\tcall tupleflagcheck" << std::endl;
+          outfile_ << "\tpop %rbx\n" << std::endl;
 
           outfile_ << "\tmovl 2(%rbx), %eax" << std::endl;
           outfile_ << "\tmovslq %eax, %rdi" << std::endl;
@@ -862,12 +849,6 @@ void CodeGen::Generate(std::vector
           outfile_ << "\tpush %rbx" << std::endl;
           outfile_ << "\tcall tuplesizecheck" << std::endl;
           outfile_ << "\tpop %rbx" << std::endl;
-
-          outfile_ << "\tmovb (%rbx), %al" << std::endl;
-          outfile_ << "\tmovzx %al, %rdi" << std::endl;
-          outfile_ << "\tpush %rbx" << std::endl;
-          outfile_ << "\tcall tupleflagcheck" << std::endl;
-          outfile_ << "\tpop %rbx\n" << std::endl;
 
           // Get the actual object
           outfile_ << "\tmovq 8(%rbx), %rbx" << std::endl;
@@ -900,6 +881,12 @@ void CodeGen::Generate(std::vector
             outfile_ << "\tcall existencecheck" << std::endl;
             outfile_ << "\tpop %rbx" << std::endl;
 
+            outfile_ << "\tmovb (%rbx), %al" << std::endl;
+            outfile_ << "\tmovzx %al, %rdi" << std::endl;
+            outfile_ << "\tpush %rbx" << std::endl;
+            outfile_ << "\tcall tupleflagcheck" << std::endl;
+            outfile_ << "\tpop %rbx\n" << std::endl;
+
             outfile_ << "\tmovl 2(%rbx), %eax" << std::endl;
             outfile_ << "\tmovslq %eax, %rdi" << std::endl;
             outfile_ << "\tpop %rsi" << std::endl;
@@ -907,12 +894,6 @@ void CodeGen::Generate(std::vector
             outfile_ << "\tpush %rbx" << std::endl;
             outfile_ << "\tcall tuplesizecheck" << std::endl;
             outfile_ << "\tpop %rbx" << std::endl;
-
-            outfile_ << "\tmovb (%rbx), %al" << std::endl;
-            outfile_ << "\tmovzx %al, %rdi" << std::endl;
-            outfile_ << "\tpush %rbx" << std::endl;
-            outfile_ << "\tcall tupleflagcheck" << std::endl;
-            outfile_ << "\tpop %rbx\n" << std::endl;
 
             // Get the actual object (x->whatever)
             outfile_ << "\tmovq 8(%rbx), %rbx" << std::endl;
@@ -1003,6 +984,12 @@ void CodeGen::Generate(std::vector
           outfile_ << "\tcall existencecheck" << std::endl;
           outfile_ << "\tpop %rbx" << std::endl;
 
+          outfile_ << "\tmovb (%rbx), %al" << std::endl;
+          outfile_ << "\tmovzx %al, %rdi" << std::endl;
+          outfile_ << "\tpush %rbx" << std::endl;
+          outfile_ << "\tcall tupleflagcheck" << std::endl;
+          outfile_ << "\tpop %rbx\n" << std::endl;
+
           outfile_ << "\tmovl 2(%rbx), %eax" << std::endl;
           outfile_ << "\tmovslq %eax, %rdi" << std::endl;
           outfile_ << "\tpop %rsi" << std::endl;
@@ -1010,12 +997,6 @@ void CodeGen::Generate(std::vector
           outfile_ << "\tpush %rbx" << std::endl;
           outfile_ << "\tcall tuplesizecheck" << std::endl;
           outfile_ << "\tpop %rbx" << std::endl;
-
-          outfile_ << "\tmovb (%rbx), %al" << std::endl;
-          outfile_ << "\tmovzx %al, %rdi" << std::endl;
-          outfile_ << "\tpush %rbx" << std::endl;
-          outfile_ << "\tcall tupleflagcheck" << std::endl;
-          outfile_ << "\tpop %rbx\n" << std::endl;
 
           // Get the actual object (x->whatever)
           outfile_ << "\tmovq 8(%rbx), %rbx" << std::endl;
@@ -1035,7 +1016,7 @@ void CodeGen::Generate(std::vector
             // get the value stored and push it on the stack
 
             outfile_ << "\tpop %rbx" << std::endl;
-            outfile_ << "\tpush %rbx" << std::endl;
+            outfile_ << "\tpush (%rbx)" << std::endl;
             // Get the correct offset
             outfile_ << "\tadd $8, %rbx" << std::endl;
             outfile_ << "\tmov (%rbx), %rcx" << std::endl;
@@ -1049,6 +1030,13 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tpop %rcx" << std::endl;
         outfile_ << "\tpop %rdx" << std::endl;
         outfile_ << "\tpush %rcx" << std::endl;
+
+        // Check if the rhs is actually a integer
+        outfile_ << "\tmovzbl %dl, %rdi" << std::endl;
+        outfile_ << "\tcall integerflagcheck" << std::endl;
+        outfile_ << "\tpop %rcx" << std::endl;
+        outfile_ << "\tpush %rcx" << std::endl;
+
         outfile_ << "\timul $16, %rcx" << std::endl;
         outfile_ << "\tmov %rcx, %rdi" << std::endl;
         outfile_ << "\tcall newtuple" << std::endl;
