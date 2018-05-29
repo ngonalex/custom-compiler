@@ -8,6 +8,7 @@ void CodeGen::GeneratePrinter() {
   GenerateIntegerFlagCheck();
   GenerateExistenceCheck();
   GenerateTupleSizeCheck();
+  GenerateCreateNewTuple();
 
   // printtupletypeerror
   outfile_ << "printtupletypeerror:" << std::endl;
@@ -157,33 +158,33 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
   std::vector<std::string> parsedstring;
 
   switch (loadtype) {
-    case INTLOAD:
+    case INTLOAD:  // 2 pushes
       outfile_ << "\t# Loading in an integer" << std::endl;
       outfile_ << "\tmov $" + std::to_string(tac->arg1.value())
         + ", %rcx" << std::endl;
       outfile_ << "\tmov $0x01000000, %rax" << std::endl;
-      outfile_ << "\tpush %rax\n" << std::endl;
+      outfile_ << "\tpush %rax" << std::endl;
       outfile_ << "\tpush %rcx\n" << std::endl;
       break;
-    case VARLOAD:
+    case VARLOAD:  // 2 pushes
       outfile_ << "\t# Loading from a variable" << std::endl;
       outfile_ << "\tmov " << VariableNameHelper(tac->arg1.reg().name())
         << ", %rbx" << std::endl;
-      outfile_ << "\tpush %rbx" << std::endl;
 
       // Then load it into register
       if (currscope_ == FUNCTION) {
+        outfile_ << "\tpush %rbx" << std::endl;
         outfile_ << "\tmov " << std::to_string(
         symbollocations_.find(tac->arg1.reg().name())->second+8)
           << "(%rbp), %rbx" << std::endl;
         outfile_ << "\tpush %rbx\n" << std::endl;
       } else {
-        // Error handling (Refactor first 4 lines into a function)
+        outfile_ << "\tpush (%rbx)" << std::endl;
         outfile_ << "\tmov 8(%rbx), %rcx" << std::endl;
         outfile_ << "\tpush %rcx\n" << std::endl;
       }
       break;
-    case VARASSIGNLOAD:
+    case VARASSIGNLOAD:  // Always pop 3 things
 
       // Two cases one of it it's a deref, other if it's a var
       // Only add to map if it's a var
@@ -200,7 +201,7 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
         outfile_ << "\t# Loading a value into variable "
           + tac->target.reg().name() << std::endl;
         ClearRegister("rcx");
-        outfile_ << "\tpop %rcx" << std::endl;
+        outfile_ << "\tpop %rcx" << std::endl;  // VALUE
         outfile_ << "\tpop %rax" << std::endl;  // This is the FLAG
 
         if (currscope_ == FUNCTION) {
@@ -259,13 +260,11 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
         << "(%rbp), %rax" << std::endl;
       outfile_ << "\tmov %rax, -" << std::to_string(-8 + argumentnum*32)
         << "(%rbp)" << std::endl;
-      // Remake the "Int" object
-      outfile_ << "\tmovb $0, -" << std::to_string(argumentnum*32)
+      // Remake the objects flags
+      outfile_ << "\tmov " << std::to_string(16+argumentnum*8)
+        << "(%rbp), %rax" << std::endl;
+      outfile_ << "\tmov %rax, -" << std::to_string(argumentnum*32)
         << "(%rbp)" << std::endl;
-      outfile_ << "\tmovb $1, -" << std::to_string(-1 + argumentnum*32)
-        << "(%rbp)" << std::endl;
-      outfile_ << "\tmovl $0, -" << std::to_string(-2 + argumentnum*32)
-        << "(%rbp)\n" << std::endl;
       // Include it in the symbol table
       if (symbollocations_.count(varname) == 0) {
         symbollocations_.insert(std::pair<std::string, int>(varname,
@@ -284,20 +283,17 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
         tac->target.reg().name(), -16+-16*(symbollocations_.size()+1)));
       }
       outfile_ << "\t# Returning from function and loading value" << std::endl;
-
+      outfile_ << "\tmov (%rax), %rcx" << std::endl;
       // Update the whole structure with the correct type
       // (always returns an int) Then move it into the value field
       // Remake the "Int" object if it's a function
       if (currscope_ == FUNCTION) {
         // Update flags
-        outfile_ << "\tmovb $0,"
+        outfile_ << "\tmov %rcx,"
           << VariableNameHelper(tac->target.reg().name()) << std::endl;
         int index = symbollocations_.find(tac->target.reg().name())->second;
-        outfile_ << "\tmovb $1, " << std::to_string(index+1) << "(%rbp)\n";
-        outfile_ << "\tmovl $0, " << std::to_string(index+2) << "(%rbp)\n";
-
-
         // now load the value of rax in
+        outfile_ << "\tmov 8(%rax), %rax" << std::endl;
         outfile_ << "\tmovq %rax, " << std::to_string(index+8) << "(%rbp)\n"
           << std::endl;
       } else {
@@ -305,9 +301,8 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
         outfile_ << "\tmov "
           << VariableNameHelper(tac->target.reg().name())
           << ", %rbx" << std::endl;
-        outfile_ << "\tmovb $0, (%rbx)" << std::endl;
-        outfile_ << "\tmovb $1, 1(%rbx)" << std::endl;
-        outfile_ << "\tmovl $0, 2(%rbx)" << std::endl;
+        outfile_ << "\tmov %rcx, (%rbx)" << std::endl;
+        outfile_ << "\tmov 8(%rax), %rax" << std::endl;
         outfile_ << "\tmov %rax, 8(%rbx)\n" << std::endl;
       }
       break;
@@ -455,9 +450,40 @@ void CodeGen::GenerateBinaryExprHelper(
   // double pop from stack
   outfile_ << " btwn int, int\n";
   outfile_ << "\tpop %rbx" << std::endl;  // rbx = right value
-  outfile_ << "\tpop %r8" << std::endl;  // rcx = right flag
+  outfile_ << "\tpop %rcx" << std::endl;  // rcx = right flag
   outfile_ << "\tpop %rax" << std::endl;  // rax = left value
-  outfile_ << "\tpop %r9" << std::endl;  // rdx = left flag
+  outfile_ << "\tpop %rdx" << std::endl;  // rdx = left flag
+
+  outfile_ << "\tpush %rdx" << std::endl;
+  outfile_ << "\tpush %rax" << std::endl;
+  outfile_ << "\tpush %rcx" << std::endl;
+  outfile_ << "\tpush %rbx" << std::endl;
+
+  outfile_ << "\tshr $56, %rcx" << std::endl;
+  outfile_ << "\tmovzbl %cl, %rdi" << std::endl;
+
+  // Error Handling here
+  // Both things MUST be an integer as our language
+  // does not support "tuple addition"
+  outfile_ << "\tcall integerflagcheck" << std::endl;
+
+  outfile_ << "\tpop %rbx" << std::endl;  // rbx = right value
+  outfile_ << "\tpop %rcx" << std::endl;  // rcx = right flag
+  outfile_ << "\tpop %rax" << std::endl;  // rax = left value
+  outfile_ << "\tpop %rdx" << std::endl;  // rdx = left flag
+
+  outfile_ << "\tpush %rdx" << std::endl;
+  outfile_ << "\tpush %rax" << std::endl;
+  outfile_ << "\tpush %rcx" << std::endl;
+  outfile_ << "\tpush %rbx" << std::endl;
+
+  outfile_ << "\tshr $56, %rdx" << std::endl;
+  outfile_ << "\tmovzbl %dl, %rdi" << std::endl;
+  outfile_ << "\tcall integerflagcheck" << std::endl;
+  outfile_ << "\tpop %rbx" << std::endl;  // rbx = right value
+  outfile_ << "\tpop %rcx" << std::endl;  // rcx = right flag
+  outfile_ << "\tpop %rax" << std::endl;  // rax = left value
+  outfile_ << "\tpop %rdx" << std::endl;  // rdx = left flag
   // }
 }
 
@@ -498,6 +524,19 @@ std::vector<std::string> CodeGen::DereferenceParserHelper(
     resultvector.push_back(token);
   }
   return resultvector;
+}
+
+void CodeGen::GenerateCreateNewTuple() {
+  outfile_ << "newtuple:" << std::endl;
+  outfile_ << "\tmov $heap, %rbx" << std::endl;
+  outfile_ << "\tmov $bumpptr, %rcx" << std::endl;
+  outfile_ << "\tmov (%rcx), %rdx" << std::endl;
+
+  outfile_ << "\tadd %rdx, %rbx" << std::endl;
+  outfile_ << "\tadd %rdi, %rdx" << std::endl;
+  outfile_ << "\tmov %rdx, (%rcx)" << std::endl;
+  outfile_ << "\tmov %rbx, %rax" << std::endl;
+  outfile_ << "\tret" << std::endl;
 }
 
 void CodeGen::GenerateTupleFlagCheck() {
@@ -706,6 +745,7 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tmov $returnobj, %rcx" << std::endl;
         outfile_ << "\tmov %rbx, (%rcx)" << std::endl;
         outfile_ << "\tmov %rax, 8(%rcx)" << std::endl;
+        outfile_ << "\tmov $returnobj, %rax" << std::endl;
 
         outfile_ << "\tpop %rbx" << std::endl;
         outfile_ << "\tmov %rbp, %rsp" << std::endl;
@@ -729,7 +769,7 @@ void CodeGen::Generate(std::vector
             << code->target.label().name() << std::endl;
         if (parsedstring.size() == 2) {
           // REFACTOR OUT TO HELPER FUNCTION LATER
-          // ITS VERY LIKE VARIABLENAMEHELPER OR ANOTHER HELPER
+          // ITS VERY LIKELY VARIABLENAMEHELPER OR ANOTHER HELPER
           // FUNCTION CAN DO WHAT FUNCTIONS REQUIRE DITTO FOR RHS
           if (currscope_ == GLOBAL) {
             outfile_ << "\tmov " << VariableNameHelper(code->arg1.reg().name())
@@ -803,6 +843,7 @@ void CodeGen::Generate(std::vector
           }
         } else {
           outfile_ << "\tpop %rcx" << std::endl;
+          outfile_ << "\tpop %rdx" << std::endl;
           outfile_ << "\tpop %rbx" << std::endl;
           outfile_ << "\tpush %rcx" << std::endl;
 
@@ -878,6 +919,7 @@ void CodeGen::Generate(std::vector
 
             // Get the correct offset
             outfile_ << "\tpop %rax" << std::endl;
+            outfile_ << "\tpop %rcx" << std::endl;
             outfile_ << "\tsub $1, %rax" << std::endl;
             outfile_ << "\timul $16, %rax" << std::endl;
             outfile_ << "\tadd %rax, %rbx" << std::endl;
@@ -891,14 +933,8 @@ void CodeGen::Generate(std::vector
               // get the value stored and push it on the stack
 
               outfile_ << "\tpop %rbx" << std::endl;
-              // More error handling
-              outfile_ << "\t#Check if it's an int RHS DEREF" << std::endl;
-              outfile_ << "\tmovb (%rbx), %al" << std::endl;
-              outfile_ << "\tmovzx %al, %rdi" << std::endl;
-              outfile_ << "\tpush %rbx" << std::endl;
-              outfile_ << "\tcall integerflagcheck" << std::endl;
-              outfile_ << "\tpop %rbx\n" << std::endl;
               // Get the correct offset
+              outfile_ << "\tpush %rbx" << std::endl;
               outfile_ << "\tadd $8, %rbx" << std::endl;
               outfile_ << "\tmov (%rbx), %rcx" << std::endl;
               outfile_ << "\tpush %rcx\n" << std::endl;
@@ -933,6 +969,7 @@ void CodeGen::Generate(std::vector
 
             // Get the correct index of the object
             outfile_ << "\tpop %rax" << std::endl;
+            outfile_ << "\tpop %rcx" << std::endl;
             outfile_ << "\tsub $1, %rax" << std::endl;
             outfile_ << "\timul $16, %rax" << std::endl;
             outfile_ << "\tadd %rax, %rbx" << std::endl;
@@ -946,13 +983,7 @@ void CodeGen::Generate(std::vector
               // get the value stored and push it on the stack
 
               outfile_ << "\tpop %rbx" << std::endl;
-              // More error handling
-              outfile_ << "\t#Check if it's an int RHS DEREF" << std::endl;
-              outfile_ << "\tmovb (%rbx), %al" << std::endl;
-              outfile_ << "\tmovzx %al, %rdi" << std::endl;
               outfile_ << "\tpush %rbx" << std::endl;
-              outfile_ << "\tcall integerflagcheck" << std::endl;
-              outfile_ << "\tpop %rbx\n" << std::endl;
               // Get the correct offset
               outfile_ << "\tadd $8, %rbx" << std::endl;
               outfile_ << "\tmov (%rbx), %rcx" << std::endl;
@@ -960,8 +991,9 @@ void CodeGen::Generate(std::vector
             }
           }
         } else {
-          outfile_ << "\tpop %rcx" << std::endl;
-          outfile_ << "\tpop %rbx" << std::endl;
+          outfile_ << "\tpop %rcx" << std::endl;  // value
+          outfile_ << "\tpop %rax" << std::endl;  // flags
+          outfile_ << "\tpop %rbx" << std::endl;  // address
           outfile_ << "\tpush %rcx" << std::endl;
           // Error Handling here to check the size + if you're actually an tuple
           outfile_ << "\t#Error Handling Here DerefChild" << std::endl;
@@ -1003,13 +1035,7 @@ void CodeGen::Generate(std::vector
             // get the value stored and push it on the stack
 
             outfile_ << "\tpop %rbx" << std::endl;
-            // More error handling
-            outfile_ << "\t#Check if it's an int RHS DEREF" << std::endl;
-            outfile_ << "\tmovb (%rbx), %al" << std::endl;
-            outfile_ << "\tmovzx %al, %rdi" << std::endl;
             outfile_ << "\tpush %rbx" << std::endl;
-            outfile_ << "\tcall integerflagcheck" << std::endl;
-            outfile_ << "\tpop %rbx\n" << std::endl;
             // Get the correct offset
             outfile_ << "\tadd $8, %rbx" << std::endl;
             outfile_ << "\tmov (%rbx), %rcx" << std::endl;
@@ -1021,10 +1047,11 @@ void CodeGen::Generate(std::vector
         outfile_ << "\t# Making a tuple for variable: "
           << code->target.label().name() << std::endl;
         outfile_ << "\tpop %rcx" << std::endl;
+        outfile_ << "\tpop %rdx" << std::endl;
         outfile_ << "\tpush %rcx" << std::endl;
         outfile_ << "\timul $16, %rcx" << std::endl;
         outfile_ << "\tmov %rcx, %rdi" << std::endl;
-        outfile_ << "\tcall malloc" << std::endl;
+        outfile_ << "\tcall newtuple" << std::endl;
 
         outfile_ << "\tpop %rcx" << std::endl;
         outfile_ << "\tpop %rbx" << std::endl;

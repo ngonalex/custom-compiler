@@ -230,9 +230,9 @@ void LowererVisitor::VisitAssignmentFromArithExp(
   assignment.rhs().Visit(const_cast<LowererVisitor*>(this));
 
   Operand arg1 = Operand(blocks_[blocks_.size()-1]->target.reg());
-  if (lastchildtype_ == DEREFCHILD) {
-    blocks_[blocks_.size()-1]->op = Opcode(RHSTUPLEDEREFERENCE);
-  }
+  // if (lastchildtype_ == DEREFCHILD) {
+  //   blocks_[blocks_.size()-1]->op = Opcode(RHSTUPLEDEREFERENCE);
+  // }
   CreateArithmeticAssignment(lhstarget, arg1);
 }
 

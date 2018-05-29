@@ -47,7 +47,7 @@ class CodeGen {
     void GenerateTupleSizeCheck();
     void GenerateUnboxer();
     void GenerateBoxer();
-    void GetNewMemoryLocation();
+    void GenerateCreateNewTuple();
 
     // This function checks if the current scope is function or global
     // If it's global then it just returns the name of the variable

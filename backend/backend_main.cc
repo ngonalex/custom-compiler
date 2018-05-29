@@ -62,45 +62,51 @@ int main() {
     make_unique<const SubtractExpr>(
       make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(1)))));
 
-  // statements.push_back(std::move(make_unique<const AssignmentFromNewTuple>(
-  //     make_unique<const VariableExpr>("x"),
-  //     make_unique<const IntegerExpr>(3))));
+  statements.push_back(std::move(make_unique<const AssignmentFromNewTuple>(
+      make_unique<const VariableExpr>("x"),
+      make_unique<const IntegerExpr>(3))));
 
-  // statements.push_back(std::move(make_unique<const AssignmentFromNewTuple>(
-  //     make_unique<const Dereference>(
-  //       make_unique<const VariableExpr>("x"),
-  //       make_unique<const IntegerExpr>(1)),
-  //     make_unique<const IntegerExpr>(10))));
+  statements.push_back(std::move(make_unique<const AssignmentFromNewTuple>(
+      make_unique<const Dereference>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(1)),
+      make_unique<const IntegerExpr>(10))));
 
-  //     statements.push_back(std::move(make_unique<const AssignmentFromArithExp>(
-  //     make_unique<const Dereference>(
-  //       make_unique<const VariableExpr>("x"),
-  //       make_unique<const IntegerExpr>(2)),
-  //     make_unique<const IntegerExpr>(1000))));
+      statements.push_back(std::move(make_unique<const AssignmentFromArithExp>(
+      make_unique<const Dereference>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(2)),
+      make_unique<const IntegerExpr>(1000))));
 
-  // statements.push_back(std::move(make_unique<const AssignmentFromArithExp>(
-  //     make_unique<const Dereference>(
-  //       make_unique<const Dereference>(
-  //         make_unique<const VariableExpr>("x"),
-  //         make_unique<const IntegerExpr>(1)),
-  //       make_unique<const IntegerExpr>(2)),
-  //     make_unique<const IntegerExpr>(100))));
+        statements.push_back(std::move(make_unique<const AssignmentFromArithExp>(
+     make_unique<const VariableExpr>("y"),
+     make_unique<const Dereference>(
+       make_unique<const VariableExpr>("x"),
+       make_unique<const IntegerExpr>(2)))));
 
-  // statements.push_back(std::move(make_unique<const AssignmentFromArithExp>(
-  //   make_unique<const Dereference>(
-  //       make_unique<const VariableExpr>("x"),
-  //       make_unique<const IntegerExpr>(2)),
-  //   make_unique<const Dereference>(
-  //     make_unique<const Dereference>(
-  //       make_unique<const VariableExpr>("x"),
-  //       make_unique<const IntegerExpr>(1)),
-  //     make_unique<const IntegerExpr>(2)))));
+  statements.push_back(std::move(make_unique<const AssignmentFromArithExp>(
+      make_unique<const Dereference>(
+        make_unique<const Dereference>(
+          make_unique<const VariableExpr>("x"),
+          make_unique<const IntegerExpr>(1)),
+        make_unique<const IntegerExpr>(2)),
+      make_unique<const IntegerExpr>(100))));
 
-  // statements.push_back(std::move(make_unique<const AssignmentFromArithExp>(
-  //    make_unique<const VariableExpr>("y"),
-  //    make_unique<const Dereference>(
-  //      make_unique<const VariableExpr>("x"),
-  //      make_unique<const IntegerExpr>(2)))));
+  statements.push_back(std::move(make_unique<const AssignmentFromArithExp>(
+    make_unique<const Dereference>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(2)),
+    make_unique<const Dereference>(
+      make_unique<const Dereference>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(1)),
+      make_unique<const IntegerExpr>(2)))));
+
+  statements.push_back(std::move(make_unique<const AssignmentFromArithExp>(
+     make_unique<const VariableExpr>("y"),
+     make_unique<const Dereference>(
+       make_unique<const VariableExpr>("x"),
+       make_unique<const IntegerExpr>(2)))));
 
   auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
 
@@ -141,45 +147,45 @@ int main() {
       make_unique<VariableExpr>("bobMONEY"),
       make_unique<VariableExpr>("bob")))));
 
-  // fact_body.push_back(std::move(make_unique<const AssignmentFromNewTuple>(
-  //     make_unique<const VariableExpr>("x"),
-  //     make_unique<const IntegerExpr>(3))));
+  fact_body.push_back(std::move(make_unique<const AssignmentFromNewTuple>(
+      make_unique<const VariableExpr>("x"),
+      make_unique<const IntegerExpr>(3))));
 
-  // fact_body.push_back(std::move(make_unique<const AssignmentFromNewTuple>(
-  //     make_unique<const Dereference>(
-  //       make_unique<const VariableExpr>("x"),
-  //       make_unique<const IntegerExpr>(1)),
-  //     make_unique<const IntegerExpr>(10))));
+  fact_body.push_back(std::move(make_unique<const AssignmentFromNewTuple>(
+      make_unique<const Dereference>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(1)),
+      make_unique<const IntegerExpr>(10))));
 
-      // fact_body.push_back(std::move(make_unique<const AssignmentFromArithExp>(
-      // make_unique<const Dereference>(
-      //   make_unique<const VariableExpr>("x"),
-      //   make_unique<const IntegerExpr>(2)),
-      // make_unique<const IntegerExpr>(1000))));
+      fact_body.push_back(std::move(make_unique<const AssignmentFromArithExp>(
+      make_unique<const Dereference>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(2)),
+      make_unique<const IntegerExpr>(1000))));
 
-  // fact_body.push_back(std::move(make_unique<const AssignmentFromArithExp>(
-  //     make_unique<const Dereference>(
-  //       make_unique<const Dereference>(
-  //         make_unique<const VariableExpr>("x"),
-  //         make_unique<const IntegerExpr>(1)),
-  //       make_unique<const IntegerExpr>(2)),
-  //     make_unique<const IntegerExpr>(100))));
+  fact_body.push_back(std::move(make_unique<const AssignmentFromArithExp>(
+      make_unique<const Dereference>(
+        make_unique<const Dereference>(
+          make_unique<const VariableExpr>("x"),
+          make_unique<const IntegerExpr>(1)),
+        make_unique<const IntegerExpr>(2)),
+      make_unique<const IntegerExpr>(100))));
 
-  // fact_body.push_back(std::move(make_unique<const AssignmentFromArithExp>(
-  //   make_unique<const Dereference>(
-  //       make_unique<const VariableExpr>("x"),
-  //       make_unique<const IntegerExpr>(2)),
-  //   make_unique<const Dereference>(
-  //     make_unique<const Dereference>(
-  //       make_unique<const VariableExpr>("x"),
-  //       make_unique<const IntegerExpr>(1)),
-  //     make_unique<const IntegerExpr>(2)))));
+  fact_body.push_back(std::move(make_unique<const AssignmentFromArithExp>(
+    make_unique<const Dereference>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(2)),
+    make_unique<const Dereference>(
+      make_unique<const Dereference>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(1)),
+      make_unique<const IntegerExpr>(2)))));
 
-  // fact_body.push_back(std::move(make_unique<const AssignmentFromArithExp>(
-  //    make_unique<const VariableExpr>("y"),
-  //    make_unique<const Dereference>(
-  //      make_unique<const VariableExpr>("x"),
-  //      make_unique<const IntegerExpr>(2)))));
+  fact_body.push_back(std::move(make_unique<const AssignmentFromArithExp>(
+     make_unique<const VariableExpr>("y"),
+     make_unique<const Dereference>(
+       make_unique<const VariableExpr>("x"),
+       make_unique<const IntegerExpr>(2)))));
 
   fact_body.push_back(std::move(make_unique<Conditional>(
     make_unique<GreaterThanExpr>(
