@@ -65,7 +65,10 @@ void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddress
       cfg_vector.push_back(block);
       ++creation_order;
     } else {
-      new_block.push_back(make_unique<struct ThreeAddressCode>(iter));
+      auto block = make_unique<struct ThreeAddressCode>();
+      block->target = iter->target;
+      block->op = iter->op;
+      new_block.push_back(std::move(block));
     }
 
   } 
@@ -82,7 +85,10 @@ ControlFlowGraphNode::ControlFlowGraphNode() {
 
 ControlFlowGraphNode::ControlFlowGraphNode(std::vector<std::unique_ptr<struct ThreeAddressCode>> input) {
   for (const auto& iter: input) {
-    localblock_.push_back(make_unique<ThreeAddressCode>(iter));
+    auto block = make_unique<struct ThreeAddressCode>();
+    block->target = iter->target;
+    block->op = iter->op;
+    localblock_.push_back(std::move(block));
   }
   creation_order = 0;
   leftnode_ = NULL;
@@ -96,7 +102,10 @@ ControlFlowGraphNode::ControlFlowGraphNode(const ControlFlowGraphNode &copy) {
   // Because it is a vector of unique pointers
   // Each element has to be manually copied
   for (const auto& iter: copy.GetLocalBlock()) {
-    localblock_.push_back(make_unique<struct ThreeAddressCode>(iter));
+    auto block = make_unique<struct ThreeAddressCode>();
+    block->target = iter->target;
+    block->op = iter->op;
+    localblock_.push_back(std::move(block));
   }
   //localblock_ = block_copy;
   creation_order = copy.GetCreationOrder();
@@ -109,7 +118,10 @@ ControlFlowGraphNode& ControlFlowGraphNode::operator=(ControlFlowGraphNode &copy
   //localblock_ = copy.GetLocalBlock();
   localblock_.clear();
   for (const auto& iter: copy.GetLocalBlock()) {
-    localblock_.push_back(make_unique<struct ThreeAddressCode>(iter));
+    auto block = make_unique<struct ThreeAddressCode>();
+    block->target = iter->target;
+    block->op = iter->op;
+    localblock_.push_back(std::move(block));
   }
   creation_order = copy.GetCreationOrder();
   leftnode_ = copy.GetLeftNode();
@@ -120,8 +132,11 @@ ControlFlowGraphNode& ControlFlowGraphNode::operator=(ControlFlowGraphNode &copy
 
 void ControlFlowGraphNode::SetLocalBlock(std::vector<std::unique_ptr<struct ThreeAddressCode>> input) {
   for (const auto& iter: input) {
-    localblock_.push_back(make_unique<ThreeAddressCode>(iter));
-  } 
+    auto block = make_unique<struct ThreeAddressCode>();
+    block->target = iter->target;
+    block->op = iter->op;
+    localblock_.push_back(std::move(block));
+  }
 }
 
 void ControlFlowGraphNode::SetLeftNode(std::unique_ptr<ControlFlowGraphNode> input) {

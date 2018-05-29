@@ -30,17 +30,24 @@ class ControlFlowGraphNode {
    //return std::move(localblock_);
     std::vector<std::unique_ptr<struct ThreeAddressCode>> local_block_copy;
     for (const auto& iter: localblock_) {
-      local_block_copy.push_back(make_unique<struct ThreeAddressCode>(iter));
+      auto block = make_unique<struct ThreeAddressCode>();
+      block->target = iter->target;
+      block->op = iter->op;
+      local_block_copy.push_back(std::move(block));
     }
     return std::move(local_block_copy);
 
   }
   ControlFlowGraphNode(const ControlFlowGraphNode &copy);
   std::unique_ptr<ControlFlowGraphNode> GetLeftNode() const {
-    return std::move(make_unique<ControlFlowGraphNode>(leftnode_)); 
+    auto leftcopy = make_unique<class ControlFlowGraphNode>();
+    leftcopy = leftnode_;
+    return std::move(leftcopy); 
   }
   std::unique_ptr<ControlFlowGraphNode> GetRightNode() const {
-    return std::move(make_unique<ControlFlowGraphNode>(rightnode_)); 
+    auto rightcopy = make_unique<class ControlFlowGraphNode>();
+    rightcopy = rightnode_;
+    return std::move(rightcopy); 
   }
   int GetCreationOrder() const {
     return creation_order;
