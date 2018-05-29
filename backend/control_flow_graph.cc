@@ -5,7 +5,7 @@ namespace backend {
 
 ControlFlowGraph::ControlFlowGraph
 (std::vector<std::unique_ptr<struct ThreeAddressCode>> input) {
-  CreateCFG(input);
+  CreateCFG(std::move(input));
 }
 
 std::unique_ptr<ControlFlowGraphNode> RecursiveCreate(std::vector<ControlFlowGraphNode> graph_set) {
@@ -32,34 +32,34 @@ void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddress
   int creation_order = 0;
   for (const auto &iter: input) {
     if (iter->op.opcode() == CONDITIONAL) {
-      ControlFlowGraphNode conditional_block(new_block);
+      ControlFlowGraphNode conditional_block(std::move(new_block));
       conditional_block.SetCreationOrder(creation_order);
       conditional_block.SetBlockType(CONDITIONAL_BLOCK);
       new_block.clear();
       cfg_vector.push_back(conditional_block);
       ++creation_order;
     } else if (iter->op.opcode() == LOOP) {
-      ControlFlowGraphNode loop_block(new_block);
+      ControlFlowGraphNode loop_block(std::move(new_block));
       loop_block.SetCreationOrder(creation_order);
       loop_block.SetBlockType(LOOP_BLOCK);
       new_block.clear();
       cfg_vector.push_back(loop_block);
       ++creation_order;
     } else if (iter->op.opcode() == FUNCALL) {
-      ControlFlowGraphNode function_block(new_block);
+      ControlFlowGraphNode function_block(std::move(new_block));
       function_block.SetCreationOrder(creation_order);
       function_block.SetBlockType(FUNCTION_BLOCK);
       new_block.clear();
       cfg_vector.push_back(function_block);
       ++creation_order;
     } else if (iter->op.opcode() == JUMP) {
-      ControlFlowGraphNode block(new_block);
+      ControlFlowGraphNode block(std::move(new_block));
       block.SetCreationOrder(creation_order);
       new_block.clear();
       cfg_vector.push_back(block);
       ++creation_order;
     } else if (iter == input.back()) {
-      ControlFlowGraphNode block(new_block);
+      ControlFlowGraphNode block(std::move(new_block));
       block.SetCreationOrder(creation_order);
       new_block.clear();
       cfg_vector.push_back(block);
@@ -94,6 +94,25 @@ ControlFlowGraphNode::ControlFlowGraphNode(std::vector<std::unique_ptr<struct Th
   leftnode_ = NULL;
   rightnode_ = NULL;
   blocktype_ = NO_TYPE;
+}
+std::unique_ptr<ControlFlowGraphNode> ControlFlowGraphNode::GetLeftNode() const {
+  auto leftcopy = make_unique<class ControlFlowGraphNode>();
+  leftcopy->SetBlockType(leftnode_->GetBlockType()); 
+  leftcopy->SetCreationOrder(leftnode_->GetCreationOrder());
+  leftcopy->SetLocalBlock(leftnode_->GetLocalBlock());
+  leftcopy->SetLeftNode(leftnode_->GetLeftNode());
+  leftcopy->SetRightNode(leftnode_->GetRightNode());
+  return std::move(leftcopy); 
+}
+
+std::unique_ptr<ControlFlowGraphNode> ControlFlowGraphNode::GetRightNode() const {
+  auto rightcopy = make_unique<class ControlFlowGraphNode>();
+  rightcopy->SetBlockType(rightnode_->GetBlockType()); 
+  rightcopy->SetCreationOrder(rightnode_->GetCreationOrder());
+  rightcopy->SetLocalBlock(rightnode_->GetLocalBlock());
+  rightcopy->SetLeftNode(rightnode_->GetLeftNode());
+  rightcopy->SetRightNode(rightnode_->GetRightNode());
+  return std::move(rightcopy); 
 }
 
 ControlFlowGraphNode::ControlFlowGraphNode(const ControlFlowGraphNode &copy) {

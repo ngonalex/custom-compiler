@@ -39,16 +39,8 @@ class ControlFlowGraphNode {
 
   }
   ControlFlowGraphNode(const ControlFlowGraphNode &copy);
-  std::unique_ptr<ControlFlowGraphNode> GetLeftNode() const {
-    auto leftcopy = make_unique<class ControlFlowGraphNode>();
-    leftcopy = leftnode_;
-    return std::move(leftcopy); 
-  }
-  std::unique_ptr<ControlFlowGraphNode> GetRightNode() const {
-    auto rightcopy = make_unique<class ControlFlowGraphNode>();
-    rightcopy = rightnode_;
-    return std::move(rightcopy); 
-  }
+  std::unique_ptr<ControlFlowGraphNode> GetLeftNode() const;
+  std::unique_ptr<ControlFlowGraphNode> GetRightNode() const;
   int GetCreationOrder() const {
     return creation_order;
   }
