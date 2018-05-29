@@ -10,22 +10,24 @@ using namespace cs160::frontend;
 TEST(RelationlHelper, gtoet) {
   GreaterThanOrEqualToOpParser opParser;
   ParseStatus result;
-  result.status = false;
-  result.remainingCharacters = ">=";
+  result.status = true;
+  result.remainingCharacters = "";
+  result.parsedCharacters = ">=";
 
-  ParseStatus testResult = opParser.parse("");
+  ParseStatus testResult = opParser.parse(">=");
 
   EXPECT_EQ(testResult, result);
 }
 
 // Success Case <=
-TEST(RelationlHelper, gtolt) {
+TEST(RelationlHelper, ltoet) {
   LessThanOrEqualToOpParser opParser;
   ParseStatus result;
-  result.status = false;
-  result.remainingCharacters = "<=";
+  result.status = true;
+  result.remainingCharacters = "";
+  result.parsedCharacters = "<=";
 
-  ParseStatus testResult = opParser.parse("");
+  ParseStatus testResult = opParser.parse("<=");
 
   EXPECT_EQ(testResult, result);
 }
@@ -34,10 +36,11 @@ TEST(RelationlHelper, gtolt) {
 TEST(RelationlHelper, eqto) {
   EqualToOpParser opParser;
   ParseStatus result;
-  result.status = false;
-  result.remainingCharacters = "==";
+  result.status = true;
+  result.remainingCharacters = "";
+  result.parsedCharacters = "==";
 
-  ParseStatus testResult = opParser.parse("");
+  ParseStatus testResult = opParser.parse("==");
 
   EXPECT_EQ(testResult, result);
 }
@@ -46,10 +49,11 @@ TEST(RelationlHelper, eqto) {
 TEST(RelationlHelper, gt) {
   GreaterThanOpParser opParser;
   ParseStatus result;
-  result.status = false;
-  result.remainingCharacters = ">";
+  result.status = true;
+  result.remainingCharacters = "";
+  result.parsedCharacters = ">";
 
-  ParseStatus testResult = opParser.parse("");
+  ParseStatus testResult = opParser.parse(">");
 
   EXPECT_EQ(testResult, result);
 }
@@ -58,10 +62,11 @@ TEST(RelationlHelper, gt) {
 TEST(RelationlHelper, lt) {
   LessThanOpParser opParser;
   ParseStatus result;
-  result.status = false;
-  result.remainingCharacters = "<";
+  result.status = true;
+  result.remainingCharacters = "";
+  result.parsedCharacters = "<";
 
-  ParseStatus testResult = opParser.parse("");
+  ParseStatus testResult = opParser.parse("<");
 
   EXPECT_EQ(testResult, result);
 }
@@ -70,10 +75,11 @@ TEST(RelationlHelper, lt) {
 TEST(RelationlHelper, andP) {
   AndOpParser opParser;
   ParseStatus result;
-  result.status = false;
-  result.remainingCharacters = "&&";
+  result.status = true;
+  result.remainingCharacters = "";
+  result.parsedCharacters = "&&";
 
-  ParseStatus testResult = opParser.parse("");
+  ParseStatus testResult = opParser.parse("&&");
 
   EXPECT_EQ(testResult, result);
 }
@@ -82,10 +88,11 @@ TEST(RelationlHelper, andP) {
 TEST(RelationlHelper, orP) {
   OrOpParser opParser;
   ParseStatus result;
-  result.status = false;
-  result.remainingCharacters = "||";
+  result.status = true;
+  result.remainingCharacters = "";
+  result.parsedCharacters = "||";
 
-  ParseStatus testResult = opParser.parse("");
+  ParseStatus testResult = opParser.parse("||");
 
   EXPECT_EQ(testResult, result);
 }
@@ -94,41 +101,23 @@ TEST(RelationlHelper, orP) {
 TEST(RelationlHelper, notP) {
   NotOpParser opParser;
   ParseStatus result;
-  result.status = false;
-  result.remainingCharacters = "!";
+  result.status = true;
+  result.remainingCharacters = "";
+  result.parsedCharacters = "!";
 
-  ParseStatus testResult = opParser.parse("");
+  ParseStatus testResult = opParser.parse("!");
 
   EXPECT_EQ(testResult, result);
 }
 
 TEST(RelationHelper, allParser) {
+  RelationOperator parser;
+  ParseStatus result;
+  result.status = true;
+  result.remainingCharacters = "";
+  result.parsedCharacters = ">=";
 
+  ParseStatus testResult = parser.parse(">=");
 
-
-    EqualToOpParser equalTo;
-    GreaterThanOpParser greaterThan;
-    LessThanOpParser lessThan;
-    GreaterThanOrEqualToOpParser greaterOrEqual;
-    LessThanOrEqualToOpParser lessOrEqual;
-      // > or <
-    OrCombinator greaterOrLess;
-    greaterOrLess.firstParser = reinterpret_cast<NullParser *>(&greaterThan);
-    greaterOrLess.secondParser = reinterpret_cast<NullParser *>(&lessThan);
-    // >= or <=
-    OrCombinator orEqualTo;
-    orEqualTo.firstParser = reinterpret_cast<NullParser *>(&greaterOrEqual);
-    orEqualTo.secondParser = reinterpret_cast<NullParser *>(&lessOrEqual);
-    // > or < or >= or <=
-    OrCombinator both;
-    both.firstParser = reinterpret_cast<NullParser *>(&orEqualTo);
-    both.secondParser = reinterpret_cast<NullParser *>(&greaterOrLess);
-    // == or > or < or >= or <=
-    OrCombinator all;
-    all.firstParser = reinterpret_cast<NullParser *>(&equalTo);
-    all.secondParser = reinterpret_cast<NullParser *>(&both);
-
-    ParseStatus result;
-    result.status = false;
-    result.remainingCharacters = "!";
+  EXPECT_EQ(testResult, result);
 }

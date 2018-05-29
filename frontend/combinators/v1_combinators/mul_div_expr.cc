@@ -40,10 +40,10 @@ std::unique_ptr<const ArithmeticExpr> MulDivExprParser::make_node(std::string op
   std::unique_ptr<const ArithmeticExpr> first_leaf,
   std::unique_ptr<const ArithmeticExpr> second_leaf) {
   if (op == "*") {
-      return make_unique<MultiplyExpr>(std::move(first_leaf),
+      return make_unique<const MultiplyExpr>(std::move(first_leaf),
 																		 std::move(second_leaf));
    } else if (op == "/") {
-      return make_unique<DivideExpr>(std::move(first_leaf),
+      return make_unique<const DivideExpr>(std::move(first_leaf),
 																   std::move(second_leaf));
   } else {
     return nullptr;

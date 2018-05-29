@@ -33,29 +33,9 @@ ParseStatus RelationBodyParser::parse(std::string inputProgram, std::string erro
 	if (result.status) {
     errorMessage = "Expected Relation Operator (>, >=, <, <=, ==)";
     // Bunch of crap to parse all the operators
-    EqualToOpParser equalTo;
-    GreaterThanOpParser greaterThan;
-    LessThanOpParser lessThan;
-    GreaterThanOrEqualToOpParser greaterOrEqual;
-    LessThanOrEqualToOpParser lessOrEqual;
-      // > or <
-    OrCombinator greaterOrLess;
-    greaterOrLess.firstParser = reinterpret_cast<NullParser *>(&greaterThan);
-    greaterOrLess.secondParser = reinterpret_cast<NullParser *>(&lessThan);
-    // >= or <=
-    OrCombinator orEqualTo;
-    orEqualTo.firstParser = reinterpret_cast<NullParser *>(&greaterOrEqual);
-    orEqualTo.secondParser = reinterpret_cast<NullParser *>(&lessOrEqual);
-    // > or < or >= or <=
-    OrCombinator both;
-    both.firstParser = reinterpret_cast<NullParser *>(&orEqualTo);
-    both.secondParser = reinterpret_cast<NullParser *>(&greaterOrLess);
-    // == or > or < or >= or <=
-    OrCombinator all;
-    all.firstParser = reinterpret_cast<NullParser *>(&equalTo);
-    all.secondParser = reinterpret_cast<NullParser *>(&both);
+    RelationOperator relOpParser;
 
-    ParseStatus result2 = all.parse(result.remainingCharacters);
+    ParseStatus result2 = relOpParser.parse(result.remainingCharacters);
 
     // Second Arithmetic Expression
     if (result2.status) {

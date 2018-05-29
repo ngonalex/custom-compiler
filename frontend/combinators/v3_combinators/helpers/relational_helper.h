@@ -47,6 +47,11 @@ class NotOpParser : NullParser {
    virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
 };
 
+class RelationOperator : NullParser {
+ public:
+   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
+};
+
 } // namespace frontend
 } // namespace cs160
 
