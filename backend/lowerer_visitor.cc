@@ -20,10 +20,12 @@ std::string LowererVisitor::GetOutput() {
   std::string output = "";
 
   // Probably make this a private variable or something?
-  std::vector<std::string> printhelper = {"intload", "VARLOAD", "VARASSIGNLOAD"
-    "FUNARGLOAD", "FUNRETLOAD, ""+", "-", "*", "/", "<", "<=", ">", ">=",
+  std::vector<std::string> printhelper = {"INTLOAD", "VARLOAD", "VARASSIGNLOAD",
+    "FUNARGLOAD", "FUNRETLOAD", "+", "-", "*", "/", "<", "<=", ">", ">=",
     "==", "&&", "||", "¬", "while", "if", "jmp", "je", "jne", "jg", "jge",
-    "jl", "jle", "MkLabel"};
+    "jl", "jle", "MkLabel", "call", "return", "def", "FUNPROLOGUE", "FUNEPILOGUE", "PRINTARITH", "NOTYPE",
+    "LHSDEREFERENCE", "RHSINTDEREFERENCE", "RHSTUPLEDEREFERENCE", "NEWTUPLE", "VARCHILDTUPLE"};
+
 
   for (unsigned int i = 0; i < blocks_.size(); ++i) {
     // If it's a just a int (Register without a name then access it's value)
