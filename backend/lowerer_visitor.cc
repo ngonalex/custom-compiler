@@ -4,11 +4,6 @@
 namespace cs160 {
 namespace backend {
 
-  /*EXPTYPE -> TUP | INT
-  TUP(EXPTYPE)
-  INT(NONE)
-  "a" -> TUP(TUP(INT))*/
-
 std::string LowererVisitor::GetOutputArithmeticHelper(std::string output,
   int index, std::vector<std::string> printhelper) {
   output = output + blocks_[index]->target.reg().name()
