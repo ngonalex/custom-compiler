@@ -176,6 +176,6 @@ ParseStatus RelationOperator::parse(std::string inputProgram, std::string errorT
   OrCombinator all;
   all.firstParser = reinterpret_cast<NullParser *>(&equalTo);
   all.secondParser = reinterpret_cast<NullParser *>(&both);
-
+	
 	return all.parse(inputProgram);
 }

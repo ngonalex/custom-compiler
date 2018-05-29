@@ -1,6 +1,6 @@
 #include "frontend/combinators/v1_combinators/ae.h"
 #include "frontend/combinators/v3_combinators/relation_body.h"
-#include "frontend/combinators/v3_combinators/helpers/relational_helpers.h"
+#include "frontend/combinators/v3_combinators/helpers/relational_helper.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 #include <string>     // std::string, std::stoi
 
@@ -26,7 +26,7 @@ ParseStatus RelationBodyParser::parse(std::string inputProgram, std::string erro
 
   // First Arithmetic Expression
   ArithExprParser aeParser;
-  ParseStatus result = aeParser.Parse(inputProgram) ;
+  ParseStatus result = aeParser.parse(inputProgram);
   std::string errorMessage = "Expected Arithmetic Expression";
 
   // Relational Operator
@@ -36,21 +36,20 @@ ParseStatus RelationBodyParser::parse(std::string inputProgram, std::string erro
     RelationOperator relOpParser;
 
     ParseStatus result2 = relOpParser.parse(result.remainingCharacters);
-
     // Second Arithmetic Expression
     if (result2.status) {
+      result2.parsedCharacters = result.parsedCharacters + result2.parsedCharacters;
       errorMessage = "Expected an Arithmetic Expression after Relation Operator";
       ArithExprParser aeParser;
-      ParseStatus result = aeParser.Parse(result2.remainingCharacters); 
+      ParseStatus result3 = aeParser.parse(result2.remainingCharacters); 
       if (result3.status) {
+        result3.parsedCharacters = result2.parsedCharacters + result2.parsedCharacters;
         result3.ast = std::move((std::move(result.ast), 
           result2.parsedCharacters, std::move(result3.ast)));
         return result3;
       }
        // TODO: Check logic operators
     }
-   
-    
   } 
   
   // TODO: Recheck this. It's probably wrong
@@ -63,13 +62,14 @@ ParseStatus RelationBodyParser::parse(std::string inputProgram, std::string erro
 }
 
 // ae rop ae
-std::unique_ptr<const ArithmeticExpr> RelationBodyParser::make_node(std::unique_ptr<const ArithmeticExpr> first_ae, 
-  std::string rop, std::unique_ptr<const ArithmeticExpr> second_ae) {
+   std::unique_ptr<const RelationalBinaryOperator> RelationBodyParser::make_node(
+     std::unique_ptr<const ArithmeticExpr> first_ae, 
+     std::string rop, std::unique_ptr<const ArithmeticExpr> second_ae) {
   if (rop == "<") {
     return make_unique<const LessThanExpr>(std::move(first_ae), std::move(second_ae));
   } else if (rop == "<=") {
     return make_unique<const LessThanEqualToExpr>(std::move(first_ae), std::move(second_ae));
-  } else if (reop == ">") {
+  } else if (rop == ">") {
     return make_unique<const GreaterThanExpr>(std::move(first_ae), std::move(second_ae));
   } else if (rop == ">=") {
     return make_unique<const GreaterThanEqualToExpr>(std::move(first_ae), std::move(second_ae));

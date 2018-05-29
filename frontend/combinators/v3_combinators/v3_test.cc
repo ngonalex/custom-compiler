@@ -2,6 +2,7 @@
 #include "abstract_syntax/print_visitor_v2.h"
 #include "frontend/combinators/v1_combinators/ae.h"
 #include "frontend/combinators/v3_combinators/helpers/relational_helper.h"
+#include "frontend/combinators/v3_combinators/relation_parser.h"
 #include "gtest/gtest.h"
 
 using namespace cs160::frontend;
@@ -120,4 +121,13 @@ TEST(RelationHelper, allParser) {
   ParseStatus testResult = parser.parse(">=");
 
   EXPECT_EQ(testResult, result);
+}
+
+TEST(RelationExpression, greaterThan) {
+  RelationParser parser;
+  ParseStatus result = parser.parse("x >= 3");
+
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "x >= 3");
 }

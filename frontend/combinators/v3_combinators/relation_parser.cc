@@ -1,5 +1,6 @@
 #include "frontend/combinators/v3_combinators/relation_parser.h"
-#include "frontend/combinators/v3_combinators/helpers/relational_helpers.h"
+#include "frontend/combinators/v3_combinators/relation_body.h"
+#include "frontend/combinators/v3_combinators/helpers/relational_helper.h"
 #include <string>     // std::string, std::stoi
 
 /*
@@ -24,20 +25,20 @@ ParseStatus RelationParser::parse(std::string inputProgram, std::string errorTyp
 
   RelationBodyParser re;
 
-  NotParser notParser;
-  ParseStatus notResult = notParse.Parse(inputProgram);
-  if (notResult.success) {
+  NotOpParser notParser;
+  ParseStatus notResult = notParser.parse(inputProgram);
+  if (notResult.status) {
     // ! REXPR
-    ParseStatus reResult = re.Parser(notResult.remainingCharacters);
-    if (reResult.status()) {
+    ParseStatus reResult = re.parse(notResult.remainingCharacters);
+    if (reResult.status) {
       reResult.ast = make_unique<const LogicalNotExpr>(
         unique_cast<const RelationalExpr>(std::move(reResult.ast)));
     }
   } else {
     // REXPR
-    ParseStatus reResult = re.Parser(inputProgram);
-    if (reResult.status()) {
-      return result;
+    ParseStatus reResult = re.parse(inputProgram);
+    if (reResult.status) {
+      return reResult;
     }
   }
 

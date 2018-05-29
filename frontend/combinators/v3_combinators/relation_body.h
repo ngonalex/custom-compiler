@@ -11,7 +11,7 @@ class RelationBodyParser : NullParser {
  public:
    virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
    
-   std::unique_ptr<const RelationalBinaryOperator> RelationBodyParser::make_node(
+   std::unique_ptr<const RelationalBinaryOperator> make_node(
      std::unique_ptr<const ArithmeticExpr> first_ae, 
      std::string rop, std::unique_ptr<const ArithmeticExpr> second_ae);
 
