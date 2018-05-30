@@ -18,18 +18,6 @@ class ParseStatus { // Super class
 	std::string remainingCharacters;
 	std::string parsedCharacters;
 
-	// Only for the success case
-	std::unique_ptr<const AstNode> ast;
-
-	// Only for And Combinator
-	std::unique_ptr<const AstNode> second_ast;
-
-	// Only for zero_or_more and one_or_more case when returning multiple ast nodes
-	std::vector<std::unique_ptr<const AstNode>> astNodes;
-
-	// Only for the failed case
-	std::string errorType;
-
 	// check if two ParseStatuses are equal
 	bool operator==(const ParseStatus &b) const;
 
