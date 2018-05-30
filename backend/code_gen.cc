@@ -885,7 +885,7 @@ void CodeGen::Generate(std::vector
             outfile_ << "\tmovzx %al, %rdi" << std::endl;
             outfile_ << "\tpush %rbx" << std::endl;
             outfile_ << "\tcall tupleflagcheck" << std::endl;
-            outfile_ << "\tpop %rbx\n" << std::endl;
+            outfile_ << "\tpop %rbx" << std::endl;
 
             outfile_ << "\tmovl 2(%rbx), %eax" << std::endl;
             outfile_ << "\tmovslq %eax, %rdi" << std::endl;
@@ -915,7 +915,7 @@ void CodeGen::Generate(std::vector
 
               outfile_ << "\tpop %rbx" << std::endl;
               // Get the correct offset
-              outfile_ << "\tpush %rbx" << std::endl;
+              outfile_ << "\tpush (%rbx)" << std::endl;
               outfile_ << "\tadd $8, %rbx" << std::endl;
               outfile_ << "\tmov (%rbx), %rcx" << std::endl;
               outfile_ << "\tpush %rcx\n" << std::endl;
@@ -964,7 +964,7 @@ void CodeGen::Generate(std::vector
               // get the value stored and push it on the stack
 
               outfile_ << "\tpop %rbx" << std::endl;
-              outfile_ << "\tpush %rbx" << std::endl;
+              outfile_ << "\tpush (%rbx)" << std::endl;
               // Get the correct offset
               outfile_ << "\tadd $8, %rbx" << std::endl;
               outfile_ << "\tmov (%rbx), %rcx" << std::endl;
