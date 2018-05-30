@@ -4,13 +4,13 @@
 namespace cs160 {
 namespace backend {
 
-std::string LowererVisitor::GetOutputArithmeticHelper(std::string output,
-  int index, std::vector<std::string> printhelper) {
-  output = output + blocks_[index]->target.reg().name()
-    + " <- " + blocks_[index]->arg1.reg().name();
+std::string LowererVisitor::GetOutputArithmeticHelper(
+    std::string output, int index, std::vector<std::string> printhelper) {
+  output = output + blocks_[index]->target.reg().name() + " <- " +
+           blocks_[index]->arg1.reg().name();
 
-  output = output + " " + printhelper[blocks_[index]->op.opcode()]
-    + " " + blocks_[index]->arg2.reg().name();
+  output = output + " " + printhelper[blocks_[index]->op.opcode()] + " " +
+           blocks_[index]->arg2.reg().name();
 
   return output;
 }
@@ -20,9 +20,10 @@ std::string LowererVisitor::GetOutput() {
   std::string output = "";
 
   // Probably make this a private variable or something?
-  std::vector<std::string> printhelper = {"load", "+", "-", "*", "/", "<", "<=",
-    ">", ">=", "==", "&&", "||", "¬", "while", "if",
-    "jmp", "je", "jne", "jg", "jge", "jl", "jle", "MkLabel"};
+  std::vector<std::string> printhelper = {
+      "load", "+",   "-",  "*",   "/",  "<",     "<=",     ">",
+      ">=",   "==",  "&&", "||",  "¬",  "while", "if",     "jmp",
+      "je",   "jne", "jg", "jge", "jl", "jle",   "MkLabel"};
 
   for (unsigned int i = 0; i < blocks_.size(); ++i) {
     // If it's a just a int (Register without a name then access it's value)
@@ -31,11 +32,11 @@ std::string LowererVisitor::GetOutput() {
     switch (opcodetype) {
       case LOAD:
         if (blocks_[i]->arg1.optype() == INT) {
-          output = output + blocks_[i]->target.reg().name()
-            + " <- " + std::to_string(blocks_[i]->arg1.value());
+          output = output + blocks_[i]->target.reg().name() + " <- " +
+                   std::to_string(blocks_[i]->arg1.value());
         } else {
-            output = output + blocks_[i]->target.reg().name()
-              + " <- " + blocks_[i]->arg1.reg().name();
+          output = output + blocks_[i]->target.reg().name() + " <- " +
+                   blocks_[i]->arg1.reg().name();
         }
         break;
       // case ADD:
@@ -55,49 +56,49 @@ std::string LowererVisitor::GetOutput() {
       //   break;
       // case LESSTHANEQ:
       case LOGNOT:
-        output = output + blocks_[i]->target.reg().name()
-          + " <- " + printhelper[LOGNOT] + blocks_[i]->arg1.reg().name();
+        output = output + blocks_[i]->target.reg().name() + " <- " +
+                 printhelper[LOGNOT] + blocks_[i]->arg1.reg().name();
         break;
       case LOOP:
         output = output + printhelper[LOOP] + " " +
-          blocks_[i]->arg2.reg().name() + " == 0";
+                 blocks_[i]->arg2.reg().name() + " == 0";
         break;
       case CONDITIONAL:
         output = output + printhelper[CONDITIONAL] + " " +
-          blocks_[i]->arg2.reg().name() + " == 0";
+                 blocks_[i]->arg2.reg().name() + " == 0";
         break;
       // Abstract jumps out
       case JUMP:
         output = output + printhelper[JUMP] + " " +
-          blocks_[i]->target.label().name();
+                 blocks_[i]->target.label().name();
         break;
       case JEQUAL:
         output = output + printhelper[JEQUAL] + " " +
-          blocks_[i]->target.label().name();
+                 blocks_[i]->target.label().name();
         break;
       case JNOTEQUAL:
         output = output + printhelper[JNOTEQUAL] + " " +
-          blocks_[i]->target.label().name();
+                 blocks_[i]->target.label().name();
         break;
       case JGREATER:
         output = output + printhelper[JGREATER] + " " +
-          blocks_[i]->target.label().name();
+                 blocks_[i]->target.label().name();
         break;
       case JGREATEREQ:
         output = output + printhelper[JGREATEREQ] + " " +
-          blocks_[i]->target.label().name();
+                 blocks_[i]->target.label().name();
         break;
       case JLESS:
         output = output + printhelper[JLESS] + " " +
-          blocks_[i]->target.label().name();
+                 blocks_[i]->target.label().name();
         break;
       case JLESSEQ:
         output = output + printhelper[JLESSEQ] + " " +
-          blocks_[i]->target.label().name();
+                 blocks_[i]->target.label().name();
         break;
       case LABEL:
         output = output + printhelper[LABEL] + " " +
-          blocks_[i]->target.label().name();
+                 blocks_[i]->target.label().name();
         break;
       default:
         output = GetOutputArithmeticHelper(output, i, printhelper);
@@ -137,8 +138,8 @@ void LowererVisitor::VisitGreaterThanExpr(const GreaterThanExpr& exp) {
   BinaryOperatorHelper(GREATERTHAN, arg1, arg2);
 }
 void LowererVisitor::VisitGreaterThanEqualToExpr(
-  const GreaterThanEqualToExpr& exp) {
-    // Visit left hand side (Last thing should be the target where it stores it)
+    const GreaterThanEqualToExpr& exp) {
+  // Visit left hand side (Last thing should be the target where it stores it)
   exp.lhs().Visit(const_cast<LowererVisitor*>(this));
   Register arg1 = GetArgument(lastchildtype_);
   exp.rhs().Visit(const_cast<LowererVisitor*>(this));
@@ -224,13 +225,13 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
   globalset_ = originalset_;
 
   // Check here if there's an issue with unassigned variables
-  if (localsets_[localsets_.size()-1] != localsets_[localsets_.size()-2]) {
+  if (localsets_[localsets_.size() - 1] != localsets_[localsets_.size() - 2]) {
     std::cerr << "Unassigned Variable Detected\n";
     exit(1);
   } else {
     // Otherwise we can now safely copy one of the local sets
     // as a globalset
-    globalset_ = localsets_[localsets_.size()-1];
+    globalset_ = localsets_[localsets_.size() - 1];
 
     // Delete the last two
     localsets_.pop_back();
@@ -301,7 +302,7 @@ void LowererVisitor::VisitAssignment(const Assignment& assignment) {
 
   newblock->target = Target(Register(varname, VARIABLEREG));
   newblock->op = Opcode(LOAD);
-  newblock->arg1 = Operand(blocks_[blocks_.size()-1]->target.reg());
+  newblock->arg1 = Operand(blocks_[blocks_.size() - 1]->target.reg());
 
   blocks_.push_back(std::move(newblock));
 }
@@ -310,7 +311,7 @@ void LowererVisitor::VisitProgram(const Program& program) {
   // Do all the Assignments, then eval the AE?
 
   for (auto& statement : program.statements()) {
-      statement->Visit(this);
+    statement->Visit(this);
   }
 
   program.arithmetic_exp().Visit(this);
@@ -327,8 +328,8 @@ void LowererVisitor::VisitVariableExpr(const VariableExpr& exp) {
 // functions as the only difference between add/sub/mult/div is their "sign"
 // (Also some additional error handling for div req)
 
-void LowererVisitor::BinaryOperatorHelper(Type type,
-  Register arg1, Register arg2) {
+void LowererVisitor::BinaryOperatorHelper(Type type, Register arg1,
+                                          Register arg2) {
   // Load value into target (t <- prev->target + prev->prev->target)
   // Last two elements of the vector should be the integers to load in
 
@@ -345,8 +346,8 @@ void LowererVisitor::BinaryOperatorHelper(Type type,
 
   newblock->op = Opcode(type);
   // look at this later, just going to do this now to test some things
-  newblock->target = Target(Register("t_" +
-    std::to_string(counter_.variablecount), VIRTUALREG));
+  newblock->target = Target(
+      Register("t_" + std::to_string(counter_.variablecount), VIRTUALREG));
 
   // Push into vector
   blocks_.push_back(std::move(newblock));
@@ -363,8 +364,8 @@ void LowererVisitor::VisitIntegerExpr(const IntegerExpr& exp) {
   newblock->op = Opcode(LOAD);
 
   // look at this later,just going to do this now to test some things
-  newblock->target = Target(Register("t_" +
-    std::to_string(counter_.variablecount), VIRTUALREG));
+  newblock->target = Target(
+      Register("t_" + std::to_string(counter_.variablecount), VIRTUALREG));
 
   // Push into vector
   blocks_.push_back(std::move(newblock));
@@ -413,10 +414,10 @@ void LowererVisitor::VisitDivideExpr(const DivideExpr& exp) {
 
 void LowererVisitor::CreateComparisionBlock(Type type) {
   ASSERT(type == CONDITIONAL || type == LOOP,
-    "Must be a loop or a conditional type");
+         "Must be a loop or a conditional type");
 
   auto newblock = make_unique<struct ThreeAddressCode>();
-  newblock->arg2 = Operand(blocks_[blocks_.size()-1]->target.reg());
+  newblock->arg2 = Operand(blocks_[blocks_.size() - 1]->target.reg());
   // Flip the comparision so it jumps if it's negative
   newblock->arg1 = Operand(0);
 
@@ -430,7 +431,7 @@ void LowererVisitor::CreateComparisionBlock(Type type) {
 }
 
 void LowererVisitor::CreateLabelBlock(std::string labelname) {
-  auto labelblock  = make_unique<struct ThreeAddressCode>();
+  auto labelblock = make_unique<struct ThreeAddressCode>();
   labelblock->target = Target(Label(labelname));
   labelblock->op = Opcode(LABEL);
   blocks_.push_back(std::move(labelblock));
@@ -438,9 +439,10 @@ void LowererVisitor::CreateLabelBlock(std::string labelname) {
 
 void LowererVisitor::CreateJumpBlock(std::string jumpname, Type type) {
   // Probably a better way to do this
-  ASSERT(type == JUMP || type == JEQUAL || type == JGREATER
-    || type == JGREATEREQ || type == JLESS || type == JLESSEQ
-    || type == JNOTEQUAL, "Must be a jump type");
+  ASSERT(type == JUMP || type == JEQUAL || type == JGREATER ||
+             type == JGREATEREQ || type == JLESS || type == JLESSEQ ||
+             type == JNOTEQUAL,
+         "Must be a jump type");
 
   auto jumpblock = make_unique<struct ThreeAddressCode>();
   jumpblock->target = Target(Label(jumpname));
@@ -471,15 +473,15 @@ Register LowererVisitor::GetArgument(ChildType type) {
   Register arg;
   switch (type) {
     case INTCHILD:
-      arg = blocks_[blocks_.size()-1]->target.reg();
+      arg = blocks_[blocks_.size() - 1]->target.reg();
       break;
     case VARCHILD:
       // Check if variable has been assigned here?
       arg = Register(variablestack_.top(), VARIABLEREG);
       variablestack_.pop();
 
-      if ( globalset_.count(arg.name()) == 0 ) {
-        std::cerr << "Variable "+ arg.name() +" not assigned\n";
+      if (globalset_.count(arg.name()) == 0) {
+        std::cerr << "Variable " + arg.name() + " not assigned\n";
         exit(1);
       }
       break;
@@ -489,7 +491,6 @@ Register LowererVisitor::GetArgument(ChildType type) {
   }
   return arg;
 }
-
 
 }  // namespace backend
 }  // namespace cs160

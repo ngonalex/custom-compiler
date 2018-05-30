@@ -6,7 +6,7 @@
 
 namespace cs160 {
 namespace frontend {
-	
+
 class AndCombinator : NullParser {
  public:
 	virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
@@ -14,7 +14,7 @@ class AndCombinator : NullParser {
 	NullParser* secondParser;
 };
 
-}	// namespace frontend
-}	// namespace cs160
+}  // namespace frontend
+}  // namespace cs160
 
-#endif // AND_COMBINATOR_H_
+#endif  // AND_COMBINATOR_H_

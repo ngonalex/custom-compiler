@@ -1,7 +1,6 @@
 #ifndef BACKEND_HELPER_STRUCT_H_
 #define BACKEND_HELPER_STRUCT_H_
 
-
 namespace cs160 {
 namespace backend {
 
@@ -10,8 +9,8 @@ struct Counter {
   int branchcount;
   int continuecount;
   int loopcount;
-  Counter() : variablecount(0), branchcount(0),
-    continuecount(0), loopcount(0) {}
+  Counter()
+      : variablecount(0), branchcount(0), continuecount(0), loopcount(0) {}
 };
 
 }  // namespace backend

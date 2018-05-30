@@ -13,7 +13,7 @@ class ArithExprParser : NullParser {
    virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
 };
 
-} // namespace frontend
-} // namespace cs160
+}  // namespace frontend
+}  // namespace cs160
 
-#endif // AE_H_
+#endif  // AE_H_

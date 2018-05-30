@@ -7,13 +7,13 @@
 
 namespace cs160 {
 namespace frontend {
-	
+
 class MulDivOpParser : NullParser {
 public:
 	virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
 };
 
-} // namespace frontend
-} // namespace cs160
+}  // namespace frontend
+}  // namespace cs160
 
-#endif // MUL_DIV_OP_H_
+#endif  // MUL_DIV_OP_H_

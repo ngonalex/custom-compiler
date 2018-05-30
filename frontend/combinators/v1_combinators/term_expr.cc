@@ -69,7 +69,8 @@ ParseStatus TermExprParser::parse(std::string inputProgram, std::string errorTyp
       result.remainingCharacters = aeParseStatus.remainingCharacters;
 
       CloseParenParser close_paren;
-      ParseStatus cpParseStatus = close_paren.parse(aeParseStatus.remainingCharacters);
+      ParseStatus cpParseStatus =
+          close_paren.parse(aeParseStatus.remainingCharacters);
       if (cpParseStatus.status) {
         result.parsedCharacters += cpParseStatus.parsedCharacters;
         result.remainingCharacters = cpParseStatus.remainingCharacters;

@@ -1,7 +1,7 @@
 #include "frontend/combinators/v1_combinators/num_parser.h"
-#include "frontend/combinators/v1_combinators/single_digit.h"
-#include "frontend/combinators/basic_combinators/one_or_more_combinator.h"
 #include <string>
+#include "frontend/combinators/basic_combinators/one_or_more_combinator.h"
+#include "frontend/combinators/v1_combinators/single_digit.h"
 
 #define super NullParser
 

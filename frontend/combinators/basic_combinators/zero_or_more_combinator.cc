@@ -6,9 +6,13 @@ using namespace cs160::frontend;
 
 ParseStatus ZeroOrMoreCombinator::parse(std::string inputProgram, std::string errorType){
 
-	ParseStatus pStatus;
-	pStatus.status = true;
-	pStatus.remainingCharacters = inputProgram;
+  while (pStatus.status) {
+    ParseStatus status2 = parser->parse(pStatus.remainingCharacters);
+    pStatus.status = status2.status;
+    if (status2.status) {
+      pStatus.remainingCharacters = status2.remainingCharacters;
+    }
+  }
 
 
 	while (pStatus.status){
@@ -27,9 +31,7 @@ ParseStatus ZeroOrMoreCombinator::parse(std::string inputProgram, std::string er
 		}
 	}
 
-	pStatus.status = true;
-
-	return pStatus;
+  return pStatus;
 }
 
 

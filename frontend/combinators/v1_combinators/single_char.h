@@ -20,4 +20,4 @@ class SingleVarCharParser : NullParser {
 }  // namespace frontend
 }  // namespace cs160
 
-#endif // SINGLE_CHAR_H_
+#endif  // SINGLE_CHAR_H_
