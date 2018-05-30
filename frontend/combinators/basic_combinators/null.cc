@@ -9,7 +9,7 @@ ParseStatus NullParser::parse(std::string inputProgram, std::string errorType) {
 	status.remainingCharacters = inputProgram;
 	status.parsedCharacters = "";
 	status.ast = nullptr;
-	status.second_ast = nullptr;
+	//status.second_ast = nullptr;
 	if(errorType != "") {
 		status.errorType = errorType;
 	}

@@ -74,6 +74,7 @@ TEST(Combinators, DigitAndCharCombinator) {
   aC.firstParser = reinterpret_cast<NullParser *>(&digitParser);
   aC.secondParser = reinterpret_cast<NullParser *>(&charParser);
 
+  //ParseStatus result = aC.parse("1o1");
   ParseStatus result = aC.parse("1o1");
 
   EXPECT_EQ(result.status, true);

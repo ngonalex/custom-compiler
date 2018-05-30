@@ -45,12 +45,15 @@ ParseStatus ProgramParser::parse(std::string inputProgram, std::string errorType
     result.parsedCharacters += (" " + assignResult.parsedCharacters);
     result.remainingCharacters = assignResult.remainingCharacters;
     
-    std::vector<std::unique_ptr<const Assignment>> temporaryAssign;    
-    for(auto i : assignResult.astNodes) {
-      temporaryAssign.push_back(std::move(unique_cast<const Assignment>(std::move(i))));
+    
+    std::vector<std::unique_ptr<const Assignment>> temporaryAssign; 
+
+    for(auto i = assignResult.astNodes.begin(); i != assignResult.astNodes.end(); ++i) {
+      temporaryAssign.push_back(unique_cast<const Assignment>(std::move(*i)));
     }
-      result.ast = std::move(make_unique<const Program>(assignResult.astNodes,
-    unique_cast<const ArithmeticExpr>(std::move(arithResult.ast))));
+
+    result.ast = make_unique<const Program>(std::move(temporaryAssign),
+    unique_cast<const ArithmeticExpr>(std::move(arithResult.ast)));
     return result;
   }
   else {
