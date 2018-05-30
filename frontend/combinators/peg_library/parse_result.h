@@ -18,10 +18,13 @@ class ParseResult {
   std::unique_ptr<const T> ast_result;
   
   static ParseResult failure(std::string msg) {
-    return ParseResult(false, msg, nullptr, false);
+    return ParseResult(false, msg, nullptr);
   }
   static ParseResult success(std::unique_ptr<const T> result) {
-    return ParseResult(true, "", std::move(result), false);
+    return ParseResult(true, "", std::move(result));
+  }
+  static ParseResult success() {
+    return ParseResult(true, "", nullptr);
   }
 
  private:

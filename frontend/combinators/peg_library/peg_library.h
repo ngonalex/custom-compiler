@@ -15,14 +15,11 @@ class AtomParser {
 		char_to_parse_ = char_to_parse;
 	}
 
-	void parse(std::string input) {
-		if (input.size() == 0) {
-			return failure("hello");
+	ParseResult<AstNode> parse(std::string input) {
+		if (input.size() == 0 || input[0] != char_to_parse_) {
+			return ParseResult<AstNode>::failure("Failed to parse");
 		} 
-		if (input[0] == char_to_parse) {
-			
-			result.parsedChars
-		}
+		return ParseResult<AstNode>::success();
 	}
 
  private:

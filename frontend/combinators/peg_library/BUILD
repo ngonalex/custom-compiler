@@ -1,7 +1,7 @@
 cc_library(
 	name = "peg_library",
 	copts = ["-Wall -g"],
-	hdrs = ["atom_parser.h",
+	hdrs = ["peg_library.h",
 					"parse_result.h"],
 	deps = ["//utility"],
 	visibility = ["//visibility:public"],
@@ -9,7 +9,7 @@ cc_library(
 
 cc_test(
 	name = "lib_test",
-	deps = ["@gtest//:main", ":peg_library"],
+	deps = ["@gtest//:main", ":peg_library", "//abstract_syntax:abstract_syntax"],
 	srcs = ["lib_test.cc"],
 	copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
 	timeout = "short",
