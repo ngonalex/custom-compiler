@@ -33,9 +33,6 @@ using cs160::backend::ThreeAddressCode;
 using cs160::backend::CodeGen;
 using cs160::make_unique;
 
-<<<<<<< HEAD
-=======
-
 /*
 fact(int bob)
   if(bob >1)
@@ -47,8 +44,6 @@ fact(int bob)
 
 */
 
-
->>>>>>> e2948035cca85c0574df4a760fd56345a1d14256
 std::string exec(const char* cmd) {
     std::array<char, 128> buffer;
     std::string result;
