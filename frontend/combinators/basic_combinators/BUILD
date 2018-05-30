@@ -1,7 +1,9 @@
 cc_library(
 	name = "basic_combinators",
 	copts = ["-Wall -g"],
-	hdrs = ["parse_status.h"],
+	hdrs = ["parse_status.h",
+					"atom_parser.h"],
+	srcs = ["atom_parser.cc"],
 	deps = ["//utility", "//abstract_syntax:abstract_syntax", "//abstract_syntax:print_visitor_v1"],
 	visibility = ["//visibility:public"],
 )

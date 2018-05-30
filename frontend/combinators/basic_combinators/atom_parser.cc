@@ -1,33 +1,25 @@
-#include "frontend/combinators/basic_combinators/and_combinator.h"
-
-#define super NullParser
+#include "frontend/combinators/basic_combinators/atom_parser.h"
+#include "frontend/combinators/basic_combinators/parse_status.h"
 
 using namespace cs160::frontend;
 
-ParseStatus AtomParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
-  if (input.size() == 0 || input[0] != char_to_parse_) {
-    ParseStatus result;
-    result.errorType = "Failed to parse";
-    result.return ParseStatus::("Failed to parse");
-  }
-  return ParseResult<AstNode>::success();
+ParseStatus<const AstNode> AtomParser::parse(std::string input, 
+                              int start_character, 
+                              std::string error_type) {
 
-  ParseStatus secondStatus =
-      secondParser->parse(firstStatus.remainingCharacters);
+  // Failures
+  if (input.size() == 0 || input[0] != char_to_parse) {
+    return ParseStatus<const AstNode>::failure(start_character, 
+                                  input, "Error parsing Atom\n");
+  } 
 
-  if (!secondStatus.status) {
-    return secondStatus;
-  }
-
-  ParseStatus both;
-  both.status = true;
-  both.parsedCharacters =
-      firstStatus.parsedCharacters + secondStatus.parsedCharacters;
-  both.remainingCharacters = secondStatus.remainingCharacters;
-  both.ast = std::move(firstStatus.ast);
-  both.second_ast = std::move(secondStatus.ast);
-
-  return both;
+  // Success
+  std::string remaining_chars(input.begin()+1, input.end());
+  return ParseStatus<const AstNode>::success(
+    start_character, 
+    start_character+1, 
+    remaining_chars, 
+    char_to_parse);
 }
 
 // NUM and Operator

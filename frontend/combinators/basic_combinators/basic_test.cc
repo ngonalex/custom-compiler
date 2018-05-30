@@ -1,5 +1,6 @@
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/parse_status.h"
+#include "frontend/combinators/basic_combinators/atom_parser.h"
 
 #include "gtest/gtest.h"
 
@@ -7,7 +8,7 @@ using namespace cs160::frontend;
 
 // Success case for Single Character test :: single_char.cc
 TEST(ParseStatus, NonAstSucess) {
-  auto result = ParseStatus<AstNode>::success(0, 4, "af", "10");
+  auto result = ParseStatus<const AstNode>::success(0, 4, "af", "10");
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.character_start, 0);

@@ -2,21 +2,26 @@
 #define ATOM_PARSER_H_
 
 #include "abstract_syntax/abstract_syntax.h"
-#include "frontend/combinators/basic_combinators/null.h"
+
+#include <string>
+
+using namespace cs160::abstract_syntax::frontend;
 
 namespace cs160 {
 namespace frontend {
 
-class AtomParser : NullParser {
+class AtomParser {
  public:
-  virtual ParseStatus parse(std::string inputProgram,
-  				int startCharacter,
-			    std::string errorType = "");
+  ParseStatus<const AstNode> parse(
+            std::string intput,
+  				  int start_character,
+			      std::string error_type = "");
 
-  explicit AtomParser(char char_to_parse) { char_to_parse_ = char_to_parse; }
+  explicit AtomParser(char char_to_parse) { 
+    this->char_to_parse = char_to_parse;
+  }
 
- private:
-  char char_to_parse_:
+  char char_to_parse;
 };
 
 }  // namespace frontend
