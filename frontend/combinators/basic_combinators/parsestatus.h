@@ -29,6 +29,8 @@ class ParseStatus {  // Super class
 
 	// Only for the failed case
 	std::string errorType;
+
+	int characterStart;
 /*
 	explicit ParseStatus(bool p_status, std::string p_remainingCharacters,
 		std::string p_parsedCharacters, std::unique_ptr<const AstNode> p_ast, 
@@ -46,7 +48,48 @@ class ParseStatus {  // Super class
 	// check if two ParseStatuses are equal
 	bool operator==(const ParseStatus &b) const;
 
-  bool operator!=(const ParseStatus &b) const;
+  	bool operator!=(const ParseStatus &b) const;
+
+  	  static ParseStatus failure(std::string errorType, int characterStart) {
+	    return ParseResult(false, "", "", 
+	    	nullptr, nullptr
+	    	std::vector<std::unique_ptr<const AstNode>> astNodes,
+	    	errorType, characterStart);
+	  }
+	  static ParseStatus success(std::string remainingCharacters, 
+	  	std::string parsedCharacters,
+	  	std::unique_ptr<const AstNode> result, int characterStart) {
+	    return ParseResult(true, remainingCharacters, parsedCharacters, result, nullptr, std::vector<unsigned long>(), "", characterStart);
+	  }
+	  static ParseStatus andSuccess(std::string remainingCharacters, 
+	  	std::string parsedCharacters,
+	  	std::unique_ptr<const AstNode> result,
+	  	std::unique_ptr<const AstNode> secondResult,
+	  	int characterStart) {
+	    return ParseResult(true, remainingCharacters, parsedCharacters, result, secondResult, std::vector<unsigned long>(), "", characterStart);
+	  }
+	  static ParseStatus vectorSuccess(std::string remainingCharacters, 
+	  	std::string parsedCharacters,
+	  	std::vector<std::unique_ptr<const AstNode>> astNodes,
+	  	int characterStart) {
+	    return ParseResult(true, remainingCharacters, parsedCharacters, nullptr, nullptr, astNodes, "", characterStart);
+	  }
+
+ private:
+ 	ParseStatus(bool status, std::string remainingCharacters, 
+ 		std::string parsedCharacters, std::unique_ptr<const AstNode> ast, 
+ 		std::unique_ptr<const AstNode> second_ast, 
+ 		std::vector<std::unique_ptr<const AstNode>> astNodes, std::string errorType, 
+ 		int characterStart) {
+ 		this->status = status;
+ 		this->remainingCharacters = remainingCharacters;
+ 		this->parsedCharacters = parsedCharacters;
+ 		this->ast = ast; 		
+ 		this->second_ast = second_ast;
+ 		this->astNodes = astNodes;
+ 		this->errorType = errorType;
+ 		this->characterStart = characterStart;
+ 	}
 };
 /*
 class AndCombParseStatus : public ParseStatus { 
