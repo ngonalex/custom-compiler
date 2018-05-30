@@ -71,7 +71,7 @@ TEST(Combinators, DigitAndCharCombinator) {
   aC.firstParser = reinterpret_cast<NullParser *>(&digitParser);
   aC.secondParser = reinterpret_cast<NullParser *>(&charParser);
 
-  //ParseStatus result = aC.parse("1o1");
+  // ParseStatus result = aC.parse("1o1");
   ParseStatus result = aC.parse("1o1");
 
   EXPECT_EQ(result.status, true);
@@ -358,7 +358,9 @@ TEST(Combinators, ComplicatedAe) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(output, "((((((7 * 10) + (9 / 3)) + 16) - ((8 * 2) * 3)) - 77) + (12 * 1))");
+  EXPECT_EQ(
+      output,
+      "((((((7 * 10) + (9 / 3)) + 16) - ((8 * 2) * 3)) - 77) + (12 * 1))");
 }
 
 TEST(Combinators, NegComplicatedAe) {
@@ -372,5 +374,7 @@ TEST(Combinators, NegComplicatedAe) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(output, "(0 - ((((((7 * 10) + (9 / 3)) + 16) - ((8 * 2) * 3)) - 77) + (12 * 1)))");
+  EXPECT_EQ(output,
+	    "(0 - ((((((7 * 10) + (9 / 3)) + 16) - ((8 * 2) * 3)) - 77) + (12 "
+	    "* 1)))");
 }

@@ -19,52 +19,36 @@ ParseStatus AssignmentParser::parse(std::string inputProgram, std::string errorT
     return super::parse(inputProgram);
   }
 
+  // Parsers used
   HelperVariableParser varParser;
   WordParser wordParser;
-  OrCombinator orCombinator; // Left of equal can be variable instantiation or variable_name
-  orCombinator.firstParser = reinterpret_cast<NullParser *>(&varParser);
-  orCombinator.secondParser = reinterpret_cast<NullParser *>(&wordParser);
+  OrCombinator varOrWord; // Left of equal can be variable instantiation or variable_name
+  varOrWord.firstParser = reinterpret_cast<NullParser *>(&varParser);
+  varOrWord.secondParser = reinterpret_cast<NullParser *>(&wordParser);
 
   EqualSignParser equalSignParser;
   ArithExprParser arithExprParser;
 
-  ParseStatus result;
+  // Grammar declaration
+  AndCombinator firstAnd;
+  firstAnd.firstParser = reinterpret_cast<NullParser *>(&varOrWord);
+  firstAnd.secondParser = reinterpret_cast<NullParser *>(&equalSignParser);
 
-  // Parse the first expression
-  ParseStatus varResult = orCombinator.parse(inputProgram);
-  
-  result.status = varResult.status;
+  AndCombinator secondAnd;
+  secondAnd.firstParser = reinterpret_cast<NullParser *>(&firstAnd);
+  secondAnd.secondParser = reinterpret_cast<NullParser *>(&arithExprParser);
 
-  if(varResult.status) {
-    result.parsedCharacters += varResult.parsedCharacters;
-    result.remainingCharacters = varResult.remainingCharacters;
-    ParseStatus equalSignStatus = equalSignParser.parse(result.remainingCharacters);
 
-    if(equalSignStatus.status) {
-      result.parsedCharacters += (" " + equalSignStatus.parsedCharacters);
-      result.remainingCharacters = equalSignStatus.remainingCharacters;
-      ParseStatus termStatus = arithExprParser.parse(result.remainingCharacters);
-      if(termStatus.status) {
-        result.parsedCharacters += (" " + termStatus.parsedCharacters);
-        result.remainingCharacters = termStatus.remainingCharacters;
-
-        result.ast = std::move(make_unique<const Assignment>(
-          unique_cast<const VariableExpr>(std::move(varResult.ast)),
-          unique_cast<const ArithmeticExpr>(std::move(termStatus.ast))));
-      }
-      else {
-        result.status = termStatus.status;
-        result.errorType = termStatus.errorType;
-      }
-    }
-    else {
-      result.status = equalSignStatus.status;
-      result.errorType = equalSignStatus.errorType;
-    }
+  if(secondAnd.status) {
+    ParseStatus result::sucess(secondAnd.remainingCharacters, 
+      secondAnd.parsedCharacters, std::move(make_unique<const Assignment>(
+            unique_cast<const VariableExpr>(std::move(varResult.ast)),
+            unique_cast<const ArithmeticExpr>(std::move(termStatus.ast)))), 
+      secondAnd.characterStart);
   }
   else {
-    result.errorType = varResult.errorType;
+    ParseStatus result::failure(secondAnd.errorType, secondAnd.characterStart);
   }
-
+      
   return result;
 }
