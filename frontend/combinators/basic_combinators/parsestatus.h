@@ -54,33 +54,36 @@ class ParseStatus {  // Super class
   bool operator!=(const ParseStatus &b) const;
 
   static ParseStatus failure(std::string errorType, int characterStart) {
-    return ParseResult(
-	false, "", "", nullptr,
-	nullptr std::vector<std::unique_ptr<const AstNode>> astNodes, errorType,
-	characterStart);
+    std::vector<std::unique_ptr<const AstNode>> astNodes;
+    return ParseStatus( false, "", "", nullptr, nullptr, astNodes, errorType, characterStart);
   }
+
   static ParseStatus success(std::string remainingCharacters,
 			     std::string parsedCharacters,
 			     std::unique_ptr<const AstNode> result,
 			     int characterStart) {
-    return ParseResult(true, remainingCharacters, parsedCharacters, result,
-		       nullptr, std::vector<unsigned long>(), "",
+        std::vector<std::unique_ptr<const AstNode>> astNodes;
+    return ParseStatus(true, remainingCharacters, parsedCharacters, std::move(result),
+		       nullptr, astNodes, "",
 		       characterStart);
   }
+
   static ParseStatus andSuccess(std::string remainingCharacters,
 				std::string parsedCharacters,
 				std::unique_ptr<const AstNode> result,
 				std::unique_ptr<const AstNode> secondResult,
 				int characterStart) {
-    return ParseResult(true, remainingCharacters, parsedCharacters, result,
-		       secondResult, std::vector<unsigned long>(), "",
+        std::vector<std::unique_ptr<const AstNode>> astNodes;
+    return ParseStatus(true, remainingCharacters, parsedCharacters, std::move(result),
+		       std::move(secondResult), std::move(astNodes), "",
 		       characterStart);
   }
+  
   static ParseStatus vectorSuccess(
       std::string remainingCharacters, std::string parsedCharacters,
       std::vector<std::unique_ptr<const AstNode>> astNodes,
       int characterStart) {
-    return ParseResult(true, remainingCharacters, parsedCharacters, nullptr,
+    return ParseStatus(true, remainingCharacters, parsedCharacters, nullptr,
 		       nullptr, astNodes, "", characterStart);
   }
 
@@ -93,9 +96,9 @@ class ParseStatus {  // Super class
     this->status = status;
     this->remainingCharacters = remainingCharacters;
     this->parsedCharacters = parsedCharacters;
-    this->ast = ast;
-    this->second_ast = second_ast;
-    this->astNodes = astNodes;
+    this->ast = std::move(ast);
+    this->second_ast = std::move(second_ast);
+    this->astNodes = std::move(astNodes);
     this->errorType = errorType;
     this->characterStart = characterStart;
   }
