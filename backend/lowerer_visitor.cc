@@ -180,7 +180,7 @@ void LowererVisitor::VisitAssignmentFromNewTuple(
     globalset_.insert(lhstarget);
 
     auto block = make_unique<struct ThreeAddressCode>();
-    block->target = Target(Label(lhstarget));
+    block->target = Target(Register(lhstarget, VARIABLEREG));
     block->op = Opcode(VARCHILDTUPLE);
     blocks_.push_back(std::move(block));
   }
@@ -745,7 +745,7 @@ void LowererVisitor::CreateFunctionDefEpilogue(std::string name) {
 void LowererVisitor::CreateDereference(std::string basevariable,
   std::string targetvariable, int indexofchild) {
   auto block = make_unique<struct ThreeAddressCode>();
-  block->target = Target(Label(targetvariable));
+  block->target = Target(Register(targetvariable, DEREFREG));
   block->op = Opcode(currdereferencetype_);
   block->arg1 = Operand(Register(basevariable, DEREFREG));
   block->arg2 = Operand(Register("Parent", DEREFREG));
@@ -758,7 +758,7 @@ void LowererVisitor::CreateDereference(std::string basevariable,
 void LowererVisitor::CreateTupleAssignment(std::string target,
   Operand operand) {
   auto block = make_unique<struct ThreeAddressCode>();
-  block->target = Target(Label(target));
+  block->target = Target(Register(target, VARIABLEREG));
   block->op = Opcode(NEWTUPLE);
   block->arg1 = operand;
 
@@ -768,22 +768,12 @@ void LowererVisitor::CreateTupleAssignment(std::string target,
 void LowererVisitor::CreateArithmeticAssignment(std::string target,
   Operand operand) {
   auto block = make_unique<struct ThreeAddressCode>();
-  block->target = Target(Label(target));
+  block->target = Target(Register(target, VARIABLEREG));
   block->op = Opcode(VARASSIGNLOAD);
   block->arg1 = operand;
 
   blocks_.push_back(std::move(block));
 }
-
-// void LowererVisitor::CreateRHSINTDEREFERENCEAssignment(std::string target,
-//   Operand operand) {
-//   auto block = make_unique<struct ThreeAddressCode>();
-//   block->target = Target(Label(target));
-//   block->op = Opcode(RHSDEFERENCEASSIGNMENT);
-//   block->arg1 = operand;
-
-//   blocks_.push_back(std::move(block));
-// }
 
 std::string LowererVisitor::JumpLabelHelper() {
   std::string newlabel = "falsebranch" + std::to_string(counter_.branchcount);
@@ -803,27 +793,9 @@ std::string LowererVisitor::ContinueLabelHelper() {
   return newcontinue;
 }
 
-// Obsolete Function now, remove later
+// Obsolete Function now
 Register LowererVisitor::GetArgument(ChildType type) {
   Register arg = blocks_[blocks_.size()-1]->target.reg();
-  // switch (type) {
-  //   case INTCHILD:
-  //     // arg = blocks_[blocks_.size()-1]->target.reg();
-  //     break;
-  //   case VARCHILD:
-  //     // Check if variable has been assigned here?
-  //     // arg = Register(variablestack_.top(), VARIABLEREG);
-  //     variablestack_.pop();
-
-  //     if ( globalset_.count(arg.name()) == 0 ) {
-  //       std::cerr << "Variable "+ arg.name() +" not assigned\n";
-  //       exit(1);
-  //     }
-  //     break;
-  //   default:
-  //     // There should be type throw error?
-  //     break;
-  // }
   return arg;
 }
 

@@ -84,7 +84,7 @@ int main() {
        make_unique<const VariableExpr>("x"),
        make_unique<const IntegerExpr>(2)))));
 
-        statements.push_back(std::move(make_unique<const AssignmentFromArithExp>(
+    statements.push_back(std::move(make_unique<const AssignmentFromArithExp>(
      make_unique<const VariableExpr>("y"),
      make_unique<const Dereference>(
        make_unique<const VariableExpr>("x"),

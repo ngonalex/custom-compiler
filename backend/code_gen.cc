@@ -189,13 +189,13 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
       // Two cases one of it it's a deref, other if it's a var
       // Only add to map if it's a var
       // Case down below is for vars
-      parsedstring = DereferenceParserHelper(tac->target.label().name());
+      parsedstring = DereferenceParserHelper(tac->target.reg().name());
 
       if (parsedstring.size() == 1) {
-        if (symbollocations_.count(tac->target.label().name()) == 0) {
+        if (symbollocations_.count(tac->target.reg().name()) == 0) {
           // Add it to the map if its new
           symbollocations_.insert(std::pair<std::string, int>(
-          tac->target.label().name(), -16+-16*(symbollocations_.size()+1)));
+          tac->target.reg().name(), -16+-16*(symbollocations_.size()+1)));
         }
 
         outfile_ << "\t# Loading a value into variable "
@@ -206,15 +206,15 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
 
         if (currscope_ == FUNCTION) {
           // lines 208 and 209 SUCK, REFACTOR VARIABLE NAME HELPER
-          VariableNameHelper(tac->target.label().name());
-          int index = symbollocations_.find(tac->target.label().name())->second;
+          VariableNameHelper(tac->target.reg().name());
+          int index = symbollocations_.find(tac->target.reg().name())->second;
           outfile_ << "\tmov %rax,"
-            << VariableNameHelper(tac->target.label().name()) << std::endl;
+            << VariableNameHelper(tac->target.reg().name()) << std::endl;
           outfile_ << "\tmovq %rcx, " << std::to_string(index+8) << "(%rbp)\n"
             << std::endl;
         } else {
           outfile_ << "\tmov "
-            << VariableNameHelper(tac->target.label().name())
+            << VariableNameHelper(tac->target.reg().name())
             << ", %rbx" << std::endl;
           outfile_ << "\tmov %rax, (%rbx)" << std::endl;
           outfile_ << "\tmov %rcx, 8(%rbx)\n" << std::endl;
@@ -222,19 +222,19 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
 
         // Add it to the set, then call the print function
         if (currscope_ == GLOBAL) {
-          assignmentset_.insert(tac->target.label().name());
+          assignmentset_.insert(tac->target.reg().name());
           outfile_ << "\tmov %rcx, %rax\n" << std::endl;
           // Call on correct print function
-          outfile_ << "\t# Going to print " << tac->target.label().name()
+          outfile_ << "\t# Going to print " << tac->target.reg().name()
             << std::endl;
-          GeneratePrintCall(tac->target.label().name()+"ascii");
+          GeneratePrintCall(tac->target.reg().name()+"ascii");
           outfile_ << "\t# Returning from printing "
-            << tac->target.label().name() << std::endl;
+            << tac->target.reg().name() << std::endl;
           outfile_ << std::endl;
         }
       } else {  // Needs to handle functions
         // Handle Derefs
-        outfile_ << "\t# Loading an int into " << tac->target.label().name()
+        outfile_ << "\t# Loading an int into " << tac->target.reg().name()
           << std::endl;
 
         // Rewrite flags
@@ -762,9 +762,9 @@ void CodeGen::Generate(std::vector
         GenerateEpilogue();
         break;
       case LHSDEREFERENCE:  // Needs to handle functions (only for varchild)
-        parsedstring = DereferenceParserHelper(code->target.label().name());
+        parsedstring = DereferenceParserHelper(code->target.reg().name());
         outfile_ << "\t# LHSDereference of variable "
-            << code->target.label().name() << std::endl;
+            << code->target.reg().name() << std::endl;
         if (parsedstring.size() == 2) {
           // REFACTOR OUT TO HELPER FUNCTION LATER
           // ITS VERY LIKELY VARIABLENAMEHELPER OR ANOTHER HELPER
@@ -863,9 +863,9 @@ void CodeGen::Generate(std::vector
 
         break;
       case RHSINTDEREFERENCE:  // Needs to handle functions
-        parsedstring = DereferenceParserHelper(code->target.label().name());
+        parsedstring = DereferenceParserHelper(code->target.reg().name());
         outfile_ << "\t#Dereference of variable "
-            << code->target.label().name() << std::endl;
+            << code->target.reg().name() << std::endl;
         if (parsedstring.size() == 2) {
           // Same comment as LHS REFACTOR!!
           if (currscope_ == GLOBAL) {
@@ -1026,7 +1026,7 @@ void CodeGen::Generate(std::vector
         break;
       case NEWTUPLE:  // Needs to handle functions (maybe unneeded)
         outfile_ << "\t# Making a tuple for variable: "
-          << code->target.label().name() << std::endl;
+          << code->target.reg().name() << std::endl;
         outfile_ << "\tpop %rcx" << std::endl;
         outfile_ << "\tpop %rdx" << std::endl;
         outfile_ << "\tpush %rcx" << std::endl;
@@ -1045,13 +1045,13 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tpop %rbx" << std::endl;
 
         // 100% theres a better way to do this
-        if (DereferenceParserHelper(code->target.label().name()).size() == 1
+        if (DereferenceParserHelper(code->target.reg().name()).size() == 1
           && currscope_ == FUNCTION) {
           // Rewrite flags
           outfile_ << "\tmovb $1,"
-            << VariableNameHelper(code->target.label().name()) << std::endl;
+            << VariableNameHelper(code->target.reg().name()) << std::endl;
           int index =
-            symbollocations_.find(code->target.label().name())->second;
+            symbollocations_.find(code->target.reg().name())->second;
           outfile_ << "\tmovb $1, " << std::to_string(index+1) << "(%rbp)\n";
           outfile_ << "\tmovl %ecx, " << std::to_string(index+2) << "(%rbp)\n";
           outfile_ << "\tmovq %rax, " << std::to_string(index+8) << "(%rbp)\n"
@@ -1067,15 +1067,15 @@ void CodeGen::Generate(std::vector
         }
         break;
       case VARCHILDTUPLE:  // May need to handle functions
-        if (symbollocations_.count(code->target.label().name()) == 0) {
+        if (symbollocations_.count(code->target.reg().name()) == 0) {
           // Add it to the map then create a spot for it (if its a function)
           symbollocations_.insert(std::pair<std::string, int>(
-          code->target.label().name(), -16+-16*(symbollocations_.size()+1)));
+          code->target.reg().name(), -16+-16*(symbollocations_.size()+1)));
         }
-        outfile_ << "\t# Getting value of " << code->target.label().name()
+        outfile_ << "\t# Getting value of " << code->target.reg().name()
           << std::endl;
         outfile_ << "\tmov " <<
-          VariableNameHelper(code->target.label().name()) << ", %rbx"
+          VariableNameHelper(code->target.reg().name()) << ", %rbx"
           << std::endl;
         outfile_ << "\tpush %rbx\n" << std::endl;
         break;
