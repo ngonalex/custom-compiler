@@ -42,8 +42,8 @@ ParseStatus ProgramParser::parse(std::string inputProgram, std::string errorType
   // Parse the arithmetic expression
   ParseStatus arithResult = arithExprParser.parse(result.remainingCharacters);
   if(arithResult.status) {
-    result.parsedCharacters += (" " + assignResult.parsedCharacters);
-    result.remainingCharacters = assignResult.remainingCharacters;
+    result.parsedCharacters += (" " + arithResult.parsedCharacters);
+    result.remainingCharacters = arithResult.remainingCharacters;
     
     
     std::vector<std::unique_ptr<const Assignment>> temporaryAssign; 
