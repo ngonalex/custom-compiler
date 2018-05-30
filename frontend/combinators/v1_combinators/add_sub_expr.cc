@@ -1,4 +1,6 @@
+#include "frontend/combinators/v1_combinators/helpers/v1_helpers.h"
 #include "frontend/combinators/v1_combinators/add_sub_expr.h"
+#include "frontend/combinators/v1_combinators/num_parser.h"
 
 #define super NullParser
 

@@ -1,3 +1,4 @@
+#include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/peg_library/peg_library.h"
 #include "gtest/gtest.h"
 
@@ -18,9 +19,9 @@ TEST(AtomParser, atomParserFailure) {
   EXPECT_EQ(result.status, false);
 }
 
-TEST(AtomParser, atomParserFailure) {
-  AtomParser atomParser('');
-  ParseResult<AstNode> result = atomParser.parse("hello world");
+// TEST(AtomParser, atomParserBlank) {
+//   AtomParser atomParser();
+//   ParseResult<Assignment> result = atomParser.parse("hello world");
 
-  EXPECT_EQ(result.status, true);
-}
+//   EXPECT_EQ(result.status, true);
+// }

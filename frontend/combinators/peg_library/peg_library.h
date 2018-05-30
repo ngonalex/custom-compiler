@@ -15,11 +15,19 @@ class AtomParser {
 		char_to_parse_ = char_to_parse;
 	}
 
+	explicit AtomParser() {
+		char_to_parse_ = '\0';
+	}
+
+// return ParseResult<Assignment>::failure("Missing ':' inside an assignment");
 	ParseResult<AstNode> parse(std::string input) {
-		if (input.size() == 0 || input[0] != char_to_parse_) {
+		if (input.size() == 0) {
 			return ParseResult<AstNode>::failure("Failed to parse");
-		} 
-		return ParseResult<AstNode>::success();
+		} else if (input[0] == char_to_parse_ || char_to_parse_ == '\0') {
+			return ParseResult<AstNode>::success();
+		} else {
+			return ParseResult<AstNode>::failure("Failed to parse"); 
+		}
 	}
 
  private:

@@ -3,9 +3,6 @@
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
-#include "frontend/combinators/v1_combinators/mul_div_op.h"
-#include "frontend/combinators/v1_combinators/num_parser.h"
-#include "frontend/combinators/v1_combinators/term_expr.h"
 
 namespace cs160 {
 namespace frontend {
