@@ -8,12 +8,13 @@ using namespace cs160::frontend;
 using namespace std;
 
 // )
-ParseStatus CloseParenParser::parse(std::string inputProgram, std::string errorType) {
-	trim(inputProgram);
+ParseStatus CloseParenParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+	int endCharacter = startCharacter;
+	endCharacter += trim(inputProgram);
 	std::string errorMessage = "Expecting close paranthesis";
 
 	if (inputProgram.size() == 0) {
-		return super::parse(inputProgram, errorMessage);
+		return super::parse(inputProgram, endCharacter, errorMessage);
 	}
 
 	ParseStatus status;
@@ -21,20 +22,23 @@ ParseStatus CloseParenParser::parse(std::string inputProgram, std::string errorT
 		status.status = true;
 		status.remainingCharacters = inputProgram.erase(0, 1);
 		status.parsedCharacters = ')';
+		status.startCharacter = startCharacter;
+		status.endCharacter = endCharacter + 1;
 	} else {
-		return super::parse(inputProgram, errorMessage);
+		return super::parse(inputProgram, endCharacter, errorMessage);
 	}
 	return status;
 }
 
 // (
-ParseStatus OpenParenParser::parse(std::string inputProgram, std::string errorType) {
-	trim(inputProgram);
+ParseStatus OpenParenParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+	int endCharacter = startCharacter;
+	endCharacter += trim(inputProgram);
 
 	std::string errorMessage = "Expecting open paranthesis";
 
 	if (inputProgram.size() == 0) {
-		return super::parse(inputProgram, errorMessage);
+		return super::parse(inputProgram, endCharacter, errorMessage);
 	}
 
 	ParseStatus status;
@@ -42,20 +46,23 @@ ParseStatus OpenParenParser::parse(std::string inputProgram, std::string errorTy
 		status.status = true;
 		status.remainingCharacters = inputProgram.erase(0, 1);
 		status.parsedCharacters = '(';
+		status.startCharacter = startCharacter;
+		status.endCharacter = endCharacter + 1;
 	} else {
-		return super::parse(inputProgram, errorMessage);
+		return super::parse(inputProgram, endCharacter, errorMessage);
 	}
 	return status;
 }
 
 // - 
-ParseStatus NegativeParser::parse(std::string inputProgram, std::string errorType) {
-	trim(inputProgram);
+ParseStatus NegativeParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+	int endCharacter = startCharacter;
+	endCharacter += trim(inputProgram);
 	std::string errorMessage = "Expecting -";
 
 
 	if (inputProgram.size() == 0) {
-		return super::parse(inputProgram, errorMessage);
+		return super::parse(inputProgram, endCharacter, errorMessage);
 	}
 
 	ParseStatus status;
@@ -64,19 +71,22 @@ ParseStatus NegativeParser::parse(std::string inputProgram, std::string errorTyp
 		status.status = true;
 		status.remainingCharacters = inputProgram.erase(0, 1);
 		status.parsedCharacters = '-';
+		status.startCharacter = startCharacter;
+		status.endCharacter = endCharacter + 1;
 	} else {
-		return super::parse(inputProgram, errorMessage);
+		return super::parse(inputProgram, endCharacter, errorMessage);
 	}
 	return status;
 }
 
 // + - 
-ParseStatus AddSubOpParser::parse(std::string inputProgram, std::string errorType) {
-	trim(inputProgram);
+ParseStatus AddSubOpParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+	int endCharacter = startCharacter;
+	endCharacter += trim(inputProgram);
 	std::string errorMessage = "Expecting + or -";
 
 	if (inputProgram.size() == 0) {
-		return super::parse(inputProgram, errorMessage);
+		return super::parse(inputProgram, endCharacter, errorMessage);
 	}
 	ParseStatus status;
 
@@ -84,19 +94,22 @@ ParseStatus AddSubOpParser::parse(std::string inputProgram, std::string errorTyp
 		status.status = true;
 		status.parsedCharacters = inputProgram[0];
 		status.remainingCharacters = inputProgram.erase(0, 1);
+		status.startCharacter = startCharacter;
+		status.endCharacter = endCharacter + 1;
 	} else {
-		return super::parse(inputProgram, errorMessage);
+		return super::parse(inputProgram, endCharacter, errorMessage);
 	}
 	return status;
 }
 
 // * /
-ParseStatus MulDivOpParser::parse(std::string inputProgram, std::string errorType) {
-	trim(inputProgram);
+ParseStatus MulDivOpParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+	int endCharacter = startCharacter;
+	endCharacter += trim(inputProgram);
 	std::string errorMessage = "Expecting * or /";
 
 	if (inputProgram.size() == 0) {
-		return super::parse(inputProgram, errorMessage);
+		return super::parse(inputProgram, endCharacter, errorMessage);
 	}
 
 	ParseStatus status;
@@ -105,19 +118,22 @@ ParseStatus MulDivOpParser::parse(std::string inputProgram, std::string errorTyp
 		status.status = true;
 		status.parsedCharacters = inputProgram[0];
 		status.remainingCharacters = inputProgram.erase(0, 1);
+		status.startCharacter = startCharacter;
+		status.endCharacter = endCharacter + 1;
 	} else {
-		return super::parse(inputProgram, errorMessage);
+		return super::parse(inputProgram, endCharacter, errorMessage);
 	}
 	return status;
 }
 
 // ;
-ParseStatus SemiColonParser::parse(std::string inputProgram, std::string errorType) {
-	trim(inputProgram);
+ParseStatus SemiColonParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+	int endCharacter = startCharacter;
+	endCharacter += trim(inputProgram);
 	std::string errorMessage = "Missing semicolon";
 
 	if (inputProgram.size() == 0) {
-		return super::parse(inputProgram, errorMessage);
+		return super::parse(inputProgram, endCharacter, errorMessage);
 	}
 
 	ParseStatus status;
@@ -125,8 +141,10 @@ ParseStatus SemiColonParser::parse(std::string inputProgram, std::string errorTy
 		status.status = true;
 		status.parsedCharacters = inputProgram[0];
 		status.remainingCharacters = inputProgram.erase(0, 1);
+		status.startCharacter = startCharacter;
+		status.endCharacter = endCharacter + 1;
 	} else {
-		return super::parse(inputProgram, errorMessage);
+		return super::parse(inputProgram, endCharacter, errorMessage);
 	}
 	return status;
 }
