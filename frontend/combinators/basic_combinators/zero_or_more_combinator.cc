@@ -11,10 +11,10 @@ ParseStatus ZeroOrMoreCombinator::parse(std::string inputProgram, std::string er
 	pStatus.remainingCharacters = inputProgram;
 
 
-	while (pStatus.status){
+	while (pStatus.status) {
         ParseStatus status2 = parser->parse(pStatus.remainingCharacters);
 		pStatus.status = status2.status;
-		if (status2.status){
+		if (status2.status) {
 			pStatus.parsedCharacters += status2.parsedCharacters;
 			pStatus.remainingCharacters = status2.remainingCharacters;
 			if(status2.ast != NULL) {
