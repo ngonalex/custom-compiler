@@ -11,9 +11,14 @@ ControlFlowGraph::ControlFlowGraph
 std::unique_ptr<ControlFlowGraphNode> RecursiveCreate(std::vector<std::unique_ptr<ControlFlowGraphNode>> graph_set) {
   if (graph_set.empty()) {
     return NULL;
-  } else if (graph_set.front()->GetBlockType() == CONDITIONAL_BLOCK) {
-    return NULL;
+  } else if (graph_set.size() == 1) {
+    return std::move(graph_set[0]);
   } else {
+    if (graph_set.front()->GetBlockType() == CONDITIONAL_BLOCK) {
+      //graph_set.front()->SetLeftNode(RecursiveCreate());
+      //graph_set.front()->SetRightNode(RecursiveCreate());
+      return NULL;
+    }
     return NULL;
   }
 }
@@ -36,6 +41,10 @@ void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddress
   std::vector<std::unique_ptr<struct ThreeAddressCode>> new_block;
   int creation_order = 0;
   for (const auto &iter: input) {
+    auto block = make_unique<struct ThreeAddressCode>();
+    block->target = iter->target;
+    block->op = iter->op;
+    new_block.push_back(std::move(block));
     if (iter->op.opcode() == CONDITIONAL) {
       //std::vector<std::unique_ptr<struct ThreeAddressCode>> copy_block = CopyBlock(new_block);
       //ControlFlowGraphNode conditional_block(std::move(new_block));
@@ -87,10 +96,7 @@ void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddress
       cfg_vector.push_back(std::move(block));
       ++creation_order;
     } else {
-      auto block = make_unique<struct ThreeAddressCode>();
-      block->target = iter->target;
-      block->op = iter->op;
-      new_block.push_back(std::move(block));
+      //No need to make a block
     }
 
   } 

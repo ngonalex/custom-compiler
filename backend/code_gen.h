@@ -41,6 +41,14 @@ class CodeGen {
     void GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
       Type type);
 
+    void GenerateTupleFlagCheck();
+    void GenerateIntegerFlagCheck();
+    void GenerateExistenceCheck();
+    void GenerateTupleSizeCheck();
+    void GenerateUnboxer();
+    void GenerateBoxer();
+    void GenerateCreateNewTuple();
+
     // This function checks if the current scope is function or global
     // If it's global then it just returns the name of the variable
     // otherwise it checks the map for the function and returns the correct

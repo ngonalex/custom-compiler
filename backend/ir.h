@@ -66,7 +66,12 @@ enum Type {
   PRINTARITH,
   NOTYPE,
   LHSDEREFERENCE,
+<<<<<<< HEAD
   RHSDEFERERENCE,
+=======
+  RHSINTDEREFERENCE,
+  RHSTUPLEDEREFERENCE,
+>>>>>>> 3e3681c077f48ff53425892fffa13fbfb26878ca
   NEWTUPLE,
   VARCHILDTUPLE,  // change this later
 };
@@ -114,6 +119,7 @@ class Register {
   Register() : name_(""), type_(NOREG) {}
   std::string name() const {return name_;}
   RegisterType type() const {return type_;}
+  void ChangeRegisterName(std::string newname) {name_ = newname;}
 
  private:
   std::string name_;
