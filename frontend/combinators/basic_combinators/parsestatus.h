@@ -32,6 +32,7 @@ class ParseStatus {  // Super class
   std::string errorType;
 
   int characterStart;
+  int characterEnd;
   /*
 	  explicit ParseStatus(bool p_status, std::string p_remainingCharacters,
 		  std::string p_parsedCharacters, std::unique_ptr<const AstNode>

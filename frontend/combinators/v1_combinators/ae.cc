@@ -12,22 +12,25 @@ using namespace cs160::frontend;
    close_paren
 */
 
-ParseStatus ArithExprParser::parse(std::string inputProgram,
+ParseStatus ArithExprParser::parse(std::string inputProgram, int startCharacter,
 				   std::string errorType) {
-  trim(inputProgram);
+  int endCharacter = startCharacter;
+  endCharacter += trim(inputProgram);
   if (inputProgram.size() == 0) {
-    return super::parse(inputProgram);
+    return super::parse(inputProgram, endCharacter);
   }
   AddSubExprParser ae;
   SemiColonParser semiColonP;
-  ParseStatus aeParseResult = ae.parse(inputProgram);
+  ParseStatus aeParseResult = ae.parse(inputProgram, endCharacter);
+  aeParseResult.startCharacter = startCharacter;
   if (aeParseResult.status) {
     ParseStatus semiColonResult =
-	semiColonP.parse(aeParseResult.remainingCharacters);
+	semiColonP.parse(aeParseResult.remainingCharacters, aeParseResult.endCharacter);
     aeParseResult.status = semiColonResult.status;
     if (semiColonResult.status) {
       aeParseResult.remainingCharacters = semiColonResult.remainingCharacters;
       aeParseResult.parsedCharacters += semiColonResult.parsedCharacters;
+      aeParseResult.endCharacter = semiColonResult.endCharacter;
     } else {
       aeParseResult.errorType = semiColonResult.errorType;
     }

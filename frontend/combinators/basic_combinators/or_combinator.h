@@ -13,6 +13,7 @@ class OrCombinator : NullParser {
   NullParser *secondParser;
 
   virtual ParseStatus parse(std::string inputProgram,
+  				int startCharacter,
 			    std::string errorType = "");
 };
 

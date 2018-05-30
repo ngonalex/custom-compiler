@@ -11,6 +11,7 @@ namespace frontend {
 class MulDivOpParser : NullParser {
  public:
   virtual ParseStatus parse(std::string inputProgram,
+  				int startCharacter,
 			    std::string errorType = "");
 };
 

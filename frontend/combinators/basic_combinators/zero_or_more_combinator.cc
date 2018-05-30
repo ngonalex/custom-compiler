@@ -5,17 +5,21 @@
 using namespace cs160::frontend;
 
 ParseStatus ZeroOrMoreCombinator::parse(std::string inputProgram,
+          int startCharacter,
 					std::string errorType) {
   ParseStatus pStatus;
   pStatus.status = true;
   pStatus.remainingCharacters = inputProgram;
+  pStatus.startCharacter = startCharacter;
+  pStatus.endCharacter = startCharacter;
 
   while (pStatus.status) {
-    ParseStatus status2 = parser->parse(pStatus.remainingCharacters);
+    ParseStatus status2 = parser->parse(pStatus.remainingCharacters, pStatus.endCharacter);
     pStatus.status = status2.status;
     if (status2.status) {
       pStatus.parsedCharacters += status2.parsedCharacters;
       pStatus.remainingCharacters = status2.remainingCharacters;
+      pStatus.endCharacter = status2.endCharacter;
       if (status2.ast != NULL) {
 	pStatus.astNodes.push_back(std::move(status2.ast));
       }

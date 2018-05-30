@@ -4,7 +4,7 @@
 
 using namespace cs160::frontend;
 
-ParseStatus AtomParser::parse(std::string inputProgram, std::string errorType) {
+ParseStatus AtomParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
   if (input.size() == 0 || input[0] != char_to_parse_) {
     ParseStatus result;
     result.errorType = "Failed to parse";

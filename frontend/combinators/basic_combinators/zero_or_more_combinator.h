@@ -11,6 +11,7 @@ class ZeroOrMoreCombinator : NullParser {
  public:
   NullParser *parser;
   virtual ParseStatus parse(std::string inputProgram,
+  				int startCharacter,
 			    std::string errorType = "");
 };
 

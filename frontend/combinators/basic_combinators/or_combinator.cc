@@ -5,12 +5,13 @@
 using namespace cs160::frontend;
 
 ParseStatus OrCombinator::parse(std::string inputProgram,
+				int startCharacter,
 				std::string errorType) {
-  ParseStatus firstStatus = firstParser->parse(inputProgram);
+  ParseStatus firstStatus = firstParser->parse(inputProgram, startCharacter);
   if (firstStatus.status) {
     return firstStatus;
   }
 
-  ParseStatus secondStatus = secondParser->parse(inputProgram);
+  ParseStatus secondStatus = secondParser->parse(inputProgram, startCharacter);
   return secondStatus;
 }
