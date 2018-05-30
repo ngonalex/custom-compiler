@@ -7,9 +7,7 @@ using namespace cs160::frontend;
 
 ParseStatus OneOrMoreCombinator::parse(std::string inputProgram, std::string errorType){
 
-  if (!pStatus.status) {
-    return pStatus;
-  }
+	ParseStatus pStatus = parser->parse(inputProgram);
 
 	if (!pStatus.status) {
 		return pStatus;
