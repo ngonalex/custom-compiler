@@ -5,7 +5,7 @@
 using namespace cs160::frontend;
 
 ParseStatus SingleDigitParser::parse(std::string inputProgram,
-                                     std::string errorType) {
+				     std::string errorType) {
   trim(inputProgram);
   std::string errorMessage = "Digit should be between 0 and 9";
 

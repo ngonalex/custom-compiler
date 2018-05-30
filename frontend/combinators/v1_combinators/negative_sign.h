@@ -8,8 +8,9 @@ namespace cs160 {
 namespace frontend {
 
 class NegativeParser : NullParser {
-public:
-	virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
+ public:
+  virtual ParseStatus parse(std::string inputProgram,
+			    std::string errorType = "");
 };
 
 }  // namespace frontend

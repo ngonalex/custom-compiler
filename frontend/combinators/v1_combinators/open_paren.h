@@ -9,7 +9,8 @@ namespace frontend {
 
 class OpenParenParser : NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, std::string errorType = ""); 
+  virtual ParseStatus parse(std::string inputProgram,
+			    std::string errorType = "");
 };
 
 }  // namespace frontend

@@ -9,13 +9,13 @@ namespace frontend {
 
 class AtomParser : NullParser {
  public:
-	virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
+  virtual ParseStatus parse(std::string inputProgram,
+			    std::string errorType = "");
 
-	explicit AtomParser(char char_to_parse) {
-		char_to_parse_ = char_to_parse;
-	}
- private: 
- 	char char_to_parse_:
+  explicit AtomParser(char char_to_parse) { char_to_parse_ = char_to_parse; }
+
+ private:
+  char char_to_parse_:
 };
 
 }  // namespace frontend

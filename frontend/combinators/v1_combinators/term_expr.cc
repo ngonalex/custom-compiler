@@ -8,7 +8,8 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus TermExprParser::parse(std::string inputProgram, std::string errorType) {
+ParseStatus TermExprParser::parse(std::string inputProgram,
+				  std::string errorType) {
   trim(inputProgram);
 
   if (inputProgram.size() == 0) {
@@ -23,7 +24,7 @@ ParseStatus TermExprParser::parse(std::string inputProgram, std::string errorTyp
   orC.secondParser = reinterpret_cast<NullParser *>(&num);
 
   ParseStatus numParseStatus = orC.parse(inputProgram);
-  //ParseStatus numParseStatus = num.parse(inputProgram);
+  // ParseStatus numParseStatus = num.parse(inputProgram);
 
   if (numParseStatus.status) {
     return numParseStatus;  // Returning Success on Num
@@ -45,10 +46,9 @@ ParseStatus TermExprParser::parse(std::string inputProgram, std::string errorTyp
       result.remainingCharacters = aeParseStatus.remainingCharacters;
       std::unique_ptr<const ArithmeticExpr> zero = make_unique<IntegerExpr>(0);
       result.ast = std::move(make_unique<const SubtractExpr>(
-        unique_cast<const ArithmeticExpr>(std::move(zero)),
-        unique_cast<const ArithmeticExpr>(std::move(aeParseStatus.ast))));
-    }
-    else {
+	  unique_cast<const ArithmeticExpr>(std::move(zero)),
+	  unique_cast<const ArithmeticExpr>(std::move(aeParseStatus.ast))));
+    } else {
       result.status = aeParseStatus.status;
     }
     return result;
@@ -70,25 +70,22 @@ ParseStatus TermExprParser::parse(std::string inputProgram, std::string errorTyp
 
       CloseParenParser close_paren;
       ParseStatus cpParseStatus =
-          close_paren.parse(aeParseStatus.remainingCharacters);
+	  close_paren.parse(aeParseStatus.remainingCharacters);
       if (cpParseStatus.status) {
-        result.parsedCharacters += cpParseStatus.parsedCharacters;
-        result.remainingCharacters = cpParseStatus.remainingCharacters;
-        result.ast = std::move(aeParseStatus.ast);
+	result.parsedCharacters += cpParseStatus.parsedCharacters;
+	result.remainingCharacters = cpParseStatus.remainingCharacters;
+	result.ast = std::move(aeParseStatus.ast);
+      } else {
+	result.status = cpParseStatus.status;
+	result.errorType = cpParseStatus.errorType;
       }
-      else {
-        result.status = cpParseStatus.status;
-        result.errorType = cpParseStatus.errorType;
-      }
+    } else {
+      result.status = aeParseStatus.status;
+      result.errorType = aeParseStatus.errorType;
     }
-    else {
-        result.status = aeParseStatus.status;
-        result.errorType = aeParseStatus.errorType;
-    }
-  }
-  else {
+  } else {
     result.status = openParseStatus.status;
-      result.errorType = openParseStatus.errorType;
+    result.errorType = openParseStatus.errorType;
   }
 
   return result;

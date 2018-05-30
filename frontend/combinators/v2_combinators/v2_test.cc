@@ -2,10 +2,10 @@
 #include "abstract_syntax/print_visitor_v2.h"
 #include "frontend/combinators/v1_combinators/ae.h"
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
-#include "frontend/combinators/v2_combinators/main/word_parser.h"
-#include "frontend/combinators/v2_combinators/main/variable_parser.h"
 #include "frontend/combinators/v2_combinators/main/assignment_parser.h"
 #include "frontend/combinators/v2_combinators/main/program_parser.h"
+#include "frontend/combinators/v2_combinators/main/variable_parser.h"
+#include "frontend/combinators/v2_combinators/main/word_parser.h"
 #include "gtest/gtest.h"
 
 using namespace cs160::frontend;
@@ -181,7 +181,7 @@ TEST(WordParserCombinator, successTypeParser1) {
 
   ParseStatus testResult = parser.parse("     Integer");
 
-  //EXPECT_EQ(testResult, result);
+  // EXPECT_EQ(testResult, result);
   EXPECT_EQ(testResult.status, result.status);
   EXPECT_EQ(testResult.parsedCharacters, result.parsedCharacters);
   EXPECT_EQ(testResult.remainingCharacters, result.remainingCharacters);
@@ -193,7 +193,8 @@ TEST(WordParserCombinator, failTypeParser1) {
   ParseStatus result;
   result.status = false;
 
-  ParseStatus testResult = parser.parse("  _abc  "); // type can only contain a through z
+  ParseStatus testResult =
+      parser.parse("  _abc  ");  // type can only contain a through z
 
   EXPECT_EQ(testResult, result);
   EXPECT_EQ(testResult.errorType, "Incorrect type in variable declaration");
@@ -307,7 +308,9 @@ TEST(VariableParserCombinator, failVariableParser4) {
   ParseStatus testResult = parser.parse("var 1victor : Integer");
 
   EXPECT_EQ(testResult, result);
-  EXPECT_EQ(testResult.errorType, "Declare variable names with 'var variable_name : type = expression'");
+  EXPECT_EQ(
+      testResult.errorType,
+      "Declare variable names with 'var variable_name : type = expression'");
 }
 
 // Fail Case VariableParser : colon missing
@@ -319,8 +322,8 @@ TEST(VariableParserCombinator, failVariableParser5) {
   ParseStatus testResult = parser.parse(" var _victor Integer");
 
   EXPECT_EQ(testResult, result);
-  //TODO FIX
-  //EXPECT_EQ(testResult.errorType, )
+  // TODO FIX
+  // EXPECT_EQ(testResult.errorType, )
 }
 
 // Fail Case Missing semicolon
@@ -334,7 +337,6 @@ TEST(WordParserCombinator, failVariableParser6) {
   EXPECT_EQ(testResult, result);
   EXPECT_EQ(testResult.errorType, "Missing semicolon");
 }
-
 
 // Success Case VariableParser
 TEST(AssignmentParserCombinator, successAssignmentParser1) {
@@ -384,7 +386,7 @@ TEST(AssignmentParserCombinator, successAssignmentParser3) {
 
   ParseStatus testResult = parser.parse(" victor = (123 * 1 + 3901 - 2);");
 
-    // Traversing the AST created from the variable name
+  // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
   testResult.ast->Visit(a);
   std::string output = a->GetOutput();
@@ -413,7 +415,9 @@ TEST(AssignmentParserCombinator, failAssignmentParser2) {
   ParseStatus testResult = parser.parse("1victor = (123 * 1 + 3901 - 2);");
 
   EXPECT_EQ(testResult, result);
-  EXPECT_EQ(testResult.errorType, "Declare variable names with 'var variable_name : type = expression'");
+  EXPECT_EQ(
+      testResult.errorType,
+      "Declare variable names with 'var variable_name : type = expression'");
 }
 
 // Fail Case VariableParser : missing equal sign
@@ -457,7 +461,6 @@ TEST(BinaryOperatorExpr, successBinaryOperatorExpr1) {
   EXPECT_EQ(output, "(((victor + 490) - _foo) + 3)");
 }
 
-
 // Success Case ProgramParser
 TEST(AssignmentParserCombinator, successProgramParser1) {
   ProgramParser parser;
@@ -466,9 +469,10 @@ TEST(AssignmentParserCombinator, successProgramParser1) {
   result.remainingCharacters = "";
   result.parsedCharacters = "victor = (123*1+3901-2);j = 4; j+victor;";
 
-  ParseStatus testResult = parser.parse(" victor = (123 * 1 + 3901 - 2); j = 4; j+victor;");
+  ParseStatus testResult =
+      parser.parse(" victor = (123 * 1 + 3901 - 2); j = 4; j+victor;");
 
-    // Traversing the AST created from the variable name
+  // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
   testResult.ast->Visit(a);
   std::string output = a->GetOutput();
@@ -482,7 +486,7 @@ TEST(AssignmentParserCombinator, failProgramParser1) {
   ProgramParser parser;
   ParseStatus result;
   result.status = false;
-  //result.errorType = "Incorrect type in variable declaration";
+  // result.errorType = "Incorrect type in variable declaration";
 
   ParseStatus testResult = parser.parse("x = ; x + 2;");
 
@@ -494,11 +498,9 @@ TEST(AssignmentParserCombinator, failProgramParser2) {
   ProgramParser parser;
   ParseStatus result;
   result.status = false;
-  //result.errorType = "Incorrect type in variable declaration";
+  // result.errorType = "Incorrect type in variable declaration";
 
   ParseStatus testResult = parser.parse("x = 3; x + 2");
 
   EXPECT_EQ(testResult.status, result.status);
 }
-
-
