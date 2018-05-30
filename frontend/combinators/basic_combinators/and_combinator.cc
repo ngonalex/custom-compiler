@@ -17,7 +17,10 @@ ParseStatus AndCombinator::parse(std::string inputProgram, int startCharacter, s
   if (!secondStatus.status) {
     return secondStatus;
   }
-
+/*
+  ParseStatus both::andSuccess(secondStatus.remainingCharacters, 
+  	firstStatus.parsedCharacters + secondStatus.parsedCharacters, std::move(firstStatus.ast),
+  	std::move(secondStatus.ast), firstStatus.characterStart + secondStatus.characterStart);*/
   ParseStatus both;
   both.status = true;
   both.parsedCharacters =

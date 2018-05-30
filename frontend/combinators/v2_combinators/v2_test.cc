@@ -356,7 +356,7 @@ TEST(AssignmentParserCombinator, successAssignmentParser1) {
   EXPECT_EQ(testResult, result);
   EXPECT_EQ(output, "_victor = 490");
 }
-
+/*
 // Success Case VariableParser
 TEST(AssignmentParserCombinator, successAssignmentParser2) {
   AssignmentParser parser;
@@ -504,3 +504,7 @@ TEST(AssignmentParserCombinator, failProgramParser2) {
 
   EXPECT_EQ(testResult.status, result.status);
 }
+<<<<<<< Updated upstream
+=======
+
+*/
