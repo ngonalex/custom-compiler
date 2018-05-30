@@ -20,10 +20,12 @@ std::string LowererVisitor::GetOutput() {
   std::string output = "";
 
   // Probably make this a private variable or something?
-  std::vector<std::string> printhelper = {"intload", "VARLOAD", "VARASSIGNLOAD"
-    "FUNARGLOAD", "FUNRETLOAD, ""+", "-", "*", "/", "<", "<=", ">", ">=",
+  std::vector<std::string> printhelper = {"INTLOAD", "VARLOAD", "VARASSIGNLOAD",
+    "FUNARGLOAD", "FUNRETLOAD", "+", "-", "*", "/", "<", "<=", ">", ">=",
     "==", "&&", "||", "¬", "while", "if", "jmp", "je", "jne", "jg", "jge",
-    "jl", "jle", "MkLabel"};
+    "jl", "jle", "MkLabel", "FUNCTIONCALL", "FUNRETURNEPILOGUE", "FUNCTIONDEF", "FUNPROLOGUE", "FUNEPILOGUE", "PRINTARITH", "NOTYPE",
+    "LHSDEREFERENCE", "RHSINTDEREFERENCE", "RHSTUPLEDEREFERENCE", "NEWTUPLE", "VARCHILDTUPLE"};
+
 
   for (unsigned int i = 0; i < blocks_.size(); ++i) {
     // If it's a just a int (Register without a name then access it's value)
@@ -37,7 +39,10 @@ std::string LowererVisitor::GetOutput() {
       case VARASSIGNLOAD:
         output = output + blocks_[i]->target.reg().name()
               + " <- " + blocks_[i]->arg1.reg().name();
+        break;
       case FUNARGLOAD:
+        output = output + blocks_[i]->target.reg().name()
+              + " <- " + std::to_string(blocks_[i]->arg1.value());
         break;
       // case ADD:
       //   GetOutputArithmeticHelper(output, i, printhelper);
