@@ -214,7 +214,7 @@ TEST_F(LowererTest, FunctionCallTest) {
   auto foo_retval = make_unique<const AddExpr>(
     make_unique<const VariableExpr>("foo_retval"),
     make_unique<const IntegerExpr>(0));
-  
+
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
   foo_params.push_back(std::move(make_unique<const VariableExpr>("bob")));
 
@@ -329,7 +329,7 @@ TEST_F(LowererTest, VariabletoVariableAssignmentTest) {
 
   auto expr = make_unique<Program>(std::move(function_defs),
     std::move(statements), std::move(arithexpr));
-  
+
   expr->Visit(&lowerer_);
 
   // t_0 <- 5
@@ -484,7 +484,7 @@ TEST_F(LowererTest, LoopWithNestedLogicalsWithVariables) {
 
   auto expr = make_unique<Program>(std::move(function_defs),
     std::move(statements), std::move(arithexpr));
-  
+
   expr->Visit(&lowerer_);
 
   // t_0 <- 5

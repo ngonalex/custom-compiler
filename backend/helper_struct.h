@@ -12,6 +12,8 @@ struct Counter {
   int localvarcount;
   Counter() : variablecount(0), branchcount(0),
     continuecount(0), loopcount(0), localvarcount(0) {}
+};
+
 }  // namespace backend
 }  // namespace cs160
 
