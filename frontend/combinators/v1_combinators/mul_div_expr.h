@@ -3,8 +3,8 @@
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
-#include "frontend/combinators/v1_combinators/num_parser.h"
 #include "frontend/combinators/v1_combinators/mul_div_op.h"
+#include "frontend/combinators/v1_combinators/num_parser.h"
 #include "frontend/combinators/v1_combinators/term_expr.h"
 
 namespace cs160 {
@@ -18,7 +18,7 @@ class MulDivExprParser : NullParser {
      std::unique_ptr<const ArithmeticExpr> second_leaf); 
 };
 
-} // namespace frontend
-} // namespace cs160
+}  // namespace frontend
+}  // namespace cs160
 
-#endif // MUL_DIV_EXPR_H_
+#endif  // MUL_DIV_EXPR_H_

@@ -2,35 +2,34 @@
 #define BACKEND_INTERPRETER_VISITOR_H_
 
 #include <stdio.h>
+#include <iostream>
 #include <map>
 #include <stack>
-#include <iostream>
-#include <utility>
 #include <string>
+#include <utility>
 
 #include "abstract_syntax/abstract_syntax.h"
 
-using cs160::abstract_syntax::backend::AstVisitor;
-using cs160::abstract_syntax::backend::IntegerExpr;
 using cs160::abstract_syntax::backend::AddExpr;
-using cs160::abstract_syntax::backend::SubtractExpr;
-using cs160::abstract_syntax::backend::MultiplyExpr;
-using cs160::abstract_syntax::backend::DivideExpr;
-using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::Assignment;
-using cs160::abstract_syntax::backend::Program;
-using cs160::abstract_syntax::backend::VariableExpr;
-using cs160::abstract_syntax::backend::LessThanExpr;
-using cs160::abstract_syntax::backend::LessThanEqualToExpr;
-using cs160::abstract_syntax::backend::GreaterThanExpr;
-using cs160::abstract_syntax::backend::GreaterThanEqualToExpr;
+using cs160::abstract_syntax::backend::AstVisitor;
+using cs160::abstract_syntax::backend::Conditional;
+using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::EqualToExpr;
+using cs160::abstract_syntax::backend::GreaterThanEqualToExpr;
+using cs160::abstract_syntax::backend::GreaterThanExpr;
+using cs160::abstract_syntax::backend::IntegerExpr;
+using cs160::abstract_syntax::backend::LessThanEqualToExpr;
+using cs160::abstract_syntax::backend::LessThanExpr;
 using cs160::abstract_syntax::backend::LogicalAndExpr;
 using cs160::abstract_syntax::backend::LogicalBinaryOperator;
 using cs160::abstract_syntax::backend::LogicalNotExpr;
 using cs160::abstract_syntax::backend::LogicalOrExpr;
 using cs160::abstract_syntax::backend::Loop;
-using cs160::abstract_syntax::backend::Conditional;
+using cs160::abstract_syntax::backend::MultiplyExpr;
+using cs160::abstract_syntax::backend::Program;
+using cs160::abstract_syntax::backend::SubtractExpr;
+using cs160::abstract_syntax::backend::VariableExpr;
 
 namespace cs160 {
 namespace backend {
@@ -56,8 +55,7 @@ class InterpreterVisitor : public AstVisitor {
   void VisitLessThanExpr(const LessThanExpr& exp) {}
   void VisitLessThanEqualToExpr(const LessThanEqualToExpr& exp) {}
   void VisitGreaterThanExpr(const GreaterThanExpr& exp) {}
-  void VisitGreaterThanEqualToExpr(
-      const GreaterThanEqualToExpr& exp) {}
+  void VisitGreaterThanEqualToExpr(const GreaterThanEqualToExpr& exp) {}
   void VisitEqualToExpr(const EqualToExpr& exp) {}
   void VisitLogicalAndExpr(const LogicalAndExpr& exp) {}
   void VisitLogicalOrExpr(const LogicalOrExpr& exp) {}
@@ -82,7 +80,7 @@ class InterpreterVisitor : public AstVisitor {
     opstack_.pop();
     int l = opstack_.top();
     opstack_.pop();
-    opstack_.push(l+r);
+    opstack_.push(l + r);
   }
 
   void VisitSubtractExpr(const SubtractExpr& exp) {
@@ -96,7 +94,7 @@ class InterpreterVisitor : public AstVisitor {
     opstack_.pop();
     int l = opstack_.top();
     opstack_.pop();
-    opstack_.push(l-r);
+    opstack_.push(l - r);
   }
 
   void VisitMultiplyExpr(const MultiplyExpr& exp) {
@@ -109,7 +107,7 @@ class InterpreterVisitor : public AstVisitor {
     opstack_.pop();
     unsigned int l = opstack_.top();
     opstack_.pop();
-    opstack_.push(l*r);
+    opstack_.push(l * r);
   }
 
   void VisitDivideExpr(const DivideExpr& exp) {
@@ -129,7 +127,7 @@ class InterpreterVisitor : public AstVisitor {
     opstack_.pop();
     int l = opstack_.top();
     opstack_.pop();
-    opstack_.push(l/r);
+    opstack_.push(l / r);
   }
 
   void VisitVariableExpr(const VariableExpr& exp) {
@@ -157,7 +155,6 @@ class InterpreterVisitor : public AstVisitor {
 
     program.arithmetic_exp().Visit(this);
   }
-
 
  private:
   // Not very general, this is probably a bad idea for future ASTS

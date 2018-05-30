@@ -21,11 +21,14 @@ ParseStatus ZeroOrMoreCombinator::parse(std::string inputProgram, std::string er
 				pStatus.astNodes.push_back(std::move(status2.ast)); 
 			}
 		}
+		else {
+			pStatus.status = false;
+			pStatus.errorType = status2.errorType;
+		}
 	}
 
 	pStatus.status = true;
 
 	return pStatus;
 }
-
 

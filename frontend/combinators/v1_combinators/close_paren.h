@@ -6,13 +6,13 @@
 
 namespace cs160 {
 namespace frontend {
-  
+
 class CloseParenParser : NullParser {
  public:
    virtual ParseStatus parse(std::string inputProgram, std::string errorType = ""); 
 };
 
-} // namespace frontend
-} // namespace cs160
+}  // namespace frontend
+}  // namespace cs160
 
-#endif // CLOSE_PAREN_H
+#endif  // CLOSE_PAREN_H

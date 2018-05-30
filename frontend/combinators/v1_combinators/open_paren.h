@@ -12,7 +12,7 @@ class OpenParenParser : NullParser {
    virtual ParseStatus parse(std::string inputProgram, std::string errorType = ""); 
 };
 
-} // namespace frontend
-} // namespace cs160
+}  // namespace frontend
+}  // namespace cs160
 
-#endif // OPEN_PAREN_H
+#endif  // OPEN_PAREN_H

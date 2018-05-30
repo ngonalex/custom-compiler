@@ -11,6 +11,7 @@
 #define super NullParser
 
 using namespace cs160::frontend;
+using namespace std;
 
 ParseStatus VarKeywordParser::parse(std::string inputProgram, std::string errorType) {
 	trim(inputProgram);
