@@ -9,8 +9,8 @@ namespace frontend {
 
 class OneOrMoreCombinator : NullParser {
  public:
-  NullParser *parser;
-  virtual ParseStatus parse(std::string inputProgram);
+	NullParser *parser;
+	virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
 };
 
 }  // namespace frontend

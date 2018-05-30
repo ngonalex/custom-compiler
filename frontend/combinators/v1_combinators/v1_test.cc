@@ -1,5 +1,5 @@
 #include "abstract_syntax/abstract_syntax.h"
-#include "abstract_syntax/print_visitor_v1.h"
+#include "abstract_syntax/print_visitor_v2.h"
 #include "frontend/combinators/v1_combinators/single_char.h"
 #include "frontend/combinators/v1_combinators/single_digit.h"
 
@@ -74,6 +74,7 @@ TEST(Combinators, DigitAndCharCombinator) {
   aC.firstParser = reinterpret_cast<NullParser *>(&digitParser);
   aC.secondParser = reinterpret_cast<NullParser *>(&charParser);
 
+  //ParseStatus result = aC.parse("1o1");
   ParseStatus result = aC.parse("1o1");
 
   EXPECT_EQ(result.status, true);
@@ -242,7 +243,7 @@ TEST(Combinators, SimplyAddition) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(output, "(+ 5 77)");
+  EXPECT_EQ(output, "(5 + 77)");
 }
 
 TEST(Combinators, SimpleMul) {
@@ -256,7 +257,7 @@ TEST(Combinators, SimpleMul) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(output, "(* 225 335)");
+  EXPECT_EQ(output, "(225 * 335)");
 }
 
 // TODO: FIX THESE
@@ -271,7 +272,7 @@ TEST(Combinators, SimpleParen) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(output, "(* 225 335)");
+  EXPECT_EQ(output, "(225 * 335)");
 }
 
 TEST(Combinators, NegativeNumber) {
@@ -285,7 +286,7 @@ TEST(Combinators, NegativeNumber) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "abasdf");
-  EXPECT_EQ(output, "(- 0 101281510)");
+  EXPECT_EQ(output, "(0 - 101281510)");
 }
 
 /* // Original - broken
@@ -307,7 +308,7 @@ TEST(Combinators, TrivialAe) {
 // New - working
 TEST(Combinators, TrivialAe1) {
   ArithExprParser test;
-  ParseStatus result = test.parse("((225*335)+12)/2");
+  ParseStatus result = test.parse("((225*335)+12)/2;");
 
   // Traversing the AST created from the number
   PrintVisitor *a = new PrintVisitor();
@@ -316,13 +317,13 @@ TEST(Combinators, TrivialAe1) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(output, "(/ (+ (* 225 335) 12) 2)");
+  EXPECT_EQ(output, "(((225 * 335) + 12) / 2)");
 }
 
 // New - working
 TEST(Combinators, TrivialAe2) {
   ArithExprParser test;
-  ParseStatus result = test.parse("(225*335)+(12/2)");
+  ParseStatus result = test.parse("(225*335)+(12/2);");
 
   // Traversing the AST created from the number
   PrintVisitor *a = new PrintVisitor();
@@ -331,13 +332,13 @@ TEST(Combinators, TrivialAe2) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(output, "(+ (* 225 335) (/ 12 2))");
+  EXPECT_EQ(output, "((225 * 335) + (12 / 2))");
 }
 
 // New - working
 TEST(Combinators, TrivialAe3) {
   ArithExprParser test;
-  ParseStatus result = test.parse("(225*335)+12/2");
+  ParseStatus result = test.parse("(225*335)+12/2;");
 
   // Traversing the AST created from the number
   PrintVisitor *a = new PrintVisitor();
@@ -346,12 +347,12 @@ TEST(Combinators, TrivialAe3) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(output, "(+ (* 225 335) (/ 12 2))");
+  EXPECT_EQ(output, "((225 * 335) + (12 / 2))");
 }
 
 TEST(Combinators, ComplicatedAe) {
   ArithExprParser test;
-  ParseStatus result = test.parse("7*10+9/3+16-8*2*3-77+12*1");
+  ParseStatus result = test.parse("7*10+9/3+16-8*2*3-77+12*1;");
 
   // Traversing the AST created from the number
   PrintVisitor *a = new PrintVisitor();
@@ -360,14 +361,12 @@ TEST(Combinators, ComplicatedAe) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(
-      output,
-      "(+ (- (- (+ (+ (* 7 10) (/ 9 3)) 16) (* (* 8 2) 3)) 77) (* 12 1))");
+  EXPECT_EQ(output, "((((((7 * 10) + (9 / 3)) + 16) - ((8 * 2) * 3)) - 77) + (12 * 1))");
 }
 
 TEST(Combinators, NegComplicatedAe) {
   ArithExprParser test;
-  ParseStatus result = test.parse("-(7*10+9/3+16-8*2*3-77+12*1)");
+  ParseStatus result = test.parse("-(7*10+9/3+16-8*2*3-77+12*1);");
 
   // Traversing the AST created from the number
   PrintVisitor *a = new PrintVisitor();
@@ -376,7 +375,5 @@ TEST(Combinators, NegComplicatedAe) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(output,
-            "(- 0 (+ (- (- (+ (+ (* 7 10) (/ 9 3)) 16) (* (* 8 2) 3)) 77) (* "
-            "12 1)))");
+  EXPECT_EQ(output, "(0 - ((((((7 * 10) + (9 / 3)) + 16) - ((8 * 2) * 3)) - 77) + (12 * 1)))");
 }

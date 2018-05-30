@@ -12,10 +12,10 @@ namespace frontend {
 
 class MulDivExprParser : NullParser {
  public:
-  virtual ParseStatus parse(std::string inputProgram);
-  std::unique_ptr<const AstNode> make_node(
-      std::string op, std::unique_ptr<const AstNode> first_leaf,
-      std::unique_ptr<const AstNode> second_leaf);
+   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
+   std::unique_ptr<const ArithmeticExpr> make_node(std::string op, 
+     std::unique_ptr<const ArithmeticExpr> first_leaf,
+     std::unique_ptr<const ArithmeticExpr> second_leaf); 
 };
 
 }  // namespace frontend
