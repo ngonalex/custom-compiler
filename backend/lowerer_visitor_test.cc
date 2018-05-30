@@ -7,6 +7,7 @@
 #include "gtest/gtest.h"
 
 using cs160::abstract_syntax::backend::AstVisitor;
+using cs160::abstract_syntax::backend::ArithmeticExpr;
 using cs160::abstract_syntax::backend::IntegerExpr;
 using cs160::abstract_syntax::backend::AddExpr;
 using cs160::abstract_syntax::backend::SubtractExpr;
@@ -24,6 +25,8 @@ using cs160::abstract_syntax::backend::LogicalOrExpr;
 using cs160::abstract_syntax::backend::Loop;
 using cs160::abstract_syntax::backend::Conditional;
 using cs160::abstract_syntax::backend::Statement;
+using cs160::abstract_syntax::backend::FunctionCall;
+using cs160::abstract_syntax::backend::FunctionDef;
 using cs160::backend::LowererVisitor;
 using cs160::make_unique;
 
@@ -140,11 +143,14 @@ TEST_F(LowererTest, DoubleIntAssignmentTest) {
     "t_2 <- t_0 + t_1\nx <- t_2\n");
 }
 
-TEST_F(LowererTest, FunctionDefTest){
+TEST_F(LowererTest, FunctionDefTest) {
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
+
+  // empty fact_body
   Statement::Block fact_body;
 
+  // return value
   auto foo_retval = make_unique<const AddExpr>(
     make_unique<const IntegerExpr>(1),
     make_unique<const IntegerExpr>(0));
@@ -153,57 +159,82 @@ TEST_F(LowererTest, FunctionDefTest){
                                                 std::move(fact_body),
                                                 std::move(foo_retval));
 
-  foo_def->Visit(&lowerer_);
+  foo_def->Visit(&lowerer_); 
   
   EXPECT_EQ(lowerer_.GetOutput(), " <-  def \nMkLabel func\n <-  FUNPROLOGUE \nt_0 <- 1\nt_1 <- 0\nt_2 <- t_0 + t_1\n <-  FUNEPILOGUE \n");
 }
 
-// TEST_F(LowererTest, BasicProgramCreation) {
-//   Statement::Block statements;
+TEST_F(LowererTest, FunctionCallTest) {
+  Statement::Block statements;
 
-//   statements.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("x"),
-//     make_unique<AddExpr>(
-//       make_unique<IntegerExpr>(5),
-//       make_unique<IntegerExpr>(10)))));
+  // bob = 10
+  // int returnval = fact(bob)
+  // func fact (int bob) {
+  //    returnval = 1
+  //    return retunval + 0
+  // }
+  statements.push_back(make_unique<const Assignment>(make_unique<const VariableExpr>("bob"), make_unique<const IntegerExpr>(10)));
 
-//   auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
-//     make_unique<IntegerExpr>(5));
+  auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
+  arguments.push_back(std::move(make_unique<const VariableExpr>("bob")));
+  
+  // call function fact
+  statements.push_back(std::move(make_unique<const FunctionCall>(
+      make_unique<const VariableExpr>("foo_retval"), "fact",
+      std::move(arguments))));
 
-//   auto expr = make_unique<Program>(std::move(statements),
-//     std::move(arithexpr));
+  // getting the return value
+  auto ae = make_unique<const VariableExpr>("foo_retval");
 
-//   expr->Visit(&lowerer_);
+  auto foo_retval = make_unique<const AddExpr>(
+    make_unique<const VariableExpr>("foo_retval"),
+    make_unique<const IntegerExpr>(0));
+      
+  auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
+  foo_params.push_back(std::move(make_unique<const VariableExpr>("bob")));
 
-//   // t_0 <- 5
-//   // t_1 <- 10
-//   // t_2 <- t_0 + t_1
-//   // x <- t_2
-//   // t_3 <- 7
-//   // t_4 <- 5
-//   // t_5 <- t_3 - t_4
+  Statement::Block fact_body;
 
-//   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
-//     "x <- t_2\nt_3 <- 7\nt_4 <- 5\nt_5 <- t_3 - t_4\n");
-// }
+  fact_body.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("foo_retval"),
+    make_unique<IntegerExpr>(1))));
 
-// TEST_F(LowererTest, UnassignedVariable) {
-//   auto expr = make_unique<const LogicalAndExpr>(
-//     make_unique<const LessThanExpr>(
-//         make_unique<const VariableExpr>("x"),
-//         make_unique<const IntegerExpr>(100)),
-//     make_unique<const GreaterThanExpr>(
-//         make_unique<const VariableExpr>("x"),
-//         make_unique<const IntegerExpr>(100)));
+  // fact_body.push_back(std::move(make_unique<const AddExpr>(make_unique<const VariableExpr>("foo_reval"),make_unique<const VariableExpr>("bob"))));
 
-//     // t_0 <- 100
-//     // t_1 <- x < t_0
-//     // t_2 <- 100
-//     // t_3 <- x > t_2
-//     // t_4 <- t_1 && t_3
-//     EXPECT_EXIT(expr->Visit(&lowerer_), ::testing::ExitedWithCode(1),
-//       "Variable x not assigned");
-// }
+  auto foo_def = make_unique<const FunctionDef>("fact", std::move(foo_params),
+                                                std::move(fact_body),
+                                                std::move(foo_retval));
+
+  FunctionDef::Block function_defs;
+  function_defs.push_back(std::move(foo_def));
+
+  auto ast = make_unique<const Program>(std::move(function_defs),
+    std::move(statements), std::move(ae));
+
+
+  ast->Visit(&lowerer_); 
+  
+  // there is a new line problem 
+  EXPECT_EQ(lowerer_.GetOutput(), "");
+}
+
+TEST_F(LowererTest, UnassignedVariable) {
+  auto expr = make_unique<const LogicalAndExpr>(
+    make_unique<const LessThanExpr>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(100)),
+    make_unique<const GreaterThanExpr>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(100)));
+
+    // t_0 <- 100
+    // t_1 <- x < t_0
+    // t_2 <- 100
+    // t_3 <- x > t_2
+    // t_4 <- t_1 && t_3
+    EXPECT_EXIT(expr->Visit(&lowerer_), ::testing::ExitedWithCode(1),
+      "Variable x not assigned");
+}
 
 // TEST_F(LowererTest, NestedLogicalsWithInts) {
 //   auto expr = make_unique<const LogicalOrExpr>(

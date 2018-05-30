@@ -23,7 +23,7 @@ std::string LowererVisitor::GetOutput() {
   std::vector<std::string> printhelper = {"INTLOAD", "VARLOAD", "VARASSIGNLOAD",
     "FUNARGLOAD", "FUNRETLOAD", "+", "-", "*", "/", "<", "<=", ">", ">=",
     "==", "&&", "||", "¬", "while", "if", "jmp", "je", "jne", "jg", "jge",
-    "jl", "jle", "MkLabel", "call", "return", "def", "FUNPROLOGUE", "FUNEPILOGUE", "PRINTARITH", "NOTYPE",
+    "jl", "jle", "MkLabel", "call", "FUNRETURNEPILOGUE", "def", "FUNPROLOGUE", "FUNEPILOGUE", "PRINTARITH", "NOTYPE",
     "LHSDEREFERENCE", "RHSINTDEREFERENCE", "RHSTUPLEDEREFERENCE", "NEWTUPLE", "VARCHILDTUPLE"};
 
 
