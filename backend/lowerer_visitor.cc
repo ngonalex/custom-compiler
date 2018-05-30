@@ -23,7 +23,7 @@ std::string LowererVisitor::GetOutput() {
   std::vector<std::string> printhelper = {"INTLOAD", "VARLOAD", "VARASSIGNLOAD",
     "FUNARGLOAD", "FUNRETLOAD", "+", "-", "*", "/", "<", "<=", ">", ">=",
     "==", "&&", "||", "¬", "while", "if", "jmp", "je", "jne", "jg", "jge",
-    "jl", "jle", "MkLabel", "call", "FUNRETURNEPILOGUE", "def", "FUNPROLOGUE", "FUNEPILOGUE", "PRINTARITH", "NOTYPE",
+    "jl", "jle", "MkLabel", "FUNCTIONCALL", "FUNRETURNEPILOGUE", "FUNCTIONDEF", "FUNPROLOGUE", "FUNEPILOGUE", "PRINTARITH", "NOTYPE",
     "LHSDEREFERENCE", "RHSINTDEREFERENCE", "RHSTUPLEDEREFERENCE", "NEWTUPLE", "VARCHILDTUPLE"};
 
 
@@ -39,7 +39,10 @@ std::string LowererVisitor::GetOutput() {
       case VARASSIGNLOAD:
         output = output + blocks_[i]->target.reg().name()
               + " <- " + blocks_[i]->arg1.reg().name();
+        break;
       case FUNARGLOAD:
+        output = output + blocks_[i]->target.reg().name()
+              + " <- " + std::to_string(blocks_[i]->arg1.value());
         break;
       // case ADD:
       //   GetOutputArithmeticHelper(output, i, printhelper);

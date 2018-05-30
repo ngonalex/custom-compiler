@@ -33,6 +33,28 @@ using cs160::make_unique;
 
 // TO DO: Write tests for variables as AEs
 class LowererTest : public ::testing::Test {
+
+ public:
+  std::unique_ptr<const FunctionDef> GenerateFuncDef() {
+    // empty params
+    auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
+
+  // empty fact_body
+    Statement::Block fact_body;
+
+  // return value
+    auto foo_retval = make_unique<const IntegerExpr>(0);
+
+    auto foo_def = make_unique<const FunctionDef>("func", std::move(foo_params),
+                                                std::move(fact_body),
+                                                std::move(foo_retval));
+    return foo_def;
+  }
+
+  std::string GenerateFuncDefOutPut(int blocksize){
+    return  " <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n <-  FUNPROLOGUE \nt_" + std::to_string(blocksize) + " <- 0\n <-  FUNEPILOGUE \n";
+  }
+
  protected:
   LowererVisitor lowerer_;
 };
@@ -161,8 +183,9 @@ TEST_F(LowererTest, FunctionDefTest) {
 
   foo_def->Visit(&lowerer_); 
   
-  EXPECT_EQ(lowerer_.GetOutput(), " <-  def \nMkLabel func\n <-  FUNPROLOGUE \nt_0 <- 1\nt_1 <- 0\nt_2 <- t_0 + t_1\n <-  FUNEPILOGUE \n");
+  EXPECT_EQ(lowerer_.GetOutput(), " <-  FUNCTIONDEF \nMkLabel func\n <-  FUNPROLOGUE \nt_0 <- 1\nt_1 <- 0\nt_2 <- t_0 + t_1\n <-  FUNEPILOGUE \n");
 }
+
 
 TEST_F(LowererTest, FunctionCallTest) {
   Statement::Block statements;
@@ -215,7 +238,7 @@ TEST_F(LowererTest, FunctionCallTest) {
   ast->Visit(&lowerer_); 
   
   // there is a new line problem 
-  EXPECT_EQ(lowerer_.GetOutput(), "");
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 10\nbob <- t_0\n <-  FUNCTIONCALL \nfoo_retval <- FUNRETLOAD FUNRETLOAD \n <-  FUNRETURNEPILOGUE \n <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel fact\n <-  FUNPROLOGUE \nbob <- 0\nt_1 <- 1\nfoo_retval <- t_1\nt_2 <- 0\nt_3 <- foo_retval + t_2\n <-  FUNEPILOGUE \n");
 }
 
 TEST_F(LowererTest, UnassignedVariable) {
@@ -236,650 +259,673 @@ TEST_F(LowererTest, UnassignedVariable) {
       "Variable x not assigned");
 }
 
-// TEST_F(LowererTest, NestedLogicalsWithInts) {
-//   auto expr = make_unique<const LogicalOrExpr>(
-//     make_unique<const LogicalAndExpr>(
-//       make_unique<const LessThanExpr>(
-//         make_unique<const IntegerExpr>(50),
-//         make_unique<const IntegerExpr>(100)),
-//       make_unique<const GreaterThanExpr>(
-//         make_unique<const IntegerExpr>(50),
-//         make_unique<const IntegerExpr>(0))),
-//     make_unique<const LogicalAndExpr>(
-//       make_unique<const LessThanEqualToExpr>(
-//         make_unique<const IntegerExpr>(50),
-//         make_unique<const IntegerExpr>(100)),
-//       make_unique<const GreaterThanEqualToExpr>(
-//         make_unique<const IntegerExpr>(50),
-//         make_unique<const IntegerExpr>(0))));
-
-//   expr->Visit(&lowerer_);
-//   // t_0 <- 50
-//   // t_1 <- 100
-//   // t_2 <- t_0 < t_1
-//   // t_3 <- 50
-//   // t_4 <- 0
-//   // t_5 <- t_3 > t_4
-//   // t_6 <- t_2 && t_5
-//   // t_7 <- 50
-//   // t_8 <- 100
-//   // t_9 <- t_7 <= t_8
-//   // t_10 <- 50
-//   // t_11 <- 0
-//   // t_12 <- t_10 >= t_11
-//   // t_13 <- t_9 && t_12
-//   // t_14 <- t_6 || t_13
-//   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 50\nt_1 <- 100\nt_2 <- t_0 < t_1\n"
-//     "t_3 <- 50\nt_4 <- 0\nt_5 <- t_3 > t_4\nt_6 <- t_2 && t_5\n"
-//     "t_7 <- 50\nt_8 <- 100\nt_9 <- t_7 <= t_8\nt_10 <- 50\nt_11 <- 0\n"
-//     "t_12 <- t_10 >= t_11\nt_13 <- t_9 && t_12\nt_14 <- t_6 || t_13\n");
-// }
-
-// TEST_F(LowererTest, VariabletoVariableAssignmentTest) {
-//   Statement::Block statements;
-
-//   statements.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("x"),
-//     make_unique<AddExpr>(
-//       make_unique<IntegerExpr>(5),
-//       make_unique<IntegerExpr>(10)))));
-
-//   statements.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("y"),
-//     make_unique<SubtractExpr>(
-//       make_unique<VariableExpr>("x"),
-//       make_unique<IntegerExpr>(10)))));
-
-//   auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
-//     make_unique<IntegerExpr>(5));
-
-//   auto expr = make_unique<Program>(std::move(statements),
-//     std::move(arithexpr));
-
-//   expr->Visit(&lowerer_);
-
-//   // t_0 <- 5
-//   // t_1 <- 10
-//   // t_2 <- t_0 + t_1
-//   // x <- t_2
-//   // t_3 <- 10
-//   // t_4 <- x - t_3
-//   // y <- t_4
-//   // t_5 <- 7
-//   // t_6 <- 5
-//   // t_7 <- t_5 - t_6
-
-//   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
-//     "x <- t_2\nt_3 <- 10\nt_4 <- x - t_3\ny <- t_4\nt_5 <- 7\nt_6 <- 5\n"
-//     "t_7 <- t_5 - t_6\n");
-// }
-
-// TEST_F(LowererTest, ConditionalWithNestedLogicalsWithVariables) {
-//   Statement::Block statements;
-
-//   statements.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("x"),
-//     make_unique<AddExpr>(
-//       make_unique<IntegerExpr>(5),
-//       make_unique<IntegerExpr>(10)))));
-
-//   statements.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("y"),
-//     make_unique<SubtractExpr>(
-//       make_unique<IntegerExpr>(5),
-//       make_unique<IntegerExpr>(10)))));
-
-//   statements.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("bob"),
-//     make_unique<AddExpr>(
-//       make_unique<VariableExpr>("y"),
-//       make_unique<VariableExpr>("x")))));
-
-//   statements.push_back(std::move(make_unique<const Conditional>(
-//     make_unique<LogicalOrExpr>(
-//     make_unique<const LogicalAndExpr>(
-//       make_unique<const LessThanExpr>(
-//         make_unique<const VariableExpr>("x"),
-//         make_unique<const IntegerExpr>(100)),
-//       make_unique<const GreaterThanExpr>(
-//         make_unique<const VariableExpr>("y"),
-//         make_unique<const VariableExpr>("x"))),
-//     make_unique<const LogicalAndExpr>(
-//       make_unique<const LessThanEqualToExpr>(
-//         make_unique<const VariableExpr>("bob"),
-//         make_unique<const IntegerExpr>(100)),
-//       make_unique<const GreaterThanEqualToExpr>(
-//         make_unique<const VariableExpr>("bob"),
-//         make_unique<const IntegerExpr>(0)))),
-//         Statement::Block(), Statement::Block())));
-
-//   auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
-//     make_unique<IntegerExpr>(5));
-
-//   auto expr = make_unique<Program>(std::move(statements),
-//     std::move(arithexpr));
-
-//   expr->Visit(&lowerer_);
-
-//   // t_0 <- 5
-//   // t_1 <- 10
-//   // t_2 <- t_0 + t_1
-//   // x <- t_2
-//   // t_3 <- 5
-//   // t_4 <- 10
-//   // t_5 <- t_3 - t_4
-//   // y <- t_5
-//   // t_6 <- y + x
-//   // bob <- t_6
-//   // t_7 <- 100
-//   // t_8 <- x < t_7
-//   // t_9 <- y > x
-//   // t_10 <- t_8 && t_9
-//   // t_11 <- 100
-//   // t_12 <- bob <= t_11
-//   // t_13 <- 0
-//   // t_14 <- bob >= t_13
-//   // t_15 <- t_12 && t_14
-//   // t_16 <- t_10 || t_15
-//   // if t_16 == 0
-//   // je falsebranch0
-//   // jmp continue0
-//   // MkLabel falsebranch0
-//   // jmp continue0
-//   // MkLabel continue0
-//   // t_17 <- 7
-//   // t_18 <- 5
-//   // t_19 <- t_17 - t_18
-//   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
-//     "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
-//     "t_6 <- y + x\nbob <- t_6\nt_7 <- 100\nt_8 <- x < t_7\nt_9 <- y > x\n"
-//     "t_10 <- t_8 && t_9\nt_11 <- 100\nt_12 <- bob <= t_11\n"
-//     "t_13 <- 0\nt_14 <- bob >= t_13\nt_15 <- t_12 && t_14\n"
-//     "t_16 <- t_10 || t_15\nif t_16 == 0\nje falsebranch0\njmp continue0\n"
-//     "MkLabel falsebranch0\njmp continue0\nMkLabel continue0\nt_17 <- 7\n"
-//     "t_18 <- 5\nt_19 <- t_17 - t_18\n");
-// }
-
-// TEST_F(LowererTest, LoopWithNestedLogicalsWithVariables) {
-//   Statement::Block statements;
-
-//   statements.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("x"),
-//     make_unique<AddExpr>(
-//       make_unique<IntegerExpr>(5),
-//       make_unique<IntegerExpr>(10)))));
-
-//   statements.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("y"),
-//     make_unique<SubtractExpr>(
-//       make_unique<IntegerExpr>(5),
-//       make_unique<IntegerExpr>(10)))));
-
-//   statements.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("bob"),
-//     make_unique<AddExpr>(
-//       make_unique<VariableExpr>("y"),
-//       make_unique<VariableExpr>("x")))));
-
-//   statements.push_back(std::move(make_unique<const Loop>(
-//     make_unique<LogicalOrExpr>(
-//     make_unique<const LogicalAndExpr>(
-//       make_unique<const LessThanExpr>(
-//         make_unique<const VariableExpr>("x"),
-//         make_unique<const IntegerExpr>(100)),
-//       make_unique<const GreaterThanExpr>(
-//         make_unique<const VariableExpr>("y"),
-//         make_unique<const VariableExpr>("x"))),
-//     make_unique<const LogicalAndExpr>(
-//       make_unique<const LessThanEqualToExpr>(
-//         make_unique<const VariableExpr>("bob"),
-//         make_unique<const IntegerExpr>(100)),
-//       make_unique<const GreaterThanEqualToExpr>(
-//         make_unique<const VariableExpr>("bob"),
-//         make_unique<const IntegerExpr>(0)))),
-//         Statement::Block())));
-
-//   auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
-//     make_unique<IntegerExpr>(5));
-
-//   auto expr = make_unique<Program>(std::move(statements),
-//     std::move(arithexpr));
-
-//   expr->Visit(&lowerer_);
-
-//   // t_0 <- 5
-//   // t_1 <- 10
-//   // t_2 <- t_0 + t_1
-//   // x <- t_2
-//   // t_3 <- 5
-//   // t_4 <- 10
-//   // t_5 <- t_3 - t_4
-//   // y <- t_5
-//   // t_6 <- y + x
-//   // bob <- t_6
-//   // MkLabel loop0
-//   // t_7 <- 100
-//   // t_8 <- x < t_7
-//   // t_9 <- y > x
-//   // t_10 <- t_8 && t_9
-//   // t_11 <- 100
-//   // t_12 <- bob <= t_11
-//   // t_13 <- 0
-//   // t_14 <- bob >= t_13
-//   // t_15 <- t_12 && t_14
-//   // t_16 <- t_10 || t_15
-//   // while t_16 == 0
-//   // je continue0
-//   // jmp loop0
-//   // MkLabel continue0
-//   // t_17 <- 7
-//   // t_18 <- 5
-//   // t_19 <- t_17 - t_18
-//   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
-//     "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
-//     "t_6 <- y + x\nbob <- t_6\nMkLabel loop0\nt_7 <- 100\nt_8 <- x < t_7\n"
-//     "t_9 <- y > x\nt_10 <- t_8 && t_9\nt_11 <- 100\nt_12 <- bob <= t_11\n"
-//     "t_13 <- 0\nt_14 <- bob >= t_13\nt_15 <- t_12 && t_14\n"
-//     "t_16 <- t_10 || t_15\nwhile t_16 == 0\nje continue0\njmp loop0\n"
-//     "MkLabel continue0\nt_17 <- 7\nt_18 <- 5\nt_19 <- t_17 - t_18\n");
-// }
-
-// TEST_F(LowererTest, ConditionalsWithTrueBranch) {
-//   Statement::Block statements;
-//   Statement::Block trueblock;
-
-//   statements.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("x"),
-//     make_unique<AddExpr>(
-//       make_unique<IntegerExpr>(5),
-//       make_unique<IntegerExpr>(10)))));
-
-//   statements.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("y"),
-//     make_unique<SubtractExpr>(
-//       make_unique<IntegerExpr>(5),
-//       make_unique<IntegerExpr>(10)))));
-
-//   statements.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("bob"),
-//     make_unique<AddExpr>(
-//       make_unique<VariableExpr>("y"),
-//       make_unique<VariableExpr>("x")))));
-
-//   trueblock.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("bob"),
-//       make_unique<AddExpr>(
-//       make_unique<VariableExpr>("y"),
-//       make_unique<VariableExpr>("x")))));
-
-//   statements.push_back(std::move(make_unique<const Conditional>(
-//     make_unique<LogicalOrExpr>(
-//     make_unique<const LogicalAndExpr>(
-//       make_unique<const LessThanExpr>(
-//         make_unique<const VariableExpr>("x"),
-//         make_unique<const IntegerExpr>(100)),
-//       make_unique<const GreaterThanExpr>(
-//         make_unique<const VariableExpr>("y"),
-//         make_unique<const VariableExpr>("x"))),
-//     make_unique<const LogicalAndExpr>(
-//       make_unique<const LessThanEqualToExpr>(
-//         make_unique<const VariableExpr>("bob"),
-//         make_unique<const IntegerExpr>(100)),
-//       make_unique<const GreaterThanEqualToExpr>(
-//         make_unique<const VariableExpr>("bob"),
-//         make_unique<const IntegerExpr>(0)))),
-//         std::move(trueblock), Statement::Block())));
-
-//   auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
-//     make_unique<IntegerExpr>(5));
-
-//   auto expr = make_unique<Program>(std::move(statements),
-//     std::move(arithexpr));
-
-//   expr->Visit(&lowerer_);
-
-//   // t_0 <- 5
-//   // t_1 <- 10
-//   // t_2 <- t_0 + t_1
-//   // x <- t_2
-//   // t_3 <- 5
-//   // t_4 <- 10
-//   // t_5 <- t_3 - t_4
-//   // y <- t_5
-//   // t_6 <- y + x
-//   // bob <- t_6
-//   // t_7 <- 100
-//   // t_8 <- x < t_7
-//   // t_9 <- y > x
-//   // t_10 <- t_8 && t_9
-//   // t_11 <- 100
-//   // t_12 <- bob <= t_11
-//   // t_13 <- 0
-//   // t_14 <- bob >= t_13
-//   // t_15 <- t_12 && t_14
-//   // t_16 <- t_10 || t_15
-//   // if t_16 == 0
-//   // je falsebranch0
-//   // t_17 <- y + x
-//   // bob <- t_17
-//   // jmp continue0
-//   // MkLabel falsebranch0
-//   // jmp continue0
-//   // MkLabel continue0
-//   // t_18 <- 7
-//   // t_19 <- 5
-//   // t_20 <- t_18 - t_19
-//   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
-//     "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
-//     "t_6 <- y + x\nbob <- t_6\nt_7 <- 100\nt_8 <- x < t_7\nt_9 <- y > x\n"
-//     "t_10 <- t_8 && t_9\nt_11 <- 100\nt_12 <- bob <= t_11\n"
-//     "t_13 <- 0\nt_14 <- bob >= t_13\nt_15 <- t_12 && t_14\n"
-//     "t_16 <- t_10 || t_15\nif t_16 == 0\nje falsebranch0\nt_17 <- y + x\n"
-//     "bob <- t_17\njmp continue0\nMkLabel falsebranch0\njmp continue0\n"
-//     "MkLabel continue0\nt_18 <- 7\nt_19 <- 5\nt_20 <- t_18 - t_19\n");
-// }
-
-// TEST_F(LowererTest, ConditionalsWithFalseBranch) {
-//   Statement::Block statements;
-//   Statement::Block falseblock;
-
-//   statements.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("x"),
-//     make_unique<AddExpr>(
-//       make_unique<IntegerExpr>(5),
-//       make_unique<IntegerExpr>(10)))));
-
-//   statements.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("y"),
-//     make_unique<SubtractExpr>(
-//       make_unique<IntegerExpr>(5),
-//       make_unique<IntegerExpr>(10)))));
-
-//   statements.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("bob"),
-//     make_unique<AddExpr>(
-//       make_unique<VariableExpr>("y"),
-//       make_unique<VariableExpr>("x")))));
-
-//   falseblock.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("bob"),
-//       make_unique<AddExpr>(
-//       make_unique<VariableExpr>("y"),
-//       make_unique<VariableExpr>("x")))));
-
-//   statements.push_back(std::move(make_unique<const Conditional>(
-//     make_unique<LogicalOrExpr>(
-//     make_unique<const LogicalAndExpr>(
-//       make_unique<const LessThanExpr>(
-//         make_unique<const VariableExpr>("x"),
-//         make_unique<const IntegerExpr>(100)),
-//       make_unique<const GreaterThanExpr>(
-//         make_unique<const VariableExpr>("y"),
-//         make_unique<const VariableExpr>("x"))),
-//     make_unique<const LogicalAndExpr>(
-//       make_unique<const LessThanEqualToExpr>(
-//         make_unique<const VariableExpr>("bob"),
-//         make_unique<const IntegerExpr>(100)),
-//       make_unique<const GreaterThanEqualToExpr>(
-//         make_unique<const VariableExpr>("bob"),
-//         make_unique<const IntegerExpr>(0)))),
-//         Statement::Block(), std::move(falseblock))));
-
-//   auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
-//     make_unique<IntegerExpr>(5));
-
-//   auto expr = make_unique<Program>(std::move(statements),
-//     std::move(arithexpr));
-
-//   expr->Visit(&lowerer_);
-
-//   // t_0 <- 5
-//   // t_1 <- 10
-//   // t_2 <- t_0 + t_1
-//   // x <- t_2
-//   // t_3 <- 5
-//   // t_4 <- 10
-//   // t_5 <- t_3 - t_4
-//   // y <- t_5
-//   // t_6 <- y + x
-//   // bob <- t_6
-//   // t_7 <- 100
-//   // t_8 <- x < t_7
-//   // t_9 <- y > x
-//   // t_10 <- t_8 && t_9
-//   // t_11 <- 100
-//   // t_12 <- bob <= t_11
-//   // t_13 <- 0
-//   // t_14 <- bob >= t_13
-//   // t_15 <- t_12 && t_14
-//   // t_16 <- t_10 || t_15
-//   // if t_16 == 0
-//   // je falsebranch0
-//   // jmp continue0
-//   // MkLabel falsebranch0
-//   // t_17 <- y + x
-//   // bob <- t_17
-//   // jmp continue0
-//   // MkLabel continue0
-//   // t_18 <- 7
-//   // t_19 <- 5
-//   // t_20 <- t_18 - t_19
-//   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
-//     "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
-//     "t_6 <- y + x\nbob <- t_6\nt_7 <- 100\nt_8 <- x < t_7\nt_9 <- y > x\n"
-//     "t_10 <- t_8 && t_9\nt_11 <- 100\nt_12 <- bob <= t_11\n"
-//     "t_13 <- 0\nt_14 <- bob >= t_13\nt_15 <- t_12 && t_14\n"
-//     "t_16 <- t_10 || t_15\nif t_16 == 0\nje falsebranch0\njmp continue0\n"
-//     "MkLabel falsebranch0\nt_17 <- y + x\nbob <- t_17\njmp continue0\n"
-//     "MkLabel continue0\nt_18 <- 7\nt_19 <- 5\nt_20 <- t_18 - t_19\n");
-// }
-
-// TEST_F(LowererTest, ConditionalsWithBothBranch) {
-//   Statement::Block statements;
-//   Statement::Block trueblock;
-//   Statement::Block falseblock;
-
-//   statements.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("x"),
-//     make_unique<AddExpr>(
-//       make_unique<IntegerExpr>(5),
-//       make_unique<IntegerExpr>(10)))));
-
-//   statements.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("y"),
-//     make_unique<SubtractExpr>(
-//       make_unique<IntegerExpr>(5),
-//       make_unique<IntegerExpr>(10)))));
-
-//   statements.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("bob"),
-//     make_unique<AddExpr>(
-//       make_unique<VariableExpr>("y"),
-//       make_unique<VariableExpr>("x")))));
-
-//   trueblock.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("bob"),
-//       make_unique<AddExpr>(
-//       make_unique<VariableExpr>("y"),
-//       make_unique<VariableExpr>("x")))));
-
-//   falseblock.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("bob"),
-//       make_unique<SubtractExpr>(
-//       make_unique<VariableExpr>("y"),
-//       make_unique<VariableExpr>("x")))));
-
-//   statements.push_back(std::move(make_unique<const Conditional>(
-//     make_unique<LogicalOrExpr>(
-//     make_unique<const LogicalAndExpr>(
-//       make_unique<const LessThanExpr>(
-//         make_unique<const VariableExpr>("x"),
-//         make_unique<const IntegerExpr>(100)),
-//       make_unique<const GreaterThanExpr>(
-//         make_unique<const VariableExpr>("y"),
-//         make_unique<const VariableExpr>("x"))),
-//     make_unique<const LogicalAndExpr>(
-//       make_unique<const LessThanEqualToExpr>(
-//         make_unique<const VariableExpr>("bob"),
-//         make_unique<const IntegerExpr>(100)),
-//       make_unique<const GreaterThanEqualToExpr>(
-//         make_unique<const VariableExpr>("bob"),
-//         make_unique<const IntegerExpr>(0)))),
-//         std::move(trueblock), std::move(falseblock))));
-
-//   auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
-//     make_unique<IntegerExpr>(5));
-
-//   auto expr = make_unique<Program>(std::move(statements),
-//     std::move(arithexpr));
-
-//   expr->Visit(&lowerer_);
-
-//   // t_0 <- 5
-//   // t_1 <- 10
-//   // t_2 <- t_0 + t_1
-//   // x <- t_2
-//   // t_3 <- 5
-//   // t_4 <- 10
-//   // t_5 <- t_3 - t_4
-//   // y <- t_5
-//   // t_6 <- y + x
-//   // bob <- t_6
-//   // t_7 <- 100
-//   // t_8 <- x < t_7
-//   // t_9 <- y > x
-//   // t_10 <- t_8 && t_9
-//   // t_11 <- 100
-//   // t_12 <- bob <= t_11
-//   // t_13 <- 0
-//   // t_14 <- bob >= t_13
-//   // t_15 <- t_12 && t_14
-//   // t_16 <- t_10 || t_15
-//   // if t_16 == 0
-//   // je falsebranch0
-//   // t_17 <- y + x
-//   // bob <- t_17
-//   // jmp continue0
-//   // MkLabel falsebranch0
-//   // t_18 <- y - x
-//   // bob <- t_18
-//   // jmp continue0
-//   // MkLabel continue0
-//   // t_19 <- 7
-//   // t_20 <- 5
-//   // t_21 <- t_19 - t_20
-//   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
-//     "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
-//     "t_6 <- y + x\nbob <- t_6\nt_7 <- 100\nt_8 <- x < t_7\nt_9 <- y > x\n"
-//     "t_10 <- t_8 && t_9\nt_11 <- 100\nt_12 <- bob <= t_11\n"
-//     "t_13 <- 0\nt_14 <- bob >= t_13\nt_15 <- t_12 && t_14\n"
-//     "t_16 <- t_10 || t_15\nif t_16 == 0\nje falsebranch0\nt_17 <- y + x\n"
-//     "bob <- t_17\njmp continue0\nMkLabel falsebranch0\nt_18 <- y - x\n"
-//     "bob <- t_18\njmp continue0\nMkLabel continue0\nt_19 <- 7\nt_20 <- 5\n"
-//     "t_21 <- t_19 - t_20\n");
-// }
-
-// TEST_F(LowererTest, LoopWithBody) {
-//   Statement::Block statements;
-//   Statement::Block loopbody;
-
-//   statements.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("x"),
-//     make_unique<AddExpr>(
-//       make_unique<IntegerExpr>(5),
-//       make_unique<IntegerExpr>(10)))));
-
-//   statements.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("y"),
-//     make_unique<SubtractExpr>(
-//       make_unique<IntegerExpr>(5),
-//       make_unique<IntegerExpr>(10)))));
-
-//   statements.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("bob"),
-//     make_unique<AddExpr>(
-//       make_unique<VariableExpr>("y"),
-//       make_unique<VariableExpr>("x")))));
-
-//   loopbody.push_back(std::move(make_unique<Assignment>(
-//     make_unique<VariableExpr>("bob"),
-//       make_unique<SubtractExpr>(
-//       make_unique<VariableExpr>("y"),
-//       make_unique<VariableExpr>("x")))));
-
-//   statements.push_back(std::move(make_unique<const Loop>(
-//     make_unique<LogicalOrExpr>(
-//     make_unique<const LogicalAndExpr>(
-//       make_unique<const LessThanExpr>(
-//         make_unique<const VariableExpr>("x"),
-//         make_unique<const IntegerExpr>(100)),
-//       make_unique<const GreaterThanExpr>(
-//         make_unique<const VariableExpr>("y"),
-//         make_unique<const VariableExpr>("x"))),
-//     make_unique<const LogicalAndExpr>(
-//       make_unique<const LessThanEqualToExpr>(
-//         make_unique<const VariableExpr>("bob"),
-//         make_unique<const IntegerExpr>(100)),
-//       make_unique<const GreaterThanEqualToExpr>(
-//         make_unique<const VariableExpr>("bob"),
-//         make_unique<const IntegerExpr>(0)))),
-//         std::move(loopbody))));
-
-//   auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
-//     make_unique<IntegerExpr>(5));
-
-
-
-//   auto expr = make_unique<Program>(Statement::Block(), std::move(statements),
-//     std::move(arithexpr));
-
-//   expr->Visit(&lowerer_);
-
-//   // t_0 <- 5
-//   // t_1 <- 10
-//   // t_2 <- t_0 + t_1
-//   // x <- t_2
-//   // t_3 <- 5
-//   // t_4 <- 10
-//   // t_5 <- t_3 - t_4
-//   // y <- t_5
-//   // t_6 <- y + x
-//   // bob <- t_6
-//   // MkLabel loop0
-//   // t_7 <- 100
-//   // t_8 <- x < t_7
-//   // t_9 <- y > x
-//   // t_10 <- t_8 && t_9
-//   // t_11 <- 100
-//   // t_12 <- bob <= t_11
-//   // t_13 <- 0
-//   // t_14 <- bob >= t_13
-//   // t_15 <- t_12 && t_14
-//   // t_16 <- t_10 || t_15
-//   // while t_16 == 0
-//   // je continue0
-//   // t_17 <- y - x
-//   // bob <- t_17
-//   // jmp loop0
-//   // MkLabel continue0
-//   // t_18 <- 7
-//   // t_19 <- 5
-//   // t_20 <- t_18 - t_19
-//   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
-//     "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
-//     "t_6 <- y + x\nbob <- t_6\nMkLabel loop0\nt_7 <- 100\nt_8 <- x < t_7\n"
-//     "t_9 <- y > x\nt_10 <- t_8 && t_9\nt_11 <- 100\nt_12 <- bob <= t_11\n"
-//     "t_13 <- 0\nt_14 <- bob >= t_13\nt_15 <- t_12 && t_14\n"
-//     "t_16 <- t_10 || t_15\nwhile t_16 == 0\nje continue0\nt_17 <- y - x\n"
-//     "bob <- t_17\njmp loop0\nMkLabel continue0\nt_18 <- 7\nt_19 <- 5\n"
-//     "t_20 <- t_18 - t_19\n");
-// }
-
-  // TEST_F(LowererTest, EasyFunction) {
-  //   auto expr = make_unique<DivideExpr>(
-  //   make_unique<IntegerExpr>(7), make_unique<IntegerExpr>(5));
-
-  //   auto foo_def = make_unique<const FunctionDef>("fib");
-  // }
+TEST_F(LowererTest, NestedLogicalsWithInts) {
+  auto expr = make_unique<const LogicalOrExpr>(
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanExpr>(
+        make_unique<const IntegerExpr>(50),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanExpr>(
+        make_unique<const IntegerExpr>(50),
+        make_unique<const IntegerExpr>(0))),
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanEqualToExpr>(
+        make_unique<const IntegerExpr>(50),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanEqualToExpr>(
+        make_unique<const IntegerExpr>(50),
+        make_unique<const IntegerExpr>(0))));
+
+  expr->Visit(&lowerer_);
+  // t_0 <- 50
+  // t_1 <- 100
+  // t_2 <- t_0 < t_1
+  // t_3 <- 50
+  // t_4 <- 0
+  // t_5 <- t_3 > t_4
+  // t_6 <- t_2 && t_5
+  // t_7 <- 50
+  // t_8 <- 100
+  // t_9 <- t_7 <= t_8
+  // t_10 <- 50
+  // t_11 <- 0
+  // t_12 <- t_10 >= t_11
+  // t_13 <- t_9 && t_12
+  // t_14 <- t_6 || t_13
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 50\nt_1 <- 100\nt_2 <- t_0 < t_1\n"
+    "t_3 <- 50\nt_4 <- 0\nt_5 <- t_3 > t_4\nt_6 <- t_2 && t_5\n"
+    "t_7 <- 50\nt_8 <- 100\nt_9 <- t_7 <= t_8\nt_10 <- 50\nt_11 <- 0\n"
+    "t_12 <- t_10 >= t_11\nt_13 <- t_9 && t_12\nt_14 <- t_6 || t_13\n");
+}
+
+
+
+TEST_F(LowererTest, VariabletoVariableAssignmentTest) {
+  Statement::Block statements;
+
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("x"),
+    make_unique<AddExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
+
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("y"),
+    make_unique<SubtractExpr>(
+      make_unique<VariableExpr>("x"),
+      make_unique<IntegerExpr>(10)))));
+
+  auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
+    make_unique<IntegerExpr>(5));
+
+  FunctionDef::Block function_defs;
+  auto func_def = GenerateFuncDef();
+  function_defs.push_back(std::move(func_def));
+
+  auto expr = make_unique<Program>(std::move(function_defs), std::move(statements),
+    std::move(arithexpr));
+
+  expr->Visit(&lowerer_);
+
+  // t_0 <- 5
+  // t_1 <- 10
+  // t_2 <- t_0 + t_1
+  // x <- t_2
+  // t_3 <- 10
+  // t_4 <- x - t_3
+  // y <- t_4
+  // t_5 <- 7
+  // t_6 <- 5
+  // t_7 <- t_5 - t_6
+
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
+    "x <- t_2\nt_3 <- 10\nt_4 <- x - t_3\ny <- t_4\nt_5 <- 7\nt_6 <- 5\n"
+    "t_7 <- t_5 - t_6\n" + GenerateFuncDefOutPut(8));
+}
+
+TEST_F(LowererTest, ConditionalWithNestedLogicalsWithVariables) {
+  Statement::Block statements;
+
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("x"),
+    make_unique<AddExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
+
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("y"),
+    make_unique<SubtractExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
+
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("bob"),
+    make_unique<AddExpr>(
+      make_unique<VariableExpr>("y"),
+      make_unique<VariableExpr>("x")))));
+
+  statements.push_back(std::move(make_unique<const Conditional>(
+    make_unique<LogicalOrExpr>(
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanExpr>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanExpr>(
+        make_unique<const VariableExpr>("y"),
+        make_unique<const VariableExpr>("x"))),
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanEqualToExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanEqualToExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(0)))),
+        Statement::Block(), Statement::Block())));
+
+  auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
+    make_unique<IntegerExpr>(5));
+
+  FunctionDef::Block function_defs;
+  auto func_def = GenerateFuncDef();
+  function_defs.push_back(std::move(func_def));
+
+  auto expr = make_unique<Program>(std::move(function_defs),std::move(statements),
+    std::move(arithexpr));
+
+  expr->Visit(&lowerer_);
+
+  // t_0 <- 5
+  // t_1 <- 10
+  // t_2 <- t_0 + t_1
+  // x <- t_2
+  // t_3 <- 5
+  // t_4 <- 10
+  // t_5 <- t_3 - t_4
+  // y <- t_5
+  // t_6 <- y + x
+  // bob <- t_6
+  // t_7 <- 100
+  // t_8 <- x < t_7
+  // t_9 <- y > x
+  // t_10 <- t_8 && t_9
+  // t_11 <- 100
+  // t_12 <- bob <= t_11
+  // t_13 <- 0
+  // t_14 <- bob >= t_13
+  // t_15 <- t_12 && t_14
+  // t_16 <- t_10 || t_15
+  // if t_16 == 0
+  // je falsebranch0
+  // jmp continue0
+  // MkLabel falsebranch0
+  // jmp continue0
+  // MkLabel continue0
+  // t_17 <- 7
+  // t_18 <- 5
+  // t_19 <- t_17 - t_18
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
+    "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
+    "t_6 <- y + x\nbob <- t_6\nt_7 <- 100\nt_8 <- x < t_7\nt_9 <- y > x\n"
+    "t_10 <- t_8 && t_9\nt_11 <- 100\nt_12 <- bob <= t_11\n"
+    "t_13 <- 0\nt_14 <- bob >= t_13\nt_15 <- t_12 && t_14\n"
+    "t_16 <- t_10 || t_15\nif t_16 == 0\nje falsebranch0\njmp continue0\n"
+    "MkLabel falsebranch0\njmp continue0\nMkLabel continue0\nt_17 <- 7\n"
+    "t_18 <- 5\nt_19 <- t_17 - t_18\n" + GenerateFuncDefOutPut(20));
+}
+
+TEST_F(LowererTest, LoopWithNestedLogicalsWithVariables) {
+  Statement::Block statements;
+
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("x"),
+    make_unique<AddExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
+
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("y"),
+    make_unique<SubtractExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
+
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("bob"),
+    make_unique<AddExpr>(
+      make_unique<VariableExpr>("y"),
+      make_unique<VariableExpr>("x")))));
+
+  statements.push_back(std::move(make_unique<const Loop>(
+    make_unique<LogicalOrExpr>(
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanExpr>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanExpr>(
+        make_unique<const VariableExpr>("y"),
+        make_unique<const VariableExpr>("x"))),
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanEqualToExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanEqualToExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(0)))),
+        Statement::Block())));
+
+  auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
+    make_unique<IntegerExpr>(5));
+
+  FunctionDef::Block function_defs;
+  auto func_def = GenerateFuncDef();
+  function_defs.push_back(std::move(func_def));
+
+
+  auto expr = make_unique<Program>(std::move(function_defs), std::move(statements),
+    std::move(arithexpr));
+
+  expr->Visit(&lowerer_);
+
+  // t_0 <- 5
+  // t_1 <- 10
+  // t_2 <- t_0 + t_1
+  // x <- t_2
+  // t_3 <- 5
+  // t_4 <- 10
+  // t_5 <- t_3 - t_4
+  // y <- t_5
+  // t_6 <- y + x
+  // bob <- t_6
+  // MkLabel loop0
+  // t_7 <- 100
+  // t_8 <- x < t_7
+  // t_9 <- y > x
+  // t_10 <- t_8 && t_9
+  // t_11 <- 100
+  // t_12 <- bob <= t_11
+  // t_13 <- 0
+  // t_14 <- bob >= t_13
+  // t_15 <- t_12 && t_14
+  // t_16 <- t_10 || t_15
+  // while t_16 == 0
+  // je continue0
+  // jmp loop0
+  // MkLabel continue0
+  // t_17 <- 7
+  // t_18 <- 5
+  // t_19 <- t_17 - t_18
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
+    "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
+    "t_6 <- y + x\nbob <- t_6\nMkLabel loop0\nt_7 <- 100\nt_8 <- x < t_7\n"
+    "t_9 <- y > x\nt_10 <- t_8 && t_9\nt_11 <- 100\nt_12 <- bob <= t_11\n"
+    "t_13 <- 0\nt_14 <- bob >= t_13\nt_15 <- t_12 && t_14\n"
+    "t_16 <- t_10 || t_15\nwhile t_16 == 0\nje continue0\njmp loop0\n"
+    "MkLabel continue0\nt_17 <- 7\nt_18 <- 5\nt_19 <- t_17 - t_18\n" + GenerateFuncDefOutPut(20));
+}
+
+TEST_F(LowererTest, ConditionalsWithTrueBranch) {
+  Statement::Block statements;
+  Statement::Block trueblock;
+
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("x"),
+    make_unique<AddExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
+
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("y"),
+    make_unique<SubtractExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
+
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("bob"),
+    make_unique<AddExpr>(
+      make_unique<VariableExpr>("y"),
+      make_unique<VariableExpr>("x")))));
+
+  trueblock.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("bob"),
+      make_unique<AddExpr>(
+      make_unique<VariableExpr>("y"),
+      make_unique<VariableExpr>("x")))));
+
+  statements.push_back(std::move(make_unique<const Conditional>(
+    make_unique<LogicalOrExpr>(
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanExpr>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanExpr>(
+        make_unique<const VariableExpr>("y"),
+        make_unique<const VariableExpr>("x"))),
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanEqualToExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanEqualToExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(0)))),
+        std::move(trueblock), Statement::Block())));
+
+  auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
+    make_unique<IntegerExpr>(5));
+
+
+  FunctionDef::Block function_defs;
+  auto func_def = GenerateFuncDef();
+  function_defs.push_back(std::move(func_def));
+
+  auto expr = make_unique<Program>(std::move(function_defs), std::move(statements),
+    std::move(arithexpr));
+
+  expr->Visit(&lowerer_);
+
+  // t_0 <- 5
+  // t_1 <- 10
+  // t_2 <- t_0 + t_1
+  // x <- t_2
+  // t_3 <- 5
+  // t_4 <- 10
+  // t_5 <- t_3 - t_4
+  // y <- t_5
+  // t_6 <- y + x
+  // bob <- t_6
+  // t_7 <- 100
+  // t_8 <- x < t_7
+  // t_9 <- y > x
+  // t_10 <- t_8 && t_9
+  // t_11 <- 100
+  // t_12 <- bob <= t_11
+  // t_13 <- 0
+  // t_14 <- bob >= t_13
+  // t_15 <- t_12 && t_14
+  // t_16 <- t_10 || t_15
+  // if t_16 == 0
+  // je falsebranch0
+  // t_17 <- y + x
+  // bob <- t_17
+  // jmp continue0
+  // MkLabel falsebranch0
+  // jmp continue0
+  // MkLabel continue0
+  // t_18 <- 7
+  // t_19 <- 5
+  // t_20 <- t_18 - t_19
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
+    "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
+    "t_6 <- y + x\nbob <- t_6\nt_7 <- 100\nt_8 <- x < t_7\nt_9 <- y > x\n"
+    "t_10 <- t_8 && t_9\nt_11 <- 100\nt_12 <- bob <= t_11\n"
+    "t_13 <- 0\nt_14 <- bob >= t_13\nt_15 <- t_12 && t_14\n"
+    "t_16 <- t_10 || t_15\nif t_16 == 0\nje falsebranch0\nt_17 <- y + x\n"
+    "bob <- t_17\njmp continue0\nMkLabel falsebranch0\njmp continue0\n"
+    "MkLabel continue0\nt_18 <- 7\nt_19 <- 5\nt_20 <- t_18 - t_19\n" + GenerateFuncDefOutPut(21));
+}
+
+TEST_F(LowererTest, ConditionalsWithFalseBranch) {
+  Statement::Block statements;
+  Statement::Block falseblock;
+
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("x"),
+    make_unique<AddExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
+
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("y"),
+    make_unique<SubtractExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
+
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("bob"),
+    make_unique<AddExpr>(
+      make_unique<VariableExpr>("y"),
+      make_unique<VariableExpr>("x")))));
+
+  falseblock.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("bob"),
+      make_unique<AddExpr>(
+      make_unique<VariableExpr>("y"),
+      make_unique<VariableExpr>("x")))));
+
+  statements.push_back(std::move(make_unique<const Conditional>(
+    make_unique<LogicalOrExpr>(
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanExpr>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanExpr>(
+        make_unique<const VariableExpr>("y"),
+        make_unique<const VariableExpr>("x"))),
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanEqualToExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanEqualToExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(0)))),
+        Statement::Block(), std::move(falseblock))));
+
+  auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
+    make_unique<IntegerExpr>(5));
+
+  FunctionDef::Block function_defs;
+  auto func_def = GenerateFuncDef();
+  function_defs.push_back(std::move(func_def));
+
+  auto expr = make_unique<Program>(std::move(function_defs), std::move(statements),
+    std::move(arithexpr));
+
+  expr->Visit(&lowerer_);
+
+  // t_0 <- 5
+  // t_1 <- 10
+  // t_2 <- t_0 + t_1
+  // x <- t_2
+  // t_3 <- 5
+  // t_4 <- 10
+  // t_5 <- t_3 - t_4
+  // y <- t_5
+  // t_6 <- y + x
+  // bob <- t_6
+  // t_7 <- 100
+  // t_8 <- x < t_7
+  // t_9 <- y > x
+  // t_10 <- t_8 && t_9
+  // t_11 <- 100
+  // t_12 <- bob <= t_11
+  // t_13 <- 0
+  // t_14 <- bob >= t_13
+  // t_15 <- t_12 && t_14
+  // t_16 <- t_10 || t_15
+  // if t_16 == 0
+  // je falsebranch0
+  // jmp continue0
+  // MkLabel falsebranch0
+  // t_17 <- y + x
+  // bob <- t_17
+  // jmp continue0
+  // MkLabel continue0
+  // t_18 <- 7
+  // t_19 <- 5
+  // t_20 <- t_18 - t_19
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
+    "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
+    "t_6 <- y + x\nbob <- t_6\nt_7 <- 100\nt_8 <- x < t_7\nt_9 <- y > x\n"
+    "t_10 <- t_8 && t_9\nt_11 <- 100\nt_12 <- bob <= t_11\n"
+    "t_13 <- 0\nt_14 <- bob >= t_13\nt_15 <- t_12 && t_14\n"
+    "t_16 <- t_10 || t_15\nif t_16 == 0\nje falsebranch0\njmp continue0\n"
+    "MkLabel falsebranch0\nt_17 <- y + x\nbob <- t_17\njmp continue0\n"
+    "MkLabel continue0\nt_18 <- 7\nt_19 <- 5\nt_20 <- t_18 - t_19\n" + GenerateFuncDefOutPut(21));
+}
+
+TEST_F(LowererTest, ConditionalsWithBothBranch) {
+  Statement::Block statements;
+  Statement::Block trueblock;
+  Statement::Block falseblock;
+
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("x"),
+    make_unique<AddExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
+
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("y"),
+    make_unique<SubtractExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
+
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("bob"),
+    make_unique<AddExpr>(
+      make_unique<VariableExpr>("y"),
+      make_unique<VariableExpr>("x")))));
+
+  trueblock.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("bob"),
+      make_unique<AddExpr>(
+      make_unique<VariableExpr>("y"),
+      make_unique<VariableExpr>("x")))));
+
+  falseblock.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("bob"),
+      make_unique<SubtractExpr>(
+      make_unique<VariableExpr>("y"),
+      make_unique<VariableExpr>("x")))));
+
+  statements.push_back(std::move(make_unique<const Conditional>(
+    make_unique<LogicalOrExpr>(
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanExpr>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanExpr>(
+        make_unique<const VariableExpr>("y"),
+        make_unique<const VariableExpr>("x"))),
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanEqualToExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanEqualToExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(0)))),
+        std::move(trueblock), std::move(falseblock))));
+
+  auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
+    make_unique<IntegerExpr>(5));
+
+  FunctionDef::Block function_defs;
+  auto func_def = GenerateFuncDef();
+  function_defs.push_back(std::move(func_def));
+
+  auto expr = make_unique<Program>(std::move(function_defs), std::move(statements),
+    std::move(arithexpr));
+
+  expr->Visit(&lowerer_);
+
+  // t_0 <- 5
+  // t_1 <- 10
+  // t_2 <- t_0 + t_1
+  // x <- t_2
+  // t_3 <- 5
+  // t_4 <- 10
+  // t_5 <- t_3 - t_4
+  // y <- t_5
+  // t_6 <- y + x
+  // bob <- t_6
+  // t_7 <- 100
+  // t_8 <- x < t_7
+  // t_9 <- y > x
+  // t_10 <- t_8 && t_9
+  // t_11 <- 100
+  // t_12 <- bob <= t_11
+  // t_13 <- 0
+  // t_14 <- bob >= t_13
+  // t_15 <- t_12 && t_14
+  // t_16 <- t_10 || t_15
+  // if t_16 == 0
+  // je falsebranch0
+  // t_17 <- y + x
+  // bob <- t_17
+  // jmp continue0
+  // MkLabel falsebranch0
+  // t_18 <- y - x
+  // bob <- t_18
+  // jmp continue0
+  // MkLabel continue0
+  // t_19 <- 7
+  // t_20 <- 5
+  // t_21 <- t_19 - t_20
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
+    "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
+    "t_6 <- y + x\nbob <- t_6\nt_7 <- 100\nt_8 <- x < t_7\nt_9 <- y > x\n"
+    "t_10 <- t_8 && t_9\nt_11 <- 100\nt_12 <- bob <= t_11\n"
+    "t_13 <- 0\nt_14 <- bob >= t_13\nt_15 <- t_12 && t_14\n"
+    "t_16 <- t_10 || t_15\nif t_16 == 0\nje falsebranch0\nt_17 <- y + x\n"
+    "bob <- t_17\njmp continue0\nMkLabel falsebranch0\nt_18 <- y - x\n"
+    "bob <- t_18\njmp continue0\nMkLabel continue0\nt_19 <- 7\nt_20 <- 5\n"
+    "t_21 <- t_19 - t_20\n" + GenerateFuncDefOutPut(22));
+}
+
+TEST_F(LowererTest, LoopWithBody) {
+  Statement::Block statements;
+  Statement::Block loopbody;
+
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("x"),
+    make_unique<AddExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
+
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("y"),
+    make_unique<SubtractExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
+
+  statements.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("bob"),
+    make_unique<AddExpr>(
+      make_unique<VariableExpr>("y"),
+      make_unique<VariableExpr>("x")))));
+
+  loopbody.push_back(std::move(make_unique<Assignment>(
+    make_unique<VariableExpr>("bob"),
+      make_unique<SubtractExpr>(
+      make_unique<VariableExpr>("y"),
+      make_unique<VariableExpr>("x")))));
+
+  statements.push_back(std::move(make_unique<const Loop>(
+    make_unique<LogicalOrExpr>(
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanExpr>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanExpr>(
+        make_unique<const VariableExpr>("y"),
+        make_unique<const VariableExpr>("x"))),
+    make_unique<const LogicalAndExpr>(
+      make_unique<const LessThanEqualToExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(100)),
+      make_unique<const GreaterThanEqualToExpr>(
+        make_unique<const VariableExpr>("bob"),
+        make_unique<const IntegerExpr>(0)))),
+        std::move(loopbody))));
+
+  auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
+    make_unique<IntegerExpr>(5));
+
+  FunctionDef::Block function_defs;
+  auto func_def = GenerateFuncDef();
+  function_defs.push_back(std::move(func_def));
+
+  auto expr = make_unique<Program>(std::move(function_defs), std::move(statements),
+    std::move(arithexpr));
+
+  expr->Visit(&lowerer_);
+
+  // t_0 <- 5
+  // t_1 <- 10
+  // t_2 <- t_0 + t_1
+  // x <- t_2
+  // t_3 <- 5
+  // t_4 <- 10
+  // t_5 <- t_3 - t_4
+  // y <- t_5
+  // t_6 <- y + x
+  // bob <- t_6
+  // MkLabel loop0
+  // t_7 <- 100
+  // t_8 <- x < t_7
+  // t_9 <- y > x
+  // t_10 <- t_8 && t_9
+  // t_11 <- 100
+  // t_12 <- bob <= t_11
+  // t_13 <- 0
+  // t_14 <- bob >= t_13
+  // t_15 <- t_12 && t_14
+  // t_16 <- t_10 || t_15
+  // while t_16 == 0
+  // je continue0
+  // t_17 <- y - x
+  // bob <- t_17
+  // jmp loop0
+  // MkLabel continue0
+  // t_18 <- 7
+  // t_19 <- 5
+  // t_20 <- t_18 - t_19
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
+    "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
+    "t_6 <- y + x\nbob <- t_6\nMkLabel loop0\nt_7 <- 100\nt_8 <- x < t_7\n"
+    "t_9 <- y > x\nt_10 <- t_8 && t_9\nt_11 <- 100\nt_12 <- bob <= t_11\n"
+    "t_13 <- 0\nt_14 <- bob >= t_13\nt_15 <- t_12 && t_14\n"
+    "t_16 <- t_10 || t_15\nwhile t_16 == 0\nje continue0\nt_17 <- y - x\n"
+    "bob <- t_17\njmp loop0\nMkLabel continue0\nt_18 <- 7\nt_19 <- 5\n"
+    "t_20 <- t_18 - t_19\n" + GenerateFuncDefOutPut(21));
+}
 
 // To do: Nested Branches + Nested Loops + LogicalNot
