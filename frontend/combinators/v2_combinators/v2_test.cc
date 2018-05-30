@@ -454,8 +454,8 @@ TEST(BinaryOperatorExpr, successBinaryOperatorExpr1) {
   EXPECT_EQ(output, "(((victor + 490) - _foo) + 3)");
 }
 
-/*
-// Success Case VariableParser
+
+// Success Case ProgramParser
 TEST(AssignmentParserCombinator, successProgramParser1) {
   ProgramParser parser;
   ParseStatus result;
@@ -463,7 +463,7 @@ TEST(AssignmentParserCombinator, successProgramParser1) {
   result.remainingCharacters = "";
   result.parsedCharacters = "victor = (123*1+3901-2);j=4;j+victor";
 
-  ParseStatus testResult = parser.parse(" victor = (123 * 1 + 3901 - 2); j = 4; 3 + 4;");
+  ParseStatus testResult = parser.parse(" victor = (123 * 1 + 3901 - 2); j = 4; j+victor;");
 
     // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
@@ -471,8 +471,10 @@ TEST(AssignmentParserCombinator, successProgramParser1) {
   std::string output = a->GetOutput();
 
   //EXPECT_EQ(testResult, result);
-    EXPECT_EQ(testResult.status, result.status);
+  EXPECT_EQ(testResult.status, result.status);
   EXPECT_EQ(testResult.remainingCharacters, result.remainingCharacters);
   EXPECT_EQ(testResult.parsedCharacters, result.parsedCharacters);
-  EXPECT_EQ(output, "victor = (((123 * 1) + 3901) - 2);j=4;j+victor");
-}*/
+  EXPECT_EQ(output, "victor = (((123 * 1) + 3901) - 2); j = 4; (j + victor)");
+}
+
+// Fail Case ProgramParser without semicolon
