@@ -15,7 +15,6 @@ using namespace std;
 
 ParseStatus ProgramParser::parse(std::string inputProgram, std::string errorType) {
   trim(inputProgram);
-  
 
   if (inputProgram.size() == 0) {
     return super::parse(inputProgram);
@@ -58,6 +57,7 @@ ParseStatus ProgramParser::parse(std::string inputProgram, std::string errorType
   }
   else {
     // Cannot parse any arithmetic expressions
+    assignResult.status = arithResult.status;
     assignResult.errorType = arithResult.errorType;
     return assignResult;
   }

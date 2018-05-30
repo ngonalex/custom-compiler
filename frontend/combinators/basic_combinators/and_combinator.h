@@ -12,7 +12,6 @@ class AndCombinator : NullParser {
 	virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
 	NullParser* firstParser;
 	NullParser* secondParser;
-
 };
 
 }	// namespace frontend

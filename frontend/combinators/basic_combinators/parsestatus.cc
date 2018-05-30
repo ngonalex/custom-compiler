@@ -20,7 +20,7 @@ bool ParseStatus::operator!=(const ParseStatus &b) const {
 						this->parsedCharacters != b.parsedCharacters);
 	}
 	else {
-		return (this->status == b.status);
+		return (this->status != b.status);
 	}
 }
 

@@ -179,9 +179,12 @@ TEST(WordParserCombinator, successTypeParser1) {
   result.remainingCharacters = "";
   result.parsedCharacters = "Integer";
 
-  ParseStatus testResult = parser.parse("   Integer");
+  ParseStatus testResult = parser.parse("     Integer");
 
-  EXPECT_EQ(testResult, result);
+  //EXPECT_EQ(testResult, result);
+  EXPECT_EQ(testResult.status, result.status);
+  EXPECT_EQ(testResult.parsedCharacters, result.parsedCharacters);
+  EXPECT_EQ(testResult.remainingCharacters, result.remainingCharacters);
 }
 
 // Fail Case TypeParser
@@ -461,7 +464,7 @@ TEST(AssignmentParserCombinator, successProgramParser1) {
   ParseStatus result;
   result.status = true;
   result.remainingCharacters = "";
-  result.parsedCharacters = "victor = (123*1+3901-2);j=4;j+victor";
+  result.parsedCharacters = "victor = (123*1+3901-2);j = 4; j+victor;";
 
   ParseStatus testResult = parser.parse(" victor = (123 * 1 + 3901 - 2); j = 4; j+victor;");
 
@@ -470,18 +473,32 @@ TEST(AssignmentParserCombinator, successProgramParser1) {
   testResult.ast->Visit(a);
   std::string output = a->GetOutput();
 
-  //EXPECT_EQ(testResult, result);
-  EXPECT_EQ(testResult.status, result.status);
-  EXPECT_EQ(testResult.remainingCharacters, result.remainingCharacters);
-  EXPECT_EQ(testResult.parsedCharacters, result.parsedCharacters);
+  EXPECT_EQ(testResult, result);
   EXPECT_EQ(output, "victor = (((123 * 1) + 3901) - 2); j = 4; (j + victor)");
 }
 
-// Fail Case ProgramParser without semicolon
-/*
-ProgramParser -> root node; calls all other parsers
-Fail: 
-“x = ; x + 2” ->  ParseStatus(successStatus = false, expectedCharacters = “expression”)
-“1vic = 3; 1vic + 3” ->  ParseStatus(successStatus = false, expectedCharacters = “Invalid variable name”)
-“X + 3; var y = 3” ->  ParseStatus(successStatus = false, expectedCharacters = “:”)
-*/
+// Fail Case ProgramParser
+TEST(AssignmentParserCombinator, failProgramParser1) {
+  ProgramParser parser;
+  ParseStatus result;
+  result.status = false;
+  //result.errorType = "Incorrect type in variable declaration";
+
+  ParseStatus testResult = parser.parse("x = ; x + 2;");
+
+  EXPECT_EQ(testResult.status, result.status);
+}
+
+// Fail Case ProgramParser
+TEST(AssignmentParserCombinator, failProgramParser2) {
+  ProgramParser parser;
+  ParseStatus result;
+  result.status = false;
+  //result.errorType = "Incorrect type in variable declaration";
+
+  ParseStatus testResult = parser.parse("x = 3; x + 2");
+
+  EXPECT_EQ(testResult.status, result.status);
+}
+
+
