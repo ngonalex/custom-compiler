@@ -78,7 +78,7 @@ class ParseStatus {  // Super class
 		       std::move(secondResult), std::move(astNodes), "",
 		       characterStart);
   }
-  
+
   static ParseStatus vectorSuccess(
       std::string remainingCharacters, std::string parsedCharacters,
       std::vector<std::unique_ptr<const AstNode>> astNodes,

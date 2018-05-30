@@ -19,8 +19,6 @@ ParseStatus AssignmentParser::parse(std::string inputProgram, std::string errorT
     return super::parse(inputProgram);
   }
 
-  ParseStatus result;
-
   // Parsers used
   HelperVariableParser varParser;
   WordParser wordParser;
@@ -41,11 +39,16 @@ ParseStatus AssignmentParser::parse(std::string inputProgram, std::string errorT
   secondAnd.secondParser = reinterpret_cast<NullParser *>(&arithExprParser);
 
 
-  ParseStatus result::sucess(secondAnd.remainingCharacters, 
-    secondAnd.parsedCharacters, std::move(make_unique<const Assignment>(
-          unique_cast<const VariableExpr>(std::move(varResult.ast)),
-          unique_cast<const ArithmeticExpr>(std::move(termStatus.ast)))), 
-    secondAnd.characterStart);
+  if(secondAnd.status) {
+    ParseStatus result::sucess(secondAnd.remainingCharacters, 
+      secondAnd.parsedCharacters, std::move(make_unique<const Assignment>(
+            unique_cast<const VariableExpr>(std::move(varResult.ast)),
+            unique_cast<const ArithmeticExpr>(std::move(termStatus.ast)))), 
+      secondAnd.characterStart);
+  }
+  else {
+    ParseStatus result::failure(secondAnd.errorType, secondAnd.characterStart);
+  }
       
   return result;
 }
