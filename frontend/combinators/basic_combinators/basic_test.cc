@@ -18,3 +18,16 @@ TEST(ParseStatus, NonAstSucess) {
   EXPECT_EQ(result.error_type, "No Error");
   EXPECT_EQ(result.ast_result, nullptr);
 }
+
+TEST(AtomParser, AtomParserSucess) {
+  auto parser = AtomParser('a');
+  auto result = parser.parse("af", 0, "No Error");
+
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.character_start, 0);
+  EXPECT_EQ(result.character_end, 1);
+  EXPECT_EQ(result.remaining_chars, "f");
+  EXPECT_EQ(result.parsed_chars, "a");
+  EXPECT_EQ(result.error_type, "No Error");
+  EXPECT_EQ(result.ast_result, nullptr);
+}

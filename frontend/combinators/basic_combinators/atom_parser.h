@@ -2,6 +2,7 @@
 #define ATOM_PARSER_H_
 
 #include "abstract_syntax/abstract_syntax.h"
+#include "frontend/combinators/basic_combinators/parse_status.h"
 
 #include <string>
 
@@ -15,7 +16,7 @@ class AtomParser {
   ParseStatus<const AstNode> parse(
             std::string intput,
   				  int start_character,
-			      std::string error_type = "");
+			      std::string error_type);
 
   explicit AtomParser(char char_to_parse) { 
     this->char_to_parse = char_to_parse;
