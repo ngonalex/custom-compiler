@@ -2,6 +2,7 @@
 #define BACKEND_CONTROL_FLOW_GRAPH_H_
 
 #include <vector>
+#include <utility>
 
 #include "utility/memory.h"
 #include "backend/lowerer_visitor.h"
@@ -62,22 +63,22 @@ class ControlFlowGraphNode {
   BlockType blocktype_;
   int creation_order;
   std::vector<std::unique_ptr<struct ThreeAddressCode>> localblock_;
-  std::unique_ptr<ControlFlowGraphNode> leftnode_; 
-  std::unique_ptr<ControlFlowGraphNode> rightnode_;
 };
 
 class ControlFlowGraph {
  public:
   ControlFlowGraph(std::vector<std::unique_ptr<struct ThreeAddressCode>>);
-  std::unique_ptr<ControlFlowGraphNode> GetRoot() {
-   return std::move(root_);
+  std::vector<std::unique_ptr<ControlFlowGraphNode>> GetRoot() {
+   return std::move(cfg_nodes_);
   }
   void CreateCFG(std::vector<std::unique_ptr<struct ThreeAddressCode>>);
   void Optimize();
   std::vector<std::unique_ptr<struct ThreeAddressCode>> MakeThreeAddressCode();
 
  private:
-  std::unique_ptr<ControlFlowGraphNode> root_;
+  //std::unique_ptr<ControlFlowGraphNode> root_;
+  std::vector<std::unique_ptr<ControlFlowGraphNode>> cfg_nodes_;
+  std::vector<std::pair<int,int>> edges_;
 };
 
 } // namespace backend
