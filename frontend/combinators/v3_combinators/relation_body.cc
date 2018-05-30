@@ -2,6 +2,8 @@
 #include "frontend/combinators/v3_combinators/relation_body.h"
 #include "frontend/combinators/v3_combinators/helpers/relational_helper.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
+
+#include <iostream>
 #include <string>     // std::string, std::stoi
 
 /*
@@ -29,40 +31,33 @@ ParseStatus RelationBodyParser::parse(std::string inputProgram, std::string erro
   ParseStatus result = aeParser.parse(inputProgram);
   std::string errorMessage = "Expected Arithmetic Expression";
 
-  // Relational Operator
 	if (result.status) {
     errorMessage = "Expected Relation Operator (>, >=, <, <=, ==)";
-    // Bunch of crap to parse all the operators
+    // Parse the relational operators
     RelationOperator relOpParser;
-
     ParseStatus result2 = relOpParser.parse(result.remainingCharacters);
-    // Second Arithmetic Expression
     if (result2.status) {
       result2.parsedCharacters = result.parsedCharacters + result2.parsedCharacters;
       errorMessage = "Expected an Arithmetic Expression after Relation Operator";
+      // Second Arithmetic Expression
       ArithExprParser aeParser;
       ParseStatus result3 = aeParser.parse(result2.remainingCharacters); 
       if (result3.status) {
-        result3.parsedCharacters = result2.parsedCharacters + result2.parsedCharacters;
+        result3.parsedCharacters = result2.parsedCharacters + result3.parsedCharacters;
         result3.ast = std::move((std::move(result.ast), 
           result2.parsedCharacters, std::move(result3.ast)));
         return result3;
       }
-       // TODO: Check logic operators
     }
-  } 
-  
-  // TODO: Recheck this. It's probably wrong
-  else {
+  } else {
 		// Error type returned to user
 		result.errorType = errorMessage;
 	}
-
 	return result;
 }
 
 // ae rop ae
-   std::unique_ptr<const RelationalBinaryOperator> RelationBodyParser::make_node(
+std::unique_ptr<const RelationalBinaryOperator> RelationBodyParser::make_node(
      std::unique_ptr<const ArithmeticExpr> first_ae, 
      std::string rop, std::unique_ptr<const ArithmeticExpr> second_ae) {
   if (rop == "<") {

@@ -2,6 +2,8 @@
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 #include "frontend/combinators/v3_combinators/helpers/relational_helper.h"
 
+#include <iostream>
+
 #include <string>     // std::string, std::stoi
 
 #define super NullParser
