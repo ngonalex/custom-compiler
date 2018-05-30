@@ -43,7 +43,7 @@
 // }
 
 // // Todo:
-// // 1a) ArithmeticExprs (Add/Sub/Mult/Div) + corner cases (div / zero, Overflow)
+// // 1a) ArithmeticExprs (Add/Sub/Mult/Div) + corner cases (div/zero,Overflow)
 // //  b) Diff combos (Int/Int, Var/Var, Var/Int etc), Nested
 // // 2a) RelationalExprs + LogicalExprs
 // //  b) Diff combos (Int/Int, Var/Var, Var/Int etc), Nested

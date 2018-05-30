@@ -33,7 +33,6 @@ using cs160::make_unique;
 
 // TO DO: Write tests for variables as AEs
 class LowererTest : public ::testing::Test {
-
  public:
   std::unique_ptr<const FunctionDef> GenerateFuncDef() {
     // empty params
@@ -51,8 +50,10 @@ class LowererTest : public ::testing::Test {
     return foo_def;
   }
 
-  std::string GenerateFuncDefOutPut(int blocksize){
-    return  " <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n <-  FUNPROLOGUE \nt_" + std::to_string(blocksize) + " <- 0\n <-  FUNEPILOGUE \n";
+  std::string GenerateFuncDefOutPut(int blocksize) {
+    return  " <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n <-"
+    "FUNPROLOGUE \nt_" + std::to_string(blocksize) + " <- 0\n <-"
+    "  FUNEPILOGUE \n";
   }
 
  protected:
@@ -166,7 +167,6 @@ TEST_F(LowererTest, DoubleIntAssignmentTest) {
 }
 
 TEST_F(LowererTest, FunctionDefTest) {
-
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
   // empty fact_body
@@ -181,9 +181,10 @@ TEST_F(LowererTest, FunctionDefTest) {
                                                 std::move(fact_body),
                                                 std::move(foo_retval));
 
-  foo_def->Visit(&lowerer_); 
-  
-  EXPECT_EQ(lowerer_.GetOutput(), " <-  FUNCTIONDEF \nMkLabel func\n <-  FUNPROLOGUE \nt_0 <- 1\nt_1 <- 0\nt_2 <- t_0 + t_1\n <-  FUNEPILOGUE \n");
+  foo_def->Visit(&lowerer_);
+  EXPECT_EQ(lowerer_.GetOutput(), " <-  FUNCTIONDEF \nMkLabel func\n"
+  " <-  FUNPROLOGUE \nt_0 <- 1\nt_1 <- 0\n"
+  "t_2 <- t_0 + t_1\n <-  FUNEPILOGUE \n");
 }
 
 
@@ -196,11 +197,13 @@ TEST_F(LowererTest, FunctionCallTest) {
   //    returnval = 1
   //    return retunval + 0
   // }
-  statements.push_back(make_unique<const Assignment>(make_unique<const VariableExpr>("bob"), make_unique<const IntegerExpr>(10)));
+  statements.push_back(make_unique<const Assignment>(
+    make_unique<const VariableExpr>("bob"),
+    make_unique<const IntegerExpr>(10)));
 
   auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
   arguments.push_back(std::move(make_unique<const VariableExpr>("bob")));
-  
+
   // call function fact
   statements.push_back(std::move(make_unique<const FunctionCall>(
       make_unique<const VariableExpr>("foo_retval"), "fact",
@@ -212,7 +215,7 @@ TEST_F(LowererTest, FunctionCallTest) {
   auto foo_retval = make_unique<const AddExpr>(
     make_unique<const VariableExpr>("foo_retval"),
     make_unique<const IntegerExpr>(0));
-      
+
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
   foo_params.push_back(std::move(make_unique<const VariableExpr>("bob")));
 
@@ -222,7 +225,9 @@ TEST_F(LowererTest, FunctionCallTest) {
     make_unique<VariableExpr>("foo_retval"),
     make_unique<IntegerExpr>(1))));
 
-  // fact_body.push_back(std::move(make_unique<const AddExpr>(make_unique<const VariableExpr>("foo_reval"),make_unique<const VariableExpr>("bob"))));
+  // fact_body.push_back(std::move(make_unique<const AddExpr>(
+  //  make_unique<const VariableExpr>("foo_reval"),
+  //  make_unique<const VariableExpr>("bob"))));
 
   auto foo_def = make_unique<const FunctionDef>("fact", std::move(foo_params),
                                                 std::move(fact_body),
@@ -235,10 +240,13 @@ TEST_F(LowererTest, FunctionCallTest) {
     std::move(statements), std::move(ae));
 
 
-  ast->Visit(&lowerer_); 
-  
-  // there is a new line problem 
-  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 10\nbob <- t_0\n <-  FUNCTIONCALL \nfoo_retval <- FUNRETLOAD FUNRETLOAD \n <-  FUNRETURNEPILOGUE \n <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel fact\n <-  FUNPROLOGUE \nbob <- 0\nt_1 <- 1\nfoo_retval <- t_1\nt_2 <- 0\nt_3 <- foo_retval + t_2\n <-  FUNEPILOGUE \n");
+  ast->Visit(&lowerer_);
+
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 10\nbob <- t_0\n <-  FUNCTIONCALL"
+    " \nfoo_retval <- FUNRETLOAD FUNRETLOAD \n <-  FUNRETURNEPILOGUE \n"
+    " <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel fact\n <-  FUNPROLOGUE \n"
+    "bob <- 0\nt_1 <- 1\nfoo_retval <- t_1\nt_2 <- 0\nt_3 <- foo_retval + t_2\n"
+    " <-  FUNEPILOGUE \n");
 }
 
 TEST_F(LowererTest, UnassignedVariable) {
@@ -322,8 +330,8 @@ TEST_F(LowererTest, VariabletoVariableAssignmentTest) {
   auto func_def = GenerateFuncDef();
   function_defs.push_back(std::move(func_def));
 
-  auto expr = make_unique<Program>(std::move(function_defs), std::move(statements),
-    std::move(arithexpr));
+  auto expr = make_unique<Program>(std::move(function_defs),
+    std::move(statements), std::move(arithexpr));
 
   expr->Visit(&lowerer_);
 
@@ -389,8 +397,8 @@ TEST_F(LowererTest, ConditionalWithNestedLogicalsWithVariables) {
   auto func_def = GenerateFuncDef();
   function_defs.push_back(std::move(func_def));
 
-  auto expr = make_unique<Program>(std::move(function_defs),std::move(statements),
-    std::move(arithexpr));
+  auto expr = make_unique<Program>(std::move(function_defs),
+    std::move(statements), std::move(arithexpr));
 
   expr->Visit(&lowerer_);
 
@@ -480,8 +488,8 @@ TEST_F(LowererTest, LoopWithNestedLogicalsWithVariables) {
   function_defs.push_back(std::move(func_def));
 
 
-  auto expr = make_unique<Program>(std::move(function_defs), std::move(statements),
-    std::move(arithexpr));
+  auto expr = make_unique<Program>(std::move(function_defs),
+    std::move(statements), std::move(arithexpr));
 
   expr->Visit(&lowerer_);
 
@@ -519,7 +527,8 @@ TEST_F(LowererTest, LoopWithNestedLogicalsWithVariables) {
     "t_9 <- y > x\nt_10 <- t_8 && t_9\nt_11 <- 100\nt_12 <- bob <= t_11\n"
     "t_13 <- 0\nt_14 <- bob >= t_13\nt_15 <- t_12 && t_14\n"
     "t_16 <- t_10 || t_15\nwhile t_16 == 0\nje continue0\njmp loop0\n"
-    "MkLabel continue0\nt_17 <- 7\nt_18 <- 5\nt_19 <- t_17 - t_18\n" + GenerateFuncDefOutPut(20));
+    "MkLabel continue0\nt_17 <- 7\nt_18 <- 5\nt_19 <- t_17 - t_18\n" +
+    GenerateFuncDefOutPut(20));
 }
 
 TEST_F(LowererTest, ConditionalsWithTrueBranch) {
@@ -576,8 +585,8 @@ TEST_F(LowererTest, ConditionalsWithTrueBranch) {
   auto func_def = GenerateFuncDef();
   function_defs.push_back(std::move(func_def));
 
-  auto expr = make_unique<Program>(std::move(function_defs), std::move(statements),
-    std::move(arithexpr));
+  auto expr = make_unique<Program>(std::move(function_defs),
+    std::move(statements), std::move(arithexpr));
 
   expr->Visit(&lowerer_);
 
@@ -619,7 +628,8 @@ TEST_F(LowererTest, ConditionalsWithTrueBranch) {
     "t_13 <- 0\nt_14 <- bob >= t_13\nt_15 <- t_12 && t_14\n"
     "t_16 <- t_10 || t_15\nif t_16 == 0\nje falsebranch0\nt_17 <- y + x\n"
     "bob <- t_17\njmp continue0\nMkLabel falsebranch0\njmp continue0\n"
-    "MkLabel continue0\nt_18 <- 7\nt_19 <- 5\nt_20 <- t_18 - t_19\n" + GenerateFuncDefOutPut(21));
+    "MkLabel continue0\nt_18 <- 7\nt_19 <- 5\nt_20 <- t_18 - t_19\n" +
+    GenerateFuncDefOutPut(21));
 }
 
 TEST_F(LowererTest, ConditionalsWithFalseBranch) {
@@ -675,8 +685,8 @@ TEST_F(LowererTest, ConditionalsWithFalseBranch) {
   auto func_def = GenerateFuncDef();
   function_defs.push_back(std::move(func_def));
 
-  auto expr = make_unique<Program>(std::move(function_defs), std::move(statements),
-    std::move(arithexpr));
+  auto expr = make_unique<Program>(std::move(function_defs),
+    std::move(statements), std::move(arithexpr));
 
   expr->Visit(&lowerer_);
 
@@ -718,7 +728,8 @@ TEST_F(LowererTest, ConditionalsWithFalseBranch) {
     "t_13 <- 0\nt_14 <- bob >= t_13\nt_15 <- t_12 && t_14\n"
     "t_16 <- t_10 || t_15\nif t_16 == 0\nje falsebranch0\njmp continue0\n"
     "MkLabel falsebranch0\nt_17 <- y + x\nbob <- t_17\njmp continue0\n"
-    "MkLabel continue0\nt_18 <- 7\nt_19 <- 5\nt_20 <- t_18 - t_19\n" + GenerateFuncDefOutPut(21));
+    "MkLabel continue0\nt_18 <- 7\nt_19 <- 5\nt_20 <- t_18 - t_19\n" +
+    GenerateFuncDefOutPut(21));
 }
 
 TEST_F(LowererTest, ConditionalsWithBothBranch) {
@@ -781,8 +792,8 @@ TEST_F(LowererTest, ConditionalsWithBothBranch) {
   auto func_def = GenerateFuncDef();
   function_defs.push_back(std::move(func_def));
 
-  auto expr = make_unique<Program>(std::move(function_defs), std::move(statements),
-    std::move(arithexpr));
+  auto expr = make_unique<Program>(std::move(function_defs),
+    std::move(statements), std::move(arithexpr));
 
   expr->Visit(&lowerer_);
 
@@ -883,8 +894,8 @@ TEST_F(LowererTest, LoopWithBody) {
   auto func_def = GenerateFuncDef();
   function_defs.push_back(std::move(func_def));
 
-  auto expr = make_unique<Program>(std::move(function_defs), std::move(statements),
-    std::move(arithexpr));
+  auto expr = make_unique<Program>(std::move(function_defs),
+    std::move(statements), std::move(arithexpr));
 
   expr->Visit(&lowerer_);
 
