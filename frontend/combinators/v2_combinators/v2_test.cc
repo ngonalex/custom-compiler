@@ -478,3 +478,10 @@ TEST(AssignmentParserCombinator, successProgramParser1) {
 }
 
 // Fail Case ProgramParser without semicolon
+/*
+ProgramParser -> root node; calls all other parsers
+Fail: 
+“x = ; x + 2” ->  ParseStatus(successStatus = false, expectedCharacters = “expression”)
+“1vic = 3; 1vic + 3” ->  ParseStatus(successStatus = false, expectedCharacters = “Invalid variable name”)
+“X + 3; var y = 3” ->  ParseStatus(successStatus = false, expectedCharacters = “:”)
+*/
