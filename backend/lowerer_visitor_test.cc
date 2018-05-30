@@ -242,10 +242,12 @@ TEST_F(LowererTest, FunctionCallTest) {
 
   ast->Visit(&lowerer_);
 
-  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 10\nbob <- t_0\n <-  FUNCTIONCALL"
-    " \nfoo_retval <- FUNRETLOAD FUNRETLOAD \n <-  FUNRETURNEPILOGUE \n"
-    " <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel fact\n <-  FUNPROLOGUE \n"
-    "bob <- 0\nt_1 <- 1\nfoo_retval <- t_1\nt_2 <- 0\nt_3 <- foo_retval + t_2\n"
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 10\nbob <- t_0\n"
+    "t_1 <- bob VARLOAD \n <-  FUNCTIONCALL \n"
+    "foo_retval <- FUNRETLOAD FUNRETLOAD \n <-  FUNRETURNEPILOGUE \n"
+    "t_2 <- foo_retval VARLOAD \n <-  PRINTARITH \n <-  FUNCTIONDEF \n"
+    "MkLabel fact\n <-  FUNPROLOGUE \nbob <- 0\nt_3 <- 1\nfoo_retval <- t_3\n"
+    "t_4 <- foo_retval VARLOAD \nt_5 <- 0\nt_6 <- t_4 + t_5\n"
     " <-  FUNEPILOGUE \n");
 }
 
@@ -347,8 +349,10 @@ TEST_F(LowererTest, VariabletoVariableAssignmentTest) {
   // t_7 <- t_5 - t_6
 
   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
-    "x <- t_2\nt_3 <- 10\nt_4 <- x - t_3\ny <- t_4\nt_5 <- 7\nt_6 <- 5\n"
-    "t_7 <- t_5 - t_6\n" + GenerateFuncDefOutPut(8));
+    "x <- t_2\nt_3 <- x VARLOAD \nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
+    "t_6 <- 7\nt_7 <- 5\nt_8 <- t_6 - t_7\n <-  PRINTARITH \n"
+    " <-  FUNCTIONDEF \nMkLabel func\n <-  FUNPROLOGUE \nt_9 <- 0\n"
+    " <-  FUNEPILOGUE \n");
 }
 
 TEST_F(LowererTest, ConditionalWithNestedLogicalsWithVariables) {
@@ -433,12 +437,16 @@ TEST_F(LowererTest, ConditionalWithNestedLogicalsWithVariables) {
   // t_19 <- t_17 - t_18
   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
     "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
-    "t_6 <- y + x\nbob <- t_6\nt_7 <- 100\nt_8 <- x < t_7\nt_9 <- y > x\n"
-    "t_10 <- t_8 && t_9\nt_11 <- 100\nt_12 <- bob <= t_11\n"
-    "t_13 <- 0\nt_14 <- bob >= t_13\nt_15 <- t_12 && t_14\n"
-    "t_16 <- t_10 || t_15\nif t_16 == 0\nje falsebranch0\njmp continue0\n"
-    "MkLabel falsebranch0\njmp continue0\nMkLabel continue0\nt_17 <- 7\n"
-    "t_18 <- 5\nt_19 <- t_17 - t_18\n" + GenerateFuncDefOutPut(20));
+    "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\nbob <- t_8\n"
+    "t_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\nt_12 <- y VARLOAD \n"
+    "t_13 <- x VARLOAD \nt_14 <- t_12 > t_13\nt_15 <- t_11 && t_14\n"
+    "t_16 <- bob VARLOAD \nt_17 <- 100\nt_18 <- t_16 <= t_17\n"
+    "t_19 <- bob VARLOAD \nt_20 <- 0\nt_21 <- t_19 >= t_20\n"
+    "t_22 <- t_18 && t_21\nt_23 <- t_15 || t_22\nif t_23 == 0\n"
+    "je falsebranch0\njmp continue0\nMkLabel falsebranch0\njmp continue0\n"
+    "MkLabel continue0\nt_24 <- 7\nt_25 <- 5\nt_26 <- t_24 - t_25\n"
+    " <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n <-  FUNPROLOGUE \n"
+    "t_27 <- 0\n <-  FUNEPILOGUE \n");
 }
 
 TEST_F(LowererTest, LoopWithNestedLogicalsWithVariables) {
@@ -523,12 +531,15 @@ TEST_F(LowererTest, LoopWithNestedLogicalsWithVariables) {
   // t_19 <- t_17 - t_18
   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
     "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
-    "t_6 <- y + x\nbob <- t_6\nMkLabel loop0\nt_7 <- 100\nt_8 <- x < t_7\n"
-    "t_9 <- y > x\nt_10 <- t_8 && t_9\nt_11 <- 100\nt_12 <- bob <= t_11\n"
-    "t_13 <- 0\nt_14 <- bob >= t_13\nt_15 <- t_12 && t_14\n"
-    "t_16 <- t_10 || t_15\nwhile t_16 == 0\nje continue0\njmp loop0\n"
-    "MkLabel continue0\nt_17 <- 7\nt_18 <- 5\nt_19 <- t_17 - t_18\n" +
-    GenerateFuncDefOutPut(20));
+    "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\nbob <- t_8\n"
+    "MkLabel loop0\nt_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\n"
+    "t_12 <- y VARLOAD \nt_13 <- x VARLOAD \nt_14 <- t_12 > t_13\n"
+    "t_15 <- t_11 && t_14\nt_16 <- bob VARLOAD \nt_17 <- 100\n"
+    "t_18 <- t_16 <= t_17\nt_19 <- bob VARLOAD \nt_20 <- 0\n"
+    "t_21 <- t_19 >= t_20\nt_22 <- t_18 && t_21\nt_23 <- t_15 || t_22\n"
+    "while t_23 == 0\nje continue0\njmp loop0\nMkLabel continue0\nt_24 <- 7\n"
+    "t_25 <- 5\nt_26 <- t_24 - t_25\n <-  PRINTARITH \n <-  FUNCTIONDEF \n"
+    "MkLabel func\n <-  FUNPROLOGUE \nt_27 <- 0\n <-  FUNEPILOGUE \n");
 }
 
 TEST_F(LowererTest, ConditionalsWithTrueBranch) {
@@ -623,13 +634,17 @@ TEST_F(LowererTest, ConditionalsWithTrueBranch) {
   // t_20 <- t_18 - t_19
   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
     "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
-    "t_6 <- y + x\nbob <- t_6\nt_7 <- 100\nt_8 <- x < t_7\nt_9 <- y > x\n"
-    "t_10 <- t_8 && t_9\nt_11 <- 100\nt_12 <- bob <= t_11\n"
-    "t_13 <- 0\nt_14 <- bob >= t_13\nt_15 <- t_12 && t_14\n"
-    "t_16 <- t_10 || t_15\nif t_16 == 0\nje falsebranch0\nt_17 <- y + x\n"
-    "bob <- t_17\njmp continue0\nMkLabel falsebranch0\njmp continue0\n"
-    "MkLabel continue0\nt_18 <- 7\nt_19 <- 5\nt_20 <- t_18 - t_19\n" +
-    GenerateFuncDefOutPut(21));
+    "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\nbob <- t_8\n"
+    "t_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\nt_12 <- y VARLOAD \n"
+    "t_13 <- x VARLOAD \nt_14 <- t_12 > t_13\nt_15 <- t_11 && t_14\n"
+    "t_16 <- bob VARLOAD \nt_17 <- 100\nt_18 <- t_16 <= t_17\n"
+    "t_19 <- bob VARLOAD \nt_20 <- 0\nt_21 <- t_19 >= t_20\n"
+    "t_22 <- t_18 && t_21\nt_23 <- t_15 || t_22\nif t_23 == 0\n"
+    "je falsebranch0\nt_24 <- y VARLOAD \nt_25 <- x VARLOAD \n"
+    "t_26 <- t_24 + t_25\nbob <- t_26\njmp continue0\nMkLabel falsebranch0\n"
+    "jmp continue0\nMkLabel continue0\nt_27 <- 7\nt_28 <- 5\n"
+    "t_29 <- t_27 - t_28\n <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n"
+    " <-  FUNPROLOGUE \nt_30 <- 0\n <-  FUNEPILOGUE \n");
 }
 
 TEST_F(LowererTest, ConditionalsWithFalseBranch) {
@@ -723,13 +738,17 @@ TEST_F(LowererTest, ConditionalsWithFalseBranch) {
   // t_20 <- t_18 - t_19
   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
     "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
-    "t_6 <- y + x\nbob <- t_6\nt_7 <- 100\nt_8 <- x < t_7\nt_9 <- y > x\n"
-    "t_10 <- t_8 && t_9\nt_11 <- 100\nt_12 <- bob <= t_11\n"
-    "t_13 <- 0\nt_14 <- bob >= t_13\nt_15 <- t_12 && t_14\n"
-    "t_16 <- t_10 || t_15\nif t_16 == 0\nje falsebranch0\njmp continue0\n"
-    "MkLabel falsebranch0\nt_17 <- y + x\nbob <- t_17\njmp continue0\n"
-    "MkLabel continue0\nt_18 <- 7\nt_19 <- 5\nt_20 <- t_18 - t_19\n" +
-    GenerateFuncDefOutPut(21));
+    "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\nbob <- t_8\n"
+    "t_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\nt_12 <- y VARLOAD \n"
+    "t_13 <- x VARLOAD \nt_14 <- t_12 > t_13\nt_15 <- t_11 && t_14\n"
+    "t_16 <- bob VARLOAD \nt_17 <- 100\nt_18 <- t_16 <= t_17\n"
+    "t_19 <- bob VARLOAD \nt_20 <- 0\nt_21 <- t_19 >= t_20\n"
+    "t_22 <- t_18 && t_21\nt_23 <- t_15 || t_22\nif t_23 == 0\n"
+    "je falsebranch0\njmp continue0\nMkLabel falsebranch0\n"
+    "t_24 <- y VARLOAD \nt_25 <- x VARLOAD \nt_26 <- t_24 + t_25\n"
+    "bob <- t_26\njmp continue0\nMkLabel continue0\nt_27 <- 7\nt_28 <- 5\n"
+    "t_29 <- t_27 - t_28\n <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n"
+    " <-  FUNPROLOGUE \nt_30 <- 0\n <-  FUNEPILOGUE \n");
 }
 
 TEST_F(LowererTest, ConditionalsWithBothBranch) {
@@ -832,13 +851,18 @@ TEST_F(LowererTest, ConditionalsWithBothBranch) {
   // t_21 <- t_19 - t_20
   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
     "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
-    "t_6 <- y + x\nbob <- t_6\nt_7 <- 100\nt_8 <- x < t_7\nt_9 <- y > x\n"
-    "t_10 <- t_8 && t_9\nt_11 <- 100\nt_12 <- bob <= t_11\n"
-    "t_13 <- 0\nt_14 <- bob >= t_13\nt_15 <- t_12 && t_14\n"
-    "t_16 <- t_10 || t_15\nif t_16 == 0\nje falsebranch0\nt_17 <- y + x\n"
-    "bob <- t_17\njmp continue0\nMkLabel falsebranch0\nt_18 <- y - x\n"
-    "bob <- t_18\njmp continue0\nMkLabel continue0\nt_19 <- 7\nt_20 <- 5\n"
-    "t_21 <- t_19 - t_20\n" + GenerateFuncDefOutPut(22));
+    "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\nbob <- t_8\n"
+    "t_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\nt_12 <- y VARLOAD \n"
+    "t_13 <- x VARLOAD \nt_14 <- t_12 > t_13\nt_15 <- t_11 && t_14\n"
+    "t_16 <- bob VARLOAD \nt_17 <- 100\nt_18 <- t_16 <= t_17\n"
+    "t_19 <- bob VARLOAD \nt_20 <- 0\nt_21 <- t_19 >= t_20\n"
+    "t_22 <- t_18 && t_21\nt_23 <- t_15 || t_22\nif t_23 == 0\n"
+    "je falsebranch0\nt_24 <- y VARLOAD \nt_25 <- x VARLOAD \n"
+    "t_26 <- t_24 + t_25\nbob <- t_26\njmp continue0\nMkLabel falsebranch0\n"
+    "t_27 <- y VARLOAD \nt_28 <- x VARLOAD \nt_29 <- t_27 - t_28\n"
+    "bob <- t_29\njmp continue0\nMkLabel continue0\nt_30 <- 7\nt_31 <- 5\n"
+    "t_32 <- t_30 - t_31\n <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n"
+    " <-  FUNPROLOGUE \nt_33 <- 0\n <-  FUNEPILOGUE \n");
 }
 
 TEST_F(LowererTest, LoopWithBody) {
@@ -931,12 +955,17 @@ TEST_F(LowererTest, LoopWithBody) {
   // t_20 <- t_18 - t_19
   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
     "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
-    "t_6 <- y + x\nbob <- t_6\nMkLabel loop0\nt_7 <- 100\nt_8 <- x < t_7\n"
-    "t_9 <- y > x\nt_10 <- t_8 && t_9\nt_11 <- 100\nt_12 <- bob <= t_11\n"
-    "t_13 <- 0\nt_14 <- bob >= t_13\nt_15 <- t_12 && t_14\n"
-    "t_16 <- t_10 || t_15\nwhile t_16 == 0\nje continue0\nt_17 <- y - x\n"
-    "bob <- t_17\njmp loop0\nMkLabel continue0\nt_18 <- 7\nt_19 <- 5\n"
-    "t_20 <- t_18 - t_19\n" + GenerateFuncDefOutPut(21));
+    "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\nbob <- t_8\n"
+    "MkLabel loop0\nt_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\n"
+    "t_12 <- y VARLOAD \nt_13 <- x VARLOAD \nt_14 <- t_12 > t_13\n"
+    "t_15 <- t_11 && t_14\nt_16 <- bob VARLOAD \nt_17 <- 100\n"
+    "t_18 <- t_16 <= t_17\nt_19 <- bob VARLOAD \nt_20 <- 0\n"
+    "t_21 <- t_19 >= t_20\nt_22 <- t_18 && t_21\nt_23 <- t_15 || t_22\n"
+    "while t_23 == 0\nje continue0\nt_24 <- y VARLOAD \nt_25 <- x VARLOAD \n"
+    "t_26 <- t_24 - t_25\nbob <- t_26\njmp loop0\nMkLabel continue0\n"
+    "t_27 <- 7\nt_28 <- 5\nt_29 <- t_27 - t_28\n <-  PRINTARITH \n"
+    " <-  FUNCTIONDEF \nMkLabel func\n <-  FUNPROLOGUE \nt_30 <- 0\n"
+    " <-  FUNEPILOGUE \n");
 }
 
 // To do: Nested Branches + Nested Loops + LogicalNot
