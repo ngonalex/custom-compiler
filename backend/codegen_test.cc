@@ -69,7 +69,6 @@
 // TEST_F(CodeGenTest, PrintTest) {
 //   auto expr = make_unique<SubtractExpr>(
 //     make_unique<IntegerExpr>(21), make_unique<IntegerExpr>(5));
-
 //   expr->Visit(&lowerer_);
 
 //   std::ofstream file = std::ofstream("test.s");
@@ -80,4 +79,3 @@
 //   std::string result = exec("gcc -c test.s && ld test.o && ./a.out");
 //   EXPECT_EQ(result, "The result is equal to: 16\n");
 // }
-

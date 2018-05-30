@@ -1,6 +1,9 @@
 #ifndef BACKEND_LOWERER_VISITOR_H_
 #define BACKEND_LOWERER_VISITOR_H_
 
+#include <iostream>
+#include <set>
+#include <stack>
 #include <string>
 #include <vector>
 #include <stack>
@@ -9,25 +12,23 @@
 #include <algorithm>
 
 #include "abstract_syntax/abstract_syntax.h"
-#include "backend/ir.h"
 #include "backend/helper_struct.h"
-#include "utility/memory.h"
+#include "backend/ir.h"
 #include "utility/assert.h"
+#include "utility/memory.h"
 
-using cs160::abstract_syntax::backend::AstVisitor;
-using cs160::abstract_syntax::backend::IntegerExpr;
+using cs160::make_unique;
 using cs160::abstract_syntax::backend::AddExpr;
-using cs160::abstract_syntax::backend::SubtractExpr;
-using cs160::abstract_syntax::backend::MultiplyExpr;
-using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::Assignment;
-using cs160::abstract_syntax::backend::Program;
-using cs160::abstract_syntax::backend::VariableExpr;
-using cs160::abstract_syntax::backend::LessThanExpr;
-using cs160::abstract_syntax::backend::LessThanEqualToExpr;
-using cs160::abstract_syntax::backend::GreaterThanExpr;
-using cs160::abstract_syntax::backend::GreaterThanEqualToExpr;
+using cs160::abstract_syntax::backend::AstVisitor;
+using cs160::abstract_syntax::backend::Conditional;
+using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::EqualToExpr;
+using cs160::abstract_syntax::backend::GreaterThanEqualToExpr;
+using cs160::abstract_syntax::backend::GreaterThanExpr;
+using cs160::abstract_syntax::backend::IntegerExpr;
+using cs160::abstract_syntax::backend::LessThanEqualToExpr;
+using cs160::abstract_syntax::backend::LessThanExpr;
 using cs160::abstract_syntax::backend::LogicalAndExpr;
 using cs160::abstract_syntax::backend::LogicalBinaryOperator;
 using cs160::abstract_syntax::backend::LogicalNotExpr;
@@ -41,11 +42,7 @@ using cs160::make_unique;
 namespace cs160 {
 namespace backend {
 
-enum ChildType {
-  INTCHILD,
-  VARCHILD,
-  NOCHILD
-};
+enum ChildType { INTCHILD, VARCHILD, NOCHILD };
 
 class LowererVisitor : public AstVisitor {
  public:
@@ -61,8 +58,7 @@ class LowererVisitor : public AstVisitor {
   void VisitLessThanExpr(const LessThanExpr& exp);
   void VisitLessThanEqualToExpr(const LessThanEqualToExpr& exp);
   void VisitGreaterThanExpr(const GreaterThanExpr& exp);
-  void VisitGreaterThanEqualToExpr(
-      const GreaterThanEqualToExpr& exp);
+  void VisitGreaterThanEqualToExpr(const GreaterThanEqualToExpr& exp);
   void VisitEqualToExpr(const EqualToExpr& exp);
   void VisitLogicalAndExpr(const LogicalAndExpr& exp);
   void VisitLogicalOrExpr(const LogicalOrExpr& exp);
@@ -95,7 +91,7 @@ class LowererVisitor : public AstVisitor {
 
   // Helpers
   std::string GetOutputArithmeticHelper(std::string output, int index,
-    std::vector<std::string> printhelper);
+                                        std::vector<std::string> printhelper);
   void BinaryOperatorHelper(Type type, Register arg1, Register arg2);
   std::string JumpLabelHelper();
   std::string ContinueLabelHelper();
@@ -110,17 +106,11 @@ class LowererVisitor : public AstVisitor {
     return std::move(blocks_);
   }
 
-  std::stack<std::string> variablestack() {
-    return variablestack_;
-  }
+  std::stack<std::string> variablestack() { return variablestack_; }
 
-  std::vector<std::set<std::string>> localsets() {
-    return localsets_;
-  }
+  std::vector<std::set<std::string>> localsets() { return localsets_; }
 
-  std::set<std::string> globalset() {
-    return globalset_;
-  }
+  std::set<std::string> globalset() { return globalset_; }
 
  private:
   std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks_;

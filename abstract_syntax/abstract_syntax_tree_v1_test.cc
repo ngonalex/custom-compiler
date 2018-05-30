@@ -2,12 +2,12 @@
 #include "gtest/gtest.h"
 #include "utility/memory.h"
 
-using cs160::abstract_syntax::version_1::AstVisitor;
 using cs160::abstract_syntax::version_1::AddExpr;
-using cs160::abstract_syntax::version_1::SubtractExpr;
-using cs160::abstract_syntax::version_1::MultiplyExpr;
+using cs160::abstract_syntax::version_1::AstVisitor;
 using cs160::abstract_syntax::version_1::DivideExpr;
 using cs160::abstract_syntax::version_1::IntegerExpr;
+using cs160::abstract_syntax::version_1::MultiplyExpr;
+using cs160::abstract_syntax::version_1::SubtractExpr;
 
 using cs160::make_unique;
 

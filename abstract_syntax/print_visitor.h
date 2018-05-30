@@ -7,13 +7,13 @@
 #include "abstract_syntax/abstract_syntax_tree.h"
 #include "abstract_syntax/print_visitor.h"
 
-using cs160::abstract_syntax::IntegerExpr;
-using cs160::abstract_syntax::BinaryOperatorExpr;
 using cs160::abstract_syntax::AddExpr;
-using cs160::abstract_syntax::SubtractExpr;
-using cs160::abstract_syntax::MultiplyExpr;
-using cs160::abstract_syntax::DivideExpr;
 using cs160::abstract_syntax::AstVisitor;
+using cs160::abstract_syntax::BinaryOperatorExpr;
+using cs160::abstract_syntax::DivideExpr;
+using cs160::abstract_syntax::IntegerExpr;
+using cs160::abstract_syntax::MultiplyExpr;
+using cs160::abstract_syntax::SubtractExpr;
 
 namespace cs160 {
 namespace abstract_syntax {
@@ -61,16 +61,16 @@ class PrintVisitor : public AstVisitor {
     output_ << ")";
   }
 
- /* std::stack<int> opstack;
+  /* std::stack<int> opstack;
 
-  void visitInt() {
-    opstack.push(val);
-  }
+   void visitInt() {
+     opstack.push(val);
+   }
 
-  int visitAdd(lhs, rhs) {
-    lhs.visit(this) + rhs.visit(this);
-  }
-  */
+   int visitAdd(lhs, rhs) {
+     lhs.visit(this) + rhs.visit(this);
+   }
+   */
 
  private:
   std::stringstream output_;
