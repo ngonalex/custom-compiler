@@ -128,12 +128,6 @@ void LowererVisitor::VisitDereference(const Dereference& exp) {
       leftderefvariable = variablestack_.top();
       variablestack_.pop();
       leftbasevariable = variablestack_.top();
-<<<<<<< HEAD
-      variablestack_.push(leftderefvariable+"->"+rhsvirtualreg);
-      break;
-    case VARCHILD:
-      leftbasevariable = variablestack_.top();
-=======
       leftderefvariable = leftderefvariable+"->"+rhsvirtualreg;
       variablestack_.push(leftderefvariable);
       break;
@@ -144,7 +138,6 @@ void LowererVisitor::VisitDereference(const Dereference& exp) {
         "dereferenced because it has not been assigned\n";
         exit(1);
       }
->>>>>>> 3e3681c077f48ff53425892fffa13fbfb26878ca
       leftderefvariable = leftbasevariable+"->"+rhsvirtualreg;
       variablestack_.push(leftderefvariable);
       indexoflastchild = -1;
@@ -169,11 +162,7 @@ void LowererVisitor::VisitAssignmentFromNewTuple(
   currvariabletype_ = LEFTHANDVAR;
   currdereferencetype_ = LHSDEREFERENCE;
   assignment.lhs().Visit(const_cast<LowererVisitor*>(this));
-<<<<<<< HEAD
-  currdereferencetype_ = RHSDEFERERENCE;
-=======
   currdereferencetype_ = RHSINTDEREFERENCE;
->>>>>>> 3e3681c077f48ff53425892fffa13fbfb26878ca
   currvariabletype_ = RIGHTHANDVAR;
 
   std::string lhstarget;
@@ -212,11 +201,7 @@ void LowererVisitor::VisitAssignmentFromArithExp(
   currvariabletype_ = LEFTHANDVAR;
   currdereferencetype_ = LHSDEREFERENCE;
   assignment.lhs().Visit(const_cast<LowererVisitor*>(this));
-<<<<<<< HEAD
-  currdereferencetype_ = RHSDEFERERENCE;
-=======
   currdereferencetype_ = RHSINTDEREFERENCE;
->>>>>>> 3e3681c077f48ff53425892fffa13fbfb26878ca
   currvariabletype_ = RIGHTHANDVAR;
 
   std::string lhstarget;
@@ -237,15 +222,6 @@ void LowererVisitor::VisitAssignmentFromArithExp(
     variablestack_.pop();
     lhsbase = "";
     globalset_.insert(lhstarget);
-<<<<<<< HEAD
-
-    auto block = make_unique<struct ThreeAddressCode>();
-    block->target = Target(Label(lhstarget));
-    // Uses varchildtuple but should just do the same things
-    block->op = Opcode(VARCHILDTUPLE);
-    blocks_.push_back(std::move(block));
-=======
->>>>>>> 3e3681c077f48ff53425892fffa13fbfb26878ca
   }
 
   // assign the right hand side to be equal to the left hand side
@@ -254,12 +230,9 @@ void LowererVisitor::VisitAssignmentFromArithExp(
   assignment.rhs().Visit(const_cast<LowererVisitor*>(this));
 
   Operand arg1 = Operand(blocks_[blocks_.size()-1]->target.reg());
-<<<<<<< HEAD
-=======
   // if (lastchildtype_ == DEREFCHILD) {
   //   blocks_[blocks_.size()-1]->op = Opcode(RHSTUPLEDEREFERENCE);
   // }
->>>>>>> 3e3681c077f48ff53425892fffa13fbfb26878ca
   CreateArithmeticAssignment(lhstarget, arg1);
 }
 
@@ -777,11 +750,7 @@ void LowererVisitor::CreateDereference(std::string basevariable,
   block->arg1 = Operand(Register(basevariable, DEREFREG));
   block->arg2 = Operand(Register("Parent", DEREFREG));
   if (indexofchild > 0) {
-<<<<<<< HEAD
-    blocks_[indexofchild]->arg2.reg().name() = "Child";
-=======
     blocks_[indexofchild]->arg2 = Operand(Register("Child", DEREFREG));
->>>>>>> 3e3681c077f48ff53425892fffa13fbfb26878ca
   }
   blocks_.push_back(std::move(block));
 }
@@ -806,8 +775,6 @@ void LowererVisitor::CreateArithmeticAssignment(std::string target,
   blocks_.push_back(std::move(block));
 }
 
-<<<<<<< HEAD
-=======
 // void LowererVisitor::CreateRHSINTDEREFERENCEAssignment(std::string target,
 //   Operand operand) {
 //   auto block = make_unique<struct ThreeAddressCode>();
@@ -818,7 +785,6 @@ void LowererVisitor::CreateArithmeticAssignment(std::string target,
 //   blocks_.push_back(std::move(block));
 // }
 
->>>>>>> 3e3681c077f48ff53425892fffa13fbfb26878ca
 std::string LowererVisitor::JumpLabelHelper() {
   std::string newlabel = "falsebranch" + std::to_string(counter_.branchcount);
   ++counter_.branchcount;
