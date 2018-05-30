@@ -14,12 +14,38 @@ std::unique_ptr<ControlFlowGraphNode> RecursiveCreate(std::vector<std::unique_pt
   } else if (graph_set.size() == 1) {
     return std::move(graph_set[0]);
   } else {
-    if (graph_set.front()->GetBlockType() == CONDITIONAL_BLOCK) {
-      //graph_set.front()->SetLeftNode(RecursiveCreate());
-      //graph_set.front()->SetRightNode(RecursiveCreate());
-      return NULL;
+    std::vector<std::unique_ptr<ControlFlowGraphNode>> sub_vector_1;
+    std::vector<std::unique_ptr<ControlFlowGraphNode>> sub_vector_2;
+    for(const auto &iter: graph_set) {
+      std::unique_ptr<ControlFlowGraphNode> copy_node_1;
+      std::unique_ptr<ControlFlowGraphNode> copy_node_2;
+      copy_node_1->SetBlockType(iter->GetBlockType());
+      copy_node_1->SetCreationOrder(iter->GetCreationOrder());
+      copy_node_1->SetLocalBlock(std::move(iter->GetLocalBlock()));
+      copy_node_1->SetLeftNode(std::move(iter->GetLeftNode()));
+      copy_node_1->SetRightNode(std::move(iter->GetRightNode()));
+      copy_node_2->SetBlockType(iter->GetBlockType());
+      copy_node_2->SetCreationOrder(iter->GetCreationOrder());
+      copy_node_2->SetLocalBlock(std::move(iter->GetLocalBlock()));
+      copy_node_2->SetLeftNode(std::move(iter->GetLeftNode()));
+      copy_node_2->SetRightNode(std::move(iter->GetRightNode()));
+      sub_vector_1.push_back(std::move(copy_node_1));
+      sub_vector_2.push_back(std::move(copy_node_2));
     }
-    return NULL;
+    if (graph_set.front()->GetBlockType() == CONDITIONAL_BLOCK) {
+      sub_vector_1.erase(sub_vector_1.begin());
+      sub_vector_2.erase(sub_vector_2.begin(),sub_vector_2.begin()+2);
+      graph_set.front()->SetLeftNode(RecursiveCreate(std::move(sub_vector_1)));
+      graph_set.front()->SetRightNode(RecursiveCreate(std::move(sub_vector_2)));
+      return graph_set.front();
+    } else if (graph_set.front()->GetBlockType() == LOOP_BLOCK) {
+      sub_vector_1.erase(sub_vector_1.begin());
+      sub_vector_2.erase(sub_vector_2.begin(),sub_vector_2.begin()+2);
+      graph_set.front()->SetLeftNode(RecursiveCreate(std::move(sub_vector_1)));
+      graph_set.front()->SetRightNode(RecursiveCreate(std::move(sub_vector_2)));
+      return graph_set.front();
+    }
+    return std::move(graph_set[0]);
   }
 }
 std::vector<std::unique_ptr<struct ThreeAddressCode>> CopyBlock(std::vector<std::unique_ptr<struct ThreeAddressCode>> copy) {
