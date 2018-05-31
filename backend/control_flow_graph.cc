@@ -18,7 +18,8 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_s
     return NULL;
   } else if (graph_set.size() == 1) {
     ControlFlowGraphNode * temp = graph_set[0];
-      graph_set.erase(graph_set.begin());
+    graph_set.erase(graph_set.begin());
+    return temp;
   } else {
     if (graph_set.front()->GetBlockType() == CONDITIONAL_BLOCK) {
       ControlFlowGraphNode* temp0 = RecursiveCreate(graph_set,edge_graph);
@@ -48,7 +49,7 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_s
     } else { // NO TYPE
       ControlFlowGraphNode * temp = graph_set[0];
       graph_set.erase(graph_set.begin());
-      return std::move(temp); 
+      return temp; 
     }
   }
 }
@@ -120,8 +121,12 @@ void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddress
     }
 
   } 
+  std::vector<ControlFlowGraphNode *> temp_cfg;
+  for (const auto& cfgiter: cfg_vector) {
+    temp_cfg.push_back(cfgiter.get());
+  }
   std::vector<std::pair<int,int>> edge_vector;
-  RecursiveCreate(std::move(cfg_vector),edge_vector);
+  RecursiveCreate(temp_cfg,edge_vector);
   edges_ = edge_vector;
 }
 
