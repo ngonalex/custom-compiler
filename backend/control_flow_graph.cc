@@ -7,14 +7,12 @@ ControlFlowGraph::ControlFlowGraph
 (std::vector<std::unique_ptr<struct ThreeAddressCode>> input) {
   CreateCFG(std::move(input));
 }
-std::pair<int,int> PairMakeHelp(const int a, const int b) {
-  int front = a;
-  int back = b;
-  return std::make_pair(front,back);
-}
+
+//Use Recursion to find all the edges in the graph
 ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_set, 
   std::vector<std::pair<int,int>> edge_graph) {
-  if (graph_set.empty()) {
+  if (graph_set.empty()) {    
+    //Hopefully this never occurs
     return NULL;
   } else if (graph_set.size() == 1) {
     ControlFlowGraphNode * temp = graph_set[0];
@@ -22,6 +20,16 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_s
     return temp;
   } else {
     if (graph_set.front()->GetBlockType() == CONDITIONAL_BLOCK) {
+      // Should look like this:
+      //      Condition
+      //      /     \
+      //    True   False
+      //      \     /
+      //        END
+      // temp0 = Condition
+      // temp1 = True
+      // temp2 = False
+      // temp3 = END
       ControlFlowGraphNode* temp0 = RecursiveCreate(graph_set,edge_graph);
       ControlFlowGraphNode* temp1 = RecursiveCreate(graph_set,edge_graph);
       ControlFlowGraphNode* temp2 = RecursiveCreate(graph_set,edge_graph);
@@ -36,6 +44,14 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_s
       edge_graph.push_back(std::make_pair(node2,node3));
       return temp3;
     } else if (graph_set.front()->GetBlockType() == LOOP_BLOCK) { 
+      // Should look like this:
+      //      Loop
+      //      /\  \
+      //     True  \
+      //           False
+      // temp0 = Loop
+      // temp1 = True
+      // temp2 = False
       ControlFlowGraphNode* temp0 = RecursiveCreate(graph_set,edge_graph);
       ControlFlowGraphNode* temp1 = RecursiveCreate(graph_set,edge_graph);
       ControlFlowGraphNode* temp2 = RecursiveCreate(graph_set,edge_graph);
@@ -68,51 +84,40 @@ void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddress
   // IF/WHILE/FUNCTION
   // Each one has a different branching pattern
   std::vector<std::unique_ptr<ControlFlowGraphNode>> cfg_vector;
-  //ControlFlowGraphNode new_node,true_node, false_node; 
   std::vector<std::unique_ptr<struct ThreeAddressCode>> new_block;
   int creation_order = 0;
   for (const auto &iter: input) {
+    //Create a copy of the IR
     auto block = make_unique<struct ThreeAddressCode>();
     block->target = iter->target;
     block->op = iter->op;
     new_block.push_back(std::move(block));
+    //Create a block if neccessary
     if (iter->op.opcode() == CONDITIONAL) {
-      //std::vector<std::unique_ptr<struct ThreeAddressCode>> copy_block = CopyBlock(new_block);
-      //ControlFlowGraphNode conditional_block(std::move(new_block));
       auto conditional_block = make_unique<class ControlFlowGraphNode>(std::move(new_block));
       conditional_block->SetCreationOrder(creation_order);
       conditional_block->SetBlockType(CONDITIONAL_BLOCK);
-      //new_block.clear();
       std::vector<std::unique_ptr<struct ThreeAddressCode>> new_block;
       cfg_vector.push_back(std::move(conditional_block));
       ++creation_order;
     } else if (iter->op.opcode() == LOOP) {
-      //std::vector<std::unique_ptr<struct ThreeAddressCode>> copy_block = CopyBlock(new_block);
-      //ControlFlowGraphNode loop_block(std::move(new_block));
       auto loop_block = make_unique<class ControlFlowGraphNode>(std::move(new_block));
       loop_block->SetCreationOrder(creation_order);
       loop_block->SetBlockType(LOOP_BLOCK);
-      //new_block.clear();
       std::vector<std::unique_ptr<struct ThreeAddressCode>> new_block;
       cfg_vector.push_back(std::move(loop_block));
       ++creation_order;
     } else if (iter->op.opcode() == JUMP) {
-      //std::vector<std::unique_ptr<struct ThreeAddressCode>> copy_block = CopyBlock(new_block);
-      //ControlFlowGraphNode block(std::move(new_block));
       auto block = make_unique<class ControlFlowGraphNode>(std::move(new_block));
       block->SetCreationOrder(creation_order);
       block->SetBlockType(NO_TYPE);
-      //new_block.clear();
       std::vector<std::unique_ptr<struct ThreeAddressCode>> new_block;
       cfg_vector.push_back(std::move(block));
       ++creation_order;
     } else if (iter == input.back()) {
-      //std::vector<std::unique_ptr<struct ThreeAddressCode>> copy_block = CopyBlock(new_block);
       auto block = make_unique<class ControlFlowGraphNode>(std::move(new_block));
-      //ControlFlowGraphNode block(std::move(new_block));
       block->SetCreationOrder(creation_order);
       block->SetBlockType(END_BLOCK);
-      //new_block.clear();
       std::vector<std::unique_ptr<struct ThreeAddressCode>> new_block;
       cfg_vector.push_back(std::move(block));
       ++creation_order;
@@ -121,6 +126,7 @@ void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddress
     }
 
   } 
+  //Use CFGN pointers to recursively create
   std::vector<ControlFlowGraphNode *> temp_cfg;
   for (const auto& cfgiter: cfg_vector) {
     temp_cfg.push_back(cfgiter.get());
@@ -128,6 +134,7 @@ void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddress
   std::vector<std::pair<int,int>> edge_vector;
   RecursiveCreate(temp_cfg,edge_vector);
   edges_ = edge_vector;
+  cfg_nodes_ = std::move(cfg_vector);
 }
 
 ControlFlowGraphNode::ControlFlowGraphNode() {
@@ -147,7 +154,6 @@ ControlFlowGraphNode::ControlFlowGraphNode(std::vector<std::unique_ptr<struct Th
 }
 
 ControlFlowGraphNode::ControlFlowGraphNode(const ControlFlowGraphNode &copy) {
-  //std::vector<std::unique_ptr<ThreeAddressCode>> block_copy;
   localblock_.clear();
   // Because it is a vector of unique pointers
   // Each element has to be manually copied
@@ -157,13 +163,11 @@ ControlFlowGraphNode::ControlFlowGraphNode(const ControlFlowGraphNode &copy) {
     block->op = iter->op;
     localblock_.push_back(std::move(block));
   }
-  //localblock_ = block_copy;
   creation_order = copy.GetCreationOrder();
   blocktype_ = copy.GetBlockType();
 }
 
 ControlFlowGraphNode& ControlFlowGraphNode::operator=(ControlFlowGraphNode &copy) {
-  //localblock_ = copy.GetLocalBlock();
   localblock_.clear();
   for (const auto& iter: copy.GetLocalBlock()) {
     auto block = make_unique<struct ThreeAddressCode>();
