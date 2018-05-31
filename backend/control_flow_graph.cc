@@ -7,7 +7,11 @@ ControlFlowGraph::ControlFlowGraph
 (std::vector<std::unique_ptr<struct ThreeAddressCode>> input) {
   CreateCFG(std::move(input));
 }
-
+std::pair<int,int> PairMakeHelp(const int a, const int b) {
+  int front = a;
+  int back = b;
+  return std::make_pair(front,back);
+}
 ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_set, 
   std::vector<std::pair<int,int>> edge_graph) {
   if (graph_set.empty()) {
@@ -21,9 +25,26 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_s
       ControlFlowGraphNode* temp1 = RecursiveCreate(graph_set,edge_graph);
       ControlFlowGraphNode* temp2 = RecursiveCreate(graph_set,edge_graph);
       ControlFlowGraphNode* temp3 = RecursiveCreate(graph_set,edge_graph);
-      
-      edge_graph.push_back(std::make_pair<temp0->GetCreationOrder(),temp1->GetCreationOrder()>)
+      int node0 = temp0->GetCreationOrder();
+      int node1 = temp1->GetCreationOrder();
+      int node2 = temp2->GetCreationOrder();
+      int node3 = temp3->GetCreationOrder();
+      edge_graph.push_back(std::make_pair(node0,node1));
+      edge_graph.push_back(std::make_pair(node0,node2));
+      edge_graph.push_back(std::make_pair(node1,node3));
+      edge_graph.push_back(std::make_pair(node2,node3));
       return temp3;
+    } else if (graph_set.front()->GetBlockType() == LOOP_BLOCK) { 
+      ControlFlowGraphNode* temp0 = RecursiveCreate(graph_set,edge_graph);
+      ControlFlowGraphNode* temp1 = RecursiveCreate(graph_set,edge_graph);
+      ControlFlowGraphNode* temp2 = RecursiveCreate(graph_set,edge_graph);
+      int node0 = temp0->GetCreationOrder();
+      int node1 = temp1->GetCreationOrder();
+      int node2 = temp2->GetCreationOrder();
+      edge_graph.push_back(std::make_pair(node0,node1));
+      edge_graph.push_back(std::make_pair(node1,node0));
+      edge_graph.push_back(std::make_pair(node0,node2));
+      return temp2;
     } else { // NO TYPE
       ControlFlowGraphNode * temp = graph_set[0];
       graph_set.erase(graph_set.begin());
