@@ -49,14 +49,27 @@ class ParseStatus {
 	static ParseStatus success(int character_start, int character_end, std::string remaining_chars, std::string parsed_chars, std::unique_ptr<const T> ast_result) {
 		return ParseStatus(true, character_start, character_end, remaining_chars, parsed_chars, "No Error", std::move(ast_result), std::move(second_ast_result)); 
 	}
+
+	// This ParseStatus will be first parsestatus in vector for checking 
+	//success/fail when you return vector of ParseStatuses (i.e. AndCombinator)
+	static ParseStatus success() {
+		return ParseStatus(true);
+	}
+
+	static ParseStatus failure() {
+		return ParseStatus(false); 
+	}
+
+	
 	// failure state : doesn't return an Ast Node ever
 		// ParseStatus<T>::failure(int, string, string)
 	static ParseStatus failure(int character_start, std::string remaining_chars, std::string error_type) {
 		return ParseStatus(false, character_start, -1, remaining_chars, "", error_type, nullptr); 
 	}
 
+
  private:
- 	ParseStatus(bool status, int character_start, int character_end, std::string remaining_chars, std::string parsed_chars, std::string error_type, std::unique_ptr<const T> ast_result) {
+ 	ParseStatus(bool status, int character_start = 0, int character_end = 0, std::string remaining_chars = "", std::string parsed_chars = "", std::string error_type = "", std::unique_ptr<const T> ast_result = nullptr) {
 		 this->status = status;
 		 this->character_start = character_start;
 		 this->character_end = character_end;

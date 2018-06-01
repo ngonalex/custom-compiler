@@ -31,8 +31,8 @@ class ParseStatus {  // Super class
   // Only for the failed case
   std::string errorType;
 
-  int characterStart;
-  int characterEnd;
+  int startCharacter;
+  int endCharacter;
   /*
 	  explicit ParseStatus(bool p_status, std::string p_remainingCharacters,
 		  std::string p_parsedCharacters, std::unique_ptr<const AstNode>
@@ -53,7 +53,7 @@ class ParseStatus {  // Super class
   bool operator==(const ParseStatus &b) const;
 
   bool operator!=(const ParseStatus &b) const;
-
+/*
   static ParseStatus failure(std::string errorType, int characterStart) {
     std::vector<std::unique_ptr<const AstNode>> astNodes;
     return ParseStatus( false, "", "", nullptr, nullptr, astNodes, errorType, characterStart);
@@ -102,7 +102,7 @@ class ParseStatus {  // Super class
     this->astNodes = std::move(astNodes);
     this->errorType = errorType;
     this->characterStart = characterStart;
-  }
+  }*/
 };
 /*
 class AndCombParseStatus : public ParseStatus {

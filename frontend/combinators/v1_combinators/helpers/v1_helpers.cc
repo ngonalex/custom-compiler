@@ -9,7 +9,7 @@ using namespace cs160::frontend;
 using namespace std;
 
 // )
-ParseStatus<const AstNode> CloseParenParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus CloseParenParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 	std::string errorMessage = "Expecting close paranthesis";
@@ -21,17 +21,17 @@ ParseStatus<const AstNode> CloseParenParser::parse(std::string inputProgram, int
 	auto atomParser = AtomParser(')');
 	auto result = atomParser.parse(inputProgram, startCharacter);
 	if (atomParser.status) {
-		auto result = ParseStatus<const AstNode>::success(startCharacter, 
+		auto result = ParseStatus::success(startCharacter, 
 			endCharacter + 1, inputProgram.erase(0,1), atom);
 	}
 	else {
-		auto result = ParseStatus<const AstNode>::failure(startCharacter, result.remainingCharacters, errorMessage);
+		auto result = ParseStatus::failure(startCharacter, result.remainingCharacters, errorMessage);
 	}
 	return result;
 }
 
 // (
-ParseStatus<const AstNode> OpenParenParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus OpenParenParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 
@@ -55,7 +55,7 @@ ParseStatus<const AstNode> OpenParenParser::parse(std::string inputProgram, int 
 }
 
 // - 
-ParseStatus<const AstNode> NegativeParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus NegativeParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 	std::string errorMessage = "Expecting -";
@@ -80,7 +80,7 @@ ParseStatus<const AstNode> NegativeParser::parse(std::string inputProgram, int s
 }
 
 // + - 
-ParseStatus<const AstNode> AddSubOpParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus AddSubOpParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 	std::string errorMessage = "Expecting + or -";
@@ -103,7 +103,7 @@ ParseStatus<const AstNode> AddSubOpParser::parse(std::string inputProgram, int s
 }
 
 // * /
-ParseStatus<const AstNode> MulDivOpParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus MulDivOpParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 	std::string errorMessage = "Expecting * or /";
@@ -127,7 +127,7 @@ ParseStatus<const AstNode> MulDivOpParser::parse(std::string inputProgram, int s
 }
 
 // ;
-ParseStatus<const AstNode> SemiColonParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus SemiColonParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 	std::string errorMessage = "Missing semicolon";

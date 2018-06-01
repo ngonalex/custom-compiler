@@ -9,32 +9,32 @@ namespace frontend {
 
 class CloseParenParser : NullParser {
  public:
-   virtual ParseStatus<const AstNode> parse(std::string inputProgram, int startCharacter, std::string errorType = ""); 
+   virtual ParseStatus parse(std::string inputProgram, int startCharacter, std::string errorType = ""); 
 };
 
 class OpenParenParser : NullParser {
  public:
-   virtual ParseStatus<const AstNode> parse(std::string inputProgram, int startCharacter, std::string errorType = ""); 
+   virtual ParseStatus parse(std::string inputProgram, int startCharacter, std::string errorType = ""); 
 };
 
 class NegativeParser : NullParser {
  public:
-	virtual ParseStatus<const AstNode> parse(std::string inputProgram, int startCharacter, std::string errorType = "");
+	virtual ParseStatus parse(std::string inputProgram, int startCharacter, std::string errorType = "");
 };
 
 class AddSubOpParser : NullParser {
  public:
-	virtual ParseStatus<const AstNode> parse(std::string inputProgram, int startCharacter, std::string errorType = "");
+	virtual ParseStatus parse(std::string inputProgram, int startCharacter, std::string errorType = "");
 };
 
 class MulDivOpParser : NullParser {
  public:
-	virtual ParseStatus<const AstNode> parse(std::string inputProgram, int startCharacter, std::string errorType = "");
+	virtual ParseStatus parse(std::string inputProgram, int startCharacter, std::string errorType = "");
 };
 
 class SemiColonParser : NullParser {
  public:
-	virtual ParseStatus<const AstNode> parse(std::string inputProgram, int startCharacter, std::string errorType = "");
+	virtual ParseStatus parse(std::string inputProgram, int startCharacter, std::string errorType = "");
 };
 
 

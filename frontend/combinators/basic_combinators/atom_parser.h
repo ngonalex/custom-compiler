@@ -13,7 +13,7 @@ namespace frontend {
 
 class AtomParser {
  public:
-  ParseStatus<const AstNode> parse(
+  ParseStatus parse(
             std::string intput,
   				  int start_character,
 			      std::string error_type);

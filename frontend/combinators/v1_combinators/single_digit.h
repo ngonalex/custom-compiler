@@ -9,7 +9,7 @@ namespace frontend {
 
 class SingleDigitParser : NullParser {
  public:
-  virtual ParseStatus<const AstNode> parse(std::string inputProgram,
+  virtual ParseStatus parse(std::string inputProgram,
   				int startCharacter,
 			    std::string errorType = "");
 };

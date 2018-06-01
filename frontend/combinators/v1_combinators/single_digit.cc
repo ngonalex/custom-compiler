@@ -4,7 +4,7 @@
 
 using namespace cs160::frontend;
 
-ParseStatus<const AstNode> SingleDigitParser::parse(std::string inputProgram, int startCharacter,
+ParseStatus SingleDigitParser::parse(std::string inputProgram, int startCharacter,
 				     std::string errorType) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);

@@ -4,7 +4,7 @@
 
 using namespace cs160::frontend;
 
-ParseStatus<const AstNode> AndCombinator::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus AndCombinator::parse(std::string inputProgram, int startCharacter, std::string errorType) {
   ParseStatus firstStatus = firstParser->parse(inputProgram, startCharacter);
 
   if (!firstStatus.status) {
@@ -17,6 +17,8 @@ ParseStatus<const AstNode> AndCombinator::parse(std::string inputProgram, int st
   if (!secondStatus.status) {
     return secondStatus;
   }
+
+
 
   ParseStatus both::success(secondStatus.remainingCharacters, 
   	firstStatus.parsedCharacters + secondStatus.parsedCharacters, std::move(firstStatus.ast),

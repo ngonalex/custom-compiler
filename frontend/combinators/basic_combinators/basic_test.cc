@@ -1,5 +1,5 @@
 #include "abstract_syntax/abstract_syntax.h"
-#include "frontend/combinators/basic_combinators/parse_status.h"
+#include "frontend/combinators/basic_combinators/parsestatus.h"
 #include "frontend/combinators/basic_combinators/atom_parser.h"
 
 #include "gtest/gtest.h"
@@ -12,7 +12,7 @@ TEST(ParseStatus, NonAstSucess) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.character_start, 0);
-  EXPECT_EQ(result.character_end, 4);
+  EXPECT_EQ(result.character_end, 4 );
   EXPECT_EQ(result.remaining_chars, "af");
   EXPECT_EQ(result.parsed_chars, "10");
   EXPECT_EQ(result.error_type, "No Error");

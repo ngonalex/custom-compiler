@@ -9,14 +9,14 @@ namespace frontend {
 
 class SingleCharParser : NullParser {
  public:
-  virtual ParseStatus<const AstNode> parse(std::string inputProgram,
+  virtual ParseStatus parse(std::string inputProgram,
   				int startCharacter,
 			    std::string errorType = "");
 };
 
 class SingleVarCharParser : NullParser {
  public:
-  virtual ParseStatus<const AstNode> parse(std::string inputProgram,
+  virtual ParseStatus parse(std::string inputProgram,
 			    std::string errorType = "");
 };
 
