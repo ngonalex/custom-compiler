@@ -1,6 +1,7 @@
 #include "frontend/combinators/v1_combinators/helpers/v1_helpers.h"
 #include "frontend/combinators/v1_combinators/add_sub_expr.h"
 #include "frontend/combinators/v1_combinators/num_parser.h"
+#include "frontend/combinators/v1_combinators/mul_div_expr.h"
 
 #define super NullParser
 
@@ -30,7 +31,7 @@ ParseStatus AddSubExprParser::parse(std::string inputProgram, int startCharacter
 	  (asParseStatus.parsedCharacters),
 	  unique_cast<const ArithmeticExpr>(std::move(result.ast)),
 	  unique_cast<const ArithmeticExpr>(std::move(rhsParseStatus.ast))));
-      asParseStatus = op.parse(rhsParseStatus.remainingCharacters);
+      asParseStatus = op.parse(rhsParseStatus.remainingCharacters, endCharacter);
       result.parsedCharacters += (rhsParseStatus.parsedCharacters);
       result.startCharacter = startCharacter;
       result.endCharacter = rhsParseStatus.endCharacter;

@@ -8,8 +8,8 @@ ParseStatus NullParser::parse(std::string inputProgram, int startCharacter, std:
   status.status = false;
   status.remainingCharacters = inputProgram;
   status.parsedCharacters = "";
-  status.characterStart = startCharacter;
-  status.characterEnd = startCharacter;
+  status.startCharacter = startCharacter;
+  status.endCharacter = startCharacter;
   status.ast = nullptr;
   // status.second_ast = nullptr;
   if (errorType != "") {

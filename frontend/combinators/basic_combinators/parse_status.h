@@ -7,7 +7,7 @@
 #include <string> // std::string
 
 using namespace cs160::abstract_syntax::frontend;
-
+/*
 namespace cs160 {
 namespace frontend {
 
@@ -45,11 +45,6 @@ class ParseStatus {
 		return ParseStatus(true, character_start, character_end, remaining_chars, parsed_chars, "No Error", std::move(ast_result)); 
 	}
 
-	// success state for and combinator
-	static ParseStatus success(int character_start, int character_end, std::string remaining_chars, std::string parsed_chars, std::unique_ptr<const T> ast_result) {
-		return ParseStatus(true, character_start, character_end, remaining_chars, parsed_chars, "No Error", std::move(ast_result), std::move(second_ast_result)); 
-	}
-
 	// This ParseStatus will be first parsestatus in vector for checking 
 	//success/fail when you return vector of ParseStatuses (i.e. AndCombinator)
 	static ParseStatus success() {
@@ -81,6 +76,6 @@ class ParseStatus {
 };
 
 } // namespace frontend
-} // namespace cs160
+} // namespace cs160*/
 
 #endif // PARSE_STATUS_H_

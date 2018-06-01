@@ -17,6 +17,7 @@ class SingleCharParser : NullParser {
 class SingleVarCharParser : NullParser {
  public:
   virtual ParseStatus parse(std::string inputProgram,
+  				int startCharacter,
 			    std::string errorType = "");
 };
 

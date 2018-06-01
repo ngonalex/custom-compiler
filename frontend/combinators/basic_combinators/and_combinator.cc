@@ -19,10 +19,10 @@ ParseStatus AndCombinator::parse(std::string inputProgram, int startCharacter, s
   }
 
 
-
+/*
   ParseStatus both::success(secondStatus.remainingCharacters, 
   	firstStatus.parsedCharacters + secondStatus.parsedCharacters, std::move(firstStatus.ast),
-  	std::move(secondStatus.ast), firstStatus.characterStart + secondStatus.characterStart);
+  	std::move(secondStatus.ast), firstStatus.characterStart + secondStatus.characterStart);*/
   ParseStatus both;
   both.status = true;
   both.parsedCharacters =

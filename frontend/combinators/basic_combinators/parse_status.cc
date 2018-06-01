@@ -1,5 +1,5 @@
-#include "frontend/combinators/basic_combinators/parsestatus.h"
-
+#include "frontend/combinators/basic_combinators/parse_status.h"
+/*
 using namespace cs160::frontend;
 
 bool ParseStatus::operator==(const ParseStatus<T> &b) const {
@@ -21,3 +21,4 @@ bool ParseStatus::operator!=(const ParseStatus<T> &b) const {
 		return (this->is_sucess != b.is_sucess);
 	}
 }
+*/

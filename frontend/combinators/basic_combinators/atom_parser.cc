@@ -2,24 +2,29 @@
 
 using namespace cs160::frontend;
 
-ParseStatus AtomParser::parse(std::string input, 
-                              int start_character, 
-                              std::string error_type) {
+ParseStatus AtomParser::parse(std::string input, int start_character) {
 
   // Failures
   if (input.size() == 0 || input[0] != char_to_parse) {
-    return ParseStatus::failure(start_character, 
-                                  input, "Error parsing Atom\n");
+    ParseStatus result; 
+    result.startCharacter = start_character;
+    result.remainingCharacters = input;
+    result.errorType = "Error parsing Atom \n";
+    return result;
   } 
 
   // Success
   std::string remaining_chars(input.begin()+1, input.end());
   std::string parsed_char(1, char_to_parse);
-  return ParseStatus::success(
-    start_character, 
-    start_character+1, 
-    remaining_chars, 
-    parsed_char);
+
+  ParseStatus result;
+  result.status = true;
+  result.startCharacter = start_character;
+  result.endCharacter = start_character + 1;
+  result.remainingCharacters = remaining_chars;
+  result.parsedCharacters = parsed_char;
+
+  return result;
 }
 
 // NUM and Operator

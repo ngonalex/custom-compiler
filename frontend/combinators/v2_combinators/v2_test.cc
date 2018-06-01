@@ -15,9 +15,10 @@ TEST(CloseParenParser, successCloseParenParser) {
   WordParser wordParser;
   ParseStatus result;
   result.status = false;
-  result.remainingCharacters = ")";
+  result.parsedCharacters = ")";
+  result.remainingCharacters = "1";
 
-  ParseStatus testResult = wordParser.parse("11fab");
+  ParseStatus testResult = wordParser.parse(")1");
 
   EXPECT_EQ(testResult, result);
 }

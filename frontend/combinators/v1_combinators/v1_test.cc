@@ -187,10 +187,13 @@ TEST(Combinators, OpenParen) {
 // close_paren test
 TEST(Combinators, CloseParen) {
   CloseParenParser test;
-  ParseStatus result = test.parse(")abc");
+  ParseStatus result = test.parse(")abc", 0);
 
   EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.startCharacter, 1);
   EXPECT_EQ(result.remainingCharacters, "abc");
+  EXPECT_EQ(result.parsedCharacters, ")");
 }/*
 
 TEST(Combinators, FailedDigit) {

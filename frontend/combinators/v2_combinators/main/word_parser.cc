@@ -3,6 +3,7 @@
 #include "frontend/combinators/v1_combinators/single_digit.h"
 #include "frontend/combinators/basic_combinators/zero_or_more_combinator.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
+#include "frontend/combinators/basic_combinators/and_combinator.h"
 #include <string>     // std::string, std::stoi
 
 #define super NullParser
@@ -10,33 +11,33 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus WordParser::parse(std::string inputProgram, std::string errorType) {
+ParseStatus WordParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
 	int endCharacter = startCharacter;
-  	endCharacter += trim(inputProgram, endCharacter);
+  	endCharacter += trim(inputProgram);
 
 	std::string errorMessage = "Declare variable names with 'var variable_name : type = expression'";
 
 	if (inputProgram.size() == 0) {
-		return super::parse(inputProgram);
+		return super::parse(inputProgram, endCharacter);
 	}
 
 	SingleVarCharParser charParser;
 	SingleDigitParser digitParser;
 
-	OrCombinator orCombinator;
-	orCombinator.firstParser = reinterpret_cast<NullParser *>(&charParser);
-	orCombinator.secondParser = reinterpret_cast<NullParser *>(&digitParser);
+	OrCombinator charOrDigit;
+	charOrDigit.firstParser = reinterpret_cast<NullParser *>(&charParser);
+	charOrDigit.secondParser = reinterpret_cast<NullParser *>(&digitParser);
+
 	ZeroOrMoreCombinator zeroOrMore;
+	zeroOrMore.parser = reinterpret_cast<NullParser *>(&charOrDigit);
 
-	zeroOrMore.parser = reinterpret_cast<NullParser *>(&orCombinator);
+	AndCombinator firstAnd;
+	firstAnd.firstParser = reinterpret_cast<NullParser *>(&charParser);
+	firstAnd.secondParser = reinterpret_cast<NullParser *>(&charOrDigit);
 
-	// Parse the first character
-	ParseStatus result = charParser.parse(inputProgram);
+	ParseStatus result = firstAnd.parse(inputProgram, endCharacter);
 
 	if (result.status){
-		ParseStatus result2 = zeroOrMore.parse(result.remainingCharacters);
-		result.parsedCharacters += result2.parsedCharacters;
-		result.remainingCharacters = result2.remainingCharacters;
 		result.ast = std::move(make_unique<const VariableExpr>(result.parsedCharacters));
 	}
 	else{

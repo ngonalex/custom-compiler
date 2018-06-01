@@ -28,7 +28,7 @@ ParseStatus SingleCharParser::parse(std::string inputProgram, int startCharacter
   return status;
 }
 
-ParseStatus SingleVarCharParser::parse(std::string inputProgram,
+ParseStatus SingleVarCharParser::parse(std::string inputProgram, int startCharacter,
 				       std::string errorType) {
   std::string errorMessage = "Char should be alphabetical or underscore";
 

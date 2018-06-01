@@ -21,27 +21,3 @@ bool ParseStatus::operator!=(const ParseStatus &b) const {
     return (this->status != b.status);
   }
 }
-
-/*
-bool AndCombParseStatus::operator==(const ParseStatus &b) const {
-	if(this->status) {
-		return (this->status == b.status &&
-						this->remainingCharacters ==
-b.remainingCharacters && this->parsedCharacters == b.parsedCharacters);
-	}
-	else {
-		return (this->status == b.status);
-	}
-}
-
-bool AndCombParseStatus::operator!=(const ParseStatus &b) const {
-	if(this->status) {
-		return (this->status != b.status ||
-						this->remainingCharacters !=
-b.remainingCharacters || this->parsedCharacters != b.parsedCharacters);
-	}
-	else {
-		return (this->status == b.status);
-	}
-}
-*/

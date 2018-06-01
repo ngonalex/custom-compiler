@@ -19,14 +19,7 @@ ParseStatus CloseParenParser::parse(std::string inputProgram, int startCharacter
 	}
 
 	auto atomParser = AtomParser(')');
-	auto result = atomParser.parse(inputProgram, startCharacter);
-	if (atomParser.status) {
-		auto result = ParseStatus::success(startCharacter, 
-			endCharacter + 1, inputProgram.erase(0,1), atom);
-	}
-	else {
-		auto result = ParseStatus::failure(startCharacter, result.remainingCharacters, errorMessage);
-	}
+	auto result = atomParser.parse(inputProgram, endCharacter);
 	return result;
 }
 
