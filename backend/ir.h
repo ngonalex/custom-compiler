@@ -96,6 +96,14 @@ enum Scope {
   FUNCTION
 };
 
+enum FlagType {
+  TYPEFLAG,
+  EXISTENCEFLAG,
+  SIZEFLAG,
+  OBJECTFLAG,
+  NOFLAG
+};
+
 enum VariableType {
   LEFTHANDVAR,
   RIGHTHANDVAR,

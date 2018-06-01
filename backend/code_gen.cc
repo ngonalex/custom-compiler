@@ -168,21 +168,16 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
       break;
     case VARLOAD:  // 2 pushes
       outfile_ << "\t# Loading from a variable" << std::endl;
-      outfile_ << "\tmov " << VariableNameHelper(tac->arg1.reg().name())
+      outfile_ << "\tmov " <<
+        VariableNameHelper(tac->arg1.reg().name(), NOFLAG)
         << ", %rbx" << std::endl;
 
       // Then load it into register
-      if (currscope_ == FUNCTION) {
-        outfile_ << "\tpush %rbx" << std::endl;
-        outfile_ << "\tmov " << std::to_string(
-        symbollocations_.find(tac->arg1.reg().name())->second+8)
-          << "(%rbp), %rbx" << std::endl;
-        outfile_ << "\tpush %rbx\n" << std::endl;
-      } else {
-        outfile_ << "\tpush (%rbx)" << std::endl;
-        outfile_ << "\tmov 8(%rbx), %rcx" << std::endl;
-        outfile_ << "\tpush %rcx\n" << std::endl;
-      }
+      outfile_ << "\tpush %rbx" << std::endl;
+      outfile_ << "\tmov "
+        << VariableNameHelper(tac->arg1.reg().name(), OBJECTFLAG)
+        << " %rbx" << std::endl;
+      outfile_ << "\tpush %rbx\n" << std::endl;
       break;
     case VARASSIGNLOAD:  // Always pop 3 things
 
@@ -204,23 +199,21 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
         outfile_ << "\tpop %rcx" << std::endl;  // VALUE
         outfile_ << "\tpop %rax" << std::endl;  // This is the FLAG
 
-        if (currscope_ == FUNCTION) {
-          // lines 208 and 209 SUCK, REFACTOR VARIABLE NAME HELPER
-          VariableNameHelper(tac->target.reg().name());
-          int index = symbollocations_.find(tac->target.reg().name())->second;
-          outfile_ << "\tmov %rax,"
-            << VariableNameHelper(tac->target.reg().name()) << std::endl;
-          outfile_ << "\tmovq %rcx, " << std::to_string(index+8) << "(%rbp)\n"
-            << std::endl;
-        } else {
+        if (currscope_ == GLOBAL) {
           outfile_ << "\tmov "
-            << VariableNameHelper(tac->target.reg().name())
+            << VariableNameHelper(tac->target.reg().name(), NOFLAG)
             << ", %rbx" << std::endl;
-          outfile_ << "\tmov %rax, (%rbx)" << std::endl;
-          outfile_ << "\tmov %rcx, 8(%rbx)\n" << std::endl;
         }
 
+        outfile_ << "\tmov %rax,"
+          << VariableNameHelper(tac->target.reg().name(), TYPEFLAG)
+          << std::endl;
+        outfile_ << "\tmovq %rcx, "
+          << VariableNameHelper(tac->target.reg().name(), OBJECTFLAG)
+          << "\n" << std::endl;
+
         // Add it to the set, then call the print function
+        // Needs to be changed
         if (currscope_ == GLOBAL) {
           assignmentset_.insert(tac->target.reg().name());
           outfile_ << "\tmov %rcx, %rax\n" << std::endl;
@@ -232,11 +225,10 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
             << tac->target.reg().name() << std::endl;
           outfile_ << std::endl;
         }
-      } else {  // Needs to handle functions
+      } else {
         // Handle Derefs
         outfile_ << "\t# Loading an int into " << tac->target.reg().name()
           << std::endl;
-
         // Rewrite flags
         // RCX is the RHS value to be assigned
         // RAX is the flag of RHS
@@ -284,27 +276,22 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
       }
       outfile_ << "\t# Returning from function and loading value" << std::endl;
       outfile_ << "\tmov (%rax), %rcx" << std::endl;
-      // Update the whole structure with the correct type
-      // (always returns an int) Then move it into the value field
-      // Remake the "Int" object if it's a function
-      if (currscope_ == FUNCTION) {
-        // Update flags
-        outfile_ << "\tmov %rcx,"
-          << VariableNameHelper(tac->target.reg().name()) << std::endl;
-        int index = symbollocations_.find(tac->target.reg().name())->second;
-        // now load the value of rax in
-        outfile_ << "\tmov 8(%rax), %rax" << std::endl;
-        outfile_ << "\tmovq %rax, " << std::to_string(index+8) << "(%rbp)\n"
-          << std::endl;
-      } else {
-        // Update flags
+
+      if (currscope_ == GLOBAL) {
         outfile_ << "\tmov "
-          << VariableNameHelper(tac->target.reg().name())
+          << VariableNameHelper(tac->target.reg().name(), NOFLAG)
           << ", %rbx" << std::endl;
-        outfile_ << "\tmov %rcx, (%rbx)" << std::endl;
-        outfile_ << "\tmov 8(%rax), %rax" << std::endl;
-        outfile_ << "\tmov %rax, 8(%rbx)\n" << std::endl;
       }
+
+      // Update the whole structure with the correct type
+      outfile_ << "\tmov %rcx,"
+        << VariableNameHelper(tac->target.reg().name(), TYPEFLAG)
+        << std::endl;
+      // now load the value of rax in
+      outfile_ << "\tmov 8(%rax), %rax" << std::endl;
+      outfile_ << "\tmovq %rax, "
+        << VariableNameHelper(tac->target.reg().name(), OBJECTFLAG)
+        << "\n" << std::endl;
       break;
     default:
       break;
@@ -442,7 +429,6 @@ void CodeGen::GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
 
 void CodeGen::GenerateBinaryExprHelper(
   std::unique_ptr<ThreeAddressCode> tac) {
-
   outfile_ << "\tpop %rbx" << std::endl;  // rbx = right value
   outfile_ << "\tpop %rcx" << std::endl;  // rcx = right flag
   outfile_ << "\tpop %rax" << std::endl;  // rax = left value
@@ -478,21 +464,58 @@ void CodeGen::GenerateBinaryExprHelper(
   outfile_ << "\tpop %rdx" << std::endl;  // rdx = left flag
 }
 
-std::string CodeGen::VariableNameHelper(std::string variablename) {
+std::string CodeGen::VariableNameHelper(std::string variablename,
+  FlagType flag) {
+  std::string mappedname;
   if (currscope_ == GLOBAL) {
-    return "$"+variablename;
+    switch (flag) {
+      case TYPEFLAG:
+        return "(%rbx)";
+        break;
+      case EXISTENCEFLAG:
+        return "1(%rbx)";
+        break;
+      case SIZEFLAG:
+        return "2(%rbx)";
+        break;
+      case OBJECTFLAG:
+        return "8(%rbx)";
+        break;
+      default:
+        return "$"+variablename;
+        break;
+    }
   } else {
-    // We're inside a function so consult the map
-
-    if (symbollocations_.count(variablename) == 1) {
-      std::string mappedname = std::to_string(
-        symbollocations_.find(variablename)->second) + "(%rbp)";
-      return mappedname;
-    } else {
+    // We're inside a function
+    // Check if it exists first
+    if (symbollocations_.count(variablename) != 1) {
       // something bad happened
       std::cerr << "Variable name helper could not find the mapping for "
         << variablename <<" \n";
       exit(1);
+    }
+    switch (flag) {
+      int index = symbollocations_.find(variablename)->second;
+      case TYPEFLAG:
+        mappedname = std::to_string(index) + "(%rbp)";
+        return mappedname;
+        break;
+      case EXISTENCEFLAG:
+        mappedname = std::to_string(index+1) + "(%rbp)";
+        return mappedname;
+        break;
+      case SIZEFLAG:
+        mappedname = std::to_string(index+2) + "(%rbp)";
+        return mappedname;
+        break;
+      case OBJECTFLAG:
+        mappedname = std::to_string(index+8) + "(%rbp)";
+        return mappedname;
+        break;
+      default:
+        mappedname = std::to_string(index) + "(%rbp)";
+        return mappedname;
+        break;
     }
   }
 }
@@ -728,7 +751,7 @@ void CodeGen::Generate(std::vector
       case FUNEPILOGUE:
 
         outfile_ << "\t# Function Epilogue " << std::endl;
-        // Do a correct load lol
+        // Do a correct load
         outfile_ << "\tpop %rax" << std::endl;
         outfile_ << "\tpop %rbx" << std::endl;
 
@@ -749,19 +772,13 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tpop %rbx" << std::endl;
         GeneratePrintCall("printresult");
 
-        // BAD FIX, we "know" that the last thing will be the arithmetic expr
-        // So im just going to go ahead and make the exit code here
-        // later on THIS SHOULD CHANGE
         GenerateEpilogue();
         break;
-      case LHSDEREFERENCE:  // Needs to handle functions (only for varchild)
+      case LHSDEREFERENCE:
         parsedstring = DereferenceParserHelper(code->target.reg().name());
         outfile_ << "\t# LHSDereference of variable "
             << code->target.reg().name() << std::endl;
         if (parsedstring.size() == 2) {
-          // REFACTOR OUT TO HELPER FUNCTION LATER
-          // ITS VERY LIKELY VARIABLENAMEHELPER OR ANOTHER HELPER
-          // FUNCTION CAN DO WHAT FUNCTIONS REQUIRE DITTO FOR RHS
           if (currscope_ == GLOBAL) {
             outfile_ << "\tmov " << VariableNameHelper(code->arg1.reg().name())
             << ", %rbx" << std::endl;

@@ -53,7 +53,7 @@ class CodeGen {
     // If it's global then it just returns the name of the variable
     // otherwise it checks the map for the function and returns the correct
     // offset inside the stacks
-    std::string VariableNameHelper(std::string variablename);
+    std::string VariableNameHelper(std::string variablename, FlagType flag);
 
     std::vector<std::string> DereferenceParserHelper(std::string variablename);
 
