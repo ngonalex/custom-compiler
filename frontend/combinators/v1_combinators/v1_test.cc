@@ -158,10 +158,10 @@ TEST(Combinators, FailMulOp) {
 // // div_op test
 TEST(Combinators, DivOp) {
   MulDivOpParser test;
-  ParseStatus result = test.parse(" /", 0);
+  auto result = test.parse(" /", 0);
 
   EXPECT_EQ(result.status, true);
-  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.startCharacter, 1);
   EXPECT_EQ(result.endCharacter, 2);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "/");
