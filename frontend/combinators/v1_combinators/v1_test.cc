@@ -154,13 +154,15 @@ TEST(Combinators, FailMulOp) {
   EXPECT_EQ(result.remainingCharacters, "0");
   EXPECT_EQ(result.parsedCharacters, "");
 }
-
+*/
 // // div_op test
 TEST(Combinators, DivOp) {
   MulDivOpParser test;
-  ParseStatus result = test.parse("/");
+  ParseStatus result = test.parse(" /", 0);
 
   EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 2);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "/");
 }
@@ -168,9 +170,11 @@ TEST(Combinators, DivOp) {
 // // mul_op fail test
 TEST(Combinators, FailDivOp) {
   MulDivOpParser test;
-  ParseStatus result = test.parse("0");
+  ParseStatus result = test.parse("0", 0);
 
-  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 1);
   EXPECT_EQ(result.remainingCharacters, "0");
   EXPECT_EQ(result.parsedCharacters, "");
 }
@@ -178,11 +182,14 @@ TEST(Combinators, FailDivOp) {
 // open_paren test
 TEST(Combinators, OpenParen) {
   OpenParenParser test;
-  ParseStatus result = test.parse("(abc");
+  ParseStatus result = test.parse("(abc", 0);
 
   EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 1);
   EXPECT_EQ(result.remainingCharacters, "abc");
-}*/
+  EXPECT_EQ(result.parsedCharacters, "(");
+}
 
 // close_paren test
 TEST(Combinators, CloseParen) {
@@ -191,7 +198,7 @@ TEST(Combinators, CloseParen) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
-  EXPECT_EQ(result.startCharacter, 1);
+  EXPECT_EQ(result.endCharacter, 1);
   EXPECT_EQ(result.remainingCharacters, "abc");
   EXPECT_EQ(result.parsedCharacters, ")");
 }/*
