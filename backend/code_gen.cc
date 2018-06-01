@@ -442,13 +442,7 @@ void CodeGen::GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
 
 void CodeGen::GenerateBinaryExprHelper(
   std::unique_ptr<ThreeAddressCode> tac) {
-  // Shouldn't have to check it it's been assigned yet
-  // Lowerer should have done that
-  // RegisterType arg1type = tac->arg1.reg().type();
-  // RegisterType arg2type = tac->arg2.reg().type();
 
-  // double pop from stack
-  outfile_ << " btwn int, int\n";
   outfile_ << "\tpop %rbx" << std::endl;  // rbx = right value
   outfile_ << "\tpop %rcx" << std::endl;  // rcx = right flag
   outfile_ << "\tpop %rax" << std::endl;  // rax = left value
@@ -482,7 +476,6 @@ void CodeGen::GenerateBinaryExprHelper(
   outfile_ << "\tpop %rcx" << std::endl;  // rcx = right flag
   outfile_ << "\tpop %rax" << std::endl;  // rax = left value
   outfile_ << "\tpop %rdx" << std::endl;  // rdx = left flag
-  // }
 }
 
 std::string CodeGen::VariableNameHelper(std::string variablename) {
@@ -923,6 +916,7 @@ void CodeGen::Generate(std::vector
           } else {
             // Error Handling here to check the size
             // and if it's actually a tuple
+            // Swap tuple flag + existence ahead
             outfile_ << "\t#Error Handling Here RHS VARCHILD" << std::endl;
             outfile_ << "\tmovb " << VariableNameHelper(code->arg1.reg().name())
               << ", %al" << std::endl;

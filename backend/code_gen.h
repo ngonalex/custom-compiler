@@ -45,9 +45,9 @@ class CodeGen {
     void GenerateIntegerFlagCheck();
     void GenerateExistenceCheck();
     void GenerateTupleSizeCheck();
-    void GenerateUnboxer();
-    void GenerateBoxer();
     void GenerateCreateNewTuple();
+    // Flag type arg2
+    std::string FlagHelper(std::string variablename);
 
     // This function checks if the current scope is function or global
     // If it's global then it just returns the name of the variable

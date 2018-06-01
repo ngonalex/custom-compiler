@@ -10,3 +10,4 @@ bazel-*
 *.code-workspace
 *.txt
 a.out
+run
