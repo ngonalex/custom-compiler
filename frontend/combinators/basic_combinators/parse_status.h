@@ -33,18 +33,22 @@ class ParseStatus {
 	// bool operator==(const ParseStatus<T> &b) const;
 	// bool operator!=(const ParseStatus<T> &b) const;
 
-	// sucess state where you do NOT need to return an Ast Node
+	// success state where you do NOT need to return an Ast Node
 		// // ParseStatus<T>::sucess(int, int, string, string)
 	static ParseStatus success(int character_start, int character_end, std::string remaining_chars, std::string parsed_chars) {
 		return ParseStatus(true, character_start, character_end, remaining_chars, parsed_chars, "No Error", nullptr);
 	}
 
-	// sucess state where you DO need to return an Ast Node
+	// success state where you DO need to return an Ast Node
 		// ParseStatus<T>::sucess(int, int, string, string, ast)
 	static ParseStatus success(int character_start, int character_end, std::string remaining_chars, std::string parsed_chars, std::unique_ptr<const T> ast_result) {
-		return ParseStatus(true, character_start, character_end, remaining_chars, parsed_chars, "No Error", ast_result); 
+		return ParseStatus(true, character_start, character_end, remaining_chars, parsed_chars, "No Error", std::move(ast_result)); 
 	}
 
+	// success state for and combinator
+	static ParseStatus success(int character_start, int character_end, std::string remaining_chars, std::string parsed_chars, std::unique_ptr<const T> ast_result) {
+		return ParseStatus(true, character_start, character_end, remaining_chars, parsed_chars, "No Error", std::move(ast_result), std::move(second_ast_result)); 
+	}
 	// failure state : doesn't return an Ast Node ever
 		// ParseStatus<T>::failure(int, string, string)
 	static ParseStatus failure(int character_start, std::string remaining_chars, std::string error_type) {
