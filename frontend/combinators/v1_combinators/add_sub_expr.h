@@ -9,7 +9,7 @@ namespace frontend {
 
 class AddSubExprParser : NullParser {
  public:
-  virtual ParseStatus parse(std::string inputProgram,
+  virtual ParseStatus<const AstNode> parse(std::string inputProgram,
   				int startCharacter,
 			    std::string errorType = "");
   std::unique_ptr<const ArithmeticExpr> make_node(

@@ -2,14 +2,14 @@
 #define NULL_PARSER_H
 
 #include "abstract_syntax/abstract_syntax.h"
-#include "frontend/combinators/basic_combinators/parsestatus.h"
+#include "frontend/combinators/basic_combinators/parse_status.h"
 
 namespace cs160 {
 namespace frontend {
 
 class NullParser {
  public:
-  virtual ParseStatus parse(std::string inputProgram,
+  virtual ParseStatus<const AstNode> parse(std::string inputProgram,
   				int startCharacter,
 			    std::string errorType = "");
 };

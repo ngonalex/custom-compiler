@@ -41,6 +41,15 @@ cc_library(
 	visibility = ["//visibility:public"],
 )
 
+cc_library(
+	name = "v1_helpers",
+	copts = ["-Wall -g"],
+	hdrs = ["helpers/v1_helpers.h"],
+	srcs = ["helpers/v1_helpers.cc"],
+	deps = ["//utility", "//frontend/combinators/basic_combinators"],
+	visibility = ["//visibility:public"],
+)
+
 cc_test(
 	name = "combinators_test",
 	deps = ["@gtest//:main", ":v1_combinators", "//frontend/combinators/basic_combinators", "//abstract_syntax:abstract_syntax"],

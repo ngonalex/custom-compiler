@@ -9,7 +9,7 @@ namespace frontend {
 
 class WordParser : NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
+   virtual ParseStatus<const VariableExpr> parse(std::string inputProgram, std::string errorType = "");
 };
 
 } // namespace frontend

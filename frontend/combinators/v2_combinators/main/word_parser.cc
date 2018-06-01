@@ -10,7 +10,7 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus WordParser::parse(std::string inputProgram, std::string errorType) {
+ParseStatus<const VariableExpr> WordParser::parse(std::string inputProgram, std::string errorType) {
 	trim(inputProgram);
 
 	std::string errorMessage = "Declare variable names with 'var variable_name : type = expression'";

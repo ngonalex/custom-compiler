@@ -19,7 +19,7 @@
 #include "gtest/gtest.h"
 
 using namespace cs160::frontend;
-
+/*
 // Success case for Single Character test :: single_char.cc
 TEST(Combinators, SingleCharTest) {
   SingleCharParser test;
@@ -182,7 +182,7 @@ TEST(Combinators, OpenParen) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "abc");
-}
+}*/
 
 // close_paren test
 TEST(Combinators, CloseParen) {
@@ -191,7 +191,7 @@ TEST(Combinators, CloseParen) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "abc");
-}
+}/*
 
 TEST(Combinators, FailedDigit) {
   NumParser test;
@@ -286,22 +286,6 @@ TEST(Combinators, NegativeNumber) {
   EXPECT_EQ(output, "(0 - 101281510)");
 }
 
-/* // Original - broken
-TEST(Combinators, TrivialAe) {
-  ArithExprParser test;
-  ParseStatus result = test.parse("(225*335)+12/2");
-
-  // Traversing the AST created from the number
-  PrintVisitor *a = new PrintVisitor();
-  result.ast->Visit(a);
-  std::string output = a->GetOutput();
-
-  EXPECT_EQ(result.status, true);
-  EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(output, "(/ (+ (* 225 335) 12) 2)");
-}
-*/
-
 // New - working
 TEST(Combinators, TrivialAe1) {
   ArithExprParser test;
@@ -377,4 +361,4 @@ TEST(Combinators, NegComplicatedAe) {
   EXPECT_EQ(output,
 	    "(0 - ((((((7 * 10) + (9 / 3)) + 16) - ((8 * 2) * 3)) - 77) + (12 "
 	    "* 1)))");
-}
+}*/

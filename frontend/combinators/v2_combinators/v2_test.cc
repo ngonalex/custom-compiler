@@ -10,6 +10,18 @@
 
 using namespace cs160::frontend;
 
+
+TEST(CloseParenParser, successCloseParenParser) {
+  WordParser wordParser;
+  ParseStatus result;
+  result.status = false;
+  result.remainingCharacters = ")";
+
+  ParseStatus testResult = wordParser.parse("11fab");
+
+  EXPECT_EQ(testResult, result);
+}
+/*
 // Fail Case WordParser
 TEST(WordParserCombinator, failWordParser1) {
   WordParser wordParser;
@@ -356,7 +368,7 @@ TEST(AssignmentParserCombinator, successAssignmentParser1) {
   EXPECT_EQ(testResult, result);
   EXPECT_EQ(output, "_victor = 490");
 }
-/*
+
 // Success Case VariableParser
 TEST(AssignmentParserCombinator, successAssignmentParser2) {
   AssignmentParser parser;
