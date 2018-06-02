@@ -25,8 +25,8 @@ std::unique_ptr<R> unique_cast(std::unique_ptr<T> &&p) {
 }
 
 // trim from start (in place)
-static inline size_t ltrim(std::string &s) {
-  size_t origCount = s.length();
+static inline int ltrim(std::string &s) {
+  int origCount = s.length();
   s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
       return !std::isspace(ch);
   }));
@@ -34,8 +34,8 @@ static inline size_t ltrim(std::string &s) {
 }
 
 // trim from end (in place)
-static inline size_t rtrim(std::string &s) {
-  size_t origCount = s.length();
+static inline int rtrim(std::string &s) {
+  int origCount = s.length();
   s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
       return !std::isspace(ch);
   }).base(), s.end());
@@ -43,8 +43,8 @@ static inline size_t rtrim(std::string &s) {
 }
 
 // trim from both ends (in place)
-static inline size_t trim(std::string &s) {
-  size_t count = 0;
+static inline int trim(std::string &s) {
+  int count = 0;
   count += ltrim(s);
   count += rtrim(s);
 }

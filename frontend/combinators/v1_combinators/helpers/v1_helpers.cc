@@ -3,6 +3,7 @@
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 
 #include <string>     // std::string, std::stoi
+#include <iostream>
 
 #define super NullParser
 
@@ -13,7 +14,7 @@ using namespace std;
 ParseStatus CloseParenParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
-	std::string errorMessage = "Expecting close paranthesis";
+	std::string errorMessage = "Expecting close parenthesis";
 
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram, endCharacter, errorMessage);
@@ -29,7 +30,7 @@ ParseStatus OpenParenParser::parse(std::string inputProgram, int startCharacter,
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 
-	std::string errorMessage = "Expecting open paranthesis";
+	std::string errorMessage = "Expecting open parenthesis";
 
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram, endCharacter, errorMessage);
@@ -86,12 +87,15 @@ ParseStatus MulDivOpParser::parse(std::string inputProgram, int startCharacter, 
 		return super::parse(inputProgram, endCharacter, errorMessage);
 	}
 
+
+
 	auto mulParser = AtomParser('*');
 	auto divParser = AtomParser('/');
+	
 	OrCombinator mulOrDiv;
 	mulOrDiv.firstParser = reinterpret_cast<NullParser *>(&mulParser);
-	mulOrDiv.secondParser = reinterpret_cast<NullParser *>(&divParser);
 
+	mulOrDiv.secondParser = reinterpret_cast<NullParser *>(&divParser);
 	auto result = mulOrDiv.parse(inputProgram, endCharacter);
 	return result;
 }

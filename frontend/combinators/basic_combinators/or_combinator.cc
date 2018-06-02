@@ -1,5 +1,6 @@
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 
+#include <iostream>
 #define super NullParser
 
 using namespace cs160::frontend;
