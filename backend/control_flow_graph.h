@@ -20,6 +20,20 @@ enum BlockType {
   FALSE_BLOCK, END_BLOCK, NO_TYPE
 };
 
+enum EdgeType {
+  CONDITIONAL_TRUE, CONDITIONAL_FALSE,
+  CONDITIONAL_TRUE_RETURN, CONDITIONAL_FALSE_RETURN,
+  LOOP_TRUE, LOOP_FALSE, LOOP_RETURN,
+  TYPELESS_EDGE  
+};
+struct Edge {
+  std::pair<int,int> edge_pair = std::make_pair(0,0);
+  EdgeType edge_type;
+  Edge(std::pair<int,int> edge_input,
+    EdgeType edge_type_input) : 
+    edge_pair(edge_input) { edge_type = edge_type_input; }
+};
+
 // Individual nodes in the CGF
 // leftnode_ will be true branches
 // rightnode_ will be false branches
@@ -78,7 +92,7 @@ class ControlFlowGraph {
  private:
   //std::unique_ptr<ControlFlowGraphNode> root_;
   std::vector<std::unique_ptr<ControlFlowGraphNode>> cfg_nodes_;
-  std::vector<std::pair<int,int>> edges_;
+  std::vector<Edge> edges_;
 };
 
 } // namespace backend

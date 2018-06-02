@@ -10,7 +10,7 @@ ControlFlowGraph::ControlFlowGraph
 
 //Use Recursion to find all the edges in the graph
 ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_set, 
-  std::vector<std::pair<int,int>> edge_graph) {
+  std::vector<Edge> edge_graph) {
   if (graph_set.empty()) {    
     //Hopefully this never occurs
     return NULL;
@@ -38,10 +38,14 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_s
       int node1 = temp1->GetCreationOrder();
       int node2 = temp2->GetCreationOrder();
       int node3 = temp3->GetCreationOrder();
-      edge_graph.push_back(std::make_pair(node0,node1));
-      edge_graph.push_back(std::make_pair(node0,node2));
-      edge_graph.push_back(std::make_pair(node1,node3));
-      edge_graph.push_back(std::make_pair(node2,node3));
+      Edge edge1(std::make_pair(node0,node1), CONDITIONAL_TRUE);
+      Edge edge2(std::make_pair(node0,node2), CONDITIONAL_FALSE);
+      Edge edge3(std::make_pair(node1,node3), CONDITIONAL_TRUE_RETURN);
+      Edge edge4(std::make_pair(node2,node3), CONDITIONAL_FALSE_RETURN);
+      edge_graph.push_back(edge1);
+      edge_graph.push_back(edge2);
+      edge_graph.push_back(edge3);
+      edge_graph.push_back(edge4);
       return temp3;
     } else if (graph_set.front()->GetBlockType() == LOOP_BLOCK) { 
       // Should look like this:
@@ -58,9 +62,12 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_s
       int node0 = temp0->GetCreationOrder();
       int node1 = temp1->GetCreationOrder();
       int node2 = temp2->GetCreationOrder();
-      edge_graph.push_back(std::make_pair(node0,node1));
-      edge_graph.push_back(std::make_pair(node1,node0));
-      edge_graph.push_back(std::make_pair(node0,node2));
+      Edge edge1(std::make_pair(node0,node1), LOOP_TRUE);
+      Edge edge2(std::make_pair(node1,node0), LOOP_FALSE);
+      Edge edge3(std::make_pair(node0,node2), LOOP_RETURN);
+      edge_graph.push_back(edge1);
+      edge_graph.push_back(edge2);
+      edge_graph.push_back(edge3);
       return temp2;
     } else { // NO TYPE
       ControlFlowGraphNode * temp = graph_set[0];
@@ -126,12 +133,12 @@ void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddress
     }
 
   } 
-  //Use CFGN pointers to recursively create
+  //Use CFGN pointers to recursively create edge vector
   std::vector<ControlFlowGraphNode *> temp_cfg;
   for (const auto& cfgiter: cfg_vector) {
     temp_cfg.push_back(cfgiter.get());
   }
-  std::vector<std::pair<int,int>> edge_vector;
+  std::vector<Edge> edge_vector;
   RecursiveCreate(temp_cfg,edge_vector);
   edges_ = edge_vector;
   cfg_nodes_ = std::move(cfg_vector);
@@ -149,7 +156,7 @@ std::vector<std::unique_ptr<struct ThreeAddressCode>> Sweep(
 
 std::vector<std::unique_ptr<ControlFlowGraphNode>> LocalOptimize(
   std::vector<std::unique_ptr<ControlFlowGraphNode>> cfg_node,
-  std::vector<std::pair<int,int>> edges) {
+  std::vector<Edge> edges) {
    return cfg_node;
  }
 
