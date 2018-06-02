@@ -14,7 +14,7 @@ ParseStatus OrCombinator::parse(std::string inputProgram,
 
   ParseStatus secondStatus = secondParser->parse(inputProgram, startCharacter);
   if(!secondStatus.status) {
-  	secondStatus.errorType = firstStatus.errorType + " or " + secondStatus.errorType;
+  	secondStatus.errorType += " or " + firstStatus.errorType;
   }
   return secondStatus;
 }
