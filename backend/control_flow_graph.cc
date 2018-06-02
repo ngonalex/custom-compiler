@@ -137,6 +137,26 @@ void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddress
   cfg_nodes_ = std::move(cfg_vector);
 }
 
+std::pair<bool, std::vector<std::unique_ptr<struct ThreeAddressCode>>> Mark(
+  std::vector<std::unique_ptr<struct ThreeAddressCode>> block) {
+
+}
+
+std::vector<std::unique_ptr<struct ThreeAddressCode>> Sweep(
+  std::pair<bool,std::vector<std::unique_ptr<struct ThreeAddressCode>>> marked_block) {
+
+}
+
+std::vector<std::unique_ptr<ControlFlowGraphNode>> LocalOptimize(
+  std::vector<std::unique_ptr<ControlFlowGraphNode>> cfg_node,
+  std::vector<std::pair<int,int>> edges) {
+   return cfg_node;
+ }
+
+void ControlFlowGraph::Optimize() {
+  cfg_nodes_ = std::move(LocalOptimize(std::move(cfg_nodes_),edges_));
+}
+
 ControlFlowGraphNode::ControlFlowGraphNode() {
   creation_order = 0;
   blocktype_ = NO_TYPE;
