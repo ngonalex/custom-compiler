@@ -79,16 +79,17 @@ ControlFlowGraphNode RecursiveCreate(std::vector<ControlFlowGraphNode> graph_set
     }
   }
 }
-std::vector<std::unique_ptr<struct ThreeAddressCode>> CopyBlock(std::vector<std::unique_ptr<struct ThreeAddressCode>> copy) {
-  std::vector<std::unique_ptr<struct ThreeAddressCode>> copy_object;
-  for (const auto& iter: copy) {
-    auto block = make_unique<struct ThreeAddressCode>();
-    block->target = iter->target;
-    block->op = iter->op;
-    copy_object.push_back(std::move(block));
-  }
-  return std::move(copy_object);
-}
+// std::vector<std::unique_ptr<struct ThreeAddressCode>> CopyBlock(std::vector<std::unique_ptr<struct ThreeAddressCode>> copy) {
+//   std::vector<std::unique_ptr<struct ThreeAddressCode>> copy_object;
+//   for (const auto& iter: copy) {
+//     auto block = make_unique<struct ThreeAddressCode>();
+//     block->target = iter->target;
+//     block->op = iter->op;
+//     copy_object.push_back(std::move(block));
+//   }
+//   return std::move(copy_object);
+// }
+
 void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddressCode>> input) {
   // Has to branch on:
   // IF/WHILE/FUNCTION
@@ -98,35 +99,37 @@ void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddress
   int creation_order = 0;
   for (const auto &iter: input) {
     //Create a copy of the IR
-    auto block = make_unique<struct ThreeAddressCode>();
-    block->target = iter->target;
-    block->op = iter->op;
-    block->arg1 = iter->arg1;
-    block->arg2 = iter->arg2;
-    new_block.push_back(std::move(block));
+    Type blocktype = iter->op.opcode();
+    bool is_back = (iter == input.back());
+    // auto block = make_unique<struct ThreeAddressCode>();
+    // block->target = iter->target;
+    // block->op = iter->op;
+    // block->arg1 = iter->arg1;
+    // block->arg2 = iter->arg2;
+    new_block.push_back(std::move(iter));
     //Create a block if neccessary
-    if (iter->op.opcode() == CONDITIONAL) {
+    if (blocktype == CONDITIONAL) {
       ControlFlowGraphNode conditional_block(std::move(new_block));
       conditional_block.SetCreationOrder(creation_order);
       conditional_block.SetBlockType(CONDITIONAL_BLOCK);
       std::vector<std::unique_ptr<struct ThreeAddressCode>> new_block;
       cfg_vector.push_back(std::move(conditional_block));
       ++creation_order;
-    } else if (iter->op.opcode() == LOOP) {
+    } else if (blocktype == LOOP) {
       ControlFlowGraphNode loop_block(std::move(new_block));
       loop_block.SetCreationOrder(creation_order);
       loop_block.SetBlockType(LOOP_BLOCK);
       std::vector<std::unique_ptr<struct ThreeAddressCode>> new_block;
       cfg_vector.push_back(std::move(loop_block));
       ++creation_order;
-    } else if (iter->op.opcode() == JUMP) {
+    } else if (blocktype == JUMP) {
       ControlFlowGraphNode block(std::move(new_block));
       block.SetCreationOrder(creation_order);
       block.SetBlockType(NO_TYPE);
       std::vector<std::unique_ptr<struct ThreeAddressCode>> new_block;
       cfg_vector.push_back(std::move(block));
       ++creation_order;
-    } else if (iter == input.back()) {
+    } else if (is_back) {
       ControlFlowGraphNode block(std::move(new_block));
       block.SetCreationOrder(creation_order);
       block.SetBlockType(END_BLOCK);
@@ -171,14 +174,15 @@ ControlFlowGraphNode::ControlFlowGraphNode() {
 }
 
 ControlFlowGraphNode::ControlFlowGraphNode(std::vector<std::unique_ptr<struct ThreeAddressCode>> input) {
-  for (const auto& iter: input) {
-    auto block = make_unique<struct ThreeAddressCode>();
-    block->target = iter->target;
-    block->op = iter->op;
-    block->arg1 = iter->arg1;
-    block->arg2 = iter->arg2;
-    localblock_.push_back(std::move(block));
-  }
+  // for (const auto& iter: input) {
+  //   auto block = make_unique<struct ThreeAddressCode>();
+  //   block->target = iter->target;
+  //   block->op = iter->op;
+  //   block->arg1 = iter->arg1;
+  //   block->arg2 = iter->arg2;
+  //   localblock_.push_back(std::move(block));
+  // }
+  localblock_ = std::move(input);
   creation_order = 0;
   blocktype_ = NO_TYPE;
 }
@@ -195,6 +199,7 @@ ControlFlowGraphNode::ControlFlowGraphNode( ControlFlowGraphNode &copy) {
     block->arg2 = iter->arg2;
     localblock_.push_back(std::move(block));
   }
+  //localblock_ = std::move(copy.GetLocalBlock());
   creation_order = copy.GetCreationOrder();
   blocktype_ = copy.GetBlockType();
 }
@@ -209,6 +214,7 @@ ControlFlowGraphNode& ControlFlowGraphNode::operator=(ControlFlowGraphNode &copy
     block->arg2 = iter->arg2;
     localblock_.push_back(std::move(block));
   }
+  //localblock_ = std::move(copy.GetLocalBlock());
   creation_order = copy.GetCreationOrder();
   blocktype_ = copy.GetBlockType();
   return *this;
@@ -216,26 +222,28 @@ ControlFlowGraphNode& ControlFlowGraphNode::operator=(ControlFlowGraphNode &copy
 
 ControlFlowGraphNode ControlFlowGraphNode::operator=(ControlFlowGraphNode copy) {
   localblock_.clear();
-  for (const auto& iter: copy.GetLocalBlock()) {
-    auto block = make_unique<struct ThreeAddressCode>();
-    block->target = iter->target;
-    block->op = iter->op;
-    block->arg1 = iter->arg1;
-    block->arg2 = iter->arg2;
-    localblock_.push_back(std::move(block));
-  }
+  // for (const auto& iter: copy.GetLocalBlock()) {
+  //   auto block = make_unique<struct ThreeAddressCode>();
+  //   block->target = iter->target;
+  //   block->op = iter->op;
+  //   block->arg1 = iter->arg1;
+  //   block->arg2 = iter->arg2;
+  //   localblock_.push_back(std::move(block));
+  // }
+  localblock_ = std::move(copy.GetLocalBlock());
   creation_order = copy.GetCreationOrder();
   blocktype_ = copy.GetBlockType();
   return *this;
 }
 
 void ControlFlowGraphNode::SetLocalBlock(std::vector<std::unique_ptr<struct ThreeAddressCode>> input) {
-  for (const auto& iter: input) {
-    auto block = make_unique<struct ThreeAddressCode>();
-    block->target = iter->target;
-    block->op = iter->op;
-    localblock_.push_back(std::move(block));
-  }
+  // for (const auto& iter: input) {
+  //   auto block = make_unique<struct ThreeAddressCode>();
+  //   block->target = iter->target;
+  //   block->op = iter->op;
+  //   localblock_.push_back(std::move(block));
+  // }
+  localblock_ = std::move(input);
 }
 
 } //backend
