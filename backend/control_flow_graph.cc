@@ -24,7 +24,7 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_s
     graph_set.erase(graph_set.begin());
     return temp;
   } else {
-    if (graph_set.front().GetBlockType() == CONDITIONAL_BLOCK) {
+    if (graph_set.front()->GetBlockType() == CONDITIONAL_BLOCK) {
       // Should look like this:
       //      Condition
       //      /     \
@@ -52,7 +52,7 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_s
       edge_graph.push_back(edge3);
       edge_graph.push_back(edge4);
       return temp3;
-    } else if (graph_set.front().GetBlockType() == LOOP_BLOCK) { 
+    } else if (graph_set.front()->GetBlockType() == LOOP_BLOCK) { 
       // Should look like this:
       //      Loop
       //      /\  \
@@ -172,6 +172,22 @@ std::vector<std::unique_ptr<ControlFlowGraphNode>> LocalOptimize(
 
 void ControlFlowGraph::Optimize() {
   cfg_nodes_ = std::move(LocalOptimize(std::move(cfg_nodes_),edges_));
+}
+
+std::vector<std::unique_ptr<struct ThreeAddressCode>> ControlFlowGraph::MakeThreeAddressCode() {
+  int creation_check = 0;
+  std::vector<std::unique_ptr<struct ThreeAddressCode>> return_three_address;
+  while(!cfg_nodes_.empty()) {
+    for(auto &iter: cfg_nodes_) {
+      if(iter->GetCreationOrder() == creation_check) {
+        for(auto &three_iter: iter->GetLocalBlock()) {
+          return_three_address.push_back(std::move(three_iter));
+        }
+      }
+    }
+    creation_check++;
+  }
+  return std::move(return_three_address);
 }
 
 ControlFlowGraphNode::ControlFlowGraphNode() {
