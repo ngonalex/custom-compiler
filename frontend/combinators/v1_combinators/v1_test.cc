@@ -450,18 +450,20 @@ TEST(Combinators, ComplicatedAe) {
 
 
 
-// TEST(Combinators, NegComplicatedAe) {
-//   ArithExprParser test;
-//   ParseStatus result = test.parse("-(7*10+9/3+16-8*2*3-77+12*1);");
+TEST(Combinators, NegComplicatedAe) {
+  ArithExprParser test;
+  ParseStatus result = test.parse("-(7*10+9/3+16-8*2*3-77+12*1);", 0);
 
-//   // Traversing the AST created from the number
-//   PrintVisitor *a = new PrintVisitor();
-//   result.ast->Visit(a);
-//   std::string output = a->GetOutput();
+  // Traversing the AST created from the number
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
 
-//   EXPECT_EQ(result.status, true);
-//   EXPECT_EQ(result.remainingCharacters, "");
-//   EXPECT_EQ(output,
-// 	    "(0 - ((((((7 * 10) + (9 / 3)) + 16) - ((8 * 2) * 3)) - 77) + (12 "
-// 	    "* 1)))");
-// }
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.remainingCharacters, "");
+    EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 29);
+  EXPECT_EQ(output,
+	    "(0 - ((((((7 * 10) + (9 / 3)) + 16) - ((8 * 2) * 3)) - 77) + (12 "
+	    "* 1)))");
+}
