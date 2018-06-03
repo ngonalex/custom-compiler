@@ -87,8 +87,6 @@ ParseStatus MulDivOpParser::parse(std::string inputProgram, int startCharacter, 
 		return super::parse(inputProgram, endCharacter, errorMessage);
 	}
 
-	std::cout << endCharacter << std::endl;
-
 	auto mulParser = AtomParser('*');
 	auto divParser = AtomParser('/');
 	
