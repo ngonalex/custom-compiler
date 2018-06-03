@@ -13,9 +13,9 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus ProgramParser::parse(std::string inputProgram, std::string errorType) {
-  trim(inputProgram);
-
+ParseStatus ProgramParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+    int endCharacter = startCharacter;
+  endCharacter += trim(inputProgram);
   if (inputProgram.size() == 0) {
     return super::parse(inputProgram);
   }

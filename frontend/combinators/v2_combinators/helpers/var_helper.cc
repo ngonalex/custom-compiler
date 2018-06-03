@@ -2,9 +2,9 @@
 #include "frontend/combinators/basic_combinators/one_or_more_combinator.h"
 #include "frontend/combinators/v1_combinators/single_char.h"
 #include "frontend/combinators/v2_combinators/main/word_parser.h"
-#include "frontend/combinators/v1_combinators/semicolon_parser.h"
 #include "frontend/combinators/v1_combinators/num_parser.h"
-#include "frontend/combinators/basic_combinators/or_combinator.h"
+#include "frontend/combinators/v1_combinators/helpers/v1_helpers.h"
+#include "frontend/combinators/basic_combinators/and_combinator.h"
 
 #include <string>     // std::string, std::stoi
 
@@ -13,15 +13,29 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus VarKeywordParser::parse(std::string inputProgram, std::string errorType) {
-	trim(inputProgram);
+ParseStatus VarKeywordParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+  int endCharacter = startCharacter;
+  endCharacter += trim(inputProgram);
 
   std::string errorMessage = "Start variable declaration with var";
 
 	if (inputProgram.size() == 0) {
-		return super::parse(inputProgram, errorMessage);
+		return super::parse(inputProgram, endCharacter, errorMessage);
 	}
 
+  auto vParser = AtomParser('v');
+  auto aParser = AtomParser('a');
+  auto rParser = AtomParser('r'); 
+  AndCombinator andOne;
+  andOne.firstParser = reinterpret_cast<NullParser *>(&vParser);
+  andOne.secondParser = reinterpret_cast<NullParser *>(&aParser);
+  AndCombinator andTwo;
+  andTwo.firstParser = reinterpret_cast<NullParser *>(&andOne);
+  andTwo.secondParser = reinterpret_cast<NullParser *>(&rParser);
+
+  auto result = andTwo.parse(inputProgram, endCharacter);
+  return result;
+/*
   ParseStatus result;
 
   if(inputProgram.substr(0,3) == "var") {
@@ -33,12 +47,13 @@ ParseStatus VarKeywordParser::parse(std::string inputProgram, std::string errorT
     result.status = false;
     result.errorType = errorMessage;
   }
-  return result;
+  return result;*/
 }
 
 
-ParseStatus ColonParser::parse(std::string inputProgram, std::string errorType) {
-	trim(inputProgram);
+ParseStatus ColonParser::parse(std::string inputProgram, int startCharacter) {
+    int endCharacter = startCharacter;
+  endCharacter += trim(inputProgram);
 
   std::string errorMessage = "Missing colon";
 
@@ -61,8 +76,9 @@ ParseStatus ColonParser::parse(std::string inputProgram, std::string errorType) 
 }
 
 
-ParseStatus TypeParser::parse(std::string inputProgram, std::string errorType) {
-	trim(inputProgram);
+ParseStatus TypeParser::parse(std::string inputProgram, int startCharacter) {
+  int endCharacter = startCharacter;
+  endCharacter += trim(inputProgram);
 
   std::string errorMessage = "Incorrect type in variable declaration";
 	if (inputProgram.size() == 0) {
@@ -82,8 +98,9 @@ ParseStatus TypeParser::parse(std::string inputProgram, std::string errorType) {
   return result;
 }
 
-ParseStatus EqualSignParser::parse(std::string inputProgram, std::string errorType) {
-	trim(inputProgram);
+ParseStatus EqualSignParser::parse(std::string inputProgram, int startCharacter) {
+  int endCharacter = startCharacter;
+  endCharacter += trim(inputProgram);
   std::string errorMessage = "Missing equal sign";
 	if (inputProgram.size() == 0) {
 		return super::parse(inputProgram, errorMessage);
@@ -133,8 +150,9 @@ ParseStatus BOExpr::parse(std::string inputProgram, std::string errorType) {
   return result;
 }*/
 
-ParseStatus HelperVariableParser::parse(std::string inputProgram, std::string errorType) {
-  trim(inputProgram);
+ParseStatus HelperVariableParser::parse(std::string inputProgram, int startCharacter) {
+  int endCharacter = startCharacter;
+  endCharacter += trim(inputProgram);
 
   if (inputProgram.size() == 0) {
     return super::parse(inputProgram);

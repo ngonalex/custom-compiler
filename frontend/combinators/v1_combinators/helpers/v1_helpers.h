@@ -4,12 +4,18 @@
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
 
+#include <iostream>
+#include <map>
+
 namespace cs160 {
 namespace frontend {
 
 class CloseParenParser : NullParser {
  public:
    virtual ParseStatus parse(std::string inputProgram, int startCharacter, std::string errorType = ""); 
+ private:
+  std::map<int character, ParseStatus result> cache;
+
 };
 
 class OpenParenParser : NullParser {

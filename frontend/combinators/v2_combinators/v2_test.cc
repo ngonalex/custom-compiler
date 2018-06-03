@@ -12,15 +12,14 @@ using namespace cs160::frontend;
 
 
 TEST(CloseParenParser, successCloseParenParser) {
-  WordParser wordParser;
-  ParseStatus result;
-  result.status = false;
-  result.parsedCharacters = ")";
-  result.remainingCharacters = "1";
+  WordParser test;
+  ParseStatus result = test.parse(")1", 0);
 
-  ParseStatus testResult = wordParser.parse(")1");
-
-  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 1);
+  EXPECT_EQ(result.remainingCharacters, "1");
+  EXPECT_EQ(result.parsedCharacters, ")");
 }
 /*
 // Fail Case WordParser
@@ -133,7 +132,8 @@ TEST(WordParserCombinator, trimTest) {
   cs160::trim(result);
   EXPECT_EQ(result, "var");
 }
-
+*/
+/*
 // Success Case var_keyword_parser
 TEST(WordParserCombinator, successVarKeywordParser1) {
   VarKeywordParser varParser;
@@ -158,7 +158,8 @@ TEST(WordParserCombinator, failVarKeywordParser1) {
   EXPECT_EQ(testResult, result);
   EXPECT_EQ(testResult.errorType, "Start variable declaration with var");
 }
-
+*/
+/*
 // Success Case ColonParser
 TEST(WordParserCombinator, sucessColonParser1) {
   ColonParser parser;
@@ -517,7 +518,5 @@ TEST(AssignmentParserCombinator, failProgramParser2) {
 
   EXPECT_EQ(testResult.status, result.status);
 }
-<<<<<<< Updated upstream
-=======
 
 */

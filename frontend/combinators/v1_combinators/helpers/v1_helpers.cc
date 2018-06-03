@@ -14,6 +14,7 @@ using namespace std;
 ParseStatus CloseParenParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
+	// Check in the cache if the character cuont parsestatus already exists, return that parsestatus if it does
 	std::string errorMessage = "Expecting close parenthesis";
 
 	if (inputProgram.size() == 0) {
@@ -22,6 +23,8 @@ ParseStatus CloseParenParser::parse(std::string inputProgram, int startCharacter
 
 	auto atomParser = AtomParser(')');
 	auto result = atomParser.parse(inputProgram, endCharacter);
+
+	// append to cache startCharacter and ParseStatus
 	return result;
 }
 
