@@ -46,7 +46,8 @@ static inline int rtrim(std::string &s) {
 static inline int trim(std::string &s) {
   int count = 0;
   count += ltrim(s);
-  count += rtrim(s);
+  //count += rtrim(s);
+  return count;
 }
 
 }  // cs160

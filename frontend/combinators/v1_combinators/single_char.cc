@@ -7,7 +7,8 @@ using namespace cs160::frontend;
 ParseStatus SingleCharParser::parse(std::string inputProgram, int startCharacter,
 				    std::string errorType) {
   int endCharacter = startCharacter;
-  endCharacter += trim(inputProgram);
+  endCharacter += trim(inputProgram); 
+  std::string errorMessage = "Char should only have alphabetical character";
 
   if (inputProgram.size() == 0) {
     return super::parse(inputProgram, endCharacter);
@@ -19,11 +20,10 @@ ParseStatus SingleCharParser::parse(std::string inputProgram, int startCharacter
     status.status = true;
     status.parsedCharacters = inputProgram[0];
     status.remainingCharacters = inputProgram.erase(0, 1);
-    status.startCharacter = startCharacter;
+    status.startCharacter = endCharacter;
     status.endCharacter = endCharacter + 1;
   } else {
-    return super::parse(inputProgram, endCharacter,
-			"Char should only have alphabetical character");
+    return super::parse(inputProgram, endCharacter, errorMessage);
   }
   return status;
 }
@@ -46,7 +46,7 @@ ParseStatus SingleVarCharParser::parse(std::string inputProgram, int startCharac
     status.status = true;
     status.parsedCharacters = inputProgram[0];
     status.remainingCharacters = inputProgram.erase(0, 1);
-    status.startCharacter = startCharacter;
+    status.startCharacter = endCharacter;
     status.endCharacter = endCharacter + 1;
   } else {
     return super::parse(inputProgram, endCharacter, errorMessage);
