@@ -14,7 +14,7 @@ class CloseParenParser : NullParser {
  public:
    virtual ParseStatus parse(std::string inputProgram, int startCharacter, std::string errorType = ""); 
  private:
-  std::map<int character, ParseStatus result> cache;
+  std::map<int, ParseStatus> cache;
 
 };
 

@@ -8,6 +8,7 @@
 #include <string> // std::string, std::stoi
 
 #define super NullParser
+/*
 
 using namespace cs160::frontend;
 using namespace std;
@@ -73,4 +74,4 @@ ParseStatus VariableParser::parse(std::string inputProgram, int startCharacter, 
   }
 
   return result;
-}
+}*/

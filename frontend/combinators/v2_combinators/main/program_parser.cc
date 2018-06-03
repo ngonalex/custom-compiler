@@ -9,6 +9,7 @@
 #include <string> // std::string, std::stoi
 
 #define super NullParser
+/*
 
 using namespace cs160::frontend;
 using namespace std;
@@ -17,7 +18,7 @@ ParseStatus ProgramParser::parse(std::string inputProgram, int startCharacter, s
     int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
   if (inputProgram.size() == 0) {
-    return super::parse(inputProgram);
+    return super::parse(inputProgram, endCharacter, "Empty inside of ProgramParser");
   }
 
   ArithExprParser arithExprParser;
@@ -28,7 +29,7 @@ ParseStatus ProgramParser::parse(std::string inputProgram, int startCharacter, s
   ParseStatus result;
 
   // Parse the assignments at the beginning
-  ParseStatus assignResult = zeroOrMore.parse(inputProgram);
+  ParseStatus assignResult = zeroOrMore.parse(inputProgram, endCharacter);
   result.status = assignResult.status;
   if(result.status) {
     result.parsedCharacters += assignResult.parsedCharacters;
@@ -39,7 +40,7 @@ ParseStatus ProgramParser::parse(std::string inputProgram, int startCharacter, s
   }
 
   // Parse the arithmetic expression
-  ParseStatus arithResult = arithExprParser.parse(result.remainingCharacters);
+  ParseStatus arithResult = arithExprParser.parse(result.remainingCharacters, zerOrMore.endCharacter);
   if(arithResult.status) {
     result.parsedCharacters += (" " + arithResult.parsedCharacters);
     result.remainingCharacters = arithResult.remainingCharacters;
@@ -62,4 +63,4 @@ ParseStatus ProgramParser::parse(std::string inputProgram, int startCharacter, s
     return assignResult;
   }
 }
-
+*/

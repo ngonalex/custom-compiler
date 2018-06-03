@@ -50,7 +50,7 @@ ParseStatus VarKeywordParser::parse(std::string inputProgram, int startCharacter
   return result;*/
 }
 
-
+/*
 ParseStatus ColonParser::parse(std::string inputProgram, int startCharacter) {
     int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
@@ -119,36 +119,7 @@ ParseStatus EqualSignParser::parse(std::string inputProgram, int startCharacter)
   }
   return result;
 }
-/*
-ParseStatus BOExpr::parse(std::string inputProgram, std::string errorType) {
-  trim(inputProgram);
-  std::string errorMessage = "Invalid Binary Operator Expression";
-  if (inputProgram.size() == 0) {
-    return super::parse(inputProgram, errorMessage);
-  }
 
-  OrCombinator orC;
-  NumParser numParser;
-  WordParser wordParser;
-  orC.firstParser = &reinterpret_cast<NullParser *>(&wordParse);
-  orC.secondParser = &reinterpret_cast<NullParser *>(&numParser);
-  ParseStatus result = orC.parse(inputProgram);
-
-  if(result.status) {
-
-  }
-
-  if(inputProgram.substr(0,1) == "=") {
-    result.status = true;
-    result.parsedCharacters = "=";
-    result.remainingCharacters = inputProgram.erase(0,1);
-  }
-  else {
-    result.status = false;
-    result.errorType = errorMessage;
-  }
-  return result;
-}*/
 
 ParseStatus HelperVariableParser::parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
@@ -202,4 +173,4 @@ ParseStatus HelperVariableParser::parse(std::string inputProgram, int startChara
   }
 
   return result;
-}
+}*/
