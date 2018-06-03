@@ -429,39 +429,24 @@ void CodeGen::GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
 
 void CodeGen::GenerateBinaryExprHelper(
   std::unique_ptr<ThreeAddressCode> tac) {
-  outfile_ << "\tpop %rbx" << std::endl;  // rbx = right value
-  outfile_ << "\tpop %rcx" << std::endl;  // rcx = right flag
-  outfile_ << "\tpop %rax" << std::endl;  // rax = left value
-  outfile_ << "\tpop %rdx" << std::endl;  // rdx = left flag
+  outfile_ << "\tpop %r8" << std::endl;  // rbx = right value
+  outfile_ << "\tpop %r9" << std::endl;  // rcx = right flag
+  outfile_ << "\tpop %r10" << std::endl;  // rax = left value
+  outfile_ << "\tpop %r11" << std::endl;  // rdx = left flag
 
-  outfile_ << "\tpush %rdx" << std::endl;
-  outfile_ << "\tpush %rax" << std::endl;
-  outfile_ << "\tpush %rcx" << std::endl;
-  outfile_ << "\tpush %rbx" << std::endl;
-
-  outfile_ << "\tmovzbl %cl, %rdi" << std::endl;
+  outfile_ << "\tmovzbl %r9b, %rdi" << std::endl;
 
   // Error Handling here
   // Both things MUST be an integer as our language
   // does not support "tuple addition"
   outfile_ << "\tcall integerflagcheck" << std::endl;
 
-  outfile_ << "\tpop %rbx" << std::endl;  // rbx = right value
-  outfile_ << "\tpop %rcx" << std::endl;  // rcx = right flag
-  outfile_ << "\tpop %rax" << std::endl;  // rax = left value
-  outfile_ << "\tpop %rdx" << std::endl;  // rdx = left flag
-
-  outfile_ << "\tpush %rdx" << std::endl;
-  outfile_ << "\tpush %rax" << std::endl;
-  outfile_ << "\tpush %rcx" << std::endl;
-  outfile_ << "\tpush %rbx" << std::endl;
-
-  outfile_ << "\tmovzbl %dl, %rdi" << std::endl;
+  outfile_ << "\tmovzbl %r11b, %rdi" << std::endl;
   outfile_ << "\tcall integerflagcheck" << std::endl;
-  outfile_ << "\tpop %rbx" << std::endl;  // rbx = right value
-  outfile_ << "\tpop %rcx" << std::endl;  // rcx = right flag
-  outfile_ << "\tpop %rax" << std::endl;  // rax = left value
-  outfile_ << "\tpop %rdx" << std::endl;  // rdx = left flag
+  outfile_ << "\tmov %r8, %rbx" << std::endl;  // rbx = right value
+  outfile_ << "\tmov %r9, %rcx" << std::endl;  // rcx = right flag
+  outfile_ << "\tmov %r10, %rax" << std::endl;  // rax = left value
+  outfile_ << "\tmov %r11, %rdx" << std::endl;  // rdx = left flag
 }
 
 std::string CodeGen::FlagHelper() {
@@ -471,7 +456,6 @@ std::string CodeGen::FlagHelper() {
     return "%rbx";
   }
 }
-
 
 std::string CodeGen::VariableNameHelper(std::string variablename,
   FlagType flag) {
@@ -615,6 +599,99 @@ void CodeGen::GenerateTupleSizeCheck() {
   outfile_ << "\tcmp $0, %rcx" << std::endl;
   outfile_ << "\tje printsizeerror" << std::endl;
   outfile_ << "\tret" << std::endl;
+}
+
+void CodeGen::GenerateNestedDeref() {
+  outfile_ << "\tpop %rcx" << std::endl;  // value
+  outfile_ << "\tpop %rax" << std::endl;  // flags
+  outfile_ << "\tpop %rbx" << std::endl;  // address
+  outfile_ << "\tpush %rcx" << std::endl;
+  // Error Handling here to check the size + if you're actually an tuple
+  outfile_ << "\t#Error Handling Here DerefChild" << std::endl;
+  outfile_ << "\tmovb 1(%rbx), %al" << std::endl;
+  outfile_ << "\tmovzx %al, %rdi" << std::endl;
+  outfile_ << "\tpush %rbx" << std::endl;
+  outfile_ << "\tcall existencecheck" << std::endl;
+  outfile_ << "\tpop %rbx" << std::endl;
+
+  outfile_ << "\tmovb (%rbx), %al" << std::endl;
+  outfile_ << "\tmovzx %al, %rdi" << std::endl;
+  outfile_ << "\tpush %rbx" << std::endl;
+  outfile_ << "\tcall tupleflagcheck" << std::endl;
+  outfile_ << "\tpop %rbx\n" << std::endl;
+
+  outfile_ << "\tmovl 2(%rbx), %eax" << std::endl;
+  outfile_ << "\tmovslq %eax, %rdi" << std::endl;
+  outfile_ << "\tpop %rsi" << std::endl;
+  outfile_ << "\tpush %rsi" << std::endl;
+  outfile_ << "\tpush %rbx" << std::endl;
+  outfile_ << "\tcall tuplesizecheck" << std::endl;
+  outfile_ << "\tpop %rbx" << std::endl;
+
+  // Get the actual object (x->whatever)
+  outfile_ << "\tmovq 8(%rbx), %rbx" << std::endl;
+
+  // Get the correct offset
+  outfile_ << "\tpop %rax" << std::endl;
+  outfile_ << "\tsub $1, %rax" << std::endl;
+  outfile_ << "\timul $16, %rax" << std::endl;
+  outfile_ << "\tadd %rax, %rbx" << std::endl;
+  outfile_ << "\tpush %rbx" << std::endl;
+}
+
+void CodeGen::GenerateBaseDeref(std::string variablename) {
+  outfile_ << "\tmovb "
+    << VariableNameHelper(variablename, EXISTENCEFLAG)
+    << ", %al" << std::endl;
+  outfile_ << "\tmovzx %al, %rdi" << std::endl;
+  outfile_ << "\tpush %rbx" << std::endl;
+  outfile_ << "\tcall existencecheck" << std::endl;
+  outfile_ << "\tpop %rbx" << std::endl;
+
+  outfile_ << "\tmovb "
+    << VariableNameHelper(variablename, TYPEFLAG)
+    << ", %al" << std::endl;
+  outfile_ << "\tmovzx %al, %rdi" << std::endl;
+  outfile_ << "\tpush %rbx" << std::endl;
+  outfile_ << "\tcall tupleflagcheck" << std::endl;
+  outfile_ << "\tpop %rbx\n" << std::endl;
+
+  outfile_ << "\tmovl "
+    << VariableNameHelper(variablename, SIZEFLAG)
+    << ", %eax" << std::endl;
+  outfile_ << "\tmovslq %eax, %rdi" << std::endl;
+  outfile_ << "\tpop %rsi" << std::endl;
+  outfile_ << "\tpush %rsi" << std::endl;
+  outfile_ << "\tpush %rbx" << std::endl;
+  outfile_ << "\tcall tuplesizecheck" << std::endl;
+  outfile_ << "\tpop %rbx" << std::endl;
+
+  // Get the actual object
+  outfile_ << "\tmovq "
+    << VariableNameHelper(variablename, OBJECTFLAG)
+    << ", %rbx" << std::endl;
+
+  // Get the correct index of the object
+  outfile_ << "\tpop %rax" << std::endl;
+  outfile_ << "\tpop %rcx" << std::endl;
+  outfile_ << "\tsub $1, %rax" << std::endl;
+  outfile_ << "\timul $16, %rax" << std::endl;
+  outfile_ << "\tadd %rax, %rbx" << std::endl;
+  outfile_ << "\tpush %rbx\n" << std::endl;
+}
+
+void CodeGen::GenerateRHSDerefEpilogue(std::string arg2) {
+  if (arg2.compare("Parent") == 0) {
+    // If you're a parent check that what you're
+    // accessing is actually an integer
+    // get the value stored and push it on the stack
+    outfile_ << "\tpop %rbx" << std::endl;
+    // Get the correct offset
+    outfile_ << "\tpush (%rbx)" << std::endl;
+    outfile_ << "\tadd $8, %rbx" << std::endl;
+    outfile_ << "\tmov (%rbx), %rcx" << std::endl;
+    outfile_ << "\tpush %rcx\n" << std::endl;
+  }
 }
 
 void CodeGen::Generate(std::vector
@@ -796,83 +873,9 @@ void CodeGen::Generate(std::vector
           // Error Handling here to check the size
           // and if it's actually a tuple
           outfile_ << "\t#Error Handling Here LHS VARCHILD" << std::endl;
-
-          outfile_ << "\tmovb "
-            << VariableNameHelper(code->arg1.reg().name(), EXISTENCEFLAG)
-            << ", %al" << std::endl;
-          outfile_ << "\tmovzx %al, %rdi" << std::endl;
-          outfile_ << "\tpush %rbx" << std::endl;
-          outfile_ << "\tcall existencecheck" << std::endl;
-          outfile_ << "\tpop %rbx" << std::endl;
-
-          outfile_ << "\tmovb "
-            << VariableNameHelper(code->arg1.reg().name(), TYPEFLAG)
-            << ", %al" << std::endl;
-          outfile_ << "\tmovzx %al, %rdi" << std::endl;
-          outfile_ << "\tpush %rbx" << std::endl;
-          outfile_ << "\tcall tupleflagcheck" << std::endl;
-          outfile_ << "\tpop %rbx\n" << std::endl;
-
-          outfile_ << "\tmovl "
-            << VariableNameHelper(code->arg1.reg().name(), SIZEFLAG)
-            << ", %eax" << std::endl;
-          outfile_ << "\tmovslq %eax, %rdi" << std::endl;
-          outfile_ << "\tpop %rsi" << std::endl;
-          outfile_ << "\tpush %rsi" << std::endl;
-          outfile_ << "\tpush %rbx" << std::endl;
-          outfile_ << "\tcall tuplesizecheck" << std::endl;
-          outfile_ << "\tpop %rbx" << std::endl;
-
-          // Get the actual object
-          outfile_ << "\tmovq "
-            << VariableNameHelper(code->arg1.reg().name(), OBJECTFLAG)
-            << ", %rbx" << std::endl;
-
-          // Get the correct index of the object
-          outfile_ << "\tpop %rax" << std::endl;
-          outfile_ << "\tpop %rcx" << std::endl;
-          outfile_ << "\tsub $1, %rax" << std::endl;
-          outfile_ << "\timul $16, %rax" << std::endl;
-          outfile_ << "\tadd %rax, %rbx" << std::endl;
-          outfile_ << "\tpush %rbx\n" << std::endl;
+          GenerateBaseDeref(code->arg1.reg().name());
         } else {
-          outfile_ << "\tpop %rcx" << std::endl;
-          outfile_ << "\tpop %rdx" << std::endl;
-          outfile_ << "\tpop %rbx" << std::endl;
-          outfile_ << "\tpush %rcx" << std::endl;
-
-          // Error Handling here to check the size + if it's a tuple
-          outfile_ << "\t#Error Handling Here LHSDerefChild" << std::endl;
-
-          outfile_ << "\tmovb 1(%rbx), %al" << std::endl;
-          outfile_ << "\tmovzx %al, %rdi" << std::endl;
-          outfile_ << "\tpush %rbx" << std::endl;
-          outfile_ << "\tcall existencecheck" << std::endl;
-          outfile_ << "\tpop %rbx" << std::endl;
-
-          outfile_ << "\tmovb (%rbx), %al" << std::endl;
-          outfile_ << "\tmovzx %al, %rdi" << std::endl;
-          outfile_ << "\tpush %rbx" << std::endl;
-          outfile_ << "\tcall tupleflagcheck" << std::endl;
-          outfile_ << "\tpop %rbx\n" << std::endl;
-
-          outfile_ << "\tmovl 2(%rbx), %eax" << std::endl;
-          outfile_ << "\tmovslq %eax, %rdi" << std::endl;
-          outfile_ << "\tpop %rsi" << std::endl;
-          outfile_ << "\tpush %rsi" << std::endl;
-          outfile_ << "\tpush %rbx" << std::endl;
-          outfile_ << "\tcall tuplesizecheck" << std::endl;
-          outfile_ << "\tpop %rbx" << std::endl;
-
-          // Get the actual object
-          outfile_ << "\tmovq 8(%rbx), %rbx" << std::endl;
-
-          // Get the correct index of the object
-          outfile_ << "\tpop %rax" << std::endl;
-          outfile_ << "\tsub $1, %rax" << std::endl;
-          outfile_ << "\timul $16, %rax" << std::endl;
-          outfile_ << "\tadd %rax, %rbx" << std::endl;
-          outfile_ << "\tpush %rbx\n" << std::endl;
+          GenerateNestedDeref();
         }
 
         break;
@@ -890,104 +893,11 @@ void CodeGen::Generate(std::vector
           // Error Handling here to check the size
           // if you're actually an tuple
           outfile_ << "\t#Error Handling Here RHS Varchild" << std::endl;
-          outfile_ << "\tmovb "
-            << VariableNameHelper(code->arg1.reg().name(), EXISTENCEFLAG)
-            << ", %al" << std::endl;
-          outfile_ << "\tmovzx %al, %rdi" << std::endl;
-          outfile_ << "\tpush %rbx" << std::endl;
-          outfile_ << "\tcall existencecheck" << std::endl;
-          outfile_ << "\tpop %rbx" << std::endl;
-
-          outfile_ << "\tmovb "
-            << VariableNameHelper(code->arg1.reg().name(), TYPEFLAG)
-            << ", %al" << std::endl;
-          outfile_ << "\tmovzx %al, %rdi" << std::endl;
-          outfile_ << "\tpush %rbx" << std::endl;
-          outfile_ << "\tcall tupleflagcheck" << std::endl;
-          outfile_ << "\tpop %rbx\n" << std::endl;
-
-          outfile_ << "\tmovl "
-            << VariableNameHelper(code->arg1.reg().name(), SIZEFLAG)
-            << ", %eax" << std::endl;
-          outfile_ << "\tmovslq %eax, %rdi" << std::endl;
-          outfile_ << "\tpop %rsi" << std::endl;
-          outfile_ << "\tpush %rsi" << std::endl;
-          outfile_ << "\tpush %rbx" << std::endl;
-          outfile_ << "\tcall tuplesizecheck" << std::endl;
-          outfile_ << "\tpop %rbx" << std::endl;
-
-          // Get the actual object
-          outfile_ << "\tmovq "
-            << VariableNameHelper(code->arg1.reg().name(), OBJECTFLAG)
-            << ", %rbx" << std::endl;
-
-          // Get the correct offset
-          outfile_ << "\tpop %rax" << std::endl;
-          outfile_ << "\tpop %rcx" << std::endl;
-          outfile_ << "\tsub $1, %rax" << std::endl;
-          outfile_ << "\timul $16, %rax" << std::endl;
-          outfile_ << "\tadd %rax, %rbx" << std::endl;
-          outfile_ << "\tpush %rbx" << std::endl;
-
-          if (code->arg2.reg().name().compare("Parent") == 0) {
-            // If you're a parent check that what you're
-            // accessing is actually an integer
-            // get the value stored and push it on the stack
-            outfile_ << "\tpop %rbx" << std::endl;
-            // Get the correct offset
-            outfile_ << "\tpush (%rbx)" << std::endl;
-            outfile_ << "\tadd $8, %rbx" << std::endl;
-            outfile_ << "\tmov (%rbx), %rcx" << std::endl;
-            outfile_ << "\tpush %rcx\n" << std::endl;
-          }
+          GenerateBaseDeref(code->arg1.reg().name());
+          GenerateRHSDerefEpilogue(code->arg2.reg().name());
         } else {
-          outfile_ << "\tpop %rcx" << std::endl;  // value
-          outfile_ << "\tpop %rax" << std::endl;  // flags
-          outfile_ << "\tpop %rbx" << std::endl;  // address
-          outfile_ << "\tpush %rcx" << std::endl;
-          // Error Handling here to check the size + if you're actually an tuple
-          outfile_ << "\t#Error Handling Here DerefChild" << std::endl;
-          outfile_ << "\tmovb 1(%rbx), %al" << std::endl;
-          outfile_ << "\tmovzx %al, %rdi" << std::endl;
-          outfile_ << "\tpush %rbx" << std::endl;
-          outfile_ << "\tcall existencecheck" << std::endl;
-          outfile_ << "\tpop %rbx" << std::endl;
-
-          outfile_ << "\tmovb (%rbx), %al" << std::endl;
-          outfile_ << "\tmovzx %al, %rdi" << std::endl;
-          outfile_ << "\tpush %rbx" << std::endl;
-          outfile_ << "\tcall tupleflagcheck" << std::endl;
-          outfile_ << "\tpop %rbx\n" << std::endl;
-
-          outfile_ << "\tmovl 2(%rbx), %eax" << std::endl;
-          outfile_ << "\tmovslq %eax, %rdi" << std::endl;
-          outfile_ << "\tpop %rsi" << std::endl;
-          outfile_ << "\tpush %rsi" << std::endl;
-          outfile_ << "\tpush %rbx" << std::endl;
-          outfile_ << "\tcall tuplesizecheck" << std::endl;
-          outfile_ << "\tpop %rbx" << std::endl;
-
-          // Get the actual object (x->whatever)
-          outfile_ << "\tmovq 8(%rbx), %rbx" << std::endl;
-
-          // Get the correct offset
-          outfile_ << "\tpop %rax" << std::endl;
-          outfile_ << "\tsub $1, %rax" << std::endl;
-          outfile_ << "\timul $16, %rax" << std::endl;
-          outfile_ << "\tadd %rax, %rbx" << std::endl;
-          outfile_ << "\tpush %rbx" << std::endl;
-
-          if (code->arg2.reg().name().compare("Parent") == 0) {
-            // If you're a parent check that what you're
-            // accessing is actually an integer
-            // get the value stored and push it on the stack
-            outfile_ << "\tpop %rbx" << std::endl;
-            // Get the correct offset
-            outfile_ << "\tpush (%rbx)" << std::endl;
-            outfile_ << "\tadd $8, %rbx" << std::endl;
-            outfile_ << "\tmov (%rbx), %rcx" << std::endl;
-            outfile_ << "\tpush %rcx\n" << std::endl;
-          }
+          GenerateNestedDeref();
+          GenerateRHSDerefEpilogue(code->arg2.reg().name());
         }
         break;
       case NEWTUPLE:
@@ -1054,7 +964,6 @@ void CodeGen::Generate(std::vector
         exit(1);
     }
   }
-
   GeneratePrinter();
   outfile_.close();
 }

@@ -46,6 +46,9 @@ class CodeGen {
     void GenerateExistenceCheck();
     void GenerateTupleSizeCheck();
     void GenerateCreateNewTuple();
+    void GenerateNestedDeref();
+    void GenerateBaseDeref(std::string variablename);
+    void GenerateRHSDerefEpilogue(std::string arg2);
     std::string FlagHelper();
 
     // This function checks if the current scope is function or global
