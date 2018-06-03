@@ -173,10 +173,10 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
         << ", %rbx" << std::endl;
 
       // Then load it into register
-      outfile_ << "\tpush %rbx" << std::endl;
+      outfile_ << "\tpush " << FlagHelper() << std::endl;
       outfile_ << "\tmov "
         << VariableNameHelper(tac->arg1.reg().name(), OBJECTFLAG)
-        << " %rbx" << std::endl;
+        << ", %rbx" << std::endl;
       outfile_ << "\tpush %rbx\n" << std::endl;
       break;
     case VARASSIGNLOAD:  // Always pop 3 things
@@ -302,7 +302,7 @@ void CodeGen::GenerateArithmeticExpr(
   std::unique_ptr<ThreeAddressCode> tac, Type type) {
   switch (type) {
     case ADD:
-      outfile_ << "\t# Addition";
+      outfile_ << "\t# Addition\n";
       GenerateBinaryExprHelper(std::move(tac));
       ClearRegister("rcx");
       outfile_ << "\tadd %rax, %rcx\n\tadd %rbx, %rcx" << std::endl;
@@ -310,14 +310,14 @@ void CodeGen::GenerateArithmeticExpr(
       outfile_ << "\tpush %rcx\n" << std::endl;
       break;
     case SUB:
-      outfile_ << "\t# Subtraction";
+      outfile_ << "\t# Subtraction\n";
       GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\tsub %rbx, %rax" << std::endl;
       outfile_ << "\tpush %rcx\n" << std::endl;
       outfile_ << "\tpush %rax\n" << std::endl;
       break;
     case MULT:
-      outfile_ << "\t# Multiplication";
+      outfile_ << "\t# Multiplication\n";
       GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\timul %rax, %rbx" << std::endl;
       outfile_ << "\tpush %rcx\n" << std::endl;
@@ -325,7 +325,7 @@ void CodeGen::GenerateArithmeticExpr(
       break;
     case DIV:
       ClearRegister("rdx");
-      outfile_ << "\t# Division";
+      outfile_ << "\t# Division\n";
       GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\tcqto" << std::endl;  // indicating its a signed division
       outfile_ << "\tidiv %rbx" << std::endl;
@@ -344,7 +344,7 @@ void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
   // Note to self you can abstract this out even more
   switch (type) {
     case LESSTHAN:
-      outfile_ << "\t# LessThan Comparision";
+      outfile_ << "\t# LessThan Comparision\n";
       GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\tpush %rdx\n" << std::endl;
       outfile_ << "\tcmp %rbx, %rax" << std:: endl;
@@ -353,7 +353,7 @@ void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
       outfile_ << "\tpush %rcx\n" << std:: endl;
       break;
     case LESSTHANEQ:
-      outfile_ << "\t# LessThanEq Comparision";
+      outfile_ << "\t# LessThanEq Comparision\n";
       GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\tpush %rdx\n" << std::endl;
       outfile_ << "\tcmp %rbx, %rax" << std:: endl;
@@ -362,7 +362,7 @@ void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
       outfile_ << "\tpush %rcx\n" << std:: endl;
       break;
     case GREATERTHAN:
-      outfile_ << "\t# GreaterThan Comparision";
+      outfile_ << "\t# GreaterThan Comparision\n";
       GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\tpush %rdx\n" << std::endl;
       outfile_ << "\tcmp %rbx, %rax" << std:: endl;
@@ -371,7 +371,7 @@ void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
       outfile_ << "\tpush %rcx\n" << std:: endl;
       break;
     case GREATERTHANEQ:
-      outfile_ << "\t# GreaterThanEq Comparision";
+      outfile_ << "\t# GreaterThanEq Comparision\n";
       GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\tpush %rdx\n" << std::endl;
       outfile_ << "\tcmp %rbx, %rax" << std:: endl;
@@ -380,7 +380,7 @@ void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
       outfile_ << "\tpush %rcx\n" << std:: endl;
       break;
     case EQUAL:
-      outfile_ << "\t# Equals Comparision";
+      outfile_ << "\t# Equals Comparision\n";
       GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\tpush %rdx\n" << std::endl;
       outfile_ << "\tcmp %rbx, %rax" << std:: endl;
@@ -464,6 +464,15 @@ void CodeGen::GenerateBinaryExprHelper(
   outfile_ << "\tpop %rdx" << std::endl;  // rdx = left flag
 }
 
+std::string CodeGen::FlagHelper() {
+  if (currscope_ == GLOBAL) {
+    return "(%rbx)";
+  } else {
+    return "%rbx";
+  }
+}
+
+
 std::string CodeGen::VariableNameHelper(std::string variablename,
   FlagType flag) {
   std::string mappedname;
@@ -494,8 +503,8 @@ std::string CodeGen::VariableNameHelper(std::string variablename,
         << variablename <<" \n";
       exit(1);
     }
+    int index = symbollocations_.find(variablename)->second;
     switch (flag) {
-      int index = symbollocations_.find(variablename)->second;
       case TYPEFLAG:
         mappedname = std::to_string(index) + "(%rbp)";
         return mappedname;
@@ -780,64 +789,52 @@ void CodeGen::Generate(std::vector
             << code->target.reg().name() << std::endl;
         if (parsedstring.size() == 2) {
           if (currscope_ == GLOBAL) {
-            outfile_ << "\tmov " << VariableNameHelper(code->arg1.reg().name())
+            outfile_ << "\tmov "
+            << VariableNameHelper(code->arg1.reg().name(), NOFLAG)
             << ", %rbx" << std::endl;
-            // Error Handling here to check the size
-            // and if it's actually a tuple
-            outfile_ << "\t#Error Handling Here LHS VARCHILD" << std::endl;
-            outfile_ << "\tmovb (%rbx), %al" << std::endl;
-            outfile_ << "\tmovzx %al, %rdi" << std::endl;
-            outfile_ << "\tpush %rbx" << std::endl;
-            outfile_ << "\tcall tupleflagcheck" << std::endl;
-            outfile_ << "\tpop %rbx\n" << std::endl;
-
-            outfile_ << "\tmovl 2(%rbx), %eax" << std::endl;
-            outfile_ << "\tmovslq %eax, %rdi" << std::endl;
-            outfile_ << "\tpop %rsi" << std::endl;
-            outfile_ << "\tpush %rsi" << std::endl;
-            outfile_ << "\tpush %rbx" << std::endl;
-            outfile_ << "\tcall tuplesizecheck" << std::endl;
-            outfile_ << "\tpop %rbx" << std::endl;
-
-            // Get the actual object
-            outfile_ << "\tmovq 8(%rbx), %rbx" << std::endl;
-
-            // Get the correct index of the object
-            outfile_ << "\tpop %rax" << std::endl;
-            outfile_ << "\tsub $1, %rax" << std::endl;
-            outfile_ << "\timul $16, %rax" << std::endl;
-            outfile_ << "\tadd %rax, %rbx" << std::endl;
-            outfile_ << "\tpush %rbx\n" << std::endl;
-          } else {
-            // Error Handling here to check the size
-            // and if it's actually a tuple
-            outfile_ << "\t#Error Handling Here LHS VARCHILD" << std::endl;
-            outfile_ << "\tmovb " << VariableNameHelper(code->arg1.reg().name())
-              << ", %al" << std::endl;
-            outfile_ << "\tmovzx %al, %rdi" << std::endl;
-            outfile_ << "\tcall tupleflagcheck" << std::endl;
-
-            int index =
-            symbollocations_.find(code->arg1.reg().name())->second;
-
-            outfile_ << "\tmovl " << std::to_string(index+2) <<
-              "(%rbp), %eax" << std::endl;
-            outfile_ << "\tmovslq %eax, %rdi" << std::endl;
-            outfile_ << "\tpop %rsi" << std::endl;
-            outfile_ << "\tpush %rsi" << std::endl;
-            outfile_ << "\tcall tuplesizecheck" << std::endl;
-
-            // Get the actual object
-            outfile_ << "\tmovq " << std::to_string(index+8) <<
-              "(%rbp), %rbx" << std::endl;
-
-            // Get the correct index of the object
-            outfile_ << "\tpop %rax" << std::endl;
-            outfile_ << "\tsub $1, %rax" << std::endl;
-            outfile_ << "\timul $16, %rax" << std::endl;
-            outfile_ << "\tadd %rax, %rbx" << std::endl;
-            outfile_ << "\tpush %rbx\n" << std::endl;
           }
+          // Error Handling here to check the size
+          // and if it's actually a tuple
+          outfile_ << "\t#Error Handling Here LHS VARCHILD" << std::endl;
+
+          outfile_ << "\tmovb "
+            << VariableNameHelper(code->arg1.reg().name(), EXISTENCEFLAG)
+            << ", %al" << std::endl;
+          outfile_ << "\tmovzx %al, %rdi" << std::endl;
+          outfile_ << "\tpush %rbx" << std::endl;
+          outfile_ << "\tcall existencecheck" << std::endl;
+          outfile_ << "\tpop %rbx" << std::endl;
+
+          outfile_ << "\tmovb "
+            << VariableNameHelper(code->arg1.reg().name(), TYPEFLAG)
+            << ", %al" << std::endl;
+          outfile_ << "\tmovzx %al, %rdi" << std::endl;
+          outfile_ << "\tpush %rbx" << std::endl;
+          outfile_ << "\tcall tupleflagcheck" << std::endl;
+          outfile_ << "\tpop %rbx\n" << std::endl;
+
+          outfile_ << "\tmovl "
+            << VariableNameHelper(code->arg1.reg().name(), SIZEFLAG)
+            << ", %eax" << std::endl;
+          outfile_ << "\tmovslq %eax, %rdi" << std::endl;
+          outfile_ << "\tpop %rsi" << std::endl;
+          outfile_ << "\tpush %rsi" << std::endl;
+          outfile_ << "\tpush %rbx" << std::endl;
+          outfile_ << "\tcall tuplesizecheck" << std::endl;
+          outfile_ << "\tpop %rbx" << std::endl;
+
+          // Get the actual object
+          outfile_ << "\tmovq "
+            << VariableNameHelper(code->arg1.reg().name(), OBJECTFLAG)
+            << ", %rbx" << std::endl;
+
+          // Get the correct index of the object
+          outfile_ << "\tpop %rax" << std::endl;
+          outfile_ << "\tpop %rcx" << std::endl;
+          outfile_ << "\tsub $1, %rax" << std::endl;
+          outfile_ << "\timul $16, %rax" << std::endl;
+          outfile_ << "\tadd %rax, %rbx" << std::endl;
+          outfile_ << "\tpush %rbx\n" << std::endl;
         } else {
           outfile_ << "\tpop %rcx" << std::endl;
           outfile_ << "\tpop %rdx" << std::endl;
@@ -846,6 +843,13 @@ void CodeGen::Generate(std::vector
 
           // Error Handling here to check the size + if it's a tuple
           outfile_ << "\t#Error Handling Here LHSDerefChild" << std::endl;
+
+          outfile_ << "\tmovb 1(%rbx), %al" << std::endl;
+          outfile_ << "\tmovzx %al, %rdi" << std::endl;
+          outfile_ << "\tpush %rbx" << std::endl;
+          outfile_ << "\tcall existencecheck" << std::endl;
+          outfile_ << "\tpop %rbx" << std::endl;
+
           outfile_ << "\tmovb (%rbx), %al" << std::endl;
           outfile_ << "\tmovzx %al, %rdi" << std::endl;
           outfile_ << "\tpush %rbx" << std::endl;
@@ -877,110 +881,64 @@ void CodeGen::Generate(std::vector
         outfile_ << "\t#Dereference of variable "
             << code->target.reg().name() << std::endl;
         if (parsedstring.size() == 2) {
-          // Same comment as LHS REFACTOR!!
           if (currscope_ == GLOBAL) {
-            outfile_ << "\tmov " << VariableNameHelper(code->arg1.reg().name())
+            outfile_ << "\tmov "
+            << VariableNameHelper(code->arg1.reg().name(), NOFLAG)
+            << ", %rbx" << std::endl;
+          }
+
+          // Error Handling here to check the size
+          // if you're actually an tuple
+          outfile_ << "\t#Error Handling Here RHS Varchild" << std::endl;
+          outfile_ << "\tmovb "
+            << VariableNameHelper(code->arg1.reg().name(), EXISTENCEFLAG)
+            << ", %al" << std::endl;
+          outfile_ << "\tmovzx %al, %rdi" << std::endl;
+          outfile_ << "\tpush %rbx" << std::endl;
+          outfile_ << "\tcall existencecheck" << std::endl;
+          outfile_ << "\tpop %rbx" << std::endl;
+
+          outfile_ << "\tmovb "
+            << VariableNameHelper(code->arg1.reg().name(), TYPEFLAG)
+            << ", %al" << std::endl;
+          outfile_ << "\tmovzx %al, %rdi" << std::endl;
+          outfile_ << "\tpush %rbx" << std::endl;
+          outfile_ << "\tcall tupleflagcheck" << std::endl;
+          outfile_ << "\tpop %rbx\n" << std::endl;
+
+          outfile_ << "\tmovl "
+            << VariableNameHelper(code->arg1.reg().name(), SIZEFLAG)
+            << ", %eax" << std::endl;
+          outfile_ << "\tmovslq %eax, %rdi" << std::endl;
+          outfile_ << "\tpop %rsi" << std::endl;
+          outfile_ << "\tpush %rsi" << std::endl;
+          outfile_ << "\tpush %rbx" << std::endl;
+          outfile_ << "\tcall tuplesizecheck" << std::endl;
+          outfile_ << "\tpop %rbx" << std::endl;
+
+          // Get the actual object
+          outfile_ << "\tmovq "
+            << VariableNameHelper(code->arg1.reg().name(), OBJECTFLAG)
             << ", %rbx" << std::endl;
 
-            // Error Handling here to check the size
-            // if you're actually an tuple
-            outfile_ << "\t#Error Handling Here RHS Varchild" << std::endl;
-            outfile_ << "\tmovb 1(%rbx), %al" << std::endl;
-            outfile_ << "\tmovzx %al, %rdi" << std::endl;
-            outfile_ << "\tpush %rbx" << std::endl;
-            outfile_ << "\tcall existencecheck" << std::endl;
+          // Get the correct offset
+          outfile_ << "\tpop %rax" << std::endl;
+          outfile_ << "\tpop %rcx" << std::endl;
+          outfile_ << "\tsub $1, %rax" << std::endl;
+          outfile_ << "\timul $16, %rax" << std::endl;
+          outfile_ << "\tadd %rax, %rbx" << std::endl;
+          outfile_ << "\tpush %rbx" << std::endl;
+
+          if (code->arg2.reg().name().compare("Parent") == 0) {
+            // If you're a parent check that what you're
+            // accessing is actually an integer
+            // get the value stored and push it on the stack
             outfile_ << "\tpop %rbx" << std::endl;
-
-            outfile_ << "\tmovb (%rbx), %al" << std::endl;
-            outfile_ << "\tmovzx %al, %rdi" << std::endl;
-            outfile_ << "\tpush %rbx" << std::endl;
-            outfile_ << "\tcall tupleflagcheck" << std::endl;
-            outfile_ << "\tpop %rbx" << std::endl;
-
-            outfile_ << "\tmovl 2(%rbx), %eax" << std::endl;
-            outfile_ << "\tmovslq %eax, %rdi" << std::endl;
-            outfile_ << "\tpop %rsi" << std::endl;
-            outfile_ << "\tpush %rsi" << std::endl;
-            outfile_ << "\tpush %rbx" << std::endl;
-            outfile_ << "\tcall tuplesizecheck" << std::endl;
-            outfile_ << "\tpop %rbx" << std::endl;
-
-            // Get the actual object (x->whatever)
-            outfile_ << "\tmovq 8(%rbx), %rbx" << std::endl;
-
             // Get the correct offset
-            outfile_ << "\tpop %rax" << std::endl;
-            outfile_ << "\tpop %rcx" << std::endl;
-            outfile_ << "\tsub $1, %rax" << std::endl;
-            outfile_ << "\timul $16, %rax" << std::endl;
-            outfile_ << "\tadd %rax, %rbx" << std::endl;
-            outfile_ << "\tpush %rbx" << std::endl;
-
-            if (code->arg2.reg().name().compare("Child") == 0) {
-              // If you're a child don't need to do anything
-            } else {
-              // Otherwise you're the parent so check that what you're
-              // accessing is actually an integer
-              // get the value stored and push it on the stack
-
-              outfile_ << "\tpop %rbx" << std::endl;
-              // Get the correct offset
-              outfile_ << "\tpush (%rbx)" << std::endl;
-              outfile_ << "\tadd $8, %rbx" << std::endl;
-              outfile_ << "\tmov (%rbx), %rcx" << std::endl;
-              outfile_ << "\tpush %rcx\n" << std::endl;
-            }
-          } else {
-            // Error Handling here to check the size
-            // and if it's actually a tuple
-            // Swap tuple flag + existence ahead
-            outfile_ << "\t#Error Handling Here RHS VARCHILD" << std::endl;
-            outfile_ << "\tmovb " << VariableNameHelper(code->arg1.reg().name())
-              << ", %al" << std::endl;
-            outfile_ << "\tmovzx %al, %rdi" << std::endl;
-            outfile_ << "\tcall tupleflagcheck" << std::endl;
-
-            int index =
-            symbollocations_.find(code->arg1.reg().name())->second;
-
-            outfile_ << "\tmovb " << std::to_string(index+1) <<
-              "(%rbp), %al" << std::endl;
-            outfile_ << "\tmovzx %al, %rdi" << std::endl;
-            outfile_ << "\tcall existencecheck" << std::endl;
-
-            outfile_ << "\tmovl " << std::to_string(index+2) <<
-              "(%rbp), %eax" << std::endl;
-            outfile_ << "\tmovslq %eax, %rdi" << std::endl;
-            outfile_ << "\tpop %rsi" << std::endl;
-            outfile_ << "\tpush %rsi" << std::endl;
-            outfile_ << "\tcall tuplesizecheck" << std::endl;
-
-            // Get the actual object
-            outfile_ << "\tmovq " << std::to_string(index+8) <<
-              "(%rbp), %rbx" << std::endl;
-
-            // Get the correct index of the object
-            outfile_ << "\tpop %rax" << std::endl;
-            outfile_ << "\tpop %rcx" << std::endl;
-            outfile_ << "\tsub $1, %rax" << std::endl;
-            outfile_ << "\timul $16, %rax" << std::endl;
-            outfile_ << "\tadd %rax, %rbx" << std::endl;
-            outfile_ << "\tpush %rbx\n" << std::endl;
-
-            if (code->arg2.reg().name().compare("Child") == 0) {
-              // If you're a child don't need to do anything
-            } else {
-              // Otherwise you're the parent so check that what you're
-              // accessing is actually an integer
-              // get the value stored and push it on the stack
-
-              outfile_ << "\tpop %rbx" << std::endl;
-              outfile_ << "\tpush (%rbx)" << std::endl;
-              // Get the correct offset
-              outfile_ << "\tadd $8, %rbx" << std::endl;
-              outfile_ << "\tmov (%rbx), %rcx" << std::endl;
-              outfile_ << "\tpush %rcx\n" << std::endl;
-            }
+            outfile_ << "\tpush (%rbx)" << std::endl;
+            outfile_ << "\tadd $8, %rbx" << std::endl;
+            outfile_ << "\tmov (%rbx), %rcx" << std::endl;
+            outfile_ << "\tpush %rcx\n" << std::endl;
           }
         } else {
           outfile_ << "\tpop %rcx" << std::endl;  // value
@@ -1019,23 +977,20 @@ void CodeGen::Generate(std::vector
           outfile_ << "\tadd %rax, %rbx" << std::endl;
           outfile_ << "\tpush %rbx" << std::endl;
 
-          if (code->arg2.reg().name().compare("Child") == 0) {
-            // If you're a child don't need to do anything
-          } else {
-            // Otherwise you're the parent so check that what you're
+          if (code->arg2.reg().name().compare("Parent") == 0) {
+            // If you're a parent check that what you're
             // accessing is actually an integer
             // get the value stored and push it on the stack
-
             outfile_ << "\tpop %rbx" << std::endl;
-            outfile_ << "\tpush (%rbx)" << std::endl;
             // Get the correct offset
+            outfile_ << "\tpush (%rbx)" << std::endl;
             outfile_ << "\tadd $8, %rbx" << std::endl;
             outfile_ << "\tmov (%rbx), %rcx" << std::endl;
             outfile_ << "\tpush %rcx\n" << std::endl;
           }
         }
         break;
-      case NEWTUPLE:  // Needs to handle functions (maybe unneeded)
+      case NEWTUPLE:
         outfile_ << "\t# Making a tuple for variable: "
           << code->target.reg().name() << std::endl;
         outfile_ << "\tpop %rcx" << std::endl;
@@ -1055,29 +1010,32 @@ void CodeGen::Generate(std::vector
         outfile_ << "\tpop %rcx" << std::endl;
         outfile_ << "\tpop %rbx" << std::endl;
 
-        // 100% theres a better way to do this
         if (DereferenceParserHelper(code->target.reg().name()).size() == 1
           && currscope_ == FUNCTION) {
           // Rewrite flags
           outfile_ << "\tmovb $1,"
-            << VariableNameHelper(code->target.reg().name()) << std::endl;
-          int index =
-            symbollocations_.find(code->target.reg().name())->second;
-          outfile_ << "\tmovb $1, " << std::to_string(index+1) << "(%rbp)\n";
-          outfile_ << "\tmovl %ecx, " << std::to_string(index+2) << "(%rbp)\n";
-          outfile_ << "\tmovq %rax, " << std::to_string(index+8) << "(%rbp)\n"
+            << VariableNameHelper(code->target.reg().name(), TYPEFLAG)
             << std::endl;
+          outfile_ << "\tmovb $1, "
+            << VariableNameHelper(code->target.reg().name(), EXISTENCEFLAG)
+            << std::endl;
+          outfile_ << "\tmovl %ecx, "
+            << VariableNameHelper(code->target.reg().name(), SIZEFLAG)
+            << std::endl;
+          outfile_ << "\tmovq %rax, "
+            << VariableNameHelper(code->target.reg().name(), OBJECTFLAG)
+            << std::endl;
+          outfile_ << "\n";
         } else {
           // Rewrite flags
-        outfile_ << "\tmovb $1, (%rbx)" << std::endl;
-        outfile_ << "\tmovb $1, 1(%rbx)" << std::endl;
-        outfile_ << "\tmovl %ecx, 2(%rbx)" << std::endl;
-
-        // Write pointer given by malloc into value field
-        outfile_ << "\tmovq %rax, 8(%rbx)\n" << std::endl;
+          outfile_ << "\tmovb $1, (%rbx)" << std::endl;
+          outfile_ << "\tmovb $1, 1(%rbx)" << std::endl;
+          outfile_ << "\tmovl %ecx, 2(%rbx)" << std::endl;
+          // Write pointer given by heap into value field
+          outfile_ << "\tmovq %rax, 8(%rbx)\n" << std::endl;
         }
         break;
-      case VARCHILDTUPLE:  // May need to handle functions
+      case VARCHILDTUPLE:
         if (symbollocations_.count(code->target.reg().name()) == 0) {
           // Add it to the map then create a spot for it (if its a function)
           symbollocations_.insert(std::pair<std::string, int>(
@@ -1086,7 +1044,7 @@ void CodeGen::Generate(std::vector
         outfile_ << "\t# Getting value of " << code->target.reg().name()
           << std::endl;
         outfile_ << "\tmov " <<
-          VariableNameHelper(code->target.reg().name()) << ", %rbx"
+          VariableNameHelper(code->target.reg().name(), NOFLAG) << ", %rbx"
           << std::endl;
         outfile_ << "\tpush %rbx\n" << std::endl;
         break;

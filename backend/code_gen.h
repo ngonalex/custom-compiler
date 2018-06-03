@@ -46,8 +46,7 @@ class CodeGen {
     void GenerateExistenceCheck();
     void GenerateTupleSizeCheck();
     void GenerateCreateNewTuple();
-    // Flag type arg2
-    std::string FlagHelper(std::string variablename);
+    std::string FlagHelper();
 
     // This function checks if the current scope is function or global
     // If it's global then it just returns the name of the variable

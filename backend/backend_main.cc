@@ -177,11 +177,12 @@ int main() {
         make_unique<const IntegerExpr>(2)),
       make_unique<const IntegerExpr>(1000))));
 
+      // change 1 to a 2 for full compilation
       fact_body.push_back(std::move(make_unique<const AssignmentFromNewTuple>(
      make_unique<const VariableExpr>("h"),
      make_unique<const Dereference>(
        make_unique<const VariableExpr>("x"),
-       make_unique<const IntegerExpr>(1)))));
+       make_unique<const IntegerExpr>(2)))));
 
   fact_body.push_back(std::move(make_unique<const AssignmentFromArithExp>(
       make_unique<const Dereference>(
