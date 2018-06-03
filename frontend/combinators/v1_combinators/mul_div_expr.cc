@@ -34,8 +34,9 @@ ParseStatus MulDivExprParser::parse(std::string inputProgram, int startCharacter
 	        unique_cast<const ArithmeticExpr>(std::move(rhsParseStatus.ast))));
       mdParseStatus = op.parse(rhsParseStatus.remainingCharacters, rhsParseStatus.endCharacter);
       result.parsedCharacters += (rhsParseStatus.parsedCharacters);
+      result.startCharacter = startCharacter;
+      result.endCharacter = rhsParseStatus.endCharacter;
     }
-    result.endCharacter = mdParseStatus.endCharacter;
     result.remainingCharacters = mdParseStatus.remainingCharacters;
   }
   return result;  // Returning Success/Failure on TermExpr

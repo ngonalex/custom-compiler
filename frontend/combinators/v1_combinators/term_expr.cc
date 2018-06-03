@@ -19,7 +19,6 @@ ParseStatus TermExprParser::parse(std::string inputProgram, int startCharacter,
   if (inputProgram.size() == 0) {
     return super::parse(inputProgram, endCharacter);
   }
-
   // num
   OrCombinator orC;
   WordParser wordP;
@@ -52,8 +51,8 @@ ParseStatus TermExprParser::parse(std::string inputProgram, int startCharacter,
       result.endCharacter = aeParseStatus.endCharacter;
       std::unique_ptr<const ArithmeticExpr> zero = make_unique<IntegerExpr>(0);
       result.ast = std::move(make_unique<const SubtractExpr>(
-	  unique_cast<const ArithmeticExpr>(std::move(zero)),
-	  unique_cast<const ArithmeticExpr>(std::move(aeParseStatus.ast))));
+	      unique_cast<const ArithmeticExpr>(std::move(zero)),
+	      unique_cast<const ArithmeticExpr>(std::move(aeParseStatus.ast))));
     } else {
       result.startCharacter = startCharacter;
       result.status = aeParseStatus.status;
