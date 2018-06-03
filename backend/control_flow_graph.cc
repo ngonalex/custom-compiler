@@ -12,14 +12,19 @@ ControlFlowGraph::ControlFlowGraph
 ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_set, 
   std::vector<Edge> edge_graph) {
   if (graph_set.empty()) {    
-    //Hopefully this never occurs
-    return NULL;
+    //If this occurs then there's a bigger problem
+    std::vector<std::unique_ptr<struct ThreeAddressCode>> empty;
+    auto error_node = make_unique<class ControlFlowGraphNode>(std::move(empty));
+    //ControlFlowGraphNode error_node;
+    error_node->SetBlockType(ERROR_TYPE);
+    std::cout << "Error block created" << std::endl;
+    return error_node.get();
   } else if (graph_set.size() == 1) {
     ControlFlowGraphNode * temp = graph_set[0];
     graph_set.erase(graph_set.begin());
     return temp;
   } else {
-    if (graph_set.front()->GetBlockType() == CONDITIONAL_BLOCK) {
+    if (graph_set.front().GetBlockType() == CONDITIONAL_BLOCK) {
       // Should look like this:
       //      Condition
       //      /     \
@@ -30,10 +35,10 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_s
       // temp1 = True
       // temp2 = False
       // temp3 = END
-      ControlFlowGraphNode* temp0 = RecursiveCreate(graph_set,edge_graph);
-      ControlFlowGraphNode* temp1 = RecursiveCreate(graph_set,edge_graph);
-      ControlFlowGraphNode* temp2 = RecursiveCreate(graph_set,edge_graph);
-      ControlFlowGraphNode* temp3 = RecursiveCreate(graph_set,edge_graph);
+      ControlFlowGraphNode * temp0 = RecursiveCreate(graph_set,edge_graph);
+      ControlFlowGraphNode * temp1 = RecursiveCreate(graph_set,edge_graph);
+      ControlFlowGraphNode * temp2 = RecursiveCreate(graph_set,edge_graph);
+      ControlFlowGraphNode * temp3 = RecursiveCreate(graph_set,edge_graph);
       int node0 = temp0->GetCreationOrder();
       int node1 = temp1->GetCreationOrder();
       int node2 = temp2->GetCreationOrder();
@@ -47,7 +52,7 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_s
       edge_graph.push_back(edge3);
       edge_graph.push_back(edge4);
       return temp3;
-    } else if (graph_set.front()->GetBlockType() == LOOP_BLOCK) { 
+    } else if (graph_set.front().GetBlockType() == LOOP_BLOCK) { 
       // Should look like this:
       //      Loop
       //      /\  \
@@ -56,9 +61,9 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_s
       // temp0 = Loop
       // temp1 = True
       // temp2 = False
-      ControlFlowGraphNode* temp0 = RecursiveCreate(graph_set,edge_graph);
-      ControlFlowGraphNode* temp1 = RecursiveCreate(graph_set,edge_graph);
-      ControlFlowGraphNode* temp2 = RecursiveCreate(graph_set,edge_graph);
+      ControlFlowGraphNode * temp0 = RecursiveCreate(graph_set,edge_graph);
+      ControlFlowGraphNode * temp1 = RecursiveCreate(graph_set,edge_graph);
+      ControlFlowGraphNode * temp2 = RecursiveCreate(graph_set,edge_graph);
       int node0 = temp0->GetCreationOrder();
       int node1 = temp1->GetCreationOrder();
       int node2 = temp2->GetCreationOrder();
@@ -76,16 +81,17 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_s
     }
   }
 }
-std::vector<std::unique_ptr<struct ThreeAddressCode>> CopyBlock(std::vector<std::unique_ptr<struct ThreeAddressCode>> copy) {
-  std::vector<std::unique_ptr<struct ThreeAddressCode>> copy_object;
-  for (const auto& iter: copy) {
-    auto block = make_unique<struct ThreeAddressCode>();
-    block->target = iter->target;
-    block->op = iter->op;
-    copy_object.push_back(std::move(block));
-  }
-  return std::move(copy_object);
-}
+// std::vector<std::unique_ptr<struct ThreeAddressCode>> CopyBlock(std::vector<std::unique_ptr<struct ThreeAddressCode>> copy) {
+//   std::vector<std::unique_ptr<struct ThreeAddressCode>> copy_object;
+//   for (const auto& iter: copy) {
+//     auto block = make_unique<struct ThreeAddressCode>();
+//     block->target = iter->target;
+//     block->op = iter->op;
+//     copy_object.push_back(std::move(block));
+//   }
+//   return std::move(copy_object);
+// }
+
 void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddressCode>> input) {
   // Has to branch on:
   // IF/WHILE/FUNCTION
@@ -137,13 +143,13 @@ void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddress
     }
 
   } 
-  //Use CFGN pointers to recursively create edge vector
-  std::vector<ControlFlowGraphNode *> temp_cfg;
-  for (const auto& cfgiter: cfg_nodes_) {
-    temp_cfg.push_back(cfgiter.get());
+  //Use CFGN to recursively create edge vector
+  std::vector<ControlFlowGraphNode *> cfg_pointers;
+  for(auto &iter: cfg_nodes_) {
+    cfg_pointers.push_back(iter.get());
   }
   std::vector<Edge> edge_vector;
-  RecursiveCreate(temp_cfg,edge_vector);
+  RecursiveCreate(cfg_pointers,edge_vector);
   edges_ = edge_vector;
   //cfg_nodes_ = std::move(cfg_vector);
 }
@@ -174,19 +180,20 @@ ControlFlowGraphNode::ControlFlowGraphNode() {
 }
 
 ControlFlowGraphNode::ControlFlowGraphNode(std::vector<std::unique_ptr<struct ThreeAddressCode>> input) {
-  for (const auto& iter: input) {
-    auto block = make_unique<struct ThreeAddressCode>();
-    block->target = iter->target;
-    block->op = iter->op;
-    block->arg1 = iter->arg1;
-    block->arg2 = iter->arg2;
-    localblock_.push_back(std::move(block));
-  }
+  // for (const auto& iter: input) {
+  //   auto block = make_unique<struct ThreeAddressCode>();
+  //   block->target = iter->target;
+  //   block->op = iter->op;
+  //   block->arg1 = iter->arg1;
+  //   block->arg2 = iter->arg2;
+  //   localblock_.push_back(std::move(block));
+  // }
+  localblock_ = std::move(input);
   creation_order = 0;
   blocktype_ = NO_TYPE;
 }
 
-ControlFlowGraphNode::ControlFlowGraphNode(const ControlFlowGraphNode &copy) {
+ControlFlowGraphNode::ControlFlowGraphNode( ControlFlowGraphNode &copy) {
   localblock_.clear();
   // Because it is a vector of unique pointers
   // Each element has to be manually copied
@@ -198,6 +205,7 @@ ControlFlowGraphNode::ControlFlowGraphNode(const ControlFlowGraphNode &copy) {
     block->arg2 = iter->arg2;
     localblock_.push_back(std::move(block));
   }
+  //localblock_ = std::move(copy.GetLocalBlock());
   creation_order = copy.GetCreationOrder();
   blocktype_ = copy.GetBlockType();
 }
@@ -212,20 +220,36 @@ ControlFlowGraphNode& ControlFlowGraphNode::operator=(ControlFlowGraphNode &copy
     block->arg2 = iter->arg2;
     localblock_.push_back(std::move(block));
   }
+  //localblock_ = std::move(copy.GetLocalBlock());
+  creation_order = copy.GetCreationOrder();
+  blocktype_ = copy.GetBlockType();
+  return *this;
+}
+
+ControlFlowGraphNode ControlFlowGraphNode::operator=(ControlFlowGraphNode copy) {
+  localblock_.clear();
+  // for (const auto& iter: copy.GetLocalBlock()) {
+  //   auto block = make_unique<struct ThreeAddressCode>();
+  //   block->target = iter->target;
+  //   block->op = iter->op;
+  //   block->arg1 = iter->arg1;
+  //   block->arg2 = iter->arg2;
+  //   localblock_.push_back(std::move(block));
+  // }
+  localblock_ = std::move(copy.GetLocalBlock());
   creation_order = copy.GetCreationOrder();
   blocktype_ = copy.GetBlockType();
   return *this;
 }
 
 void ControlFlowGraphNode::SetLocalBlock(std::vector<std::unique_ptr<struct ThreeAddressCode>> input) {
-  for (const auto& iter: input) {
-    auto block = make_unique<struct ThreeAddressCode>();
-    block->target = iter->target;
-    block->op = iter->op;
-    block->arg1 = iter->arg1;
-    block->arg2 = iter->arg2;
-    localblock_.push_back(std::move(block));
-  }
+  // for (const auto& iter: input) {
+  //   auto block = make_unique<struct ThreeAddressCode>();
+  //   block->target = iter->target;
+  //   block->op = iter->op;
+  //   localblock_.push_back(std::move(block));
+  // }
+  localblock_ = std::move(input);
 }
 
 } //backend

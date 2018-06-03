@@ -17,7 +17,7 @@ namespace backend {
 enum BlockType {
   CONDITIONAL_BLOCK, LOOP_BLOCK,
   FUNCTION_BLOCK, TRUE_BLOCK,
-  FALSE_BLOCK, END_BLOCK, NO_TYPE
+  FALSE_BLOCK, END_BLOCK, NO_TYPE, ERROR_TYPE
 };
 
 enum EdgeType {
@@ -41,28 +41,29 @@ class ControlFlowGraphNode {
  public:
   ControlFlowGraphNode();
   ControlFlowGraphNode(std::vector<std::unique_ptr<struct ThreeAddressCode>>);
-  std::vector<std::unique_ptr<struct ThreeAddressCode>> GetLocalBlock() const {
+  std::vector<std::unique_ptr<struct ThreeAddressCode>> GetLocalBlock() {
    //return std::move(localblock_);
     std::vector<std::unique_ptr<struct ThreeAddressCode>> local_block_copy;
     for (const auto& iter: localblock_) {
       auto block = make_unique<struct ThreeAddressCode>();
       block->target = iter->target;
       block->op = iter->op;
+      block->arg1 = iter->arg1;
+      block->arg2 = iter->arg2;
       local_block_copy.push_back(std::move(block));
     }
     return std::move(local_block_copy);
 
   }
-  ControlFlowGraphNode(const ControlFlowGraphNode &copy);
-  std::unique_ptr<ControlFlowGraphNode> GetLeftNode() const;
-  std::unique_ptr<ControlFlowGraphNode> GetRightNode() const;
-  int GetCreationOrder() const {
+  ControlFlowGraphNode( ControlFlowGraphNode &copy);
+  int GetCreationOrder() {
     return creation_order;
   }
-  BlockType GetBlockType() const {
+  BlockType GetBlockType() {
     return blocktype_;
   }
   ControlFlowGraphNode& operator=(ControlFlowGraphNode &copy);
+  ControlFlowGraphNode operator=(ControlFlowGraphNode copy);
   void SetLocalBlock(std::vector<std::unique_ptr<struct ThreeAddressCode>>);
   void SetLeftNode(std::unique_ptr<ControlFlowGraphNode>);
   void SetRightNode(std::unique_ptr<ControlFlowGraphNode>);
