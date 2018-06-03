@@ -92,8 +92,8 @@ ParseStatus MulDivOpParser::parse(std::string inputProgram, int startCharacter, 
 	
 	OrCombinator mulOrDiv;
 	mulOrDiv.firstParser = reinterpret_cast<NullParser *>(&mulParser);
-
 	mulOrDiv.secondParser = reinterpret_cast<NullParser *>(&divParser);
+	
 	auto result = mulOrDiv.parse(inputProgram, endCharacter);
 	return result;
 }

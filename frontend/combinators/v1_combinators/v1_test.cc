@@ -341,7 +341,7 @@ TEST(Combinators, NegativeNumber) {
   EXPECT_EQ(result.parsedCharacters, "-101281510");
   EXPECT_EQ(output, "(0 - 101281510)");
 }
-/*
+
 // New - working
 TEST(Combinators, TrivialAe1) {
   ArithExprParser test;
@@ -359,7 +359,7 @@ TEST(Combinators, TrivialAe1) {
   EXPECT_EQ(result.parsedCharacters, "((225*335)+12)/2;");
   EXPECT_EQ(output, "(((225 * 335) + 12) / 2)");
 }
-*/
+
 // New - working
 TEST(Combinators, TrivialAe2) {
   ArithExprParser test;
@@ -441,7 +441,7 @@ TEST(Combinators, ComplicatedAe) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
-  EXPECT_EQ(result.endCharacter, 15);
+  EXPECT_EQ(result.endCharacter, 26);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "7*10+9/3+16-8*2*3-77+12*1;");
   EXPECT_EQ( output,
