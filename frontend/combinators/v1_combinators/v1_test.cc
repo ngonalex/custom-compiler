@@ -168,40 +168,42 @@ TEST(Combinators, DivOp) {
 }
 
 // // mul_op fail test
-TEST(Combinators, FailDivOp) {
-  MulDivOpParser test;
-  ParseStatus result = test.parse("0", 0);
+// TEST(Combinators, FailDivOp) {
+//   MulDivOpParser test;
+//   ParseStatus result = test.parse("0", 0);
 
-  EXPECT_EQ(result.status, true);
-  EXPECT_EQ(result.startCharacter, 0);
-  EXPECT_EQ(result.endCharacter, 1);
-  EXPECT_EQ(result.remainingCharacters, "0");
-  EXPECT_EQ(result.parsedCharacters, "");
-}
+//   EXPECT_EQ(result.status, true);
+//   EXPECT_EQ(result.startCharacter, 0);
+//   EXPECT_EQ(result.endCharacter, 1);
+//   EXPECT_EQ(result.remainingCharacters, "0");
+//   EXPECT_EQ(result.parsedCharacters, "");
+// }
 
-// open_paren test
-TEST(Combinators, OpenParen) {
-  OpenParenParser test;
-  ParseStatus result = test.parse("(abc", 0);
+// // open_paren test
+// TEST(Combinators, OpenParen) {
+//   OpenParenParser test;
+//   ParseStatus result = test.parse("(abc", 0);
 
-  EXPECT_EQ(result.status, true);
-  EXPECT_EQ(result.startCharacter, 0);
-  EXPECT_EQ(result.endCharacter, 1);
-  EXPECT_EQ(result.remainingCharacters, "abc");
-  EXPECT_EQ(result.parsedCharacters, "(");
-}
+//   EXPECT_EQ(result.status, true);
+//   EXPECT_EQ(result.startCharacter, 0);
+//   EXPECT_EQ(result.endCharacter, 1);
+//   EXPECT_EQ(result.remainingCharacters, "abc");
+//   EXPECT_EQ(result.parsedCharacters, "(");
+// }
 
-// close_paren test
-TEST(Combinators, CloseParen) {
-  CloseParenParser test;
-  ParseStatus result = test.parse(")abc", 0);
+// // close_paren test
+// TEST(Combinators, CloseParen) {
+//   CloseParenParser test;
+//   ParseStatus result = test.parse(")abc", 0);
 
-  EXPECT_EQ(result.status, true);
-  EXPECT_EQ(result.startCharacter, 0);
-  EXPECT_EQ(result.endCharacter, 1);
-  EXPECT_EQ(result.remainingCharacters, "abc");
-  EXPECT_EQ(result.parsedCharacters, ")");
-}/*
+//   EXPECT_EQ(result.status, true);
+//   EXPECT_EQ(result.startCharacter, 0);
+//   EXPECT_EQ(result.endCharacter, 1);
+//   EXPECT_EQ(result.remainingCharacters, "abc");
+//   EXPECT_EQ(result.parsedCharacters, ")");
+// }
+
+/*
 
 TEST(Combinators, FailedDigit) {
   NumParser test;
