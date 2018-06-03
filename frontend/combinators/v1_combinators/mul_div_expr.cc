@@ -29,12 +29,13 @@ ParseStatus MulDivExprParser::parse(std::string inputProgram, int startCharacter
       TermExprParser rhs;
       ParseStatus rhsParseStatus = rhs.parse(mdParseStatus.remainingCharacters, mdParseStatus.endCharacter);
       result.ast = std::move(make_node(
-	  (mdParseStatus.parsedCharacters),
-	  unique_cast<const ArithmeticExpr>(std::move(result.ast)),
-	  unique_cast<const ArithmeticExpr>(std::move(rhsParseStatus.ast))));
+	      (mdParseStatus.parsedCharacters),
+	        unique_cast<const ArithmeticExpr>(std::move(result.ast)),
+	        unique_cast<const ArithmeticExpr>(std::move(rhsParseStatus.ast))));
       mdParseStatus = op.parse(rhsParseStatus.remainingCharacters, rhsParseStatus.endCharacter);
       result.parsedCharacters += (rhsParseStatus.parsedCharacters);
     }
+    result.endCharacter = mdParseStatus.endCharacter;
     result.remainingCharacters = mdParseStatus.remainingCharacters;
   }
   return result;  // Returning Success/Failure on TermExpr
