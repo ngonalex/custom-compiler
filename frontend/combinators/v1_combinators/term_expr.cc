@@ -75,18 +75,16 @@ ParseStatus TermExprParser::parse(std::string inputProgram, int startCharacter,
     if (aeParseStatus.status) {
       result.parsedCharacters += aeParseStatus.parsedCharacters;
       result.remainingCharacters = aeParseStatus.remainingCharacters;
-
       CloseParenParser close_paren;
-      ParseStatus cpParseStatus =
-	  close_paren.parse(aeParseStatus.remainingCharacters, aeParseStatus.endCharacter);
+      ParseStatus cpParseStatus = close_paren.parse(aeParseStatus.remainingCharacters, aeParseStatus.endCharacter);
       if (cpParseStatus.status) {
-	result.parsedCharacters += cpParseStatus.parsedCharacters;
-	result.remainingCharacters = cpParseStatus.remainingCharacters;
-  result.endCharacter = cpParseStatus.endCharacter;
-	result.ast = std::move(aeParseStatus.ast);
+	      result.parsedCharacters += cpParseStatus.parsedCharacters;
+	      result.remainingCharacters = cpParseStatus.remainingCharacters;
+        result.endCharacter = cpParseStatus.endCharacter;
+	      result.ast = std::move(aeParseStatus.ast);
       } else {
-	result.status = cpParseStatus.status;
-	result.errorType = cpParseStatus.errorType;
+        result.status = cpParseStatus.status;
+        result.errorType = cpParseStatus.errorType;
       }
     } else {
       result.status = aeParseStatus.status;

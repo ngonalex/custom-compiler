@@ -337,7 +337,43 @@ TEST(Combinators, NegativeNumber) {
 // New - working
 TEST(Combinators, TrivialAe1) {
   ArithExprParser test;
-  ParseStatus result = test.parse("((225*335)+12)/2;");
+  ParseStatus result = test.parse("((225*335)+12)/2;", 0);
+
+  // Traversing the AST created from the number
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
+
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 17);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "((225*335)+12)/2;");
+  EXPECT_EQ(output, "(((225 * 335) + 12) / 2)");
+}
+
+// New - working
+TEST(Combinators, TrivialAe2) {
+  ArithExprParser test;
+  ParseStatus result = test.parse("(225*335)+(12/2);", 0);
+
+  // Traversing the AST created from the number
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
+
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 17);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "(225*335)+(12/2);");
+  EXPECT_EQ(output, "((225 * 335) + (12 / 2))");
+}
+
+// New - working
+TEST(Combinators, TrivialAe3) {
+  ArithExprParser test;
+  ParseStatus result = test.parse("(225*335)+12/2;", 0);
 
   // Traversing the AST created from the number
   PrintVisitor *a = new PrintVisitor();
@@ -347,56 +383,28 @@ TEST(Combinators, TrivialAe1) {
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 15);
-  EXPECT_EQ(result.remainingCharacters, "abasdf");
-  EXPECT_EQ(result.parsedCharacters, "((225*335)+12)/2;");
-  EXPECT_EQ(output, "(((225 * 335) + 12) / 2)");
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "(225*335)+12/2;");
+  EXPECT_EQ(output, "((225 * 335) + (12 / 2))");
 }
 
-// // New - working
-// TEST(Combinators, TrivialAe2) {
-//   ArithExprParser test;
-//   ParseStatus result = test.parse("(225*335)+(12/2);");
+TEST(Combinators, ComplicatedAe) {
+  ArithExprParser test;
+  ParseStatus result = test.parse("7*10+9/3+16-8*2*3-77+12*1;", 0);
 
-//   // Traversing the AST created from the number
-//   PrintVisitor *a = new PrintVisitor();
-//   result.ast->Visit(a);
-//   std::string output = a->GetOutput();
+  // Traversing the AST created from the number
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
 
-//   EXPECT_EQ(result.status, true);
-//   EXPECT_EQ(result.remainingCharacters, "");
-//   EXPECT_EQ(output, "((225 * 335) + (12 / 2))");
-// }
-
-// // New - working
-// TEST(Combinators, TrivialAe3) {
-//   ArithExprParser test;
-//   ParseStatus result = test.parse("(225*335)+12/2;");
-
-//   // Traversing the AST created from the number
-//   PrintVisitor *a = new PrintVisitor();
-//   result.ast->Visit(a);
-//   std::string output = a->GetOutput();
-
-//   EXPECT_EQ(result.status, true);
-//   EXPECT_EQ(result.remainingCharacters, "");
-//   EXPECT_EQ(output, "((225 * 335) + (12 / 2))");
-// }
-
-// TEST(Combinators, ComplicatedAe) {
-//   ArithExprParser test;
-//   ParseStatus result = test.parse("7*10+9/3+16-8*2*3-77+12*1;");
-
-//   // Traversing the AST created from the number
-//   PrintVisitor *a = new PrintVisitor();
-//   result.ast->Visit(a);
-//   std::string output = a->GetOutput();
-
-//   EXPECT_EQ(result.status, true);
-//   EXPECT_EQ(result.remainingCharacters, "");
-//   EXPECT_EQ(
-//       output,
-//       "((((((7 * 10) + (9 / 3)) + 16) - ((8 * 2) * 3)) - 77) + (12 * 1))");
-// }
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 15);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "7*10+9/3+16-8*2*3-77+12*1;");
+  EXPECT_EQ( output,
+    "((((((7 * 10) + (9 / 3)) + 16) - ((8 * 2) * 3)) - 77) + (12 * 1))");
+}
 
 // TEST(Combinators, NegComplicatedAe) {
 //   ArithExprParser test;

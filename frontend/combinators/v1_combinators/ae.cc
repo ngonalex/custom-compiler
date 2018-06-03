@@ -1,6 +1,8 @@
 #include "frontend/combinators/v1_combinators/ae.h"
 #include "frontend/combinators/v1_combinators/helpers/v1_helpers.h"
 
+#include <iostream>
+
 #define super NullParser
 
 using namespace cs160::frontend;
@@ -24,8 +26,7 @@ ParseStatus ArithExprParser::parse(std::string inputProgram, int startCharacter,
   ParseStatus aeParseResult = ae.parse(inputProgram, endCharacter);
   aeParseResult.startCharacter = startCharacter;
   if (aeParseResult.status) {
-    ParseStatus semiColonResult =
-	semiColonP.parse(aeParseResult.remainingCharacters, aeParseResult.endCharacter);
+    ParseStatus semiColonResult = semiColonP.parse(aeParseResult.remainingCharacters, aeParseResult.endCharacter);
     aeParseResult.status = semiColonResult.status;
     if (semiColonResult.status) {
       aeParseResult.remainingCharacters = semiColonResult.remainingCharacters;
