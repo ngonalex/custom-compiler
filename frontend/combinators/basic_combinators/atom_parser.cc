@@ -5,13 +5,16 @@ using namespace cs160::frontend;
 ParseStatus AtomParser::parse(std::string inputProgram, int startCharacter,
 				    std::string errorType) {
 
+  std::string errorMessage = "Expecting character: "; 
+  errorMessage += char_to_parse;
+
   ParseStatus result; 
   // Failures
   if (inputProgram.size() == 0 || inputProgram[0] != char_to_parse) {
     result.startCharacter = startCharacter;
     result.remainingCharacters = inputProgram;
     result.endCharacter = startCharacter;
-    result.errorType = errorType;
+    result.errorType = errorMessage;
     return result;
   } 
 

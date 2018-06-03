@@ -5,6 +5,8 @@
 #include "frontend/combinators/v1_combinators/num_parser.h"
 #include "frontend/combinators/v1_combinators/helpers/v1_helpers.h"
 #include "frontend/combinators/basic_combinators/and_combinator.h"
+#include "frontend/combinators/basic_combinators/atom_parser.h"
+
 
 #include <string>     // std::string, std::stoi
 
@@ -33,63 +35,44 @@ ParseStatus VarKeywordParser::parse(std::string inputProgram, int startCharacter
   andTwo.firstParser = reinterpret_cast<NullParser *>(&andOne);
   andTwo.secondParser = reinterpret_cast<NullParser *>(&rParser);
 
-  auto result = andTwo.parse(inputProgram, endCharacter);
+  ParseStatus result = andTwo.parse(inputProgram, endCharacter);
+  result.errorType = errorMessage;
   return result;
-/*
-  ParseStatus result;
-
-  if(inputProgram.substr(0,3) == "var") {
-    result.status = true;
-    result.parsedCharacters = "var";
-    result.remainingCharacters = inputProgram.erase(0,3);
-  }
-  else {
-    result.status = false;
-    result.errorType = errorMessage;
-  }
-  return result;*/
 }
 
-/*
-ParseStatus ColonParser::parse(std::string inputProgram, int startCharacter) {
-    int endCharacter = startCharacter;
+
+ParseStatus ColonParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+  int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
   std::string errorMessage = "Missing colon";
 
 	if (inputProgram.size() == 0) {
-		return super::parse(inputProgram, errorMessage);
+		return super::parse(inputProgram, endCharacter, errorMessage);
 	}
 
-  ParseStatus result;
+  auto vParser = AtomParser(':');
+  ParseStatus result = vParser.parse(inputProgram, endCharacter);
+  result.errorType = errorMessage;
 
-  if(inputProgram.substr(0,1) == ":") {
-    result.status = true;
-    result.parsedCharacters = ":";
-    result.remainingCharacters = inputProgram.erase(0,1);
-  }
-  else {
-    result.status = false;
-    result.errorType = errorMessage;
-  }
   return result;
 }
 
 
-ParseStatus TypeParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus TypeParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
   std::string errorMessage = "Incorrect type in variable declaration";
 	if (inputProgram.size() == 0) {
-		return super::parse(inputProgram, errorMessage);
+		return super::parse(inputProgram, endCharacter, errorMessage);
 	}
 
   OneOrMoreCombinator oneOrMore;
   SingleCharParser charParser;
 
 	oneOrMore.parser = reinterpret_cast<NullParser *>(&charParser);
-  ParseStatus result = oneOrMore.parse(inputProgram);
+  ParseStatus result = oneOrMore.parse(inputProgram, endCharacter);
 
   if(!result.status) {
     result.errorType = errorMessage;
@@ -98,35 +81,31 @@ ParseStatus TypeParser::parse(std::string inputProgram, int startCharacter) {
   return result;
 }
 
-ParseStatus EqualSignParser::parse(std::string inputProgram, int startCharacter) {
-  int endCharacter = startCharacter;
+ParseStatus EqualSignParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
+
   std::string errorMessage = "Missing equal sign";
-	if (inputProgram.size() == 0) {
-		return super::parse(inputProgram, errorMessage);
-	}
 
-  ParseStatus result;
+  if (inputProgram.size() == 0) {
+    return super::parse(inputProgram, endCharacter, errorMessage);
+  }
 
-  if(inputProgram.substr(0,1) == "=") {
-    result.status = true;
-    result.parsedCharacters = "=";
-    result.remainingCharacters = inputProgram.erase(0,1);
-  }
-  else {
-    result.status = false;
-    result.errorType = errorMessage;
-  }
+  auto vParser = AtomParser('=');
+  ParseStatus result = vParser.parse(inputProgram, endCharacter);
+  result.errorType = errorMessage;
+
   return result;
+
 }
+/*
 
-
-ParseStatus HelperVariableParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus HelperVariableParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
   if (inputProgram.size() == 0) {
-    return super::parse(inputProgram);
+    return super::parse(inputProgram, endCharacter);
   }
 
   VarKeywordParser varParser;

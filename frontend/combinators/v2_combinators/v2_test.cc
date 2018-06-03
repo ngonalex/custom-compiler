@@ -126,109 +126,98 @@ TEST(WordParserCombinator, trimTest) {
 
 // Success Case var_keyword_parser
 TEST(WordParserCombinator, successVarKeywordParser1) {
-  VarKeywordParser varParser;
-  ParseStatus result;
-  result.status = true;
-  result.remainingCharacters = "";
-  result.parsedCharacters = "var";
+  VarKeywordParser test;
+  ParseStatus result = test.parse(" var", 0);
 
-  ParseStatus testResult = varParser.parse("   var");
-
-  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 1);
+  EXPECT_EQ(result.endCharacter, 4);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "var");
 }
 
 // Fail Case var_keyword_parser
 TEST(WordParserCombinator, failVarKeywordParser1) {
-  VarKeywordParser varParser;
-  ParseStatus result;
-  result.status = false;
+  VarKeywordParser test;
+  ParseStatus result = test.parse("victor", 0);
 
-  ParseStatus testResult = varParser.parse("victor");
-
-  EXPECT_EQ(testResult, result);
-  EXPECT_EQ(testResult.errorType, "Start variable declaration with var");
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 0);
+  EXPECT_EQ(result.errorType, "Start variable declaration with var");
 }
 
-/*
+
 // Success Case ColonParser
 TEST(WordParserCombinator, sucessColonParser1) {
-  ColonParser parser;
-  ParseStatus result;
-  result.status = true;
-  result.remainingCharacters = "  joj";
-  result.parsedCharacters = ":";
+  ColonParser test;
+  ParseStatus result = test.parse("   :  joj", 0);
 
-  ParseStatus testResult = parser.parse("   :  joj");
-
-  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 3);
+  EXPECT_EQ(result.endCharacter, 4);
+  EXPECT_EQ(result.remainingCharacters, "  joj");
+  EXPECT_EQ(result.parsedCharacters, ":");
 }
 
 // Fail Case ColonParser
 TEST(WordParserCombinator, failColonParser1) {
-  ColonParser parser;
-  ParseStatus result;
-  result.status = false;
+  ColonParser test;
+  ParseStatus result = test.parse("first char not colon:", 0);
 
-  ParseStatus testResult = parser.parse("first char not colon:");
-
-  EXPECT_EQ(testResult, result);
-  EXPECT_EQ(testResult.errorType, "Missing colon");
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 0);
+  EXPECT_EQ(result.errorType, "Missing colon");
 }
+
 
 // Success Case TypeParser
 TEST(WordParserCombinator, successTypeParser1) {
-  TypeParser parser;
-  ParseStatus result;
-  result.status = true;
-  result.remainingCharacters = "";
-  result.parsedCharacters = "Integer";
+  TypeParser test;
+  ParseStatus result = test.parse("     Integer", 0);
 
-  ParseStatus testResult = parser.parse("     Integer");
-
-  // EXPECT_EQ(testResult, result);
-  EXPECT_EQ(testResult.status, result.status);
-  EXPECT_EQ(testResult.parsedCharacters, result.parsedCharacters);
-  EXPECT_EQ(testResult.remainingCharacters, result.remainingCharacters);
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 5);
+  EXPECT_EQ(result.endCharacter, 12);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "Integer");
 }
 
 // Fail Case TypeParser
 TEST(WordParserCombinator, failTypeParser1) {
-  TypeParser parser;
-  ParseStatus result;
-  result.status = false;
+  TypeParser test;
+  ParseStatus result = test.parse("  _abc  ", 0);
 
-  ParseStatus testResult =
-      parser.parse("  _abc  ");  // type can only contain a through z
-
-  EXPECT_EQ(testResult, result);
-  EXPECT_EQ(testResult.errorType, "Incorrect type in variable declaration");
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 2);
+  EXPECT_EQ(result.endCharacter, 2);
+  EXPECT_EQ(result.errorType, "Incorrect type in variable declaration");
 }
 
 // Success Case EqualSignParser
 TEST(WordParserCombinator, sucessEqualSignParser1) {
-  EqualSignParser parser;
-  ParseStatus result;
-  result.status = true;
-  result.remainingCharacters = "  3 + 4";
-  result.parsedCharacters = "=";
+  EqualSignParser test;
+  ParseStatus result = test.parse("   =  3 + 4", 0);
 
-  ParseStatus testResult = parser.parse("   =  3 + 4");
-
-  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 3);
+  EXPECT_EQ(result.endCharacter, 4);
+  EXPECT_EQ(result.remainingCharacters, "  3 + 4");
+  EXPECT_EQ(result.parsedCharacters, "=");
 }
 
 // Fail Case EqualSignParser
 TEST(WordParserCombinator, failEqualSignParser1) {
-  EqualSignParser parser;
-  ParseStatus result;
-  result.status = false;
+  EqualSignParser test;
+  ParseStatus result = test.parse("_=", 0);
 
-  ParseStatus testResult = parser.parse(" _=");
-
-  EXPECT_EQ(testResult, result);
-  EXPECT_EQ(testResult.errorType, "Missing equal sign");
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 0);
+  EXPECT_EQ(result.errorType, "Missing equal sign");
 }
-
+/*
 // Success Case VariableParser
 TEST(VariableParserCombinator, successVariableParser1) {
   VariableParser parser;
