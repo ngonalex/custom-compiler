@@ -118,7 +118,7 @@ TEST(Combinators, AddOp) {
   EXPECT_EQ(result.remainingCharacters, " ");
   EXPECT_EQ(result.parsedCharacters, "+");
 }
-/*
+
 // // add_op fail test
 TEST(Combinators, FailAddOp) {
   AddSubOpParser test;
