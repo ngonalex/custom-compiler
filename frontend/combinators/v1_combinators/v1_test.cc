@@ -118,7 +118,7 @@ TEST(Combinators, AddOp) {
   EXPECT_EQ(result.remainingCharacters, " ");
   EXPECT_EQ(result.parsedCharacters, "+");
 }
-/*
+
 // // add_op fail test
 TEST(Combinators, FailAddOp) {
   AddSubOpParser test;
@@ -130,13 +130,15 @@ TEST(Combinators, FailAddOp) {
   EXPECT_EQ(result.remainingCharacters, "*");
   EXPECT_EQ(result.parsedCharacters, "");
 }
-/*
+
 // sub_op test
 TEST(Combinators, SubOp) {
   AddSubOpParser test;
-  ParseStatus result = test.parse("-");
+  ParseStatus result = test.parse("-", 3);
 
   EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 3);
+  EXPECT_EQ(result.endCharacter, 4);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "-");
 }
@@ -144,9 +146,11 @@ TEST(Combinators, SubOp) {
 // // sub_op fail test
 TEST(Combinators, FailSubOp) {
   AddSubOpParser test;
-  ParseStatus result = test.parse("/");
+  ParseStatus result = test.parse("/", 3);
 
   EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 3);
+  EXPECT_EQ(result.endCharacter, 3);
   EXPECT_EQ(result.remainingCharacters, "/");
   EXPECT_EQ(result.parsedCharacters, "");
 }
@@ -154,9 +158,11 @@ TEST(Combinators, FailSubOp) {
 // // mul_op test
 TEST(Combinators, MulOp) {
   MulDivOpParser test;
-  ParseStatus result = test.parse("*");
+  ParseStatus result = test.parse("*", 3);
 
   EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 3);
+  EXPECT_EQ(result.endCharacter, 4);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "*");
 }
@@ -164,13 +170,15 @@ TEST(Combinators, MulOp) {
 // // mul_op fail test
 TEST(Combinators, FailMulOp) {
   MulDivOpParser test;
-  ParseStatus result = test.parse("0");
+  ParseStatus result = test.parse("0", 0);
 
   EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 0);
   EXPECT_EQ(result.remainingCharacters, "0");
   EXPECT_EQ(result.parsedCharacters, "");
 }
-*/
+
 // // div_op test
 TEST(Combinators, DivOp) {
   MulDivOpParser test;
@@ -333,7 +341,7 @@ TEST(Combinators, NegativeNumber) {
   EXPECT_EQ(result.parsedCharacters, "-101281510");
   EXPECT_EQ(output, "(0 - 101281510)");
 }
-
+/*
 // New - working
 TEST(Combinators, TrivialAe1) {
   ArithExprParser test;
@@ -351,7 +359,7 @@ TEST(Combinators, TrivialAe1) {
   EXPECT_EQ(result.parsedCharacters, "((225*335)+12)/2;");
   EXPECT_EQ(output, "(((225 * 335) + 12) / 2)");
 }
-
+*/
 // New - working
 TEST(Combinators, TrivialAe2) {
   ArithExprParser test;
