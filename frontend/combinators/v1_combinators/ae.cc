@@ -36,5 +36,7 @@ ParseStatus ArithExprParser::parse(std::string inputProgram, int startCharacter,
       aeParseResult.errorType = semiColonResult.errorType;
     }
   }
+  aeParseResult.errorType = "Missing arithmetic expression";
+
   return aeParseResult;
 }
