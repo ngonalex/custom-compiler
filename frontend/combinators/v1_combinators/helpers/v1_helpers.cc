@@ -18,8 +18,8 @@ ParseStatus CloseParenParser::parse(std::string inputProgram, int startCharacter
 	// Check in the cache if the character cuont parsestatus already exists, return that parsestatus if it does
 	auto search = cache.find(startCharacter);
 	if(search != cache.end()) {
-		ParseStatus result = search->second;
-		return result;
+		ParseStatus* a = search->second;
+		return *a;
 	} else {
 		std::string errorMessage = "Expecting close parenthesis";
 
@@ -31,7 +31,8 @@ ParseStatus CloseParenParser::parse(std::string inputProgram, int startCharacter
 		ParseStatus result = atomParser.parse(inputProgram, endCharacter);
 
 		// append to cache startCharacter and ParseStatus
-		cache.insert(std::pair<int, ParseStatus>(startCharacter, result));
+		cache.insert(std::make_pair<int, ParseStatus>(startCharacter, &result));
+
 		return result;
 	}
 }

@@ -53,6 +53,21 @@ class ParseStatus {  // Super class
   bool operator==(const ParseStatus &b) const;
 
   bool operator!=(const ParseStatus &b) const;
+
+/*
+  ParseStatus& operator=(ParseStatus&& g) {
+      this->status = g.status;
+      this->remainingCharacters = g.remainingCharacters;
+      this->parsedCharacters = g.parsedCharacters;
+      this->ast = std::move(g.ast);
+      this->second_ast = std::move(g.second_ast);
+      this->astNodes = std::move(g.astNodes);
+      this->errorType = g.errorType;
+      this->startCharacter = g.startCharacter;
+      this->endCharacter = g.endCharacter;
+      return *this;
+  }
+  */
 /*
   static ParseStatus failure(std::string errorType, int characterStart) {
     std::vector<std::unique_ptr<const AstNode>> astNodes;
