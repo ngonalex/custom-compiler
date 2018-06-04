@@ -2,29 +2,29 @@
 #include "gtest/gtest.h"
 #include "utility/memory.h"
 
-using cs160::abstract_syntax::version_4::AstVisitor;
-using cs160::abstract_syntax::version_4::ArithmeticExpr;
 using cs160::abstract_syntax::version_4::AddExpr;
-using cs160::abstract_syntax::version_4::SubtractExpr;
-using cs160::abstract_syntax::version_4::MultiplyExpr;
-using cs160::abstract_syntax::version_4::DivideExpr;
-using cs160::abstract_syntax::version_4::IntegerExpr;
-using cs160::abstract_syntax::version_4::VariableExpr;
-using cs160::abstract_syntax::version_4::LessThanExpr;
-using cs160::abstract_syntax::version_4::LessThanEqualToExpr;
-using cs160::abstract_syntax::version_4::GreaterThanExpr;
-using cs160::abstract_syntax::version_4::GreaterThanEqualToExpr;
-using cs160::abstract_syntax::version_4::EqualToExpr;
-using cs160::abstract_syntax::version_4::LogicalAndExpr;
-using cs160::abstract_syntax::version_4::LogicalOrExpr;
-using cs160::abstract_syntax::version_4::LogicalNotExpr;
-using cs160::abstract_syntax::version_4::Statement;
+using cs160::abstract_syntax::version_4::ArithmeticExpr;
 using cs160::abstract_syntax::version_4::Assignment;
+using cs160::abstract_syntax::version_4::AstVisitor;
 using cs160::abstract_syntax::version_4::Conditional;
-using cs160::abstract_syntax::version_4::Loop;
+using cs160::abstract_syntax::version_4::DivideExpr;
+using cs160::abstract_syntax::version_4::EqualToExpr;
 using cs160::abstract_syntax::version_4::FunctionCall;
 using cs160::abstract_syntax::version_4::FunctionDef;
+using cs160::abstract_syntax::version_4::GreaterThanEqualToExpr;
+using cs160::abstract_syntax::version_4::GreaterThanExpr;
+using cs160::abstract_syntax::version_4::IntegerExpr;
+using cs160::abstract_syntax::version_4::LessThanEqualToExpr;
+using cs160::abstract_syntax::version_4::LessThanExpr;
+using cs160::abstract_syntax::version_4::LogicalAndExpr;
+using cs160::abstract_syntax::version_4::LogicalNotExpr;
+using cs160::abstract_syntax::version_4::LogicalOrExpr;
+using cs160::abstract_syntax::version_4::Loop;
+using cs160::abstract_syntax::version_4::MultiplyExpr;
 using cs160::abstract_syntax::version_4::Program;
+using cs160::abstract_syntax::version_4::Statement;
+using cs160::abstract_syntax::version_4::SubtractExpr;
+using cs160::abstract_syntax::version_4::VariableExpr;
 
 using cs160::make_unique;
 

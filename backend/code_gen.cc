@@ -298,8 +298,8 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
   }
 }
 
-void CodeGen::GenerateArithmeticExpr(
-  std::unique_ptr<ThreeAddressCode> tac, Type type) {
+void CodeGen::GenerateArithmeticExpr(std::unique_ptr<ThreeAddressCode> tac,
+                                     Type type) {
   switch (type) {
     case ADD:
       outfile_ << "\t# Addition\n";
@@ -334,13 +334,13 @@ void CodeGen::GenerateArithmeticExpr(
       break;
     default:
       std::cerr << "Inside GenerateArithmeticExpr, something went"
-        << "went very wrong\n";
+                << "went very wrong\n";
       exit(1);
   }
 }
 
 void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
-  Type type) {
+                                     Type type) {
   // Note to self you can abstract this out even more
   switch (type) {
     case LESSTHAN:
@@ -350,7 +350,7 @@ void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
       outfile_ << "\tcmp %rbx, %rax" << std:: endl;
       outfile_ << "\tsetl %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-      outfile_ << "\tpush %rcx\n" << std:: endl;
+      outfile_ << "\tpush %rcx\n" << std::endl;
       break;
     case LESSTHANEQ:
       outfile_ << "\t# LessThanEq Comparision\n";
@@ -359,7 +359,7 @@ void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
       outfile_ << "\tcmp %rbx, %rax" << std:: endl;
       outfile_ << "\tsetle %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-      outfile_ << "\tpush %rcx\n" << std:: endl;
+      outfile_ << "\tpush %rcx\n" << std::endl;
       break;
     case GREATERTHAN:
       outfile_ << "\t# GreaterThan Comparision\n";
@@ -368,7 +368,7 @@ void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
       outfile_ << "\tcmp %rbx, %rax" << std:: endl;
       outfile_ << "\tsetg %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-      outfile_ << "\tpush %rcx\n" << std:: endl;
+      outfile_ << "\tpush %rcx\n" << std::endl;
       break;
     case GREATERTHANEQ:
       outfile_ << "\t# GreaterThanEq Comparision\n";
@@ -377,7 +377,7 @@ void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
       outfile_ << "\tcmp %rbx, %rax" << std:: endl;
       outfile_ << "\tsetge %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-      outfile_ << "\tpush %rcx\n" << std:: endl;
+      outfile_ << "\tpush %rcx\n" << std::endl;
       break;
     case EQUAL:
       outfile_ << "\t# Equals Comparision\n";
@@ -386,17 +386,17 @@ void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
       outfile_ << "\tcmp %rbx, %rax" << std:: endl;
       outfile_ << "\tsete %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-      outfile_ << "\tpush %rcx\n" << std:: endl;
+      outfile_ << "\tpush %rcx\n" << std::endl;
       break;
     default:
       std::cerr << "Inside GenerateRelationalExpr, something went"
-        << "went very wrong\n";
+                << "went very wrong\n";
       exit(1);
   }
 }
 
 void CodeGen::GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
-  Type type) {
+                                  Type type) {
   switch (type) {
     case LOGAND:
       outfile_ << "\t# LogicalAnd\n";
@@ -422,7 +422,7 @@ void CodeGen::GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
       break;
     default:
       std::cerr << "Inside GenerateLogicalExpr, something went"
-        << "went very wrong\n";
+                << "went very wrong\n";
       exit(1);
   }
 }
@@ -694,8 +694,8 @@ void CodeGen::GenerateRHSDerefEpilogue(std::string arg2) {
   }
 }
 
-void CodeGen::Generate(std::vector
-  <std::unique_ptr<struct ThreeAddressCode>> blocks) {
+void CodeGen::Generate(
+    std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks) {
   // boiler code here
   GenerateBoiler();
 
@@ -763,13 +763,15 @@ void CodeGen::Generate(std::vector
         outfile_ << "\t# LOOP\n";
         outfile_ << "\tpop %rax" << std::endl;
         outfile_ << "\tcmp $" << std::to_string(code->arg1.value())
-          << ", %rax\n"<< std::endl;
+                 << ", %rax\n"
+                 << std::endl;
         break;
       case CONDITIONAL:
         outfile_ << "\t# CONDITIONAL\n";
         outfile_ << "\tpop %rax" << std::endl;
         outfile_ << "\tcmp $" << std::to_string(code->arg1.value())
-          << ", %rax\n" << std::endl;
+                 << ", %rax\n"
+                 << std::endl;
         break;
       // Note to self abstract jumps out later
       case JUMP:
@@ -806,7 +808,7 @@ void CodeGen::Generate(std::vector
           << "\n" << std::endl;
         break;
       case LABEL:
-        outfile_ << code->target.label().name() << ":"   << std::endl;
+        outfile_ << code->target.label().name() << ":" << std::endl;
         break;
       case FUNCALL:
         outfile_ << "\t# Calling Function" << std::endl;

@@ -64,6 +64,17 @@ cc_library(
         visibility = ["//visibility:public"],
 )
 
+cc_library(
+        name = "print_visitor_v2",
+        copts = ["-Wall -g"],
+        hdrs = ["print_visitor_v2.h"],
+        deps = [
+             ":abstract_syntax_tree_v2",
+             "//utility"
+        ],
+        visibility = ["//visibility:public"],
+)
+
 cc_test(
         name = "abstract_syntax_tree_v1_test",
         srcs = ["abstract_syntax_tree_v1_test.cc"],
@@ -129,6 +140,17 @@ cc_test(
 	srcs = ["print_visitor_v1_test.cc"],
 	deps = [
              ":print_visitor_v1",
+             "@gtest//:main",
+        ],
+	timeout = "short",
+	size = "small",
+)
+
+cc_test(
+	name = "print_visitor_v2_test",
+	srcs = ["print_visitor_v2_test.cc"],
+	deps = [
+             ":print_visitor_v2",
              "@gtest//:main",
         ],
 	timeout = "short",

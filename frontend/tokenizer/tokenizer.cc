@@ -1,5 +1,5 @@
 #include "frontend/tokenizer/tokenizer.h"
-
+#include <regex>
 #include <sstream>
 
 using namespace cs160::frontend;
@@ -9,67 +9,97 @@ Tokenizer::Tokenizer(std::string program) : input_program_(program) {
   Token::Type prevType = Token::NONE;
   std::string currString;
 
-  //Looping through all characters of program and tokenize
+  // Looping through all characters of program and tokenize
   for (char &c : input_program_) {
-    if (c == ' ')
-      continue;
-    Token::Type type = ExtractType(c);
-    if (type != Token::FAILED) {
-      std::stringstream currStringStream;
-      currStringStream << currString;
-      currStringStream << c;
-
-      currString = currStringStream.str();
-      if (type != prevType) {
+    Token::Type separatorType = ExtractSeparator(c);
+    if (separatorType != Token::INCOMPLETE) {
+      if (currString != "") {
+        Token::Type type = ExtractType(currString);
         if (type == Token::NUM) {
-          Token newToken(type, atoi(currString.c_str()));
+          Token newToken(Token::NUM, atoi(currString.c_str()));
+          tokens_.push_back(newToken);
+        } else if (type == Token::IDENTIFIER) {
+          Token newToken(Token::IDENTIFIER, currString);
           tokens_.push_back(newToken);
         } else {
           Token newToken(type);
           tokens_.push_back(newToken);
         }
-        currString = "";
+        // printf("Current String: %s\n", currString.c_str());
       }
-      prevChar = c;
-      prevType = type;
+      if (separatorType != Token::WHITESPACE) {
+        Token newToken(separatorType);
+        tokens_.push_back(newToken);
+      }
+      currString = "";
     } else {
-      Token newToken(Token::FAILED);
-      tokens_[0] = (newToken);
-      break;
-      // Return just one token that is null
+      std::stringstream currStringStream;
+      currStringStream << currString;
+      currStringStream << c;
+
+      currString = currStringStream.str();
     }
   }
-  if(tokens_[0].type() != Token::FAILED) {
-    Token endToken(Token::END);
+
+  if (currString == "") {
+    Token endToken(Token::ENDOFFILE);
     tokens_.push_back(endToken);
   }
 }
 
-Token::Type Tokenizer::ExtractType(const char testChar) {
-  if (isdigit(testChar))
+Token::Type Tokenizer::ExtractType(std::string expression) {
+  if (expression == "var") {
+    return Token::VAR_NAME;
+  } else if (expression == "func") {
+  }
+
+  bool is_integer =
+      std::regex_match(expression, std::regex("^(0|[1-9][0-9]*)$"));
+  if (is_integer) {
     return Token::NUM;
+  } else if (!isdigit(expression[0])) {
+    return Token::IDENTIFIER;
+  } else {
+    return Token::FAILED;
+  }
+}
+
+Token::Type Tokenizer::ExtractSeparator(const char testChar) {
   switch (testChar) {
-  case '(': {
-    return Token::OPEN_PAREN;
+    case '(': {
+      return Token::OPEN_PAREN;
+    }
+    case ')': {
+      return Token::CLOSE_PAREN;
+    }
+    case '+': {
+      return Token::ADD_OP;
+    }
+    case '-': {
+      return Token::SUB_OP;
+    }
+    case '*': {
+      return Token::MUL_OP;
+    }
+    case '/': {
+      return Token::DIV_OP;
+    }
+    case '=': {
+      return Token::EQUAL_SIGN;
+    }
+    case ';': {
+      return Token::END;
+    }
+    case ':': {
+      return Token::FIELD;
+    }
+    case ' ': {
+      return Token::WHITESPACE;
+    }
+    default: { return Token::INCOMPLETE; }
   }
-  case ')': {
-    return Token::CLOSE_PAREN;
-  }
-  case '+': {
-    return Token::ADD_OP;
-  }
-  case '-': {
-    return Token::SUB_OP;
-  }
-  case '*': {
-    return Token::MUL_OP;
-  }
-  case '/': {
-    return Token::DIV_OP;
-  }
-  case '=': {
-    return Token::EQUAL_SIGN;
-  }
-  default: { return Token::FAILED; }
-  }
+}
+
+bool Tokenizer::validVariableName(std::stringstream variableName) {
+  return false;
 }

@@ -1,12 +1,9 @@
 #ifndef BACKEND_CODE_GEN_H_
 #define BACKEND_CODE_GEN_H_
 
-#include <iostream>
 #include <fstream>
-#include <string>
-#include <vector>
+#include <iostream>
 #include <map>
-#include <utility>
 #include <set>
 #include <sstream>
 

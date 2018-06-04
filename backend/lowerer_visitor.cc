@@ -4,13 +4,13 @@
 namespace cs160 {
 namespace backend {
 
-std::string LowererVisitor::GetOutputArithmeticHelper(std::string output,
-  int index, std::vector<std::string> printhelper) {
-  output = output + blocks_[index]->target.reg().name()
-    + " <- " + blocks_[index]->arg1.reg().name();
+std::string LowererVisitor::GetOutputArithmeticHelper(
+    std::string output, int index, std::vector<std::string> printhelper) {
+  output = output + blocks_[index]->target.reg().name() + " <- " +
+           blocks_[index]->arg1.reg().name();
 
-  output = output + " " + printhelper[blocks_[index]->op.opcode()]
-    + " " + blocks_[index]->arg2.reg().name();
+  output = output + " " + printhelper[blocks_[index]->op.opcode()] + " " +
+           blocks_[index]->arg2.reg().name();
 
   return output;
 }
@@ -23,9 +23,10 @@ std::string LowererVisitor::GetOutput() {
   std::vector<std::string> printhelper = {"INTLOAD", "VARLOAD", "VARASSIGNLOAD",
     "FUNARGLOAD", "FUNRETLOAD", "+", "-", "*", "/", "<", "<=", ">", ">=",
     "==", "&&", "||", "¬", "while", "if", "jmp", "je", "jne", "jg", "jge",
-    "jl", "jle", "MkLabel", "FUNCTIONCALL", "FUNRETURNEPILOGUE", "FUNCTIONDEF", "FUNPROLOGUE", "FUNEPILOGUE", "PRINTARITH", "NOTYPE",
-    "LHSDEREFERENCE", "RHSINTDEREFERENCE", "RHSTUPLEDEREFERENCE", "NEWTUPLE", "VARCHILDTUPLE"};
-
+    "jl", "jle", "MkLabel", "FUNCTIONCALL", "FUNRETURNEPILOGUE",
+    "FUNCTIONDEF", "FUNPROLOGUE", "FUNEPILOGUE", "PRINTARITH", "NOTYPE",
+    "LHSDEREFERENCE", "RHSINTDEREFERENCE", "RHSTUPLEDEREFERENCE", "NEWTUPLE",
+    "VARCHILDTUPLE"};
 
   for (unsigned int i = 0; i < blocks_.size(); ++i) {
     // If it's a just a int (Register without a name then access it's value)
@@ -61,49 +62,49 @@ std::string LowererVisitor::GetOutput() {
       //   break;
       // case LESSTHANEQ:
       case LOGNOT:
-        output = output + blocks_[i]->target.reg().name()
-          + " <- " + printhelper[LOGNOT] + blocks_[i]->arg1.reg().name();
+        output = output + blocks_[i]->target.reg().name() + " <- " +
+                 printhelper[LOGNOT] + blocks_[i]->arg1.reg().name();
         break;
       case LOOP:
         output = output + printhelper[LOOP] + " " +
-          blocks_[i]->arg2.reg().name() + " == 0";
+                 blocks_[i]->arg2.reg().name() + " == 0";
         break;
       case CONDITIONAL:
         output = output + printhelper[CONDITIONAL] + " " +
-          blocks_[i]->arg2.reg().name() + " == 0";
+                 blocks_[i]->arg2.reg().name() + " == 0";
         break;
       // Abstract jumps out
       case JUMP:
         output = output + printhelper[JUMP] + " " +
-          blocks_[i]->target.label().name();
+                 blocks_[i]->target.label().name();
         break;
       case JEQUAL:
         output = output + printhelper[JEQUAL] + " " +
-          blocks_[i]->target.label().name();
+                 blocks_[i]->target.label().name();
         break;
       case JNOTEQUAL:
         output = output + printhelper[JNOTEQUAL] + " " +
-          blocks_[i]->target.label().name();
+                 blocks_[i]->target.label().name();
         break;
       case JGREATER:
         output = output + printhelper[JGREATER] + " " +
-          blocks_[i]->target.label().name();
+                 blocks_[i]->target.label().name();
         break;
       case JGREATEREQ:
         output = output + printhelper[JGREATEREQ] + " " +
-          blocks_[i]->target.label().name();
+                 blocks_[i]->target.label().name();
         break;
       case JLESS:
         output = output + printhelper[JLESS] + " " +
-          blocks_[i]->target.label().name();
+                 blocks_[i]->target.label().name();
         break;
       case JLESSEQ:
         output = output + printhelper[JLESSEQ] + " " +
-          blocks_[i]->target.label().name();
+                 blocks_[i]->target.label().name();
         break;
       case LABEL:
         output = output + printhelper[LABEL] + " " +
-          blocks_[i]->target.label().name();
+                 blocks_[i]->target.label().name();
         break;
       default:
         output = GetOutputArithmeticHelper(output, i, printhelper);
@@ -368,8 +369,8 @@ void LowererVisitor::VisitGreaterThanExpr(const GreaterThanExpr& exp) {
   BinaryOperatorHelper(GREATERTHAN, arg1, arg2);
 }
 void LowererVisitor::VisitGreaterThanEqualToExpr(
-  const GreaterThanEqualToExpr& exp) {
-    // Visit left hand side (Last thing should be the target where it stores it)
+    const GreaterThanEqualToExpr& exp) {
+  // Visit left hand side (Last thing should be the target where it stores it)
   exp.lhs().Visit(const_cast<LowererVisitor*>(this));
   Register arg1 = GetArgument(lastchildtype_);
   exp.rhs().Visit(const_cast<LowererVisitor*>(this));
@@ -544,7 +545,7 @@ void LowererVisitor::VisitProgram(const Program& program) {
   // Do all the Assignments, then the AE, then the functions
 
   for (auto& statement : program.statements()) {
-      statement->Visit(this);
+    statement->Visit(this);
   }
 
   program.arithmetic_exp().Visit(this);
@@ -563,7 +564,6 @@ void LowererVisitor::VisitIntegerExpr(const IntegerExpr& exp) {
 
   Operand arg1 = Operand(exp.value());
   CreateLoadBlock(INTLOAD, arg1);
-
   lastchildtype_ = INTCHILD;
   ++counter_.variablecount;
 }
@@ -675,10 +675,10 @@ void LowererVisitor::CreateLoadBlock(Type type, Operand arg1) {
 
 void LowererVisitor::CreateComparisionBlock(Type type) {
   ASSERT(type == CONDITIONAL || type == LOOP,
-    "Must be a loop or a conditional type");
+         "Must be a loop or a conditional type");
 
   auto newblock = make_unique<struct ThreeAddressCode>();
-  newblock->arg2 = Operand(blocks_[blocks_.size()-1]->target.reg());
+  newblock->arg2 = Operand(blocks_[blocks_.size() - 1]->target.reg());
   // Flip the comparision so it jumps if it's negative
   newblock->arg1 = Operand(0);
 
@@ -688,7 +688,7 @@ void LowererVisitor::CreateComparisionBlock(Type type) {
 }
 
 void LowererVisitor::CreateLabelBlock(std::string labelname) {
-  auto labelblock  = make_unique<struct ThreeAddressCode>();
+  auto labelblock = make_unique<struct ThreeAddressCode>();
   labelblock->target = Target(Label(labelname));
   labelblock->op = Opcode(LABEL);
   blocks_.push_back(std::move(labelblock));
@@ -696,9 +696,10 @@ void LowererVisitor::CreateLabelBlock(std::string labelname) {
 
 void LowererVisitor::CreateJumpBlock(std::string jumpname, Type type) {
   // Probably a better way to do this
-  ASSERT(type == JUMP || type == JEQUAL || type == JGREATER
-    || type == JGREATEREQ || type == JLESS || type == JLESSEQ
-    || type == JNOTEQUAL, "Must be a jump type");
+  ASSERT(type == JUMP || type == JEQUAL || type == JGREATER ||
+             type == JGREATEREQ || type == JLESS || type == JLESSEQ ||
+             type == JNOTEQUAL,
+         "Must be a jump type");
 
   auto jumpblock = make_unique<struct ThreeAddressCode>();
   jumpblock->target = Target(Label(jumpname));

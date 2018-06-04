@@ -33,7 +33,10 @@ using cs160::backend::ThreeAddressCode;
 using cs160::backend::CodeGen;
 using cs160::make_unique;
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 71f28c4557744f4f548ad05c3a06b62d331809b4
 /*
 fact(int bob)
   if(bob >1)
@@ -45,17 +48,20 @@ fact(int bob)
 
 */
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 71f28c4557744f4f548ad05c3a06b62d331809b4
 std::string exec(const char* cmd) {
-    std::array<char, 128> buffer;
-    std::string result;
-    std::shared_ptr<FILE> pipe(popen(cmd, "r"), pclose);
-    if (!pipe) throw std::runtime_error("popen() failed!");
-    while (!feof(pipe.get())) {
-        if (fgets(buffer.data(), 128, pipe.get()) != nullptr)
-            result += buffer.data();
+  std::array<char, 128> buffer;
+  std::string result;
+  std::shared_ptr<FILE> pipe(popen(cmd, "r"), pclose);
+  if (!pipe) throw std::runtime_error("popen() failed!");
+  while (!feof(pipe.get())) {
+    if (fgets(buffer.data(), 128, pipe.get()) != nullptr)
+      result += buffer.data();
     }
-    return result;
+  return result;
 }
 
 int main() {
@@ -63,7 +69,11 @@ int main() {
   Statement::Block statements;
   auto expr = make_unique<DivideExpr>(
     make_unique<IntegerExpr>(7), make_unique<IntegerExpr>(5));
+<<<<<<< HEAD
  
+=======
+
+>>>>>>> 71f28c4557744f4f548ad05c3a06b62d331809b4
   statements.push_back(std::move(
       make_unique<const Assignment>(make_unique<const VariableExpr>("bob"),
                                     make_unique<const IntegerExpr>(10))));
