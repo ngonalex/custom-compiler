@@ -12,35 +12,32 @@ namespace frontend {
 
 class CloseParenParser : NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, int startCharacter, std::string errorType = ""); 
- private:
-  std::map<int, ParseStatus> cache;
-
+   virtual ParseStatus parse(std::string inputProgram, int startCharacter); 
 };
 
 class OpenParenParser : NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, int startCharacter, std::string errorType = ""); 
+   virtual ParseStatus parse(std::string inputProgram, int startCharacter); 
 };
 
 class NegativeParser : NullParser {
  public:
-	virtual ParseStatus parse(std::string inputProgram, int startCharacter, std::string errorType = "");
+	virtual ParseStatus parse(std::string inputProgram, int startCharacter);
 };
 
 class AddSubOpParser : NullParser {
  public:
-	virtual ParseStatus parse(std::string inputProgram, int startCharacter, std::string errorType = "");
+	virtual ParseStatus parse(std::string inputProgram, int startCharacter);
 };
 
 class MulDivOpParser : NullParser {
  public:
-	virtual ParseStatus parse(std::string inputProgram, int startCharacter, std::string errorType = "");
+	virtual ParseStatus parse(std::string inputProgram, int startCharacter);
 };
 
 class SemiColonParser : NullParser {
  public:
-	virtual ParseStatus parse(std::string inputProgram, int startCharacter, std::string errorType = "");
+	virtual ParseStatus parse(std::string inputProgram, int startCharacter);
 };
 
 

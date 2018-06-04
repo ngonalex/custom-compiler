@@ -9,14 +9,14 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus NumParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus NumParser::parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
   std::string errorMessage = "Number should only have digits (0-9)";
 
   endCharacter += trim(inputProgram);
 
   if (inputProgram.size() == 0) {
-    return super::parse(inputProgram, endCharacter, errorMessage);
+    return super::fail(inputProgram, endCharacter, errorMessage);
   }
 
   SingleDigitParser digitParser;
@@ -30,7 +30,7 @@ ParseStatus NumParser::parse(std::string inputProgram, int startCharacter, std::
     result.ast =
 	std::move(make_unique<IntegerExpr>(stoi(result.parsedCharacters)));
   } else {
-    return super::parse(inputProgram, endCharacter, errorMessage);
+    return super::fail(inputProgram, endCharacter, errorMessage);
   }
   return result;
 }

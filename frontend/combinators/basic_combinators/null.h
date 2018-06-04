@@ -9,10 +9,9 @@ namespace frontend {
 
 class NullParser {
  public:
-  virtual ParseStatus parse(std::string inputProgram,
-  				int startCharacter,
-			    std::string errorType = "");
-  //virtual ParseStatus parse(std::string inputProgram, int startCharacter);
+  ParseStatus fail(std::string inputProgram,
+  				int startCharacter, std::string errorMessage = "");
+  virtual ParseStatus parse(std::string inputProgram, int startCharacter);
 };
 
 }  // namespace frontend

@@ -15,11 +15,11 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus ProgramParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus ProgramParser::parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
   if (inputProgram.size() == 0) {
-    return super::parse(inputProgram, endCharacter, "Empty inside of ProgramParser");
+    return super::fail(inputProgram, endCharacter, "Empty inside of ProgramParser");
   }
 
   ArithExprParser arithExprParser;

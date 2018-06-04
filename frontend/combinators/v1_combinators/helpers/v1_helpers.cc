@@ -11,14 +11,14 @@ using namespace cs160::frontend;
 using namespace std;
 
 // )
-ParseStatus CloseParenParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus CloseParenParser::parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 	// Check in the cache if the character cuont parsestatus already exists, return that parsestatus if it does
 	std::string errorMessage = "Expecting close parenthesis";
 
 	if (inputProgram.size() == 0) {
-		return super::parse(inputProgram, endCharacter, errorMessage);
+		return super::fail(inputProgram, endCharacter, errorMessage);
 	}
 
 	auto atomParser = AtomParser(')');
@@ -29,14 +29,14 @@ ParseStatus CloseParenParser::parse(std::string inputProgram, int startCharacter
 }
 
 // (
-ParseStatus OpenParenParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus OpenParenParser::parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 
 	std::string errorMessage = "Expecting open parenthesis";
 
 	if (inputProgram.size() == 0) {
-		return super::parse(inputProgram, endCharacter, errorMessage);
+		return super::fail(inputProgram, endCharacter, errorMessage);
 	}
 
 	auto atomParser = AtomParser('(');
@@ -45,14 +45,14 @@ ParseStatus OpenParenParser::parse(std::string inputProgram, int startCharacter,
 }
 
 // - 
-ParseStatus NegativeParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus NegativeParser::parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 	std::string errorMessage = "Expecting -";
 
 
 	if (inputProgram.size() == 0) {
-		return super::parse(inputProgram, endCharacter, errorMessage);
+		return super::fail(inputProgram, endCharacter, errorMessage);
 	}
 
 	auto atomParser = AtomParser('-');
@@ -61,13 +61,13 @@ ParseStatus NegativeParser::parse(std::string inputProgram, int startCharacter, 
 }
 
 // + - 
-ParseStatus AddSubOpParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus AddSubOpParser::parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 	std::string errorMessage = "Expecting + or -";
 
 	if (inputProgram.size() == 0) {
-		return super::parse(inputProgram, endCharacter, errorMessage);
+		return super::fail(inputProgram, endCharacter, errorMessage);
 	}
 
 	auto plusParser = AtomParser('+');
@@ -81,13 +81,13 @@ ParseStatus AddSubOpParser::parse(std::string inputProgram, int startCharacter, 
 }
 
 // * /
-ParseStatus MulDivOpParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus MulDivOpParser::parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 	std::string errorMessage = "Expecting * or /";
 
 	if (inputProgram.size() == 0) {
-		return super::parse(inputProgram, endCharacter, errorMessage);
+		return super::fail(inputProgram, endCharacter, errorMessage);
 	}
 
 	auto mulParser = AtomParser('*');
@@ -102,13 +102,13 @@ ParseStatus MulDivOpParser::parse(std::string inputProgram, int startCharacter, 
 }
 
 // ;
-ParseStatus SemiColonParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus SemiColonParser::parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 	std::string errorMessage = "Expecting ;";
 
 	if (inputProgram.size() == 0) {
-		return super::parse(inputProgram, endCharacter, errorMessage);
+		return super::fail(inputProgram, endCharacter, errorMessage);
 	}
 
 	auto atomParser = AtomParser(';');

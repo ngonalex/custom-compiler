@@ -3,7 +3,7 @@
 
 using namespace cs160::frontend;
 
-ParseStatus NullParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus NullParser::fail(std::string inputProgram, int startCharacter, std::string errorMessage) {
   ParseStatus status;
   status.status = false;
   status.remainingCharacters = inputProgram;
@@ -12,8 +12,12 @@ ParseStatus NullParser::parse(std::string inputProgram, int startCharacter, std:
   status.endCharacter = startCharacter;
   status.ast = nullptr;
   // status.second_ast = nullptr;
-  if (errorType != "") {
-    status.errorType = errorType;
+  if (errorMessage != "") {
+    status.errorType = errorMessage;
   }
   return status;
+}
+
+ParseStatus NullParser::parse(std::string inputProgram, int startCharacter){
+    return fail(inputProgram, startCharacter);
 }

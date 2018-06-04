@@ -8,13 +8,12 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus AddSubExprParser::parse(std::string inputProgram, int startCharacter,
-				    std::string errorType) {
+ParseStatus AddSubExprParser::parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
   if (inputProgram.size() == 0) {
-    return super::parse(inputProgram, endCharacter);
+    return super::fail(inputProgram, endCharacter);
   }
   // ae
   MulDivExprParser lhs;

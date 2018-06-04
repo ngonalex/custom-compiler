@@ -12,14 +12,14 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus WordParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus WordParser::parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
   	endCharacter += trim(inputProgram);
 
 	std::string errorMessage = "Declare variable names with 'var variable_name : type = expression'";
 
 	if (inputProgram.size() == 0) {
-		return super::parse(inputProgram, endCharacter);
+		return super::fail(inputProgram, endCharacter);
 	}
 
 	SingleVarCharParser charParser;
