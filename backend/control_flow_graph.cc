@@ -10,7 +10,7 @@ ControlFlowGraph::ControlFlowGraph
 
 //Use Recursion to find all the edges in the graph
 ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_set, 
-  std::vector<Edge> edge_graph) {
+  std::vector<Edge> &edge_graph) {
   if (graph_set.empty()) {    
     //If this occurs then there's a bigger problem
     std::vector<std::unique_ptr<struct ThreeAddressCode>> empty;
@@ -154,24 +154,59 @@ void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddress
   //cfg_nodes_ = std::move(cfg_vector);
 }
 
-std::pair<bool, std::vector<std::unique_ptr<struct ThreeAddressCode>>> Mark(
-  std::vector<std::unique_ptr<struct ThreeAddressCode>> block) {
+std::vector<std::unique_ptr<struct ThreeAddressCode>> MarkSweep(
+  std::vector<std::string> &live_set,
+  ControlFlowGraphNode * apply_sweep) {
 
 }
 
-std::vector<std::unique_ptr<struct ThreeAddressCode>> Sweep(
-  std::pair<bool,std::vector<std::unique_ptr<struct ThreeAddressCode>>> marked_block) {
+std::vector<std::string> RecursiveFindPath (
+  std::vector<ControlFlowGraphNode *> passed_tac,
+  std::vector<Edge> edges, std::vector<std::string> live_set,
+   ControlFlowGraphNode * optimize_node) {
+    //Optimize the local block
+    int node_number = optimize_node->GetCreationOrder();
+    optimize_node->SetLocalBlock(std::move(MarkSweep(live_set, optimize_node)));
+    EdgeType edge1 = TYPELESS_EDGE;
+    EdgeType edge2 = TYPELESS_EDGE;
+    for (Edge iter : edges) {
+      if(iter.edge_pair.second == node_number) {
+        if(edge1 = TYPELESS_EDGE) {
+          edge1 = iter.edge_type;
+        }
+        else { 
+          edge2 = iter.edge_type;
+        }
+      }
+    }
+    if(edge1 == CONDITIONAL_FALSE_RETURN || edge1 == CONDITIONAL_TRUE_RETURN) {
+
+
+      
+    }
+
 
 }
+// std::vector<std::unique_ptr<struct ThreeAddressCode>> Sweep(
+//   std::pair<bool,std::vector<std::unique_ptr<struct ThreeAddressCode>>> marked_block) {
 
-std::vector<std::unique_ptr<ControlFlowGraphNode>> LocalOptimize(
+// }
+
+std::vector<std::unique_ptr<ControlFlowGraphNode>> OptimizeHelp(
   std::vector<std::unique_ptr<ControlFlowGraphNode>> cfg_node,
   std::vector<Edge> edges) {
-   return cfg_node;
+    std::vector<ControlFlowGraphNode *> cfg_pointer;
+    for (auto &iter: cfg_node) {
+      cfg_pointer.push_back(iter.get());
+    }
+    std::vector<std::string> live_set;
+    ControlFlowGraphNode * end = cfg_node.end()->get();
+    RecursiveFindPath(cfg_pointer,edges,live_set, end);
+    return cfg_node;
  }
 
 void ControlFlowGraph::Optimize() {
-  cfg_nodes_ = std::move(LocalOptimize(std::move(cfg_nodes_),edges_));
+  cfg_nodes_ = std::move(OptimizeHelp(std::move(cfg_nodes_),edges_));
 }
 
 std::vector<std::unique_ptr<struct ThreeAddressCode>> ControlFlowGraph::MakeThreeAddressCode() {

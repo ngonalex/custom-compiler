@@ -44,7 +44,7 @@ class ControlFlowGraphNode {
   std::vector<std::unique_ptr<struct ThreeAddressCode>> GetLocalBlock() {
    //return std::move(localblock_);
     std::vector<std::unique_ptr<struct ThreeAddressCode>> local_block_copy;
-    for (const auto& iter: localblock_) {
+    for (auto& iter: localblock_) {
       auto block = make_unique<struct ThreeAddressCode>();
       block->target = iter->target;
       block->op = iter->op;
@@ -65,8 +65,6 @@ class ControlFlowGraphNode {
   ControlFlowGraphNode& operator=(ControlFlowGraphNode &copy);
   ControlFlowGraphNode operator=(ControlFlowGraphNode copy);
   void SetLocalBlock(std::vector<std::unique_ptr<struct ThreeAddressCode>>);
-  void SetLeftNode(std::unique_ptr<ControlFlowGraphNode>);
-  void SetRightNode(std::unique_ptr<ControlFlowGraphNode>);
   void SetCreationOrder(int order) {
     creation_order = order;
   }
