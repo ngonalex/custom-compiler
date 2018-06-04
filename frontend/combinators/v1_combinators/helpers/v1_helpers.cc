@@ -4,6 +4,7 @@
 
 #include <string>     // std::string, std::stoi
 #include <iostream>
+#include <utility>   // std::pair, std::make_pair
 
 #define super NullParser
 
@@ -15,11 +16,12 @@ using namespace std;
 ParseStatus CloseParenParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
+	
 	// Check in the cache if the character cuont parsestatus already exists, return that parsestatus if it does
 	auto search = cache.find(startCharacter);
 	if(search != cache.end()) {
-		ParseStatus* a = search->second;
-		return *a;
+		ParseStatus a = search->second;
+		return a;
 	} else {
 		std::string errorMessage = "Expecting close parenthesis";
 
@@ -31,7 +33,9 @@ ParseStatus CloseParenParser::parse(std::string inputProgram, int startCharacter
 		ParseStatus result = atomParser.parse(inputProgram, endCharacter);
 
 		// append to cache startCharacter and ParseStatus
-		cache.insert(std::make_pair<int, ParseStatus>(startCharacter, &result));
+		std::pair <int, ParseStatus> cache_pair;
+		cache_pair = std::make_pair (startCharacter, &result);
+		cache.insert(cache_pair);
 
 		return result;
 	}

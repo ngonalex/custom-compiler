@@ -9,10 +9,25 @@ namespace frontend {
 
 class NullParser {
  public:
-  virtual ParseStatus parse(std::string inputProgram,
+  ParseStatus parse(std::string inputProgram,
   				int startCharacter,
 			    std::string errorType = "");
+
+	ResultStatus fail(msg, pos)
 };
+
+// class ForwardParser {
+// 	public:
+// 	ParseStatus do_parse()
+
+// 	setParser(Parser* p)
+
+// 	unique_ptr<Parser> p_;
+// };
+
+// auto mul = new ForwardParser()
+
+// mul.setParser(mulConcrete)
 
 }  // namespace frontend
 }  // namespace cs160
