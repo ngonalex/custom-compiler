@@ -6,8 +6,7 @@
 using namespace cs160::frontend;
 
 ParseStatus OrCombinator::parse(std::string inputProgram,
-				int startCharacter,
-				std::string errorType) {
+				int startCharacter) {
   ParseStatus firstStatus = firstParser->parse(inputProgram, startCharacter);
   if (firstStatus.status) {
     return firstStatus;
