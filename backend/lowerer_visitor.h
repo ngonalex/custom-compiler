@@ -40,8 +40,8 @@ using cs160::abstract_syntax::backend::Conditional;
 using cs160::abstract_syntax::backend::FunctionCall;
 using cs160::abstract_syntax::backend::FunctionDef;
 using cs160::abstract_syntax::backend::Dereference;
-using cs160::abstract_syntax::version_5::AssignmentFromArithExp;
-using cs160::abstract_syntax::version_5::AssignmentFromNewTuple;
+using cs160::abstract_syntax::backend::AssignmentFromArithExp;
+using cs160::abstract_syntax::backend::AssignmentFromNewTuple;
 using cs160::make_unique;
 
 namespace cs160 {
@@ -58,7 +58,7 @@ enum ChildType {
 class LowererVisitor : public AstVisitor {
  public:
   LowererVisitor() : counter_(), currvariabletype_(RIGHTHANDVAR),
-    currdereferencetype_(RHSINTDEREFERENCE) {}
+    currdereferencetype_(RHSDEREFERENCE) {}
 
   std::string GetOutput();
 
@@ -109,7 +109,6 @@ class LowererVisitor : public AstVisitor {
     int indexofchild);
   void CreateTupleAssignment(std::string target, Operand operand);
   void CreateArithmeticAssignment(std::string target, Operand operand);
-  void CreateRHSINTDEREFERENCEAssignment(std::string target, Operand operand);
 
   // Helpers
   std::string GetOutputArithmeticHelper(std::string output, int index,

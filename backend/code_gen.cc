@@ -881,7 +881,7 @@ void CodeGen::Generate(
         }
 
         break;
-      case RHSINTDEREFERENCE:  // Needs to handle functions
+      case RHSDEREFERENCE:  // Needs to handle functions
         parsedstring = DereferenceParserHelper(code->target.reg().name());
         outfile_ << "\t#Dereference of variable "
             << code->target.reg().name() << std::endl;

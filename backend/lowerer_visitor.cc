@@ -168,7 +168,7 @@ void LowererVisitor::VisitAssignmentFromNewTuple(
   currvariabletype_ = LEFTHANDVAR;
   currdereferencetype_ = LHSDEREFERENCE;
   assignment.lhs().Visit(const_cast<LowererVisitor*>(this));
-  currdereferencetype_ = RHSINTDEREFERENCE;
+  currdereferencetype_ = RHSDEREFERENCE;
   currvariabletype_ = RIGHTHANDVAR;
 
   std::string lhstarget;
@@ -207,7 +207,7 @@ void LowererVisitor::VisitAssignmentFromArithExp(
   currvariabletype_ = LEFTHANDVAR;
   currdereferencetype_ = LHSDEREFERENCE;
   assignment.lhs().Visit(const_cast<LowererVisitor*>(this));
-  currdereferencetype_ = RHSINTDEREFERENCE;
+  currdereferencetype_ = RHSDEREFERENCE;
   currvariabletype_ = RIGHTHANDVAR;
 
   std::string lhstarget;
