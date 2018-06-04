@@ -23,9 +23,6 @@ ParseStatus ZeroOrMoreCombinator::parse(std::string inputProgram,
       if (status2.ast != NULL) {
 	pStatus.astNodes.push_back(std::move(status2.ast));
       }
-    } else {
-      pStatus.status = false;
-      pStatus.errorType = status2.errorType;
     }
   }
 

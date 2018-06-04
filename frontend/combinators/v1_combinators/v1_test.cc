@@ -259,7 +259,7 @@ TEST(Combinators, SimpleNumTerm) {
   TermExprParser test;
   ParseStatus result = test.parse("101281510abasdf", 0);
 
-   // Traversing the AST created from the number
+  // Traversing the AST created from the number
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
@@ -276,7 +276,7 @@ TEST(Combinators, SimplyAddition) {
   AddSubExprParser test;
   ParseStatus result = test.parse("5+77", 0);
 
- // Traversing the AST created from the number
+  // Traversing the AST created from the number
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
@@ -291,7 +291,7 @@ TEST(Combinators, SimplyAddition) {
 
 TEST(Combinators, SimpleMul) {
   MulDivExprParser test;
-  ParseStatus result = test.parse("225*335", 0 );
+  ParseStatus result = test.parse("225*335", 0);
 
   // Traversing the AST created from the number
   PrintVisitor *a = new PrintVisitor();
@@ -332,7 +332,6 @@ TEST(Combinators, NegativeNumber) {
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
-
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
@@ -410,7 +409,7 @@ TEST(Combinators, AeWithMinusMinus) {
   EXPECT_EQ(result.endCharacter, 5);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "7--1;");
-  EXPECT_EQ( output, "(7 - (0 - 1))");
+  EXPECT_EQ(output, "(7 - (0 - 1))");
 }
 
 TEST(Combinators, AeWithPlusPlus) {
@@ -427,7 +426,7 @@ TEST(Combinators, AeWithPlusPlus) {
   EXPECT_EQ(result.endCharacter, 6);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "3+4+5;");
-  EXPECT_EQ( output, "((3 + 4) + 5)");
+  EXPECT_EQ(output, "((3 + 4) + 5)");
 }
 
 TEST(Combinators, ComplicatedAe) {
@@ -444,11 +443,10 @@ TEST(Combinators, ComplicatedAe) {
   EXPECT_EQ(result.endCharacter, 26);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "7*10+9/3+16-8*2*3-77+12*1;");
-  EXPECT_EQ( output,
-    "((((((7 * 10) + (9 / 3)) + 16) - ((8 * 2) * 3)) - 77) + (12 * 1))");
+  EXPECT_EQ(
+      output,
+      "((((((7 * 10) + (9 / 3)) + 16) - ((8 * 2) * 3)) - 77) + (12 * 1))");
 }
-
-
 
 TEST(Combinators, NegComplicatedAe) {
   ArithExprParser test;
@@ -461,9 +459,9 @@ TEST(Combinators, NegComplicatedAe) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "");
-    EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 29);
   EXPECT_EQ(output,
-	    "(0 - ((((((7 * 10) + (9 / 3)) + 16) - ((8 * 2) * 3)) - 77) + (12 "
-	    "* 1)))");
+            "(0 - ((((((7 * 10) + (9 / 3)) + 16) - ((8 * 2) * 3)) - 77) + (12 "
+            "* 1)))");
 }

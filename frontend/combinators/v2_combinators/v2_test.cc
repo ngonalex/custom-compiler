@@ -222,285 +222,271 @@ TEST(WordParserCombinator, failEqualSignParser1) {
   EXPECT_EQ(result.endCharacter, 0);
   EXPECT_EQ(result.errorType, "Missing equal sign");
 }
-/*
+
 // Success Case VariableParser
 TEST(VariableParserCombinator, successVariableParser1) {
-  VariableParser parser;
-  ParseStatus result;
-  result.status = true;
-  result.remainingCharacters = "";
-  result.parsedCharacters = "var _victor : Integer;";
-
-  ParseStatus testResult = parser.parse(" var _victor : Integer;");
+  VariableParser test;
+  ParseStatus result = test.parse(" var _victor : Integer;", 0);
 
   // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
-  testResult.ast->Visit(a);
+  result.ast->Visit(a);
   std::string output = a->GetOutput();
 
-  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 1);
+  EXPECT_EQ(result.endCharacter, 23);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "var_victor:Integer;");
   EXPECT_EQ(output, "_victor");
 }
+
 
 // Success Case VariableParser
 TEST(VariableParserCombinator, successVariableParser2) {
-  VariableParser parser;
-  ParseStatus result;
-  result.status = true;
-  result.remainingCharacters = "";
-  result.parsedCharacters = "var _victor : Integer;";
-
-  ParseStatus testResult = parser.parse(" var    _victor :   Integer;");
+  VariableParser test;
+  ParseStatus result = test.parse(" var    _victor :   Integer;", 0);
 
   // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
-  testResult.ast->Visit(a);
+  result.ast->Visit(a);
   std::string output = a->GetOutput();
 
-  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 1);
+  EXPECT_EQ(result.endCharacter, 28);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "var_victor:Integer;");
   EXPECT_EQ(output, "_victor");
 }
 
+
 // Fail Case VariableParser
 TEST(VariableParserCombinator, failVariableParser1) {
-  VariableParser parser;
-  ParseStatus result;
-  result.status = false;
+  VariableParser test;
+  ParseStatus result = test.parse("_victor:Integer;", 0);
 
-  ParseStatus testResult = parser.parse("_victor:Integer;");
-
-  EXPECT_EQ(testResult, result);
-  EXPECT_EQ(testResult.errorType, "Start variable declaration with var");
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 0);
+  EXPECT_EQ(result.errorType, "Start variable declaration with var");
 }
 
 // Fail Case VariableParser
 TEST(VariableParserCombinator, failVariableParser2) {
-  VariableParser parser;
-  ParseStatus result;
-  result.status = false;
+   VariableParser test;
+  ParseStatus result = test.parse("var _victor : ;", 10);
 
-  ParseStatus testResult = parser.parse("var _victor : ;");
-
-  EXPECT_EQ(testResult, result);
-  EXPECT_EQ(testResult.errorType, "Incorrect type in variable declaration");
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 10);
+  EXPECT_EQ(result.endCharacter, 10);
+  EXPECT_EQ(result.errorType, "Incorrect type in variable declaration");
 }
 
 // Fail Case VariableParser
 TEST(VariableParserCombinator, failVariableParser3) {
-  VariableParser parser;
-  ParseStatus result;
-  result.status = false;
+  VariableParser test;
+  ParseStatus result = test.parse(" Var _victor Integer", 10);
 
-  ParseStatus testResult = parser.parse("Var _victor Integer");
-
-  EXPECT_EQ(testResult, result);
-  EXPECT_EQ(testResult.errorType, "Start variable declaration with var");
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 11);
+  EXPECT_EQ(result.endCharacter, 11);
+  EXPECT_EQ(result.errorType, "Start variable declaration with var");
 }
 
 // Fail Case VariableParser
 TEST(VariableParserCombinator, failVariableParser4) {
-  VariableParser parser;
-  ParseStatus result;
-  result.status = false;
+  VariableParser test;
+  ParseStatus result = test.parse("var 1victor : Integer", 10);
 
-  ParseStatus testResult = parser.parse("var 1victor : Integer");
-
-  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 10);
+  EXPECT_EQ(result.endCharacter, 10);
   EXPECT_EQ(
-      testResult.errorType,
+      result.errorType,
       "Declare variable names with 'var variable_name : type = expression'");
 }
 
 // Fail Case VariableParser : colon missing
 TEST(VariableParserCombinator, failVariableParser5) {
-  VariableParser parser;
-  ParseStatus result;
-  result.status = false;
+  VariableParser test;
+  ParseStatus result = test.parse(" var _victor Integer", 10);
 
-  ParseStatus testResult = parser.parse(" var _victor Integer");
-
-  EXPECT_EQ(testResult, result);
-  // TODO FIX
-  // EXPECT_EQ(testResult.errorType, )
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 11);
+  EXPECT_EQ(result.endCharacter, 11);
+  EXPECT_EQ(result.errorType, "Missing colon");
 }
 
 // Fail Case Missing semicolon
 TEST(WordParserCombinator, failVariableParser6) {
-  VariableParser parser;
-  ParseStatus result;
-  result.status = false;
+  VariableParser test;
+  ParseStatus result = test.parse(" var _victor : Integer", 10);
 
-  ParseStatus testResult = parser.parse(" var _victor : Integer");
-
-  EXPECT_EQ(testResult, result);
-  EXPECT_EQ(testResult.errorType, "Missing semicolon");
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 11);
+  EXPECT_EQ(result.endCharacter, 11);
+  EXPECT_EQ(result.errorType, "Expecting ;");
 }
 
 // Success Case VariableParser
 TEST(AssignmentParserCombinator, successAssignmentParser1) {
-  AssignmentParser parser;
-  ParseStatus result;
-  result.status = true;
-  result.remainingCharacters = "";
-  result.parsedCharacters = "var _victor : Integer = 490;";
-
-  ParseStatus testResult = parser.parse("var _victor : Integer = 490;");
+  AssignmentParser test;
+  ParseStatus result = test.parse("var _victor : Integer = 490;", 0);
 
   // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
-  testResult.ast->Visit(a);
+  result.ast->Visit(a);
   std::string output = a->GetOutput();
 
-  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 28);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "var_victor:Integer=490;");
   EXPECT_EQ(output, "_victor = 490");
 }
 
 // Success Case VariableParser
 TEST(AssignmentParserCombinator, successAssignmentParser2) {
-  AssignmentParser parser;
-  ParseStatus result;
-  result.status = true;
-  result.remainingCharacters = "";
-  result.parsedCharacters = "victor = 490;";
-
-  ParseStatus testResult = parser.parse(" victor = 490;");
+  AssignmentParser test;
+  ParseStatus result = test.parse(" victor = 490;", 0);
 
   // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
-  testResult.ast->Visit(a);
+  result.ast->Visit(a);
   std::string output = a->GetOutput();
 
-  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 1);
+  EXPECT_EQ(result.endCharacter, 14);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "victor=490;");
   EXPECT_EQ(output, "victor = 490");
 }
 
 // Success Case VariableParser
 TEST(AssignmentParserCombinator, successAssignmentParser3) {
-  AssignmentParser parser;
-  ParseStatus result;
-  result.status = true;
-  result.remainingCharacters = "";
-  result.parsedCharacters = "victor = (123*1+3901-2);";
-
-  ParseStatus testResult = parser.parse(" victor = (123 * 1 + 3901 - 2);");
+  AssignmentParser test;
+  ParseStatus result = test.parse(" victor = (123 * 1 + 3901 - 2);", 0);
 
   // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
-  testResult.ast->Visit(a);
+  result.ast->Visit(a);
   std::string output = a->GetOutput();
 
-  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 1);
+  EXPECT_EQ(result.endCharacter, 31);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "victor=(123*1+3901-2);");
   EXPECT_EQ(output, "victor = (((123 * 1) + 3901) - 2)");
 }
 
 // Fail Case VariableParser
 TEST(AssignmentParserCombinator, failAssignmentParser1) {
-  AssignmentParser parser;
-  ParseStatus result;
-  result.status = false;
+  AssignmentParser test;
+  ParseStatus result = test.parse("_victor = ;", 10);
 
-  ParseStatus testResult = parser.parse("_victor = ;");
-
-  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 10);
+  EXPECT_EQ(result.endCharacter, 10);
+  EXPECT_EQ(result.errorType, "Missing arithmetic expression"); // Start of arithmetic expression
 }
 
 // Fail Case VariableParser
 TEST(AssignmentParserCombinator, failAssignmentParser2) {
-  AssignmentParser parser;
-  ParseStatus result;
-  result.status = false;
+    AssignmentParser test;
+  ParseStatus result = test.parse("1victor = (123 * 1 + 3901 - 2);", 10);
 
-  ParseStatus testResult = parser.parse("1victor = (123 * 1 + 3901 - 2);");
-
-  EXPECT_EQ(testResult, result);
-  EXPECT_EQ(
-      testResult.errorType,
-      "Declare variable names with 'var variable_name : type = expression'");
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 10);
+  EXPECT_EQ(result.endCharacter, 10);
+ EXPECT_EQ(result.errorType,
+      "Declare variable names with 'var variable_name : type = expression' or Start variable declaration with var");
 }
 
 // Fail Case VariableParser : missing equal sign
 TEST(AssignmentParserCombinator, failAssignmentParser3) {
-  AssignmentParser parser;
-  ParseStatus result;
-  result.status = false;
+  AssignmentParser test;
+  ParseStatus result = test.parse("victor", 10);
 
-  ParseStatus testResult = parser.parse("victor");
-
-  EXPECT_EQ(testResult, result);
-  EXPECT_EQ(testResult.errorType, "Missing equal sign");
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 10);
+  EXPECT_EQ(result.endCharacter, 10);
+  EXPECT_EQ(result.errorType, "Missing equal sign");
 }
 
 // Fail Case VariableParser : missing equal sign
 TEST(AssignmentParserCombinator, failAssignmentParser4) {
-  AssignmentParser parser;
-  ParseStatus result;
-  result.status = false;
+  AssignmentParser test;
+  ParseStatus result = test.parse("138 + 3; victor", 10);
 
-  ParseStatus testResult = parser.parse("138 + 3; victor");
-
-  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 10);
+  EXPECT_EQ(result.endCharacter, 10);
+  EXPECT_EQ(result.errorType,
+      "Declare variable names with 'var variable_name : type = expression' or Start variable declaration with var");
 }
+
 
 TEST(BinaryOperatorExpr, successBinaryOperatorExpr1) {
   ArithExprParser parser;
-  ParseStatus result;
-  result.status = true;
-  result.remainingCharacters = "";
-  result.parsedCharacters = "(victor+490)-_foo+3;";
 
-  ParseStatus testResult = parser.parse(" (victor + 490) - _foo + 3;");
+  ParseStatus result = parser.parse(" (victor + 490) - _foo + 3;", 0);
 
   // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
-  testResult.ast->Visit(a);
+  result.ast->Visit(a);
   std::string output = a->GetOutput();
 
-  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 1);
+  EXPECT_EQ(result.endCharacter, 24);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "(victor+490)-_foo+3;");
   EXPECT_EQ(output, "(((victor + 490) - _foo) + 3)");
+
 }
 
 // Success Case ProgramParser
 TEST(AssignmentParserCombinator, successProgramParser1) {
-  ProgramParser parser;
-  ParseStatus result;
-  result.status = true;
-  result.remainingCharacters = "";
-  result.parsedCharacters = "victor = (123*1+3901-2);j = 4; j+victor;";
-
-  ParseStatus testResult =
-      parser.parse(" victor = (123 * 1 + 3901 - 2); j = 4; j+victor;");
+  ProgramParser test;
+  ParseStatus result = test.parse(" victor = (123 * 1 + 3901 - 2); j = 4; j+victor;", 0);
 
   // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
-  testResult.ast->Visit(a);
+  result.ast->Visit(a);
   std::string output = a->GetOutput();
 
-  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 1);
+  EXPECT_EQ(result.endCharacter, 48);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "victor=(123*1+3901-2);j=4;j+victor;");
   EXPECT_EQ(output, "victor = (((123 * 1) + 3901) - 2); j = 4; (j + victor)");
 }
 
 // Fail Case ProgramParser
 TEST(AssignmentParserCombinator, failProgramParser1) {
-  ProgramParser parser;
-  ParseStatus result;
-  result.status = false;
-  // result.errorType = "Incorrect type in variable declaration";
+  ProgramParser test;
+  ParseStatus result = test.parse("x = ; x + 2;", 10);
 
-  ParseStatus testResult = parser.parse("x = ; x + 2;");
-
-  EXPECT_EQ(testResult.status, result.status);
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 10);
+  EXPECT_EQ(result.endCharacter, 10);
+  EXPECT_EQ(result.errorType, "Missing arithmetic expression");
 }
 
 // Fail Case ProgramParser
 TEST(AssignmentParserCombinator, failProgramParser2) {
-  ProgramParser parser;
-  ParseStatus result;
-  result.status = false;
-  // result.errorType = "Incorrect type in variable declaration";
+  ProgramParser test;
+  ParseStatus result = test.parse("x = 3; x + 2", 10);
 
-  ParseStatus testResult = parser.parse("x = 3; x + 2");
-
-  EXPECT_EQ(testResult.status, result.status);
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 10);
+  EXPECT_EQ(result.endCharacter, 10);
+  EXPECT_EQ(result.errorType, "Missing arithmetic expression");
 }
 
-*/
+

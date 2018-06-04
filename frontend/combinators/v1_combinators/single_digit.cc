@@ -4,8 +4,9 @@
 
 using namespace cs160::frontend;
 
-ParseStatus SingleDigitParser::parse(std::string inputProgram, int startCharacter,
-				     std::string errorType) {
+ParseStatus SingleDigitParser::parse(std::string inputProgram,
+                                     int startCharacter,
+                                     std::string errorType) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
   std::string errorMessage = "Digit should be between 0 and 9";

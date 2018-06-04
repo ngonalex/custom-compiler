@@ -9,10 +9,11 @@ namespace frontend {
 
 class AssignmentParser : NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, int startCharacter, std::string errorType = "");
+  virtual ParseStatus parse(std::string inputProgram, int startCharacter,
+                            std::string errorType = "");
 };
 
-} // namespace frontend
-} // namespace cs160
+}  // namespace frontend
+}  // namespace cs160
 
-#endif // ASSIGNMENT_PARSER_H_
+#endif  // ASSIGNMENT_PARSER_H_

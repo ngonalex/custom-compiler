@@ -4,10 +4,10 @@
 
 using namespace cs160::frontend;
 
-ParseStatus SingleCharParser::parse(std::string inputProgram, int startCharacter,
-				    std::string errorType) {
+ParseStatus SingleCharParser::parse(std::string inputProgram,
+                                    int startCharacter, std::string errorType) {
   int endCharacter = startCharacter;
-  endCharacter += trim(inputProgram); 
+  endCharacter += trim(inputProgram);
   std::string errorMessage = "Char should only have alphabetical character";
 
   if (inputProgram.size() == 0) {
@@ -28,8 +28,9 @@ ParseStatus SingleCharParser::parse(std::string inputProgram, int startCharacter
   return status;
 }
 
-ParseStatus SingleVarCharParser::parse(std::string inputProgram, int startCharacter,
-				       std::string errorType) {
+ParseStatus SingleVarCharParser::parse(std::string inputProgram,
+                                       int startCharacter,
+                                       std::string errorType) {
   std::string errorMessage = "Char should be alphabetical or underscore";
 
   int endCharacter = startCharacter;

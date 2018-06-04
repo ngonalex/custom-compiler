@@ -9,10 +9,11 @@ namespace frontend {
 
 class VariableParser : NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, int startCharacter, std::string errorType = "");
+  virtual ParseStatus parse(std::string inputProgram, int startCharacter,
+                            std::string errorType = "");
 };
 
-} // namespace frontend
-} // namespace cs160
+}  // namespace frontend
+}  // namespace cs160
 
-#endif // VARIABLE_PARSER_H_
+#endif  // VARIABLE_PARSER_H_
