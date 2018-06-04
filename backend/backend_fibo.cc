@@ -33,6 +33,14 @@ using cs160::backend::ThreeAddressCode;
 using cs160::backend::CodeGen;
 using cs160::make_unique;
 
+/* 
+fibo(int n)
+  if (n == 1 || n == 2)
+    return 1
+  else
+    return fibo_recur(n-1) + fibo_recur(n-2)
+*/
+
 std::string exec(const char* cmd) {
     std::array<char, 128> buffer;
     std::string result;

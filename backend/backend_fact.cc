@@ -33,6 +33,19 @@ using cs160::backend::ThreeAddressCode;
 using cs160::backend::CodeGen;
 using cs160::make_unique;
 
+
+/*
+fact(int bob)
+  if(bob >1)
+    bobMoney = fact(bob-1)
+    ret_val = bobMoney * bob
+  else
+    ret_value = 1
+  return ret_value
+
+*/
+
+
 std::string exec(const char* cmd) {
     std::array<char, 128> buffer;
     std::string result;
@@ -50,7 +63,7 @@ int main() {
   Statement::Block statements;
   auto expr = make_unique<DivideExpr>(
     make_unique<IntegerExpr>(7), make_unique<IntegerExpr>(5));
-
+ 
   statements.push_back(std::move(
       make_unique<const Assignment>(make_unique<const VariableExpr>("bob"),
                                     make_unique<const IntegerExpr>(10))));
