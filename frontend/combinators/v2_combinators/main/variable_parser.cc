@@ -3,12 +3,12 @@
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
 #include "frontend/combinators/v1_combinators/term_expr.h"
 #include "frontend/combinators/v1_combinators/helpers/v1_helpers.h"
-
+#include "frontend/combinators/basic_combinators/and_combinator.h"
 
 #include <string> // std::string, std::stoi
 
 #define super NullParser
-/*
+
 using namespace cs160::frontend;
 using namespace std;
 
@@ -26,51 +26,24 @@ ParseStatus VariableParser::parse(std::string inputProgram, int startCharacter, 
   TypeParser typeParser;
   SemiColonParser semiColonP;
 
-  // Parse the first character
-  ParseStatus result = varParser.parse(inputProgram);
+  AndCombinator firstAnd;
+  firstAnd.firstParser = reinterpret_cast<NullParser *>(&varParser);
+  firstAnd.secondParser = reinterpret_cast<NullParser *>(&wordParser);
+  ParseStatus intermediateValue = firstAnd.parse(inputProgram, endCharacter); // Will be used in cache
+  AndCombinator secondAnd;
+  secondAnd.firstParser = reinterpret_cast<NullParser *>(&firstAnd);
+  secondAnd.secondParser = reinterpret_cast<NullParser *>(&colonParser);
+  AndCombinator thirdAnd;
+  thirdAnd.firstParser = reinterpret_cast<NullParser *>(&secondAnd);
+  thirdAnd.secondParser = reinterpret_cast<NullParser *>(&typeParser);
+  AndCombinator fourthAnd;
+  fourthAnd.firstParser = reinterpret_cast<NullParser *>(&thirdAnd);
+  fourthAnd.secondParser = reinterpret_cast<NullParser *>(&semiColonP);
+  ParseStatus result = fourthAnd.parse(inputProgram, endCharacter);
 
-  if (result.status) {
-    ParseStatus wordResult = wordParser.parse(result.remainingCharacters);
-    if (wordResult.status) {
-      result.parsedCharacters += (" " + wordResult.parsedCharacters);
-      result.remainingCharacters = wordResult.remainingCharacters;
-      ParseStatus colonStatus = colonParser.parse(result.remainingCharacters);
-
-      if (colonStatus.status) {
-        result.parsedCharacters += (" " + colonStatus.parsedCharacters);
-        result.remainingCharacters = colonStatus.remainingCharacters;
-        ParseStatus typeStatus =
-            typeParser.parse(result.remainingCharacters);
-        if (typeStatus.status) {
-          result.parsedCharacters += (" " + typeStatus.parsedCharacters);
-          result.remainingCharacters = typeStatus.remainingCharacters;
-
-          ParseStatus semiColonResult = semiColonP.parse(result.remainingCharacters);
-          result.status = semiColonResult.status;    
-          if(semiColonResult.status) {
-            result.remainingCharacters = semiColonResult.remainingCharacters;
-            result.parsedCharacters += semiColonResult.parsedCharacters;
-            result.ast = std::move(make_unique<const VariableExpr>(wordResult.parsedCharacters));
-          }
-          else {
-            result.errorType = semiColonResult.errorType; 
-          }
-				}
-				else {
-					result.status = typeStatus.status;
-					result.errorType = typeStatus.errorType; 
-				}
-      }
-			else {
-				result.status = colonStatus.status;
-				result.errorType = colonStatus.errorType;
-			}
-    }
-		else {
-			result.status = wordResult.status;
-			result.errorType = wordResult.errorType;
-		}
+  if(result.status) {
+    result.ast = std::move(intermediateValue.second_ast);
   }
 
   return result;
-}*/
+}
