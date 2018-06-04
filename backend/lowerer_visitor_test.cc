@@ -962,4 +962,24 @@ TEST_F(LowererTest, LoopWithBody) {
     " <-  FUNEPILOGUE \n");
 }
 
+TEST_F(LowererTest, SimpleTupleTest) {
+  auto ast = make_unique<AssignmentFromNewTuple>(make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3));
+  ast->Visit(&lowerer_);
+
+  EXPECT_EQ(lowerer_.GetOutput(), "bob <-  VARCHILDTUPLE \nt_0 <- 3\nbob <- t_0 NEWTUPLE \n");
+}
+
+
+TEST_F(LowererTest, AccessTupleTest) {
+  auto ast = make_unique<AssignmentFromNewTuple>(make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3));
+  
+  // x->1 = 2
+  auto def = make_unique<Dereference>(make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(1));
+  auto access = make_unique<AssignmentFromArithExp>(std::move(def), make_unique<IntegerExpr>(2));
+  ast->Visit(&lowerer_);
+  access->Visit(&lowerer_);
+
+  EXPECT_EQ(lowerer_.GetOutput(), "bob <-  VARCHILDTUPLE \nt_0 <- 3\nbob <- t_0 NEWTUPLE \nt_1 <- 1\nbob->t_1 <- bob LHSDEREFERENCE Parent\nt_2 <- 2\nbob->t_1 <- t_2\n");
+}
+
 // To do: Nested Branches + Nested Loops + LogicalNot

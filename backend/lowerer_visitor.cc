@@ -25,7 +25,7 @@ std::string LowererVisitor::GetOutput() {
     "==", "&&", "||", "¬", "while", "if", "jmp", "je", "jne", "jg", "jge",
     "jl", "jle", "MkLabel", "FUNCTIONCALL", "FUNRETURNEPILOGUE",
     "FUNCTIONDEF", "FUNPROLOGUE", "FUNEPILOGUE", "PRINTARITH", "NOTYPE",
-    "LHSDEREFERENCE", "RHSINTDEREFERENCE", "RHSTUPLEDEREFERENCE", "NEWTUPLE",
+    "LHSDEREFERENCE", "RHSDEREFERENCE", "NEWTUPLE",
     "VARCHILDTUPLE"};
 
   for (unsigned int i = 0; i < blocks_.size(); ++i) {
