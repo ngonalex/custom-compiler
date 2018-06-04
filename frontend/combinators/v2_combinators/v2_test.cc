@@ -328,26 +328,25 @@ TEST(WordParserCombinator, failVariableParser6) {
   EXPECT_EQ(result.endCharacter, 11);
   EXPECT_EQ(result.errorType, "Expecting ;");
 }
-/*
+
 // Success Case VariableParser
 TEST(AssignmentParserCombinator, successAssignmentParser1) {
-  AssignmentParser parser;
-  ParseStatus result;
-  result.status = true;
-  result.remainingCharacters = "";
-  result.parsedCharacters = "var _victor : Integer = 490;";
-
-  ParseStatus testResult = parser.parse("var _victor : Integer = 490;");
+  AssignmentParser test;
+  ParseStatus result = test.parse("var _victor : Integer = 490;", 0);
 
   // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
-  testResult.ast->Visit(a);
+  result.ast->Visit(a);
   std::string output = a->GetOutput();
 
-  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 28);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "var_victor:Integer=490;");
   EXPECT_EQ(output, "_victor = 490");
 }
-
+/*
 // Success Case VariableParser
 TEST(AssignmentParserCombinator, successAssignmentParser2) {
   AssignmentParser parser;

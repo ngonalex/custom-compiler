@@ -3,12 +3,13 @@
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
 #include "frontend/combinators/v2_combinators/main/word_parser.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
+#include "frontend/combinators/basic_combinators/and_combinator.h"
 
 #include <string> // std::string, std::stoi
 #include <stdio.h>
 
 #define super NullParser
-/*
+
 using namespace cs160::frontend;
 using namespace std;
 
@@ -35,21 +36,25 @@ ParseStatus AssignmentParser::parse(std::string inputProgram, int startCharacter
   firstAnd.firstParser = reinterpret_cast<NullParser *>(&varOrWord);
   firstAnd.secondParser = reinterpret_cast<NullParser *>(&equalSignParser);
 
+  ParseStatus firstResult = firstAnd.parse(inputProgram, endCharacter); // Will be used as cache result for second
+
   AndCombinator secondAnd;
   secondAnd.firstParser = reinterpret_cast<NullParser *>(&firstAnd);
   secondAnd.secondParser = reinterpret_cast<NullParser *>(&arithExprParser);
 
+  ParseStatus result = secondAnd.parse(inputProgram, endCharacter);
 
-  if(secondAnd.status) {
-    ParseStatus result::sucess(secondAnd.remainingCharacters, 
-      secondAnd.parsedCharacters, std::move(make_unique<const Assignment>(
+  if(result.status) {
+    result.ast = std::move(make_unique<const Assignment>(
+            unique_cast<const VariableExpr>(std::move(firstResult.ast)),
+            unique_cast<const ArithmeticExpr>(std::move(result.second_ast))));
+    /*
+    ParseStatus result::sucess(result.remainingCharacters, 
+      result.parsedCharacters, std::move(make_unique<const Assignment>(
             unique_cast<const VariableExpr>(std::move(varResult.ast)),
             unique_cast<const ArithmeticExpr>(std::move(termStatus.ast)))), 
-      secondAnd.characterStart);
-  }
-  else {
-    ParseStatus result::failure(secondAnd.errorType, secondAnd.characterStart);
+      result.characterStart);*/
   }
       
   return result;
-}*/
+}

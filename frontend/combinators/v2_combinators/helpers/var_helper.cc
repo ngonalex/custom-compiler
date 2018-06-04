@@ -99,7 +99,7 @@ ParseStatus EqualSignParser::parse(std::string inputProgram, int startCharacter,
 
 }
 
-/*
+
 ParseStatus HelperVariableParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
@@ -112,44 +112,22 @@ ParseStatus HelperVariableParser::parse(std::string inputProgram, int startChara
   WordParser wordParser;
   ColonParser colonParser;
   TypeParser typeParser;
-  SemiColonParser semiColonP;
 
-  // Parse the first character
-  ParseStatus result = varParser.parse(inputProgram);
+  AndCombinator firstAnd;
+  firstAnd.firstParser = reinterpret_cast<NullParser *>(&varParser);
+  firstAnd.secondParser = reinterpret_cast<NullParser *>(&wordParser);
+  ParseStatus intermediateValue = firstAnd.parse(inputProgram, endCharacter); // Will be used in cache
+  AndCombinator secondAnd;
+  secondAnd.firstParser = reinterpret_cast<NullParser *>(&firstAnd);
+  secondAnd.secondParser = reinterpret_cast<NullParser *>(&colonParser);
+  AndCombinator thirdAnd;
+  thirdAnd.firstParser = reinterpret_cast<NullParser *>(&secondAnd);
+  thirdAnd.secondParser = reinterpret_cast<NullParser *>(&typeParser);
+  ParseStatus result = thirdAnd.parse(inputProgram, endCharacter);
 
-  if (result.status) {
-    ParseStatus wordResult = wordParser.parse(result.remainingCharacters);
-    if (wordResult.status) {
-      result.parsedCharacters += (" " + wordResult.parsedCharacters);
-      result.remainingCharacters = wordResult.remainingCharacters;
-      ParseStatus colonStatus = colonParser.parse(result.remainingCharacters);
-
-      if (colonStatus.status) {
-        result.parsedCharacters += (" " + colonStatus.parsedCharacters);
-        result.remainingCharacters = colonStatus.remainingCharacters;
-        ParseStatus typeStatus =
-            typeParser.parse(result.remainingCharacters);
-        if (typeStatus.status) {
-          result.parsedCharacters += (" " + typeStatus.parsedCharacters);
-          result.remainingCharacters = typeStatus.remainingCharacters;
-          result.ast = std::move(make_unique<const VariableExpr>(wordResult.parsedCharacters));
-
-        }
-        else {
-          result.status = typeStatus.status;
-          result.errorType = typeStatus.errorType; 
-        }
-      }
-      else {
-        result.status = colonStatus.status;
-        result.errorType = colonStatus.errorType;
-      }
-    }
-    else {
-      result.status = wordResult.status;
-      result.errorType = wordResult.errorType;
-    }
+  if(result.status) {
+    result.ast = std::move(intermediateValue.second_ast);
   }
 
   return result;
-}*/
+}
