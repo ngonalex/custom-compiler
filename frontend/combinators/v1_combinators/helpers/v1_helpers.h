@@ -13,9 +13,6 @@ namespace frontend {
 class CloseParenParser : NullParser {
  public:
    virtual ParseStatus parse(std::string inputProgram, int startCharacter); 
- private:
-  std::map<int, ParseStatus> cache;
-
 };
 
 class OpenParenParser : NullParser {

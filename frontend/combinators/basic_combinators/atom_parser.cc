@@ -10,6 +10,7 @@ ParseStatus AtomParser::parse(std::string inputProgram, int startCharacter) {
   ParseStatus result; 
   // Failures
   if (inputProgram.size() == 0 || inputProgram[0] != char_to_parse) {
+    result.status = false;
     result.startCharacter = startCharacter;
     result.remainingCharacters = inputProgram;
     result.endCharacter = startCharacter;
