@@ -98,8 +98,8 @@ ParseStatus EqualSignParser::parse(std::string inputProgram, int startCharacter,
   return result;
 
 }
-/*
 
+/*
 ParseStatus HelperVariableParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);

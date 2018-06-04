@@ -34,7 +34,7 @@ ParseStatus WordParser::parse(std::string inputProgram, int startCharacter, std:
 
 	AndCombinator firstAnd;
 	firstAnd.firstParser = reinterpret_cast<NullParser *>(&charParser);
-	firstAnd.secondParser = reinterpret_cast<NullParser *>(&charOrDigit);
+	firstAnd.secondParser = reinterpret_cast<NullParser *>(&zeroOrMore);
 
 	ParseStatus result = firstAnd.parse(inputProgram, endCharacter);
 

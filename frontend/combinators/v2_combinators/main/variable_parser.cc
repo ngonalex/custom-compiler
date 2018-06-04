@@ -9,16 +9,15 @@
 
 #define super NullParser
 /*
-
 using namespace cs160::frontend;
 using namespace std;
 
 ParseStatus VariableParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
-    int endCharacter = startCharacter;
+  int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
   if (inputProgram.size() == 0) {
-    return super::parse(inputProgram);
+    return super::parse(inputProgram, endCharacter);
   }
 
   VarKeywordParser varParser;

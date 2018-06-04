@@ -11,118 +11,123 @@
 using namespace cs160::frontend;
 
 
-/*
 // Fail Case WordParser
 TEST(WordParserCombinator, failWordParser1) {
   WordParser wordParser;
-  ParseStatus result;
-  result.status = false;
-  result.remainingCharacters = "11fab";
+  ParseStatus result = wordParser.parse("11fab", 0);
 
-  ParseStatus testResult = wordParser.parse("11fab");
-
-  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 0);
+  EXPECT_EQ(result.errorType, "Declare variable names with 'var variable_name : type = expression'");
 }
 
 // Fail Case WordParser
 TEST(WordParserCombinator, failWordParser2) {
-  WordParser wordParser;
-  ParseStatus result;
-  result.status = false;
-  result.remainingCharacters = "()qam";
+ WordParser wordParser;
+  ParseStatus result = wordParser.parse("()qam", 0);
 
-  ParseStatus testResult = wordParser.parse("()qam");
-
-  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 0);
+  EXPECT_EQ(result.errorType, "Declare variable names with 'var variable_name : type = expression'");
 }
 
 // Fail Case WordParser
 TEST(WordParserCombinator, failWordParser4) {
-  WordParser wordParser;
-  ParseStatus result;
-  result.status = false;
-  result.remainingCharacters = "&&qam";
+   WordParser wordParser;
+  ParseStatus result = wordParser.parse("&&qam", 0);
 
-  ParseStatus testResult = wordParser.parse("&&qam");
-
-  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 0);
+  EXPECT_EQ(result.errorType, "Declare variable names with 'var variable_name : type = expression'");
 }
+
 // Fail Case WordParser
 TEST(WordParserCombinator, failWordParser5) {
   WordParser wordParser;
-  ParseStatus result;
-  result.status = false;
-  result.remainingCharacters = "%%qam";
+  ParseStatus result = wordParser.parse("%%qam", 0);
 
-  ParseStatus testResult = wordParser.parse("%%qam");
-
-  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 0);
+  EXPECT_EQ(result.errorType, "Declare variable names with 'var variable_name : type = expression'");
 }
 
 // Fail Case WordParser
 TEST(WordParserCombinator, failWordParser6) {
   WordParser wordParser;
-  ParseStatus result;
-  result.status = false;
-  result.remainingCharacters = "123victor";
+  ParseStatus result = wordParser.parse("123victor", 0);
 
-  ParseStatus testResult = wordParser.parse("123victor");
-
-  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 0);
+  EXPECT_EQ(result.errorType, "Declare variable names with 'var variable_name : type = expression'");
 }
 
 // Success Case WordParser
 TEST(WordParserCombinator, successWordParser1) {
   WordParser wordParser;
-  ParseStatus result;
-  result.status = true;
-  result.remainingCharacters = "";
-  result.parsedCharacters = "var";
+  ParseStatus result = wordParser.parse("var", 0);
 
-  ParseStatus testResult = wordParser.parse("var");
+    // Traversing the AST created from the variable name
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
 
-  EXPECT_EQ(testResult.remainingCharacters, result.remainingCharacters);
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 3);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "var");
+  EXPECT_EQ(output, "var");
+
 }
 
 // Success Case WordParser
 TEST(WordParserCombinator, successWordParser2) {
   WordParser wordParser;
-  ParseStatus result;
-  result.status = true;
-  result.remainingCharacters = "";
-  result.parsedCharacters = "var;35345345";
+  ParseStatus result = wordParser.parse("var;35345345", 0);
 
-  ParseStatus testResult = wordParser.parse("var;35345345");
+  // Traversing the AST created from the variable name
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
 
-  EXPECT_EQ(testResult.status, result.status);
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 3);
+  EXPECT_EQ(result.remainingCharacters, ";35345345");
+  EXPECT_EQ(result.parsedCharacters, "var");
+    EXPECT_EQ(output, "var");
 }
 
 // Success Case WordParser
 TEST(WordParserCombinator, successWordParser3) {
   WordParser wordParser;
-  ParseStatus result;
-  result.status = true;
-  result.remainingCharacters = "";
-  result.parsedCharacters = "_victor";
+  ParseStatus result = wordParser.parse("_victor", 0);
 
-  ParseStatus testResult = wordParser.parse("_victor");
-
-  // Traversing the AST created from the variable name
+    // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
-  testResult.ast->Visit(a);
+  result.ast->Visit(a);
   std::string output = a->GetOutput();
 
-  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 7);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "_victor");
   EXPECT_EQ(output, "_victor");
 }
 
 // Success Case trim in utility
 TEST(WordParserCombinator, trimTest) {
-  std::string result = "    var    ";
+  std::string result = "    var ";
   cs160::trim(result);
-  EXPECT_EQ(result, "var");
+  EXPECT_EQ(result, "var ");
 }
-*/
+
 
 // Success Case var_keyword_parser
 TEST(WordParserCombinator, successVarKeywordParser1) {
