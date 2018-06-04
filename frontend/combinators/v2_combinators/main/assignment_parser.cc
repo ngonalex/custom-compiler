@@ -48,12 +48,6 @@ ParseStatus AssignmentParser::parse(std::string inputProgram, int startCharacter
     result.ast = std::move(make_unique<const Assignment>(
             unique_cast<const VariableExpr>(std::move(firstResult.ast)),
             unique_cast<const ArithmeticExpr>(std::move(result.second_ast))));
-    /*
-    ParseStatus result::sucess(result.remainingCharacters, 
-      result.parsedCharacters, std::move(make_unique<const Assignment>(
-            unique_cast<const VariableExpr>(std::move(varResult.ast)),
-            unique_cast<const ArithmeticExpr>(std::move(termStatus.ast)))), 
-      result.characterStart);*/
   }
       
   return result;

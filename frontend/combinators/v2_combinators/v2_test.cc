@@ -429,25 +429,26 @@ TEST(AssignmentParserCombinator, failAssignmentParser4) {
       "Declare variable names with 'var variable_name : type = expression' or Start variable declaration with var");
 }
 
-/*
+
 TEST(BinaryOperatorExpr, successBinaryOperatorExpr1) {
   ArithExprParser parser;
-  ParseStatus result;
-  result.status = true;
-  result.remainingCharacters = "";
-  result.parsedCharacters = "(victor+490)-_foo+3;";
 
-  ParseStatus testResult = parser.parse(" (victor + 490) - _foo + 3;");
+  ParseStatus result = parser.parse(" (victor + 490) - _foo + 3;", 0);
 
   // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
-  testResult.ast->Visit(a);
+  result.ast->Visit(a);
   std::string output = a->GetOutput();
 
-  EXPECT_EQ(testResult, result);
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 1);
+  EXPECT_EQ(result.endCharacter, 24);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "(victor+490)-_foo+3;");
   EXPECT_EQ(output, "(((victor + 490) - _foo) + 3)");
-}
 
+}
+/*
 // Success Case ProgramParser
 TEST(AssignmentParserCombinator, successProgramParser1) {
   ProgramParser parser;

@@ -18,6 +18,7 @@ ParseStatus ArithExprParser::parse(std::string inputProgram, int startCharacter,
 				   std::string errorType) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
+
   if (inputProgram.size() == 0) {
     return super::parse(inputProgram, endCharacter);
   }
@@ -31,6 +32,7 @@ ParseStatus ArithExprParser::parse(std::string inputProgram, int startCharacter,
     if (semiColonResult.status) {
       aeParseResult.remainingCharacters = semiColonResult.remainingCharacters;
       aeParseResult.parsedCharacters += semiColonResult.parsedCharacters;
+      aeParseResult.startCharacter = endCharacter;
       aeParseResult.endCharacter = semiColonResult.endCharacter;
     } else {
       aeParseResult.errorType = semiColonResult.errorType;
