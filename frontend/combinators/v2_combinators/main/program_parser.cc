@@ -49,42 +49,5 @@ ParseStatus ProgramParser::parse(std::string inputProgram, int startCharacter, s
 
   return result;
 
-/*
-  ParseStatus result;
-
-  // Parse the assignments at the beginning
-  ParseStatus assignResult = zeroOrMore.parse(inputProgram, endCharacter);
-  result.status = assignResult.status;
-  if(result.status) {
-    result.parsedCharacters += assignResult.parsedCharacters;
-    result.remainingCharacters = assignResult.remainingCharacters;
-  }
-  else {
-    return assignResult;
-  }
-
-  // Parse the arithmetic expression
-  ParseStatus arithResult = arithExprParser.parse(result.remainingCharacters, zerOrMore.endCharacter);
-  if(arithResult.status) {
-    result.parsedCharacters += (" " + arithResult.parsedCharacters);
-    result.remainingCharacters = arithResult.remainingCharacters;
-    
-    
-    std::vector<std::unique_ptr<const Assignment>> temporaryAssign; 
-
-    for(auto i = assignResult.astNodes.begin(); i != assignResult.astNodes.end(); ++i) {
-      temporaryAssign.push_back(unique_cast<const Assignment>(std::move(*i)));
-    }
-
-    result.ast = make_unique<const Program>(std::move(temporaryAssign),
-    unique_cast<const ArithmeticExpr>(std::move(arithResult.ast)));
-    return result;
-  }
-  else {
-    // Cannot parse any arithmetic expressions
-    assignResult.status = arithResult.status;
-    assignResult.errorType = arithResult.errorType;
-    return assignResult;
-  }*/
 }
 
