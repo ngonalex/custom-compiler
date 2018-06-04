@@ -2,7 +2,7 @@
 cc_library(
 	name = "backend",
 	copts = ["-Wall -g"],
-	hdrs = ["lowerer_visitor.h","interpreter_visitor.h", "code_gen.h", "ir.h",
+	hdrs = ["lowerer_visitor.h", "code_gen.h", "ir.h",
     "helper_struct.h"],
   srcs = ["code_gen.cc","lowerer_visitor.cc"],
 	deps = ["//utility:utility",
@@ -15,7 +15,7 @@ cc_test(
 	name = "backend_test",
 	deps = ["@gtest//:main", ":backend"],
 	srcs = [
-		"lowerer_visitor_test.cc","interpreter_visitor_test.cc", "codegen_test.cc"
+		"lowerer_visitor_test.cc", "codegen_test.cc"
 	],
 	copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
 	timeout = "short",

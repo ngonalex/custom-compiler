@@ -9,8 +9,9 @@ struct Counter {
   int branchcount;
   int continuecount;
   int loopcount;
-  Counter()
-      : variablecount(0), branchcount(0), continuecount(0), loopcount(0) {}
+  int localvarcount;
+  Counter() : variablecount(0), branchcount(0),
+    continuecount(0), loopcount(0), localvarcount(0) {}
 };
 
 }  // namespace backend

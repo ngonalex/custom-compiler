@@ -1,10 +1,12 @@
 bazel-*
 .vscode
-.s
-.cfg
+*.s
+*.o
+*.cfg
 .DS_Store
 .idea/
 /team-influx
 .xcodeproj
-.code-workspace
-
+*.code-workspace
+*.txt
+a.out

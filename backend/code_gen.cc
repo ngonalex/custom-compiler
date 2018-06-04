@@ -18,15 +18,15 @@ namespace backend {
 // printy: (assembly code to print yascii here)
 // printy/x should contain a jmp/call instruction to "printstart"
 // defined in GeneratePrintHeader
-// so it just does it's job of printing INTs normally
+// so it just does its job of printing INTs normally
 
 // How it all links together (Unique printer described above) ->
-// call printstart: -> call intloop -> (Potentiall a jump to printnegative:)
+// call printstart: -> call intloop -> (Potentially a jump to printnegative:)
 // call printloop: -> call printnewline ->ret printloop: ... ret uniqueprinter
 // -> ret original place that called it (_start)
 // Basically this print routine should NOT affect the regular
 // assembly in anyway and is ONLY really meant for making
-// unit testing our assembly easier. Also Very crude implementation,
+// unit testing our assembly easier. Also crude implementation,
 // doesn't follow calling conventions at all , Refactor later
 // Note to self each function requires that rax has the value to be printed
 // It cannot be at the top of the stack until after the call to printstart
@@ -94,16 +94,21 @@ void CodeGen::GeneratePrinter() {
   outfile_ << "printresult:" << std::endl;
   outfile_ << "\t.ascii \"The result is equal to: \"" << std::endl;
 
+  // printfunctionresult
+  outfile_ << "printfunctionresult:" << std::endl;
+  outfile_ << "\t.ascii \"The function returned: \"" << std::endl;
+
   // printnewline
   outfile_ << "printnewline:" << std::endl;
   outfile_ << "\t.ascii \"\\n\"" << std::endl;
 
-  GenerateResult();
+  GeneratePrintResult();
+  GeneratePrintFunctionResult();
 
   // Generate Unique Printers here
   std::set<std::string>::iterator it;
   for (it = assignmentset_.begin(); it != assignmentset_.end(); ++it) {
-    GenerateAssignment(*it);
+    GeneratePrintAssignment(*it);
   }
 }
 
@@ -127,7 +132,7 @@ void CodeGen::GeneratePrintHeader() {
   outfile_ << "\tjmp intloop" << std::endl;
 }
 
-void CodeGen::GenerateAssignment(std::string variablename) {
+void CodeGen::GeneratePrintAssignment(std::string variablename) {
   outfile_ << "print" + variablename + ":" << std::endl;
   outfile_ << "\tpush %rax" << std::endl;
   outfile_ << "\tmov $1, %rax" << std::endl;
@@ -149,7 +154,24 @@ void CodeGen::GenerateAssignment(std::string variablename) {
            << std::endl;
 }
 
-void CodeGen::GenerateResult() {
+void CodeGen::GeneratePrintFunctionResult() {
+  // printfunctionresult
+  outfile_ << "printfunctionret:" << std::endl;
+  outfile_ << "\tpush %rax" << std::endl;
+
+  outfile_ << "\tmov $1, %rax" << std::endl;
+  outfile_ << "\tmov $1, %rdi" << std::endl;
+  outfile_ << "\tmov $printfunctionresult, %rsi" << std::endl;
+  outfile_ << "\tmov $23, %rdx" << std::endl;
+  outfile_ << "\tsyscall" << std::endl;
+
+  outfile_ << "\tpop %rax" << std::endl;
+
+  outfile_ << "\tjmp printstart" << std::endl;
+  outfile_ << "\tret" << std::endl;
+}
+
+void CodeGen::GeneratePrintResult() {
   outfile_ << "printarith:" << std::endl;
 
   outfile_ << "\tpush %rax" << std::endl;
@@ -176,7 +198,7 @@ void CodeGen::GenerateData(std::set<std::string> variableset) {
 }
 
 void CodeGen::GenerateEpilogue() {
-  outfile_ << "\tmov $60, %rax\n\txor %rdi, %rdi\n\tsyscall" << std::endl;
+  outfile_ << "\tmov $60, %rax\n\txor %rdi, %rdi\n\tsyscall\n" << std::endl;
 }
 
 void CodeGen::GenerateBoiler() {
@@ -190,29 +212,95 @@ void CodeGen::ClearRegister(std::string reg) {
 }
 
 void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
-  if (tac->arg1.optype() == INT) {
-    outfile_ << "\t# Loading in an integer" << std::endl;
-    outfile_ << "\tmov $" + std::to_string(tac->arg1.value()) + ", %rcx"
-             << std::endl;
-    outfile_ << "\tpush %rcx\n" << std::endl;
-  } else {
-    outfile_ << "\t# Loading a value into variable " + tac->target.reg().name()
-             << std::endl;
-    ClearRegister("rbx");
-    outfile_ << "\tpop %rbx" << std::endl;
-    outfile_ << "\tmov %rbx, " << tac->target.reg().name() << "" << std::endl;
-    outfile_ << "\tpush %rbx" << std::endl;
+  Type loadtype = tac->op.opcode();
+  int argumentnum;
+  std::string varname;
 
-    // Add it to the set, then call the print function
-    assignmentset_.insert(tac->target.reg().name());
-    outfile_ << "\tmov %rbx, %rax\n" << std::endl;
-    // Call on correct print function
-    outfile_ << "\t# Going to print " << tac->target.reg().name() << "\n"
-             << std::endl;
-    outfile_ << "\tcall print" + tac->target.reg().name() << std::endl;
-    outfile_ << "\n\t# Returning from printing " << tac->target.reg().name()
-             << "\n"
-             << std::endl;
+  switch (loadtype) {
+    case INTLOAD:
+      outfile_ << "\t# Loading in an integer" << std::endl;
+      outfile_ << "\tmov $" + std::to_string(tac->arg1.value())
+        + ", %rcx" << std::endl;
+      outfile_ << "\tpush %rcx\n" << std::endl;
+      break;
+    case VARLOAD:
+      outfile_ << "\t# Loading a variable" << std::endl;
+      outfile_ << "\tmov " + VariableNameHelper(tac->arg1.reg().name())
+        + ", %rcx" << std::endl;
+      outfile_ << "\tpush %rcx\n" << std::endl;
+      break;
+    case VARASSIGNLOAD:
+      if (symboltable_.count(tac->target.reg().name()) == 0) {
+        // Add it to the map if its new
+        symboltable_.insert(std::pair<std::string, int>(
+        tac->target.reg().name(), -8+-8*(symboltable_.size()+1)));
+      }
+      outfile_ << "\t# Loading a value into variable "
+        + tac->target.reg().name() << std::endl;
+      ClearRegister("rbx");
+      outfile_ << "\tpop %rbx" << std::endl;
+      outfile_ << "\tmov %rbx, "
+        << VariableNameHelper(tac->target.reg().name()) << "" << std::endl;
+
+      // This currently makes it work. IT SHOuLD NOT WORK
+      // outfile_ << "\tpush %rbx" << std::endl;
+
+      // Add it to the set, then call the print function
+      if (currscope_ == GLOBAL) {
+        assignmentset_.insert(tac->target.reg().name());
+        outfile_ << "\tmov %rbx, %rax\n" << std::endl;
+        // Call on correct print function
+        outfile_ << "\t# Going to print " << tac->target.reg().name()
+          << std::endl;
+        outfile_ << "\tcall print" + tac->target.reg().name() << std::endl;
+        outfile_ << "\t# Returning from printing "
+          << tac->target.reg().name() << std::endl;
+      }
+      outfile_ << std::endl;
+      break;
+    case FUNARGLOAD:
+      // Here we're moving arguments loaded into the stack before the
+      // function call and moving it to the local stack
+      argumentnum = tac->arg1.value()+1;
+      varname = tac->target.reg().name();
+      outfile_ << "\t# Moving argument " << std::to_string(argumentnum)
+        << " into the stack" << std::endl;
+      outfile_ << "\tmov " << std::to_string(8+argumentnum*8) << "(%rbp), %rax"
+        << std::endl;
+      outfile_ << "\tmov %rax, -" << std::to_string(8+argumentnum*8)
+        << "(%rbp)\n" << std::endl;
+      // Include it in the symbol table
+      if (symboltable_.count(varname) == 0) {
+        symboltable_.insert(std::pair<std::string, int>(varname,
+          -8+-8*argumentnum));
+      } else {
+        std::cerr << "FUNARGLOAD VARIABLE ASSIGNMENT PROBLEM\n";
+        exit(1);
+      }
+      break;
+    case FUNRETLOAD:
+      // All we do here is move the value from the function to the correct
+      // variable
+      if (symboltable_.count(tac->target.reg().name()) == 0) {
+        // Add it to the map then create a spot for it (if its a function)
+        symboltable_.insert(std::pair<std::string, int>(
+        tac->target.reg().name(), -8+-8*(symboltable_.size()+1)));
+
+        // Shouldn't need this anymore
+        // if (currscope_ == FUNCTION) {
+        //   outfile_ << "\t# Creating space for " << tac->target.reg().name()
+        //     << " on the stack" << std::endl;
+        //   outfile_ << "\tsub $8, %rsp" << std::endl;
+        //   outfile_ << "\tmov %rax, -" <<
+        //   std::to_string(8+symboltable_.size()*8) << "(%rbp)\n" << std::endl;
+        // }
+      }
+      outfile_ << "\t# Returning from function and loading value" << std::endl;
+      outfile_ << "\tmov %rax, " <<
+        VariableNameHelper(tac->target.reg().name()) << "\n" << std::endl;
+      break;
+    default:
+      break;
   }
 }
 
@@ -338,29 +426,51 @@ void CodeGen::GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
 void CodeGen::GenerateBinaryExprHelper(std::unique_ptr<ThreeAddressCode> tac) {
   // Shouldn't have to check it it's been assigned yet
   // Lowerer should have done that
-  RegisterType arg1type = tac->arg1.reg().type();
-  RegisterType arg2type = tac->arg2.reg().type();
+  // RegisterType arg1type = tac->arg1.reg().type();
+  // RegisterType arg2type = tac->arg2.reg().type();
 
-  if (arg1type == VARIABLEREG && arg2type == VARIABLEREG) {
-    // Do a double load from the variable names
-    outfile_ << " btwn two variables\n";
-    outfile_ << "\tmov " << tac->arg1.reg().name() << ", %rax" << std::endl;
-    outfile_ << "\tmov " << tac->arg2.reg().name() << ", %rbx" << std::endl;
-  } else if (arg1type == VARIABLEREG && arg2type == VIRTUALREG) {
-    // Load from the first variable
-    outfile_ << " btwn var,int\n";
-    outfile_ << "\tmov " << tac->arg1.reg().name() << ", %rax" << std::endl;
-    outfile_ << "\tpop %rbx" << std::endl;
-  } else if (arg1type == VIRTUALREG && arg2type == VARIABLEREG) {
-    // Load from the second variable
-    outfile_ << " btwn int, var\n";
-    outfile_ << "\tmov " << tac->arg2.reg().name() << ", %rbx" << std::endl;
-    outfile_ << "\tpop %rax" << std::endl;
+  // if ( arg1type == VARIABLEREG && arg2type == VARIABLEREG ) {
+  //   // Do a double load from the variable names
+  //   outfile_ << " btwn two variables\n";
+  //   outfile_ << "\tmov " << VariableNameHelper(tac->arg1.reg().name())
+  //     << ", %rax" << std::endl;
+  //   outfile_ << "\tmov " << VariableNameHelper(tac->arg2.reg().name())
+  //     << ", %rbx" << std::endl;
+  // } else if ( arg1type == VARIABLEREG && arg2type == VIRTUALREG ) {
+  //     // Load from the first variable
+  //     outfile_ << " btwn var,int\n";
+  //     outfile_ << "\tmov " << VariableNameHelper(tac->arg1.reg().name())
+  //       << ", %rax" << std::endl;
+  //     outfile_ << "\tpop %rbx" << std::endl;
+  // } else if ( arg1type == VIRTUALREG && arg2type == VARIABLEREG ) {
+  //     // Load from the second variable
+  //     outfile_ << " btwn int, var\n";
+  //     outfile_ << "\tmov " << VariableNameHelper(tac->arg2.reg().name())
+  //       << ", %rbx" << std::endl;
+  //     outfile_ << "\tpop %rax" << std::endl;
+  // } else {
+      // double pop from stack
+      outfile_ << " btwn int, int\n";
+      outfile_ << "\tpop %rbx" << std::endl;  // rbx = right
+      outfile_ << "\tpop %rax" << std::endl;  // rax = left
+  // }
+}
+
+std::string CodeGen::VariableNameHelper(std::string variablename) {
+  if (currscope_ == GLOBAL) {
+    return variablename;
   } else {
-    // double pop from stack
-    outfile_ << " btwn int, int\n";
-    outfile_ << "\tpop %rbx" << std::endl;  // rbx = right
-    outfile_ << "\tpop %rax" << std::endl;  // rax = left
+    // We're inside a function so consult the map
+    if (symboltable_.count(variablename) == 1) {
+      std::string mappedname = std::to_string(
+        symboltable_.find(variablename)->second) + "(%rbp)";
+      return mappedname;
+    } else {
+      // something bad happened
+      std::cerr << "Variable name helper could not find the mapping for "
+        << variablename <<" \n";
+      exit(1);
+    }
   }
 }
 
@@ -375,7 +485,19 @@ void CodeGen::Generate(
     Type opcode = code->op.opcode();
 
     switch (opcode) {
-      case LOAD:
+      case INTLOAD:
+        GenerateLoadInstructions(std::move(code));
+        break;
+      case VARLOAD:
+        GenerateLoadInstructions(std::move(code));
+        break;
+      case VARASSIGNLOAD:
+        GenerateLoadInstructions(std::move(code));
+        break;
+      case FUNARGLOAD:
+        GenerateLoadInstructions(std::move(code));
+        break;
+      case FUNRETLOAD:
         GenerateLoadInstructions(std::move(code));
         break;
       case ADD:
@@ -431,45 +553,94 @@ void CodeGen::Generate(
       // Note to self abstract jumps out later
       case JUMP:
         outfile_ << "\t# JUMP\n";
-        outfile_ << "\tjmp " << code->target.label().name() << std::endl;
+        outfile_ << "\tjmp " << code->target.label().name()
+          << "\n" << std::endl;
         break;
       case JEQUAL:
         outfile_ << "\t# Jump on Equal\n";
-        outfile_ << "\tje " << code->target.label().name() << std::endl;
+        outfile_ << "\tje " << code->target.label().name() << "\n" << std::endl;
         break;
       case JNOTEQUAL:
         outfile_ << "\t# Jump on Not Equal\n";
-        outfile_ << "\tjne " << code->target.label().name() << std::endl;
+        outfile_ << "\tjne " << code->target.label().name()
+          << "\n" << std::endl;
         break;
       case JGREATER:
         outfile_ << "\t# Jump on greater than\n";
-        outfile_ << "\tjg " << code->target.label().name() << std::endl;
+        outfile_ << "\tjg " << code->target.label().name()
+          << "\n" << std::endl;
         break;
       case JGREATEREQ:
         outfile_ << "\t# Jump on greater or equal\n";
-        outfile_ << "\tjge " << code->target.label().name() << std::endl;
+        outfile_ << "\tjge " << code->target.label().name()
+          << "\n" << std::endl;
         break;
       case JLESS:
         outfile_ << "\t# Jump on less than\n";
-        outfile_ << "\tjl " << code->target.label().name() << std::endl;
+        outfile_ << "\tjl " << code->target.label().name()
+          << "\n" << std::endl;
       case JLESSEQ:
         outfile_ << "\t# Jump on less or equal\n";
-        outfile_ << "\tjle " << code->target.label().name() << std::endl;
+        outfile_ << "\tjle " << code->target.label().name()
+          << "\n" << std::endl;
         break;
       case LABEL:
         outfile_ << code->target.label().name() << ":" << std::endl;
         break;
+      case FUNCALL:
+        outfile_ << "\t# Calling Function" << std::endl;
+        outfile_ << "\tcall " << code->target.label().name() << "\n"
+          << std::endl;
+        break;
+      case FUNRETEP:
+        outfile_ << "\t# FunctionRetEpilogue (Restore Stack)" << std::endl;
+        outfile_ << "\tadd $" << code->arg1.value() * 8 <<
+          ", %rsp" << std::endl;
+        outfile_ << "\tcall printfunctionret\n" << std::endl;
+        break;
+      case FUNDEF:
+        // Change scope
+        currscope_ = FUNCTION;
+        // Clear map
+        symboltable_.clear();
+        break;
+      case FUNPROLOGUE:
+        outfile_ << "\t# Function Prologue " << std::endl;
+        outfile_ << "\tpush %rbp" << std::endl;
+        outfile_ << "\tmov %rsp, %rbp" << std::endl;
+        // May be unneeded
+        outfile_ << "\tpush %rbx" << std::endl;
+
+        outfile_ << "\tsub $" << code->arg1.value()*8 << ", %rsp\n"
+          << std::endl;
+        break;
+      case FUNEPILOGUE:
+
+        outfile_ << "\t# Function Epilogue " << std::endl;
+        // Do a correct load lol
+        outfile_ << "\tpop %rax" << std::endl;
+
+        outfile_ << "\tpop %rbx" << std::endl;
+        outfile_ << "\tmov %rbp, %rsp" << std::endl;
+        outfile_ << "\tpop %rbp" << std::endl;
+        outfile_ << "\tret\n" << std::endl;
+        break;
+      case PRINTARITH:
+        outfile_ << "\tpop %rax" << std::endl;
+        outfile_ << "\tcall printarith" << std::endl;
+
+        // BAD FIX, we "know" that the last thing will be the arithmetic expr
+        // So im just going to go ahead and make the exit code here
+        // later on THIS SHOULD CHANGE
+        GenerateEpilogue();
+        break;
       default:
         std::cerr << "Inside Generate and something really bad happened\n";
+        std::cerr << "Unknown opcode " << std::to_string(opcode) << std::endl;
         exit(1);
     }
   }
-  // This will probably change later, call on the print function for the
-  // Arith Expr
-  outfile_ << "\tpop %rax" << std::endl;
-  outfile_ << "\tcall printarith" << std::endl;
 
-  GenerateEpilogue();
   GeneratePrinter();
   outfile_.close();
 }
