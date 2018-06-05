@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <utility>
+#include <algorithm>
 
 #include "utility/memory.h"
 #include "backend/lowerer_visitor.h"
@@ -42,17 +43,17 @@ class ControlFlowGraphNode {
   ControlFlowGraphNode();
   ControlFlowGraphNode(std::vector<std::unique_ptr<struct ThreeAddressCode>>);
   std::vector<std::unique_ptr<struct ThreeAddressCode>> GetLocalBlock() {
-   //return std::move(localblock_);
-    std::vector<std::unique_ptr<struct ThreeAddressCode>> local_block_copy;
-    for (auto& iter: localblock_) {
-      auto block = make_unique<struct ThreeAddressCode>();
-      block->target = iter->target;
-      block->op = iter->op;
-      block->arg1 = iter->arg1;
-      block->arg2 = iter->arg2;
-      local_block_copy.push_back(std::move(block));
-    }
-    return std::move(local_block_copy);
+   return std::move(localblock_);
+    // std::vector<std::unique_ptr<struct ThreeAddressCode>> local_block_copy;
+    // for (auto& iter: localblock_) {
+    //   auto block = make_unique<struct ThreeAddressCode>();
+    //   block->target = iter->target;
+    //   block->op = iter->op;
+    //   block->arg1 = iter->arg1;
+    //   block->arg2 = iter->arg2;
+    //   local_block_copy.push_back(std::move(block));
+    // }
+    // return std::move(local_block_copy);
 
   }
   ControlFlowGraphNode( ControlFlowGraphNode &copy);

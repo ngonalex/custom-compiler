@@ -15,9 +15,8 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_s
     //If this occurs then there's a bigger problem
     std::vector<std::unique_ptr<struct ThreeAddressCode>> empty;
     auto error_node = make_unique<class ControlFlowGraphNode>(std::move(empty));
-    //ControlFlowGraphNode error_node;
     error_node->SetBlockType(ERROR_TYPE);
-    std::cout << "Error block created" << std::endl;
+    std::cerr << "Error block created, edge creation failed. Creating Error Node" << std::endl;
     return error_node.get();
   } else if (graph_set.size() == 1) {
     ControlFlowGraphNode * temp = graph_set[0];
@@ -27,7 +26,7 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_s
     if (graph_set.front()->GetBlockType() == CONDITIONAL_BLOCK) {
       // Should look like this:
       //      Condition
-      //      /     \
+      //      |     |
       //    True   False
       //      \     /
       //        END
@@ -81,16 +80,6 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_s
     }
   }
 }
-// std::vector<std::unique_ptr<struct ThreeAddressCode>> CopyBlock(std::vector<std::unique_ptr<struct ThreeAddressCode>> copy) {
-//   std::vector<std::unique_ptr<struct ThreeAddressCode>> copy_object;
-//   for (const auto& iter: copy) {
-//     auto block = make_unique<struct ThreeAddressCode>();
-//     block->target = iter->target;
-//     block->op = iter->op;
-//     copy_object.push_back(std::move(block));
-//   }
-//   return std::move(copy_object);
-// }
 
 void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddressCode>> input) {
   // Has to branch on:
@@ -101,11 +90,7 @@ void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddress
   std::vector<std::unique_ptr<struct ThreeAddressCode>> new_block;
   int creation_order = 0;
   for (auto &iter: input) {
-    //Create a copy of the IR
-    // auto block = make_unique<struct ThreeAddressCode>();
-    // block->target = iter->target;
-    // block->op = iter->op;
-    // new_block.push_back(std::move(block));
+    //Move IR to the block
     Type op_type = iter->op.opcode();
     bool is_end = (iter == input.back());
     new_block.push_back(std::move(iter));
@@ -155,12 +140,25 @@ void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddress
 }
 
 std::vector<std::unique_ptr<struct ThreeAddressCode>> MarkSweep(
-  std::vector<std::string> &live_set,
-  ControlFlowGraphNode * apply_sweep) {
+    std::vector<std::string> &live_set,
+    ControlFlowGraphNode * apply_sweep) {
+  std::vector<std::unique_ptr<struct ThreeAddressCode>> optimize_block = std::move(apply_sweep->GetLocalBlock());
+  return std::move(optimize_block); 
 
 }
 
-std::vector<std::string> RecursiveFindPath (
+std::vector<std::string> MergeVector(std::vector<std::string> vector1, std::vector<std::string> vector2) {
+  std::vector<std::string> return_vector = vector1;
+  for (auto iter: vector2) {
+    std::vector<std::string>::iterator find_value = std::find(vector2.begin(), vector2.end(), iter);
+    if (find_value != vector2.end()) {
+      return_vector.push_back(iter);
+    }
+  }
+  return return_vector;
+}
+
+std::pair<std::vector<std::string>, ControlFlowGraphNode *> RecursiveFindPath(
   std::vector<ControlFlowGraphNode *> passed_tac,
   std::vector<Edge> edges, std::vector<std::string> live_set,
    ControlFlowGraphNode * optimize_node) {
@@ -169,20 +167,49 @@ std::vector<std::string> RecursiveFindPath (
     optimize_node->SetLocalBlock(std::move(MarkSweep(live_set, optimize_node)));
     EdgeType edge1 = TYPELESS_EDGE;
     EdgeType edge2 = TYPELESS_EDGE;
-    for (Edge iter : edges) {
-      if(iter.edge_pair.second == node_number) {
-        if(edge1 = TYPELESS_EDGE) {
+    int block1 = -1;
+    int block2 = -1;
+    for (auto iter : edges) {
+      if (iter.edge_pair.second == node_number) {
+        if (edge1 = TYPELESS_EDGE) {
           edge1 = iter.edge_type;
-        }
-        else { 
+          block1 = iter.edge_pair.first;
+        } else if (edge2 = TYPELESS_EDGE) { 
           edge2 = iter.edge_type;
+          block2 = iter.edge_pair.second;
+        } else {
+          std::cerr << "More than 2 edges detected" << std::endl;
         }
       }
     }
-    if(edge1 == CONDITIONAL_FALSE_RETURN || edge1 == CONDITIONAL_TRUE_RETURN) {
-
-
+    ControlFlowGraphNode * node1;
+    ControlFlowGraphNode * node2;
+    for (auto tac_iter : passed_tac) {
+      if (tac_iter->GetCreationOrder() == block1) {
+        node1 = tac_iter;
+      } else if (tac_iter->GetCreationOrder() == block2) {
+        node2 = tac_iter;
+      }
+    }
+    if (edge1 == CONDITIONAL_TRUE_RETURN || edge1 == CONDITIONAL_FALSE_RETURN) {
+      std::vector<std::string> live_set_copy = live_set;
+      std::pair<std::vector<std::string>,ControlFlowGraphNode * > return1, return2, return3;
+      std::vector<std::string> str_return1, str_return2, merged_return;
+      return1 = RecursiveFindPath(passed_tac, edges, live_set, node1);
+      return2 = RecursiveFindPath(passed_tac, edges, live_set_copy, node2);
+      str_return1 = return1.first;
+      str_return2 = return2.first;
+      merged_return = MergeVector(str_return1,str_return2);
+      return3 = RecursiveFindPath(passed_tac, edges, merged_return, return1.second);
+      return return3; //Idunno actually
+    } else if (edge1 == CONDITIONAL_TRUE_RETURN || edge1 == CONDITIONAL_FALSE_RETURN) {
+      return std::make_pair(live_set, node1);
+    } else if (edge1 == LOOP_TRUE) {
       
+    } else if (edge1 == LOOP_FALSE) {
+
+    } else if (edge1 == LOOP_RETURN) {
+
     }
 
 
