@@ -2,6 +2,8 @@
 
 #define super NullParser
 
+#include <iostream>
+
 using namespace cs160::frontend;
 
 ParseStatus AndCombinator::parse(std::string inputProgram, int startCharacter, std::string errorType) {
@@ -30,6 +32,12 @@ ParseStatus AndCombinator::parse(std::string inputProgram, int startCharacter, s
   both.remainingCharacters = secondStatus.remainingCharacters;
   both.startCharacter = startCharacter;
   both.endCharacter = secondStatus.endCharacter;
+  
+  if (firstStatus.ast != nullptr) {
+    std::cout << "The first ast is being moved here" << std::endl;
+  } else {
+    std::cout << "The first ast is nullptr" << std::endl;
+  }
   both.ast = std::move(firstStatus.ast);
   both.second_ast = std::move(secondStatus.ast);
 

@@ -1,4 +1,5 @@
 #include "frontend/combinators/v1_combinators/term_expr.h"
+#include "frontend/combinators/basic_combinators/and_combinator.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 #include "frontend/combinators/v2_combinators/main/word_parser.h"
 
@@ -61,38 +62,56 @@ ParseStatus TermExprParser::parse(std::string inputProgram, int startCharacter,
   }
 
   // ( ae )
-  OpenParenParser open_paren;
-  ParseStatus openParseStatus = open_paren.parse(inputProgram, endCharacter);
-  result.status = openParseStatus.status;
-  result.startCharacter = startCharacter;
-  if (openParseStatus.status) {
-    result.parsedCharacters += openParseStatus.parsedCharacters;
-    result.remainingCharacters = openParseStatus.remainingCharacters;
-    // ae
-    AddSubExprParser ae;
-    ParseStatus aeParseStatus = ae.parse(openParseStatus.remainingCharacters, openParseStatus.endCharacter);
-    if (aeParseStatus.status) {
-      result.parsedCharacters += aeParseStatus.parsedCharacters;
-      result.remainingCharacters = aeParseStatus.remainingCharacters;
-      CloseParenParser close_paren;
-      ParseStatus cpParseStatus = close_paren.parse(aeParseStatus.remainingCharacters, aeParseStatus.endCharacter);
-      if (cpParseStatus.status) {
-	      result.parsedCharacters += cpParseStatus.parsedCharacters;
-	      result.remainingCharacters = cpParseStatus.remainingCharacters;
-        result.endCharacter = cpParseStatus.endCharacter;
-	      result.ast = std::move(aeParseStatus.ast);
-      } else {
-        result.status = cpParseStatus.status;
-        result.errorType = cpParseStatus.errorType;
-      }
-    } else {
-      result.status = aeParseStatus.status;
-      result.errorType = aeParseStatus.errorType;
-    }
-  } else {
-    result.status = openParseStatus.status;
-    result.errorType = openParseStatus.errorType;
-  }
 
-  return result;
+  // Basic Parser
+  OpenParenParser open_paren;
+  AddSubExprParser ae;
+  CloseParenParser close_paren;
+
+  // Combinators
+  AndCombinator open_ae;
+  open_ae.firstParser = reinterpret_cast<NullParser *>(&open_paren);
+  open_ae.secondParser = reinterpret_cast<NullParser *>(&ae);
+
+  AndCombinator paren_ae;
+  paren_ae.firstParser = reinterpret_cast<NullParser *>(&open_ae);
+  paren_ae.secondParser = reinterpret_cast<NullParser *>(&close_paren);
+
+  return paren_ae.parse(inputProgram, startCharacter);
+
+
+
+  // ParseStatus openParseStatus = open_paren.parse(inputProgram, endCharacter);
+  // result.status = openParseStatus.status;
+  // result.startCharacter = startCharacter;
+  // if (openParseStatus.status) {
+  //   result.parsedCharacters += openParseStatus.parsedCharacters;
+  //   result.remainingCharacters = openParseStatus.remainingCharacters;
+  //   // ae
+  //   AddSubExprParser ae;
+  //   ParseStatus aeParseStatus = ae.parse(openParseStatus.remainingCharacters, openParseStatus.endCharacter);
+  //   if (aeParseStatus.status) {
+  //     result.parsedCharacters += aeParseStatus.parsedCharacters;
+  //     result.remainingCharacters = aeParseStatus.remainingCharacters;
+  //     CloseParenParser close_paren;
+  //     ParseStatus cpParseStatus = close_paren.parse(aeParseStatus.remainingCharacters, aeParseStatus.endCharacter);
+  //     if (cpParseStatus.status) {
+	//       result.parsedCharacters += cpParseStatus.parsedCharacters;
+	//       result.remainingCharacters = cpParseStatus.remainingCharacters;
+  //       result.endCharacter = cpParseStatus.endCharacter;
+	//       result.ast = std::move(aeParseStatus.ast);
+  //     } else {
+  //       result.status = cpParseStatus.status;
+  //       result.errorType = cpParseStatus.errorType;
+  //     }
+  //   } else {
+  //     result.status = aeParseStatus.status;
+  //     result.errorType = aeParseStatus.errorType;
+  //   }
+  // } else {
+  //   result.status = openParseStatus.status;
+  //   result.errorType = openParseStatus.errorType;
+  // }
+
+  // return result;
 }
