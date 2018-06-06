@@ -22,6 +22,7 @@ using namespace cs160::frontend;
     ast = std::move(other.ast);
     astNodes = std::move(other.astNodes);
     second_ast = std::move(other.second_ast);
+    return *this;
   }
 
 bool ParseStatus::operator==(const ParseStatus &b) const {

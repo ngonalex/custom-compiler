@@ -31,6 +31,6 @@ ParseStatus NullParser::parse(std::string inputProgram, int startCharacter, std:
     ParseStatus result = std::move(iter->second);
     return result;
   } else {
-    do_parse(inputProgram, startCharacter);
+    return do_parse(inputProgram, startCharacter);
   }
 }
