@@ -29,6 +29,20 @@ ParseStatus AddSubExprParser::do_parse(std::string inputProgram, int startCharac
     OneOrMoreCombinator oneOrMore;
     oneOrMore.parser = &andExpr;
     
+    ParseStatus oneOrMoreResult = oneOrMore.do_parse(inputProgram, endCharacter);
+    
+    //AST Formation
+    int strIndex = 0;
+    for (int i = 0; i < oneOrMoreResult.astNodes.size(); i++){
+        if (i == 0){
+            oneOrMoreResult.ast = std::move(oneOrMoreResult.astNodes[i]);
+        } else {
+            std::string parsedCharacters = oneOrMoreResult.parsedCharactersArray[i-1];
+            std::string op = parsedCharacters.substr(parsedCharacters.size()-1, 1);
+            oneOrMoreResult.ast = make_node(op, unique_cast<const ArithmeticExpr>(std::move(oneOrMoreResult.ast)), unique_cast<const ArithmeticExpr>(std::move(oneOrMoreResult.astNodes[i])));
+        }
+    }
+    
     MulDivExprParser rhs;
     
     AndCombinator addSubExpr;

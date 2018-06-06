@@ -20,6 +20,8 @@ class ParseStatus {  // Super class
   bool status;
   std::string remainingCharacters;
   std::string parsedCharacters;
+    
+    std::vector<std::string> parsedCharactersArray;
 
   // Only for the success case
   std::unique_ptr<const AstNode> ast;
