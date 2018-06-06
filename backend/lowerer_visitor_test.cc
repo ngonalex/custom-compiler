@@ -1019,4 +1019,26 @@ TEST_F(LowererTest, NestedTupleTest){
   EXPECT_EQ(lowerer_.GetOutput(), "bob <-  VARCHILDTUPLE \nt_0 <- 4\nbob <- t_0 NEWTUPLE \nt_1 <- 1\nbob->t_1 <- bob LHSDEREFERENCE Parent\nt_2 <- 2\nbob->t_1 <- t_2 NEWTUPLE \nt_3 <- 1\nbob->t_3 <- bob LHSDEREFERENCE Child\nt_4 <- 2\nbob->t_3->t_4 <- bob LHSDEREFERENCE Parent\nt_5 <- 2\nt_6 <- 3\nt_7 <- t_5 + t_6\nbob->t_3->t_4 <- t_7\n");
 }
 
+TEST_F(LowererTest, AddTupleValueTest) {
+  auto ast = make_unique<AssignmentFromNewTuple>(make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3));
+  
+  // bob->1 = 2
+  auto def = make_unique<Dereference>(make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(1));
+  auto access = make_unique<AssignmentFromArithExp>(std::move(def), make_unique<IntegerExpr>(2));
+  auto defagain = make_unique<Dereference>(make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(1));
+
+  auto der2 = make_unique<Dereference>(make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(2));
+  auto access2 = make_unique<AssignmentFromArithExp>(std::move(der2), make_unique<IntegerExpr>(3));
+  auto defagain2 = make_unique<Dereference>(make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(2));
+
+  auto assigny = make_unique<AssignmentFromArithExp>(make_unique<VariableExpr>("y"), make_unique<AddExpr>(std::move(defagain), std::move(defagain2)));
+
+  ast->Visit(&lowerer_);
+  access->Visit(&lowerer_);
+  access2->Visit(&lowerer_);
+  assigny->Visit(&lowerer_);
+
+  EXPECT_EQ(lowerer_.GetOutput(), "bob <-  VARCHILDTUPLE \nt_0 <- 3\nbob <- t_0 NEWTUPLE \nt_1 <- 1\nbob->t_1 <- bob LHSDEREFERENCE Parent\nt_2 <- 2\nbob->t_1 <- t_2\nt_3 <- 2\nbob->t_3 <- bob LHSDEREFERENCE Parent\nt_4 <- 3\nbob->t_3 <- t_4\nt_5 <- 1\nbob->t_5 <- bob RHSDEREFERENCE Parent\nt_6 <- 2\nbob->t_6 <- bob RHSDEREFERENCE Parent\nt_7 <- bob->t_5 + bob->t_6\ny <- t_7\n");
+}
+
 // To do: Nested Branches + Nested Loops + LogicalNot
