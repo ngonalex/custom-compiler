@@ -28,7 +28,7 @@ ParseStatus NullParser::parse(std::string inputProgram, int startCharacter, std:
   iter = cache.find(startCharacter);
 
   if(iter != cache.end()) {
-    ParseStatus result = iter->second;
+    ParseStatus result = std::move(iter->second);
     return result;
   } else {
     do_parse(inputProgram, startCharacter);
