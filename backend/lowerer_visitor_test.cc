@@ -62,6 +62,7 @@ class LowererTest : public ::testing::Test {
   LowererVisitor lowerer_;
 };
 
+// ----- V1 tests -----
 TEST_F(LowererTest, IntegerExprIsVisited) {
   auto number = make_unique<IntegerExpr>(7);
   number->Visit(&lowerer_);
@@ -141,6 +142,9 @@ TEST_F(LowererTest, NestedIntVisitationsWorkProperly) {
             "t_3 <- 2\nt_4 <- 1\nt_5 <- t_3 - t_4\nt_6 <- t_2 / t_5\n");
 }
 
+// ----- End of V1 Tests ------
+
+// ----- V2 Tests ------
 TEST_F(LowererTest, SimpleAssignmentTest) {
   auto expr = make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("x"),
@@ -170,91 +174,6 @@ TEST_F(LowererTest, DoubleIntAssignmentTest) {
             "t_2 <- t_0 + t_1\nx <- t_2\n");
 }
 
-TEST_F(LowererTest, FunctionDefTest) {
-  auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
-
-  // empty fact_body
-  Statement::Block fact_body;
-
-  // return value
-  auto foo_retval = make_unique<const AddExpr>(
-    make_unique<const IntegerExpr>(1),
-    make_unique<const IntegerExpr>(0));
-
-  auto foo_def = make_unique<const FunctionDef>("func", std::move(foo_params),
-                                                std::move(fact_body),
-                                                std::move(foo_retval));
-
-  foo_def->Visit(&lowerer_);
-  EXPECT_EQ(lowerer_.GetOutput(), " <-  FUNCTIONDEF \nMkLabel func\n"
-  " <-  FUNPROLOGUE \nt_0 <- 1\nt_1 <- 0\n"
-  "t_2 <- t_0 + t_1\n <-  FUNEPILOGUE \n");
-}
-
-
-TEST_F(LowererTest, FunctionCallTest) {
-  Statement::Block statements;
-
-  // bob = 10
-  // int returnval = fact(bob)
-  // func fact (int bob) {
-  //    returnval = 1
-  //    return retunval + 0
-  // }
-  statements.push_back(make_unique<const AssignmentFromArithExp>(
-    make_unique<const VariableExpr>("bob"),
-    make_unique<const IntegerExpr>(10)));
-
-  auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
-  arguments.push_back(std::move(make_unique<const VariableExpr>("bob")));
-
-  // call function fact
-  statements.push_back(std::move(make_unique<const FunctionCall>(
-      make_unique<const VariableExpr>("foo_retval"), "fact",
-      std::move(arguments))));
-
-  // getting the return value
-  auto ae = make_unique<const VariableExpr>("foo_retval");
-
-  auto foo_retval = make_unique<const AddExpr>(
-    make_unique<const VariableExpr>("foo_retval"),
-    make_unique<const IntegerExpr>(0));
-
-  auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
-  foo_params.push_back(std::move(make_unique<const VariableExpr>("bob")));
-
-  Statement::Block fact_body;
-
-  fact_body.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("foo_retval"),
-    make_unique<IntegerExpr>(1))));
-
-  // fact_body.push_back(std::move(make_unique<const AddExpr>(
-  //  make_unique<const VariableExpr>("foo_reval"),
-  //  make_unique<const VariableExpr>("bob"))));
-
-  auto foo_def = make_unique<const FunctionDef>("fact", std::move(foo_params),
-                                                std::move(fact_body),
-                                                std::move(foo_retval));
-
-  FunctionDef::Block function_defs;
-  function_defs.push_back(std::move(foo_def));
-
-  auto ast = make_unique<const Program>(std::move(function_defs),
-    std::move(statements), std::move(ae));
-
-
-  ast->Visit(&lowerer_);
-
-  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 10\nbob <- t_0\n"
-    "t_1 <- bob VARLOAD \n <-  FUNCTIONCALL \n"
-    "foo_retval <- FUNRETLOAD FUNRETLOAD \n <-  FUNRETURNEPILOGUE \n"
-    "t_2 <- foo_retval VARLOAD \n <-  PRINTARITH \n <-  FUNCTIONDEF \n"
-    "MkLabel fact\n <-  FUNPROLOGUE \nbob <- 0\nt_3 <- 1\nfoo_retval <- t_3\n"
-    "t_4 <- foo_retval VARLOAD \nt_5 <- 0\nt_6 <- t_4 + t_5\n"
-    " <-  FUNEPILOGUE \n");
-}
-
 TEST_F(LowererTest, UnassignedVariable) {
   auto expr = make_unique<const LogicalAndExpr>(
       make_unique<const LessThanExpr>(make_unique<const VariableExpr>("x"),
@@ -270,47 +189,6 @@ TEST_F(LowererTest, UnassignedVariable) {
   EXPECT_EXIT(expr->Visit(&lowerer_), ::testing::ExitedWithCode(1),
               "Variable x not assigned");
 }
-
-TEST_F(LowererTest, NestedLogicalsWithInts) {
-  auto expr = make_unique<const LogicalOrExpr>(
-      make_unique<const LogicalAndExpr>(
-          make_unique<const LessThanExpr>(make_unique<const IntegerExpr>(50),
-                                          make_unique<const IntegerExpr>(100)),
-          make_unique<const GreaterThanExpr>(
-              make_unique<const IntegerExpr>(50),
-              make_unique<const IntegerExpr>(0))),
-      make_unique<const LogicalAndExpr>(
-          make_unique<const LessThanEqualToExpr>(
-              make_unique<const IntegerExpr>(50),
-              make_unique<const IntegerExpr>(100)),
-          make_unique<const GreaterThanEqualToExpr>(
-              make_unique<const IntegerExpr>(50),
-              make_unique<const IntegerExpr>(0))));
-
-  expr->Visit(&lowerer_);
-  // t_0 <- 50
-  // t_1 <- 100
-  // t_2 <- t_0 < t_1
-  // t_3 <- 50
-  // t_4 <- 0
-  // t_5 <- t_3 > t_4
-  // t_6 <- t_2 && t_5
-  // t_7 <- 50
-  // t_8 <- 100
-  // t_9 <- t_7 <= t_8
-  // t_10 <- 50
-  // t_11 <- 0
-  // t_12 <- t_10 >= t_11
-  // t_13 <- t_9 && t_12
-  // t_14 <- t_6 || t_13
-  EXPECT_EQ(lowerer_.GetOutput(),
-            "t_0 <- 50\nt_1 <- 100\nt_2 <- t_0 < t_1\n"
-            "t_3 <- 50\nt_4 <- 0\nt_5 <- t_3 > t_4\nt_6 <- t_2 && t_5\n"
-            "t_7 <- 50\nt_8 <- 100\nt_9 <- t_7 <= t_8\nt_10 <- 50\nt_11 <- 0\n"
-            "t_12 <- t_10 >= t_11\nt_13 <- t_9 && t_12\nt_14 <- t_6 || t_13\n");
-}
-
-
 
 TEST_F(LowererTest, VariabletoVariableAssignmentTest) {
   Statement::Block statements;
@@ -355,6 +233,48 @@ TEST_F(LowererTest, VariabletoVariableAssignmentTest) {
     "t_6 <- 7\nt_7 <- 5\nt_8 <- t_6 - t_7\n <-  PRINTARITH \n"
     " <-  FUNCTIONDEF \nMkLabel func\n <-  FUNPROLOGUE \nt_9 <- 0\n"
     " <-  FUNEPILOGUE \n");
+}
+
+// ----- End of V2 Tests ------
+
+// ----- V3 Tests -----
+TEST_F(LowererTest, NestedLogicalsWithInts) {
+  auto expr = make_unique<const LogicalOrExpr>(
+      make_unique<const LogicalAndExpr>(
+          make_unique<const LessThanExpr>(make_unique<const IntegerExpr>(50),
+                                          make_unique<const IntegerExpr>(100)),
+          make_unique<const GreaterThanExpr>(
+              make_unique<const IntegerExpr>(50),
+              make_unique<const IntegerExpr>(0))),
+      make_unique<const LogicalAndExpr>(
+          make_unique<const LessThanEqualToExpr>(
+              make_unique<const IntegerExpr>(50),
+              make_unique<const IntegerExpr>(100)),
+          make_unique<const GreaterThanEqualToExpr>(
+              make_unique<const IntegerExpr>(50),
+              make_unique<const IntegerExpr>(0))));
+
+  expr->Visit(&lowerer_);
+  // t_0 <- 50
+  // t_1 <- 100
+  // t_2 <- t_0 < t_1
+  // t_3 <- 50
+  // t_4 <- 0
+  // t_5 <- t_3 > t_4
+  // t_6 <- t_2 && t_5
+  // t_7 <- 50
+  // t_8 <- 100
+  // t_9 <- t_7 <= t_8
+  // t_10 <- 50
+  // t_11 <- 0
+  // t_12 <- t_10 >= t_11
+  // t_13 <- t_9 && t_12
+  // t_14 <- t_6 || t_13
+  EXPECT_EQ(lowerer_.GetOutput(),
+            "t_0 <- 50\nt_1 <- 100\nt_2 <- t_0 < t_1\n"
+            "t_3 <- 50\nt_4 <- 0\nt_5 <- t_3 > t_4\nt_6 <- t_2 && t_5\n"
+            "t_7 <- 50\nt_8 <- 100\nt_9 <- t_7 <= t_8\nt_10 <- 50\nt_11 <- 0\n"
+            "t_12 <- t_10 >= t_11\nt_13 <- t_9 && t_12\nt_14 <- t_6 || t_13\n");
 }
 
 TEST_F(LowererTest, ConditionalWithNestedLogicalsWithVariables) {
@@ -1010,6 +930,97 @@ TEST_F(LowererTest, LoopWithBody) {
     " <-  FUNEPILOGUE \n");
 }
 
+// ----- End of V3 Tests -----
+
+// ----- V4 Tests ------
+TEST_F(LowererTest, FunctionDefTest) {
+  auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
+
+  // empty fact_body
+  Statement::Block fact_body;
+
+  // return value
+  auto foo_retval = make_unique<const AddExpr>(
+    make_unique<const IntegerExpr>(1),
+    make_unique<const IntegerExpr>(0));
+
+  auto foo_def = make_unique<const FunctionDef>("func", std::move(foo_params),
+                                                std::move(fact_body),
+                                                std::move(foo_retval));
+
+  foo_def->Visit(&lowerer_);
+  EXPECT_EQ(lowerer_.GetOutput(), " <-  FUNCTIONDEF \nMkLabel func\n"
+  " <-  FUNPROLOGUE \nt_0 <- 1\nt_1 <- 0\n"
+  "t_2 <- t_0 + t_1\n <-  FUNEPILOGUE \n");
+}
+
+
+TEST_F(LowererTest, FunctionCallTest) {
+  Statement::Block statements;
+
+  // bob = 10
+  // int returnval = fact(bob)
+  // func fact (int bob) {
+  //    returnval = 1
+  //    return retunval + 0
+  // }
+  statements.push_back(make_unique<const AssignmentFromArithExp>(
+    make_unique<const VariableExpr>("bob"),
+    make_unique<const IntegerExpr>(10)));
+
+  auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
+  arguments.push_back(std::move(make_unique<const VariableExpr>("bob")));
+
+  // call function fact
+  statements.push_back(std::move(make_unique<const FunctionCall>(
+      make_unique<const VariableExpr>("foo_retval"), "fact",
+      std::move(arguments))));
+
+  // getting the return value
+  auto ae = make_unique<const VariableExpr>("foo_retval");
+
+  auto foo_retval = make_unique<const AddExpr>(
+    make_unique<const VariableExpr>("foo_retval"),
+    make_unique<const IntegerExpr>(0));
+
+  auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
+  foo_params.push_back(std::move(make_unique<const VariableExpr>("bob")));
+
+  Statement::Block fact_body;
+
+  fact_body.push_back(std::move(make_unique<AssignmentFromArithExp>(
+    make_unique<VariableExpr>("foo_retval"),
+    make_unique<IntegerExpr>(1))));
+
+  // fact_body.push_back(std::move(make_unique<const AddExpr>(
+  //  make_unique<const VariableExpr>("foo_reval"),
+  //  make_unique<const VariableExpr>("bob"))));
+
+  auto foo_def = make_unique<const FunctionDef>("fact", std::move(foo_params),
+                                                std::move(fact_body),
+                                                std::move(foo_retval));
+
+  FunctionDef::Block function_defs;
+  function_defs.push_back(std::move(foo_def));
+
+  auto ast = make_unique<const Program>(std::move(function_defs),
+    std::move(statements), std::move(ae));
+
+
+  ast->Visit(&lowerer_);
+
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 10\nbob <- t_0\n"
+    "t_1 <- bob VARLOAD \n <-  FUNCTIONCALL \n"
+    "foo_retval <- FUNRETLOAD FUNRETLOAD \n <-  FUNRETURNEPILOGUE \n"
+    "t_2 <- foo_retval VARLOAD \n <-  PRINTARITH \n <-  FUNCTIONDEF \n"
+    "MkLabel fact\n <-  FUNPROLOGUE \nbob <- 0\nt_3 <- 1\nfoo_retval <- t_3\n"
+    "t_4 <- foo_retval VARLOAD \nt_5 <- 0\nt_6 <- t_4 + t_5\n"
+    " <-  FUNEPILOGUE \n");
+}
+
+// ----- End of V4 Tests -----
+
+// ----- V5 Tests -----
 TEST_F(LowererTest, SimpleTupleTest) {
   auto ast = make_unique<AssignmentFromNewTuple>(make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3));
   ast->Visit(&lowerer_);
