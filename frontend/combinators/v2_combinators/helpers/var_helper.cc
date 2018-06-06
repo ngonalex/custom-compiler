@@ -14,16 +14,15 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus VarKeywordParser::parse(std::string inputProgram,
-                                    int startCharacter, std::string errorType) {
+ParseStatus VarKeywordParser::parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
   std::string errorMessage = "Start variable declaration with var";
 
-  if (inputProgram.size() == 0) {
-    return super::parse(inputProgram, endCharacter, errorMessage);
-  }
+	if (inputProgram.size() == 0) {
+		return super::fail(inputProgram, endCharacter, errorMessage);
+	}
 
   auto vParser = AtomParser('v');
   auto aParser = AtomParser('a');
@@ -40,16 +39,16 @@ ParseStatus VarKeywordParser::parse(std::string inputProgram,
   return result;
 }
 
-ParseStatus ColonParser::parse(std::string inputProgram, int startCharacter,
-                               std::string errorType) {
+
+ParseStatus ColonParser::parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
   std::string errorMessage = "Missing colon";
 
-  if (inputProgram.size() == 0) {
-    return super::parse(inputProgram, endCharacter, errorMessage);
-  }
+	if (inputProgram.size() == 0) {
+		return super::fail(inputProgram, endCharacter, errorMessage);
+	}
 
   auto vParser = AtomParser(':');
   ParseStatus result = vParser.parse(inputProgram, endCharacter);
@@ -58,15 +57,15 @@ ParseStatus ColonParser::parse(std::string inputProgram, int startCharacter,
   return result;
 }
 
-ParseStatus TypeParser::parse(std::string inputProgram, int startCharacter,
-                              std::string errorType) {
+
+ParseStatus TypeParser::parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
   std::string errorMessage = "Incorrect type in variable declaration";
-  if (inputProgram.size() == 0) {
-    return super::parse(inputProgram, endCharacter, errorMessage);
-  }
+	if (inputProgram.size() == 0) {
+		return super::fail(inputProgram, endCharacter, errorMessage);
+	}
 
   OneOrMoreCombinator oneOrMore;
   SingleCharParser charParser;
@@ -81,15 +80,14 @@ ParseStatus TypeParser::parse(std::string inputProgram, int startCharacter,
   return result;
 }
 
-ParseStatus EqualSignParser::parse(std::string inputProgram, int startCharacter,
-                                   std::string errorType) {
-  int endCharacter = startCharacter;
+ParseStatus EqualSignParser::parse(std::string inputProgram, int startCharacter) {
+   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
   std::string errorMessage = "Missing equal sign";
 
   if (inputProgram.size() == 0) {
-    return super::parse(inputProgram, endCharacter, errorMessage);
+    return super::fail(inputProgram, endCharacter, errorMessage);
   }
 
   auto vParser = AtomParser('=');
@@ -99,14 +97,13 @@ ParseStatus EqualSignParser::parse(std::string inputProgram, int startCharacter,
   return result;
 }
 
-ParseStatus HelperVariableParser::parse(std::string inputProgram,
-                                        int startCharacter,
-                                        std::string errorType) {
+
+ParseStatus HelperVariableParser::parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
   if (inputProgram.size() == 0) {
-    return super::parse(inputProgram, endCharacter);
+    return super::fail(inputProgram, endCharacter);
   }
 
   VarKeywordParser varParser;

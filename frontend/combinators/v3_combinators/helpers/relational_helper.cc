@@ -19,7 +19,7 @@ ParseStatus EqualToOpParser::parse(std::string inputProgram, int startCharacter,
 	endCharacter += trim(inputProgram);
 
 	if (inputProgram.size() <= 1) {
-		return super::parse(inputProgram, endCharacter, errorMessage);
+		return super::fail(inputProgram, endCharacter, errorMessage);
 	}
 
 	auto equalParser_1 = AtomParser('=');
@@ -36,7 +36,7 @@ ParseStatus GreaterThanOpParser::parse(std::string inputProgram, int startCharac
 	endCharacter += trim(inputProgram);
 
 	if (inputProgram.size() <= 0) {
-		return super::parse(inputProgram, endCharacter, errorMessage);
+		return super::fail(inputProgram, endCharacter, errorMessage);
 	}
 
 	auto parser = AtomParser('>');
@@ -48,7 +48,7 @@ ParseStatus LessThanOpParser::parse(std::string inputProgram, int startCharacter
 	endCharacter += trim(inputProgram);
 
 	if (inputProgram.size() <= 0) {
-		return super::parse(inputProgram, endCharacter, errorMessage);
+		return super::fail(inputProgram, endCharacter, errorMessage);
 	}
 
 	auto parser = AtomParser('<');
@@ -60,7 +60,7 @@ ParseStatus GreaterThanOrEqualToOpParser::parse(std::string inputProgram, int st
 	endCharacter += trim(inputProgram);
 
 	if (inputProgram.size() <= 1) {
-		return super::parse(inputProgram, endCharacter, errorMessage);
+		return super::fail(inputProgram, endCharacter, errorMessage);
 	}
 
 	auto greaterThanParser = AtomParser('>');
@@ -77,7 +77,7 @@ ParseStatus LessThanOrEqualToOpParser::parse(std::string inputProgram, int start
 	endCharacter += trim(inputProgram);
 
 	if (inputProgram.size() <= 1) {
-		return super::parse(inputProgram, endCharacter, errorMessage);
+		return super::fail(inputProgram, endCharacter, errorMessage);
 	}
 
 	auto lessThanParser = AtomParser('<');
@@ -94,7 +94,7 @@ ParseStatus AndOpParser::parse(std::string inputProgram, int startCharacter, std
 	endCharacter += trim(inputProgram);
 
 	if (inputProgram.size() <= 1) {
-		return super::parse(inputProgram, endCharacter, errorMessage);
+		return super::fail(inputProgram, endCharacter, errorMessage);
 	}
 
 	auto andParser_1 = AtomParser('&');
@@ -111,7 +111,7 @@ ParseStatus OrOpParser::parse(std::string inputProgram, int startCharacter, std:
 	endCharacter += trim(inputProgram);
 
 	if (inputProgram.size() <= 1) {
-		return super::parse(inputProgram, endCharacter, errorMessage);
+		return super::fail(inputProgram, endCharacter, errorMessage);
 	}
 
 	auto orParser_1 = AtomParser('|');
@@ -128,7 +128,7 @@ ParseStatus NotOpParser::parse(std::string inputProgram, int startCharacter, std
 	endCharacter += trim(inputProgram);
 
 	if (inputProgram.size() <= 0) {
-		return super::parse(inputProgram, endCharacter, errorMessage);
+		return super::fail(inputProgram, endCharacter, errorMessage);
 	}
 
 	auto parser = AtomParser('!');

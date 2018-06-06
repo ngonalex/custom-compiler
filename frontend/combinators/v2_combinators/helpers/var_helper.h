@@ -9,38 +9,32 @@ namespace frontend {
 
 class VarKeywordParser : NullParser {
  public:
-  virtual ParseStatus parse(std::string inputProgram, int startCharacter,
-                            std::string errorType = "");
+   virtual ParseStatus parse(std::string inputProgram, int startCharacter);
 };
 
 class ColonParser : NullParser {
  public:
-  virtual ParseStatus parse(std::string inputProgram, int startCharacter,
-                            std::string errorType = "");
+   virtual ParseStatus parse(std::string inputProgram, int startCharacter);
 };
 
 class TypeParser : NullParser {
  public:
-  virtual ParseStatus parse(std::string inputProgram, int startCharacter,
-                            std::string errorType = "");
+   virtual ParseStatus parse(std::string inputProgram, int startCharacter);
 };
 
 class EqualSignParser : NullParser {
  public:
-  virtual ParseStatus parse(std::string inputProgram, int startCharacter,
-                            std::string errorType = "");
+   virtual ParseStatus parse(std::string inputProgram, int startCharacter);
 };
 
 class HelperVariableParser : NullParser {
  public:
-  virtual ParseStatus parse(std::string inputProgram, int startCharacter,
-                            std::string errorType = "");
+   virtual ParseStatus parse(std::string inputProgram, int startCharacter);
 };
 /*
 class BOExpr : NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, std::string errorType =
-"");
+   virtual ParseStatus parse(std::string inputProgram);
 };*/
 
 }  // namespace frontend

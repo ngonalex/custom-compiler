@@ -2,8 +2,7 @@
 #include <iostream>
 using namespace cs160::frontend;
 
-ParseStatus AtomParser::parse(std::string inputProgram, int startCharacter,
-				    std::string errorType) {
+ParseStatus AtomParser::parse(std::string inputProgram, int startCharacter) {
 
   std::string errorMessage = "Expecting character: "; 
   errorMessage += char_to_parse;
@@ -11,6 +10,7 @@ ParseStatus AtomParser::parse(std::string inputProgram, int startCharacter,
   ParseStatus result; 
   // Failures
   if (inputProgram.size() == 0 || inputProgram[0] != char_to_parse) {
+    result.status = false;
     result.startCharacter = startCharacter;
     result.remainingCharacters = inputProgram;
     result.endCharacter = startCharacter;

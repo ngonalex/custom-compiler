@@ -4,14 +4,13 @@
 
 using namespace cs160::frontend;
 
-ParseStatus SingleCharParser::parse(std::string inputProgram,
-                                    int startCharacter, std::string errorType) {
+ParseStatus SingleCharParser::parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
   std::string errorMessage = "Char should only have alphabetical character";
 
   if (inputProgram.size() == 0) {
-    return super::parse(inputProgram, endCharacter);
+    return super::fail(inputProgram, endCharacter);
   }
 
   ParseStatus status;
@@ -23,21 +22,19 @@ ParseStatus SingleCharParser::parse(std::string inputProgram,
     status.startCharacter = endCharacter;
     status.endCharacter = endCharacter + 1;
   } else {
-    return super::parse(inputProgram, endCharacter, errorMessage);
+    return super::fail(inputProgram, endCharacter, errorMessage);
   }
   return status;
 }
 
-ParseStatus SingleVarCharParser::parse(std::string inputProgram,
-                                       int startCharacter,
-                                       std::string errorType) {
+ParseStatus SingleVarCharParser::parse(std::string inputProgram, int startCharacter) {
   std::string errorMessage = "Char should be alphabetical or underscore";
 
   int endCharacter = startCharacter;
   trim(inputProgram);
 
   if (inputProgram.size() == 0) {
-    return super::parse(inputProgram, endCharacter, errorMessage);
+    return super::fail(inputProgram, endCharacter, errorMessage);
   }
 
   ParseStatus status;
@@ -50,7 +47,7 @@ ParseStatus SingleVarCharParser::parse(std::string inputProgram,
     status.startCharacter = endCharacter;
     status.endCharacter = endCharacter + 1;
   } else {
-    return super::parse(inputProgram, endCharacter, errorMessage);
+    return super::fail(inputProgram, endCharacter, errorMessage);
   }
   return status;
 }

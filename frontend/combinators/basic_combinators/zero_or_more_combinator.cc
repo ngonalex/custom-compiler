@@ -5,8 +5,7 @@
 using namespace cs160::frontend;
 
 ParseStatus ZeroOrMoreCombinator::parse(std::string inputProgram,
-          int startCharacter,
-					std::string errorType) {
+          int startCharacter) {
   ParseStatus pStatus;
   pStatus.status = true;
   pStatus.remainingCharacters = inputProgram;

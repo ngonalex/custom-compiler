@@ -14,13 +14,12 @@ using namespace cs160::frontend;
    close_paren
 */
 
-ParseStatus ArithExprParser::parse(std::string inputProgram, int startCharacter,
-                                   std::string errorType) {
+ParseStatus ArithExprParser::parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
   if (inputProgram.size() == 0) {
-    return super::parse(inputProgram, endCharacter);
+    return super::fail(inputProgram, endCharacter);
   }
   AddSubExprParser ae;
   SemiColonParser semiColonP;

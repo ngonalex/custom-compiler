@@ -23,7 +23,7 @@ ParseStatus RelationBodyParser::parse(std::string inputProgram, std::string erro
 	trim(inputProgram);
 
   if (inputProgram.size() == 0) {
-		return super::parse(inputProgram);
+		return super::fail(inputProgram);
 	}
 
   // First Arithmetic Expression

@@ -20,7 +20,7 @@ ParseStatus RelationParser::parse(std::string inputProgram, std::string errorTyp
 	trim(inputProgram);
 
   if (inputProgram.size() == 0) {
-		return super::parse(inputProgram);
+		return super::fail(inputProgram);
 	}
 
   RelationBodyParser re;
