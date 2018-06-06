@@ -1,4 +1,7 @@
 #include "frontend/combinators/v1_combinators/helpers/v1_helpers.h"
+#include "frontend/combinators/basic_combinators/and_combinator.h"
+#include "frontend/combinators/basic_combinators/or_combinator.h"
+#include "frontend/combinators/basic_combinators/one_or_more_combinator.h"
 #include "frontend/combinators/v1_combinators/add_sub_expr.h"
 #include "frontend/combinators/v1_combinators/num_parser.h"
 #include "frontend/combinators/v1_combinators/mul_div_expr.h"
@@ -9,36 +12,36 @@ using namespace cs160::frontend;
 using namespace std;
 
 ParseStatus AddSubExprParser::do_parse(std::string inputProgram, int startCharacter) {
-  int endCharacter = startCharacter;
-  endCharacter += trim(inputProgram);
+    int endCharacter = startCharacter;
+    endCharacter += trim(inputProgram);
 
-  if (inputProgram.size() == 0) {
-    return super::fail(inputProgram, endCharacter);
-  }
-  // ae
-  MulDivExprParser lhs;
-  ParseStatus result = lhs.do_parse(inputProgram, endCharacter);
-  if (result.status) {
-    // op
-    AddSubOpParser op;
-    ParseStatus asParseStatus = op.do_parse(result.remainingCharacters, result.endCharacter);
-    while (asParseStatus.status) {
-      result.parsedCharacters += (asParseStatus.parsedCharacters);
-      MulDivExprParser rhs;
-      ParseStatus rhsParseStatus = rhs.do_parse(asParseStatus.remainingCharacters, asParseStatus.endCharacter);
-      result.ast = std::move(make_node(
-	  (asParseStatus.parsedCharacters),
-	  unique_cast<const ArithmeticExpr>(std::move(result.ast)),
-	  unique_cast<const ArithmeticExpr>(std::move(rhsParseStatus.ast))));
-      asParseStatus = op.do_parse(rhsParseStatus.remainingCharacters, rhsParseStatus.endCharacter);
-      result.parsedCharacters += (rhsParseStatus.parsedCharacters);
-      result.startCharacter = startCharacter;
+    if (inputProgram.size() == 0) {
+        return super::fail(inputProgram, endCharacter);
     }
-    result.remainingCharacters = asParseStatus.remainingCharacters;
-      result.endCharacter = asParseStatus.endCharacter;
-
-  }
-  return result;  // Returning Success/Failure on MulDivExpr
+    
+    MulDivExprParser lhs;
+    AddSubOpParser op;
+    
+    AndCombinator andExpr;
+    andExpr.firstParser = &lhs;
+    andExpr.secondParser = &op;
+    
+    OneOrMoreCombinator oneOrMore;
+    oneOrMore.parser = &andExpr;
+    
+    MulDivExprParser rhs;
+    
+    AndCombinator addSubExpr;
+    addSubExpr.firstParser = &oneOrMore;
+    addSubExpr.secondParser = &rhs;
+    
+    OrCombinator addSubExprFinal;
+    addSubExprFinal.firstParser = &addSubExpr;
+    addSubExprFinal.secondParser = &rhs;
+    
+    ParseStatus result = addSubExprFinal.do_parse(inputProgram, endCharacter);
+    
+    return result;  // Returning Success/Failure on MulDivExpr
 }
 
 // Creating the AST Node

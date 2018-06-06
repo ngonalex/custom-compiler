@@ -16,12 +16,14 @@ ParseStatus OneOrMoreCombinator::do_parse(std::string inputProgram,
   while (pStatus.status) {
     ParseStatus pStatus2 = parser->do_parse(pStatus.remainingCharacters, pStatus.endCharacter);
     pStatus.status = pStatus2.status;
-    pStatus.parsedCharacters += (pStatus2.parsedCharacters);
-    pStatus.remainingCharacters = pStatus2.remainingCharacters;
-    pStatus.endCharacter = pStatus2.endCharacter;
-    if (pStatus2.status && pStatus2.ast != NULL) {
-      pStatus.astNodes.push_back(std::move(pStatus2.ast));
-    }
+      if (pStatus2.status){
+          pStatus.parsedCharacters += (pStatus2.parsedCharacters);
+          pStatus.remainingCharacters = pStatus2.remainingCharacters;
+          pStatus.endCharacter = pStatus2.endCharacter;
+          if (pStatus2.ast != NULL) {
+              pStatus.astNodes.push_back(std::move(pStatus2.ast));
+          }
+      }
   }
 
   if (pStatus.parsedCharacters != "") pStatus.status = true;

@@ -1,4 +1,7 @@
 #include "frontend/combinators/v1_combinators/helpers/v1_helpers.h"
+#include "frontend/combinators/basic_combinators/and_combinator.h"
+#include "frontend/combinators/basic_combinators/or_combinator.h"
+#include "frontend/combinators/basic_combinators/one_or_more_combinator.h"
 #include "frontend/combinators/v1_combinators/mul_div_expr.h"
 #include "frontend/combinators/v1_combinators/num_parser.h"
 #include "frontend/combinators/v1_combinators/term_expr.h"
@@ -15,29 +18,28 @@ ParseStatus MulDivExprParser::do_parse(std::string inputProgram, int startCharac
   if (inputProgram.size() == 0) {
     return super::fail(inputProgram, endCharacter);
   }
-
-  // ae
-  TermExprParser lhs;
-  ParseStatus result = lhs.do_parse(inputProgram, endCharacter);
-  if (result.status) {
-    // op
+    
+    TermExprParser lhs;
     MulDivOpParser op;
-    ParseStatus mdParseStatus = op.do_parse(result.remainingCharacters, result.endCharacter);
-    while (mdParseStatus.status) {
-      result.parsedCharacters += mdParseStatus.parsedCharacters;
-      TermExprParser rhs;
-      ParseStatus rhsParseStatus = rhs.do_parse(mdParseStatus.remainingCharacters, mdParseStatus.endCharacter);
-      result.ast = std::move(make_node(
-	      (mdParseStatus.parsedCharacters),
-	        unique_cast<const ArithmeticExpr>(std::move(result.ast)),
-	        unique_cast<const ArithmeticExpr>(std::move(rhsParseStatus.ast))));
-      mdParseStatus = op.do_parse(rhsParseStatus.remainingCharacters, rhsParseStatus.endCharacter);
-      result.parsedCharacters += (rhsParseStatus.parsedCharacters);
-      result.startCharacter = startCharacter;
-      result.endCharacter = rhsParseStatus.endCharacter;
-    }
-    result.remainingCharacters = mdParseStatus.remainingCharacters;
-  }
+    
+    AndCombinator andExpr;
+    andExpr.firstParser = &lhs;
+    andExpr.secondParser = &op;
+    
+    OneOrMoreCombinator oneOrMore;
+    oneOrMore.parser = &andExpr;
+    
+    TermExprParser rhs;
+    
+    AndCombinator mulDivExpr;
+    mulDivExpr.firstParser = &oneOrMore;
+    mulDivExpr.secondParser = &rhs;
+    
+    OrCombinator mulDivExprFinal;
+    mulDivExprFinal.firstParser = &mulDivExpr;
+    mulDivExprFinal.secondParser = &rhs;
+    
+    ParseStatus result = mulDivExprFinal.do_parse(inputProgram, endCharacter);
   return result;  // Returning Success/Failure on TermExpr
 }
 
