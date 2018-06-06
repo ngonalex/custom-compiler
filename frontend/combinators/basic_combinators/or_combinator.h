@@ -7,7 +7,7 @@
 namespace cs160 {
 namespace frontend {
 
-class OrCombinator : NullParser {
+class OrCombinator : public NullParser {
  public:
   NullParser *firstParser;
   NullParser *secondParser;

@@ -7,32 +7,32 @@
 namespace cs160 {
 namespace frontend {
 
-class VarKeywordParser : NullParser {
+class VarKeywordParser : public NullParser {
  public:
    virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class ColonParser : NullParser {
+class ColonParser : public NullParser {
  public:
    virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class TypeParser : NullParser {
+class TypeParser : public NullParser {
  public:
    virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class EqualSignParser : NullParser {
+class EqualSignParser : public NullParser {
  public:
    virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class HelperVariableParser : NullParser {
+class HelperVariableParser : public NullParser {
  public:
    virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 /*
-class BOExpr : NullParser {
+class BOExpr : public NullParser {
  public:
    virtual ParseStatus do_parse(std::string inputProgram);
 };*/
