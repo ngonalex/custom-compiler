@@ -7,30 +7,7 @@
 namespace cs160 {
 namespace backend {
 
-enum TypeOfDataType {
-  INTEGER,
-  TUPLE
-};
-
-struct Int {
-  // TypeOfDataType type = INTEGER;
-  int value;
-};
-
-struct Tuple {
-  // TypeOfDataType type = TUPLE;
-  int size;
-  // void *next;
-};
-
-struct DataType {
-  TypeOfDataType type;
-  Int intvalue;
-  Tuple tuplevalue;
-};
-
-// Somewhat unwieldy and long is there a better way to do this?
-enum Type {
+enum OpcodeType {
   INTLOAD,
   VARLOAD,
   VARASSIGNLOAD,
@@ -159,17 +136,17 @@ class Operand {
 
 class Opcode {
  public:
-  explicit Opcode(Type type) : opcode_(type) {}
+  explicit Opcode(OpcodeType type) : opcode_(type) {}
 
-  void ChangeOpCode(Type type) { opcode_ = type; }
-  Type opcode() const { return opcode_; }
+  void ChangeOpCode(OpcodeType type) { opcode_ = type; }
+  OpcodeType opcode() const { return opcode_; }
 
   bool operator!=(const Opcode& a) const {
     return !(this->opcode() == a.opcode());
   }
 
  private:
-  Type opcode_;
+  OpcodeType opcode_;
 };
 
 class Target {

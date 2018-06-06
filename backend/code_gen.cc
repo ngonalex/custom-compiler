@@ -4,11 +4,20 @@ namespace cs160 {
 namespace backend {
 
 void CodeGen::GeneratePrinter() {
+  GenerateDivisionByZeroCheck();
   GenerateTupleFlagCheck();
   GenerateIntegerFlagCheck();
   GenerateExistenceCheck();
   GenerateTupleSizeCheck();
   GenerateCreateNewTuple();
+
+  // printdivisionbyzeroerror
+  outfile_ << "printdivisionbyzeroerror:" << std::endl;
+  outfile_ << "\tmov $printstring, %rdi" << std::endl;
+  outfile_ << "\tmov $divisionbyzeroasciz, %rsi" << std::endl;
+  outfile_ << "\tmov $0, %rax" << std::endl;
+  outfile_ << "\tcall printf" << std::endl;
+  outfile_ << "\tcall exit" << std::endl;
 
   // printtupletypeerror
   outfile_ << "printtupletypeerror:" << std::endl;
@@ -16,9 +25,7 @@ void CodeGen::GeneratePrinter() {
   outfile_ << "\tmov $tupletypeasciz, %rsi" << std::endl;
   outfile_ << "\tmov $0, %rax" << std::endl;
   outfile_ << "\tcall printf" << std::endl;
-  outfile_ << "\tmov $60, %rax" << std::endl;
-  outfile_ << "\txor $2, %rdi" << std::endl;
-  outfile_ << "\tsyscall" << std::endl;
+  outfile_ << "\tcall exit" << std::endl;
 
   // printintegertypeerror
   outfile_ << "printintegertypeerror:" << std::endl;
@@ -26,9 +33,7 @@ void CodeGen::GeneratePrinter() {
   outfile_ << "\tmov $inttypeasciz, %rsi" << std::endl;
   outfile_ << "\tmov $0, %rax" << std::endl;
   outfile_ << "\tcall printf" << std::endl;
-  outfile_ << "\tmov $60, %rax" << std::endl;
-  outfile_ << "\txor $2, %rdi" << std::endl;
-  outfile_ << "\tsyscall" << std::endl;
+  outfile_ << "\tcall exit" << std::endl;
 
   // printexistenceerror
   outfile_ << "printexistenceerror:" << std::endl;
@@ -36,9 +41,7 @@ void CodeGen::GeneratePrinter() {
   outfile_ << "\tmov $existenceerrorasciz, %rsi" << std::endl;
   outfile_ << "\tmov $0, %rax" << std::endl;
   outfile_ << "\tcall printf" << std::endl;
-  outfile_ << "\tmov $60, %rax" << std::endl;
-  outfile_ << "\txor $2, %rdi" << std::endl;
-  outfile_ << "\tsyscall" << std::endl;
+  outfile_ << "\tcall exit" << std::endl;
 
   // printsizeerror (change this later to print out the size of the tuple
   // and the index that tried to be access)
@@ -47,9 +50,7 @@ void CodeGen::GeneratePrinter() {
   outfile_ << "\tmov $outofboundserrorasciz, %rsi" << std::endl;
   outfile_ << "\tmov $0, %rax" << std::endl;
   outfile_ << "\tcall printf" << std::endl;
-  outfile_ << "\tmov $60, %rax" << std::endl;
-  outfile_ << "\txor $2, %rdi" << std::endl;
-  outfile_ << "\tsyscall" << std::endl;
+  outfile_ << "\tcall exit" << std::endl;
 
   // negative:
   outfile_ << "negative:" << std::endl;
@@ -57,7 +58,7 @@ void CodeGen::GeneratePrinter() {
 
   // printresult
   outfile_ << "printresult:" << std::endl;
-  outfile_ << "\t.asciz \"The result is equal to: \"" << std::endl;
+  outfile_ << "\t.asciz \"The program returned: \"" << std::endl;
 
   // printfunctionresult
   outfile_ << "printfunctionresult:" << std::endl;
@@ -86,11 +87,16 @@ void CodeGen::GeneratePrinter() {
 
   // tupletypeascii
   outfile_ << "tupletypeasciz:" << std::endl;
-  outfile_ << "\t.asciz \"Invalid type must be a tuple\\n\"" << std::endl;
+  outfile_ << "\t.asciz \"Invalid type: must be a tuple\\n\"" << std::endl;
 
   // inttypeascii
   outfile_ << "inttypeasciz:" << std::endl;
-  outfile_ << "\t.asciz \"Invalid type must be a int\\n\"" << std::endl;
+  outfile_ << "\t.asciz \"Invalid type: must be a int\\n\"" << std::endl;
+
+  // Divisionbyzeroascii
+  outfile_ << "\tdivisionbyzeroasciz:" << std::endl;
+  outfile_ << "\t.asciz \"Error: Division by zero\\n\"" << std::endl;
+
 
   // outofboundserrorascii
   outfile_ << "outofboundserrorasciz:" << std::endl;
@@ -105,6 +111,21 @@ void CodeGen::GeneratePrinter() {
 
 void CodeGen::GeneratePrintCall(std::string label) {
   outfile_ << "\t# Calling printf" << std::endl;
+  outfile_ << "\tpush %rax" << std::endl;
+  outfile_ << "\tmov $" << label << ", %rdi" << std::endl;
+  outfile_ << "\tmov $0, %rax" << std::endl;
+  outfile_ << "\tcall printf" << std::endl;
+
+  outfile_ << "\tpop %rax" << std::endl;
+  outfile_ << "\tmov $printint, %rdi" << std::endl;
+  outfile_ << "\tmov %rax, %rsi" << std::endl;
+  outfile_ << "\tmov $0, %rax" << std::endl;
+  outfile_ << "\tcall printf\n" << std::endl;
+}
+
+void CodeGen::TestPrint(std::string label) {
+  outfile_ << "\t# Calling printf" << std::endl;
+  outfile_ << "\tpop %rax" << std::endl;
   outfile_ << "\tpush %rax" << std::endl;
   outfile_ << "\tmov $" << label << ", %rdi" << std::endl;
   outfile_ << "\tmov $0, %rax" << std::endl;
@@ -136,9 +157,7 @@ void CodeGen::GenerateData(std::set<std::string> variableset) {
 }
 
 void CodeGen::GenerateEpilogue() {
-  outfile_ << "\tmov $60, %rax\n";
-  outfile_ << "\tmov $2, %rdi\n";
-  outfile_ << "\tsyscall\n" << std::endl;
+  outfile_ << "\tcall exit\n";
 }
 
 void CodeGen::GenerateBoiler() {
@@ -152,7 +171,7 @@ void CodeGen::ClearRegister(std::string reg) {
 }
 
 void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
-  Type loadtype = tac->op.opcode();
+  OpcodeType loadtype = tac->op.opcode();
   int argumentnum;
   std::string varname;
   std::vector<std::string> parsedstring;
@@ -161,10 +180,10 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
     case INTLOAD:  // 2 pushes
       outfile_ << "\t# Loading in an integer" << std::endl;
       outfile_ << "\tmov $" + std::to_string(tac->arg1.value())
-        + ", %rcx" << std::endl;
-      outfile_ << "\tmov $0x100, %rax" << std::endl;
-      outfile_ << "\tpush %rax" << std::endl;
-      outfile_ << "\tpush %rcx\n" << std::endl;
+        + ", %rax" << std::endl;
+      outfile_ << "\tmov $0x100, %rbx" << std::endl;
+      outfile_ << "\tpush %rbx" << std::endl;
+      outfile_ << "\tpush %rax\n" << std::endl;
       break;
     case VARLOAD:  // 2 pushes
       outfile_ << "\t# Loading from a variable" << std::endl;
@@ -299,37 +318,40 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
 }
 
 void CodeGen::GenerateArithmeticExpr(std::unique_ptr<ThreeAddressCode> tac,
-                                     Type type) {
+                                     OpcodeType type) {
   switch (type) {
     case ADD:
       outfile_ << "\t# Addition\n";
       GenerateBinaryExprHelper(std::move(tac));
       ClearRegister("rcx");
       outfile_ << "\tadd %rax, %rcx\n\tadd %rbx, %rcx" << std::endl;
-      outfile_ << "\tpush %rdx\n" << std::endl;
+      outfile_ << "\tpush %rdx" << std::endl;
       outfile_ << "\tpush %rcx\n" << std::endl;
       break;
     case SUB:
       outfile_ << "\t# Subtraction\n";
       GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\tsub %rbx, %rax" << std::endl;
-      outfile_ << "\tpush %rcx\n" << std::endl;
+      outfile_ << "\tpush %rcx" << std::endl;
       outfile_ << "\tpush %rax\n" << std::endl;
       break;
     case MULT:
       outfile_ << "\t# Multiplication\n";
       GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\timul %rax, %rbx" << std::endl;
-      outfile_ << "\tpush %rcx\n" << std::endl;
+      outfile_ << "\tpush %rcx" << std::endl;
       outfile_ << "\tpush %rbx\n" << std::endl;
       break;
     case DIV:
       ClearRegister("rdx");
       outfile_ << "\t# Division\n";
       GenerateBinaryExprHelper(std::move(tac));
+      // Check for division by zero
+      outfile_ << "\tmov %rbx, %rdi" << std::endl;
+      outfile_ << "\tcall divisionbyzerocheck" << std::endl;
       outfile_ << "\tcqto" << std::endl;  // indicating its a signed division
       outfile_ << "\tidiv %rbx" << std::endl;
-      outfile_ << "\tpush %rcx\n" << std::endl;
+      outfile_ << "\tpush %rcx" << std::endl;
       outfile_ << "\tpush %rax\n" << std::endl;
       break;
     default:
@@ -340,7 +362,7 @@ void CodeGen::GenerateArithmeticExpr(std::unique_ptr<ThreeAddressCode> tac,
 }
 
 void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
-                                     Type type) {
+                                     OpcodeType type) {
   // Note to self you can abstract this out even more
   switch (type) {
     case LESSTHAN:
@@ -396,7 +418,7 @@ void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
 }
 
 void CodeGen::GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
-                                  Type type) {
+                                  OpcodeType type) {
   switch (type) {
     case LOGAND:
       outfile_ << "\t# LogicalAnd\n";
@@ -546,34 +568,33 @@ void CodeGen::GenerateCreateNewTuple() {
   outfile_ << "\tret" << std::endl;
 }
 
+void CodeGen::GenerateDivisionByZeroCheck() {
+  // rdi contains the address of what to check
+  outfile_ << "divisionbyzerocheck:" << std::endl;
+  outfile_ << "\tcmp $0, %rdi" << std::endl;
+  outfile_ << "\tje printdivisionbyzeroerror" << std::endl;
+  outfile_ << "\tret" << std::endl;
+}
+
 void CodeGen::GenerateTupleFlagCheck() {
   // rdi contains the address of what to check
   outfile_ << "tupleflagcheck:" << std::endl;
   outfile_ << "\tcmp $1, %rdi" << std::endl;
-  outfile_ << "\tsete %dl" << std::endl;
-  outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-  outfile_ << "\tcmp $0, %rcx" << std::endl;
-  outfile_ << "\tje printtupletypeerror" << std::endl;
+  outfile_ << "\tjne printtupletypeerror" << std::endl;
   outfile_ << "\tret" << std::endl;
 }
 void CodeGen::GenerateIntegerFlagCheck() {
   // rdi contains the address of what to check
   outfile_ << "integerflagcheck:" << std::endl;
   outfile_ << "\tcmp $0, %rdi" << std::endl;
-  outfile_ << "\tsete %dl" << std::endl;
-  outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-  outfile_ << "\tcmp $0, %rcx" << std::endl;
-  outfile_ << "\tje printintegertypeerror" << std::endl;
+  outfile_ << "\tjne printintegertypeerror" << std::endl;
   outfile_ << "\tret" << std::endl;
 }
 void CodeGen::GenerateExistenceCheck() {
   // rdi contains the address of what to check
   outfile_ << "existencecheck:" << std::endl;
   outfile_ << "\tcmp $1, %rdi" << std::endl;
-  outfile_ << "\tsete %dl" << std::endl;
-  outfile_ << "\tmovzx %dl, %rcx" << std::endl;
-  outfile_ << "\tcmp $0, %rcx" << std::endl;
-  outfile_ << "\tje printexistenceerror" << std::endl;
+  outfile_ << "\tjne printexistenceerror" << std::endl;
   outfile_ << "\tret" << std::endl;
 }
 void CodeGen::GenerateTupleSizeCheck() {
@@ -695,7 +716,7 @@ void CodeGen::GenerateRHSDerefEpilogue(std::string arg2) {
 }
 
 void CodeGen::Generate(
-    std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks) {
+    std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks, int flag) {
   // boiler code here
   GenerateBoiler();
 
@@ -705,7 +726,7 @@ void CodeGen::Generate(
   // IR to assembly inst
   for (unsigned int i = 0; i < blocks.size(); ++i) {
     auto code = std::move(blocks[i]);
-    Type opcode = code->op.opcode();
+    OpcodeType opcode = code->op.opcode();
 
     switch (opcode) {
       case INTLOAD:
@@ -966,6 +987,12 @@ void CodeGen::Generate(
         exit(1);
     }
   }
+
+  if (flag == 1) {
+    TestPrint("printresult");
+    GenerateEpilogue();
+  }
+
   GeneratePrinter();
   outfile_.close();
 }

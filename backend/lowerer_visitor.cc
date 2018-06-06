@@ -18,8 +18,6 @@ std::string LowererVisitor::GetOutputArithmeticHelper(
 std::string LowererVisitor::GetOutput() {
   // Iterate through the vector and print out each basic block
   std::string output = "";
-
-  // Probably make this a private variable or something?
   std::vector<std::string> printhelper = {"INTLOAD", "VARLOAD", "VARASSIGNLOAD",
     "FUNARGLOAD", "FUNRETLOAD", "+", "-", "*", "/", "<", "<=", ">", ">=",
     "==", "&&", "||", "¬", "while", "if", "jmp", "je", "jne", "jg", "jge",
@@ -31,7 +29,7 @@ std::string LowererVisitor::GetOutput() {
   for (unsigned int i = 0; i < blocks_.size(); ++i) {
     // If it's a just a int (Register without a name then access it's value)
     // Otherwise access its name
-    Type opcodetype = blocks_[i]->op.opcode();
+    OpcodeType opcodetype = blocks_[i]->op.opcode();
     switch (opcodetype) {
       case INTLOAD:
         output = output + blocks_[i]->target.reg().name()
@@ -147,7 +145,6 @@ void LowererVisitor::VisitDereference(const Dereference& exp) {
       leftderefvariable = leftbasevariable+"->"+rhsvirtualreg;
       variablestack_.push(leftderefvariable);
       indexoflastchild = -1;
-
       break;
     default:
       std::cerr << "Inside Dereference Something went very wrong\n";
@@ -163,8 +160,6 @@ void LowererVisitor::VisitAssignmentFromNewTuple(
   const AssignmentFromNewTuple& assignment) {
   // Visit the left which will add its variable name to the stack
 
-  // left hand side can't be a variable used to hold integer cause : x or x->1
-  // (may not be true in the future)
   currvariabletype_ = LEFTHANDVAR;
   currdereferencetype_ = LHSDEREFERENCE;
   assignment.lhs().Visit(const_cast<LowererVisitor*>(this));
@@ -457,8 +452,8 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
 
   std::set<std::string> s1 = localsets_[localsets_.size()-1];
   std::set<std::string> s2 = localsets_[localsets_.size()-2];
-  std::set<std::string> intersectionset(SetIntersectionHelper(s1, s2));
-  std::set<std::string> differenceset(SetDifferenceHelper(s1, s2));
+  std::set<std::string> intersectionset(GetSetIntersection(s1, s2));
+  std::set<std::string> differenceset(GetSetDifference(s1, s2));
 
   // std::cerr << "SIZE OF SET1: " << s1.size() << std::endl;
   // std::cerr << "SIZE OF SET2: " << s2.size() << std::endl;
@@ -517,9 +512,9 @@ void LowererVisitor::VisitLoop(const Loop& loop) {
     statement->Visit(this);
   }
 
-  std::set<std::string> intersectionset(SetIntersectionHelper(originalset_,
+  std::set<std::string> intersectionset(GetSetIntersection(originalset_,
     globalset_));
-  std::set<std::string> differenceset(SetDifferenceHelper(originalset_,
+  std::set<std::string> differenceset(GetSetDifference(originalset_,
     globalset_));
 
   // Add set difference to the totalset
@@ -606,7 +601,7 @@ void LowererVisitor::VisitDivideExpr(const DivideExpr& exp) {
   BinaryOperatorHelper(DIV, arg1, arg2);
 }
 
-void LowererVisitor::CreateLoadBlock(Type type, Operand arg1) {
+void LowererVisitor::CreateLoadBlock(OpcodeType type, Operand arg1) {
   ASSERT(type == INTLOAD || type == VARASSIGNLOAD || type == FUNARGLOAD
   || type == FUNRETLOAD || type == VARLOAD,
   "Must be an Int, Variable, or function load\n");
@@ -673,7 +668,7 @@ void LowererVisitor::CreateLoadBlock(Type type, Operand arg1) {
   }
 }
 
-void LowererVisitor::CreateComparisionBlock(Type type) {
+void LowererVisitor::CreateComparisionBlock(OpcodeType type) {
   ASSERT(type == CONDITIONAL || type == LOOP,
          "Must be a loop or a conditional type");
 
@@ -694,17 +689,14 @@ void LowererVisitor::CreateLabelBlock(std::string labelname) {
   blocks_.push_back(std::move(labelblock));
 }
 
-void LowererVisitor::CreateJumpBlock(std::string jumpname, Type type) {
-  // Probably a better way to do this
+void LowererVisitor::CreateJumpBlock(std::string jumpname, OpcodeType type) {
   ASSERT(type == JUMP || type == JEQUAL || type == JGREATER ||
-             type == JGREATEREQ || type == JLESS || type == JLESSEQ ||
-             type == JNOTEQUAL,
-         "Must be a jump type");
+         type == JGREATEREQ || type == JLESS || type == JLESSEQ ||
+         type == JNOTEQUAL, "Must be a jump type");
 
   auto jumpblock = make_unique<struct ThreeAddressCode>();
   jumpblock->target = Target(Label(jumpname));
   jumpblock->op = Opcode(type);
-
   blocks_.push_back(std::move(jumpblock));
 }
 
@@ -761,6 +753,8 @@ void LowererVisitor::CreateDereference(std::string basevariable,
   blocks_.push_back(std::move(block));
 }
 
+// Can combine CreateTupleAssignment and CreateArithmeticAssignment
+// into one function
 void LowererVisitor::CreateTupleAssignment(std::string target,
   Operand operand) {
   auto block = make_unique<struct ThreeAddressCode>();
@@ -805,7 +799,7 @@ Register LowererVisitor::GetArgument(ChildType type) {
   return arg;
 }
 
-void LowererVisitor::BinaryOperatorHelper(Type type,
+void LowererVisitor::BinaryOperatorHelper(OpcodeType type,
   Register arg1, Register arg2) {
   // Load value into target (t <- prev->target + prev->prev->target)
   // Last two elements of the vector should be the integers to load in
@@ -819,10 +813,7 @@ void LowererVisitor::BinaryOperatorHelper(Type type,
     newblock->arg2 = Operand(arg2);
   }
 
-  // if (type == DIV) {check for div zero?}
-
   newblock->op = Opcode(type);
-  // look at this later, just going to do this now to test some things
   newblock->target = Target(Register("t_" +
     std::to_string(counter_.variablecount), VIRTUALREG));
 
@@ -833,7 +824,7 @@ void LowererVisitor::BinaryOperatorHelper(Type type,
   lastchildtype_ = BINOPCHILD;
 }
 
-std::set<std::string> LowererVisitor::SetDifferenceHelper(
+std::set<std::string> LowererVisitor::GetSetDifference(
   std::set<std::string> set1, std::set<std::string> set2) {
   std::set<std::string> differenceset;
   set_symmetric_difference(set1.begin(), set1.end(), set2.begin(), set2.end(),
@@ -841,7 +832,7 @@ std::set<std::string> LowererVisitor::SetDifferenceHelper(
     return differenceset;
 }
 
-std::set<std::string> LowererVisitor::SetIntersectionHelper(
+std::set<std::string> LowererVisitor::GetSetIntersection(
   std::set<std::string> set1, std::set<std::string> set2) {
     // get the intersection of the two sets
     std::set<std::string> intersectionset;

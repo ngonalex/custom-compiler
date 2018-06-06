@@ -6,6 +6,9 @@
 #include <map>
 #include <set>
 #include <sstream>
+#include <vector>
+#include <string>
+#include <utility>
 
 #include "backend/lowerer_visitor.h"
 
@@ -16,7 +19,8 @@ class CodeGen {
  public:
     explicit CodeGen(std::ofstream &filename) : outfile_(filename),
       currscope_(GLOBAL) {}
-    void Generate(std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks);
+    void Generate(std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks,
+      int flag);
     void GenerateEpilogue();
     void ClearRegister(std::string reg);
     void GenerateBoiler();
@@ -28,16 +32,18 @@ class CodeGen {
     void GeneratePrintFunctionResult();
     void GeneratePrintResult();
     void GenerateData(std::set<std::string>);
+    void TestPrint(std::string label);
     // Different nodes + helpers
     void GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac);
     void GenerateArithmeticExpr(std::unique_ptr<ThreeAddressCode> tac,
-      Type type);
+      OpcodeType type);
     void GenerateBinaryExprHelper(std::unique_ptr<ThreeAddressCode> tac);
     void GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
-      Type type);
+      OpcodeType type);
     void GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
-      Type type);
+      OpcodeType type);
 
+    void GenerateDivisionByZeroCheck();
     void GenerateTupleFlagCheck();
     void GenerateIntegerFlagCheck();
     void GenerateExistenceCheck();
@@ -62,7 +68,6 @@ class CodeGen {
   std::set<std::string> assignmentset_;
   Scope currscope_;
   std::map<std::string, int> symbollocations_;
-  std::map<std::string, int> symboltypes_;
 };
 
 }  // namespace backend

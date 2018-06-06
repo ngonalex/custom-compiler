@@ -74,7 +74,9 @@ int main() {
       statements.push_back(std::move(make_unique<const AssignmentFromArithExp>(
       make_unique<const Dereference>(
         make_unique<const VariableExpr>("x"),
-        make_unique<const IntegerExpr>(2)),
+        make_unique<const AddExpr>(
+          make_unique<const IntegerExpr>(1),
+          make_unique<const IntegerExpr>(1))),
       make_unique<const IntegerExpr>(1000))));
 
       statements.push_back(std::move(make_unique<const AssignmentFromNewTuple>(
@@ -85,9 +87,11 @@ int main() {
 
     statements.push_back(std::move(make_unique<const AssignmentFromArithExp>(
      make_unique<const VariableExpr>("y"),
-     make_unique<const Dereference>(
-       make_unique<const VariableExpr>("x"),
-       make_unique<const IntegerExpr>(2)))));
+     make_unique<const AddExpr>(
+      make_unique<const Dereference>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(2)),
+      make_unique<const IntegerExpr>(5)))));
 
   statements.push_back(std::move(make_unique<const AssignmentFromArithExp>(
       make_unique<const Dereference>(
@@ -230,7 +234,7 @@ int main() {
   CodeGen runner = CodeGen(file);
   auto test = lowerer_.GetIR();
   runner.GenerateData(lowerer_.globalset());
-  runner.Generate(std::move(test));
+  runner.Generate(std::move(test), 0);
   system("gcc -g -static test.s -o run && ./run");
   // CHANGE TO GENERATEEPILOGUE LATER
   return 0;

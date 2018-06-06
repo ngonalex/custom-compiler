@@ -101,10 +101,10 @@ class LowererVisitor : public AstVisitor {
   void CreateFunctionDefSignal(std::string name);
   void CreateFunctionCallBlock(std::string funname);
   void CreateFunctionCallReturnEpilogue(int numofregs);
-  void CreateLoadBlock(Type type, Operand arg1);
-  void CreateComparisionBlock(Type type);
+  void CreateLoadBlock(OpcodeType type, Operand arg1);
+  void CreateComparisionBlock(OpcodeType type);
   void CreateLabelBlock(std::string labelname);
-  void CreateJumpBlock(std::string jumpname, Type type);
+  void CreateJumpBlock(std::string jumpname, OpcodeType type);
   void CreateDereference(std::string basevariable, std::string targetvariable,
     int indexofchild);
   void CreateTupleAssignment(std::string target, Operand operand);
@@ -113,14 +113,14 @@ class LowererVisitor : public AstVisitor {
   // Helpers
   std::string GetOutputArithmeticHelper(std::string output, int index,
                                         std::vector<std::string> printhelper);
-  void BinaryOperatorHelper(Type type, Register arg1, Register arg2);
+  void BinaryOperatorHelper(OpcodeType type, Register arg1, Register arg2);
   std::string JumpLabelHelper();
   std::string ContinueLabelHelper();
   std::string LoopLabelHelper();
   Register GetArgument(ChildType type);
-  std::set<std::string> SetDifferenceHelper(std::set<std::string> set1,
+  std::set<std::string> GetSetDifference(std::set<std::string> set1,
     std::set<std::string> set2);
-  std::set<std::string> SetIntersectionHelper(std::set<std::string> set1,
+  std::set<std::string> GetSetIntersection(std::set<std::string> set1,
     std::set<std::string> set2);
 
   std::vector<std::unique_ptr<ThreeAddressCode>> GetIR() {
@@ -139,11 +139,10 @@ class LowererVisitor : public AstVisitor {
   std::vector<std::set<std::string>> localsets_;
   std::set<std::string> totalset_;
   std::set<std::string> globalset_;
-  std::map<std::string, DataType> typemap_;
   ChildType lastchildtype_;
   struct Counter counter_;
   VariableType currvariabletype_;
-  Type currdereferencetype_;
+  OpcodeType currdereferencetype_;
 };
 
 }  // namespace backend
