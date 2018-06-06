@@ -982,6 +982,22 @@ TEST_F(LowererTest, AccessTupleTest) {
   EXPECT_EQ(lowerer_.GetOutput(), "bob <-  VARCHILDTUPLE \nt_0 <- 3\nbob <- t_0 NEWTUPLE \nt_1 <- 1\nbob->t_1 <- bob LHSDEREFERENCE Parent\nt_2 <- 2\nbob->t_1 <- t_2\n");
 }
 
+TEST_F(LowererTest, TupleRHSDERTest) {
+  auto ast = make_unique<AssignmentFromNewTuple>(make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3));
+  
+  // bob->1 = 2
+  auto def = make_unique<Dereference>(make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(1));
+  auto access = make_unique<AssignmentFromArithExp>(std::move(def), make_unique<IntegerExpr>(2));
+  auto defagain = make_unique<Dereference>(make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(1));
+  auto assign = make_unique<AssignmentFromArithExp>(make_unique<VariableExpr>("y"), std::move(defagain));
+
+  ast->Visit(&lowerer_);
+  access->Visit(&lowerer_);
+  assign->Visit(&lowerer_);
+
+  EXPECT_EQ(lowerer_.GetOutput(), "bob <-  VARCHILDTUPLE \nt_0 <- 3\nbob <- t_0 NEWTUPLE \nt_1 <- 1\nbob->t_1 <- bob LHSDEREFERENCE Parent\nt_2 <- 2\nbob->t_1 <- t_2\nt_3 <- 1\nbob->t_3 <- bob RHSDEREFERENCE Parent\ny <- bob->t_3\n");
+}
+
 TEST_F(LowererTest, NestedTupleTest){
 
   // bob = new Tuple(4)
