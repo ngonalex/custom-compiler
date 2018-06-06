@@ -14,7 +14,7 @@ using namespace cs160::frontend;
 
 std::string errorMessage = "Expected relational operator";
 
-ParseStatus EqualToOpParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus EqualToOpParser::parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 
@@ -31,7 +31,7 @@ ParseStatus EqualToOpParser::parse(std::string inputProgram, int startCharacter,
 	return equals_equals.parse(inputProgram, endCharacter);
 }
 
-ParseStatus GreaterThanOpParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus GreaterThanOpParser::parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 
@@ -43,7 +43,7 @@ ParseStatus GreaterThanOpParser::parse(std::string inputProgram, int startCharac
 	return parser.parse(inputProgram, endCharacter);
 }
 
-ParseStatus LessThanOpParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus LessThanOpParser::parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 
@@ -55,10 +55,10 @@ ParseStatus LessThanOpParser::parse(std::string inputProgram, int startCharacter
 	return parser.parse(inputProgram, endCharacter);
 }
 
-ParseStatus GreaterThanOrEqualToOpParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus GreaterThanOrEqualToOpParser::parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
-
+	
 	if (inputProgram.size() <= 1) {
 		return super::fail(inputProgram, endCharacter, errorMessage);
 	}
@@ -72,7 +72,7 @@ ParseStatus GreaterThanOrEqualToOpParser::parse(std::string inputProgram, int st
 	return greater_or_equal.parse(inputProgram, endCharacter);
 }
 
-ParseStatus LessThanOrEqualToOpParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus LessThanOrEqualToOpParser::parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 
@@ -89,7 +89,7 @@ ParseStatus LessThanOrEqualToOpParser::parse(std::string inputProgram, int start
 	return less_or_equal.parse(inputProgram, endCharacter);
 }
 
-ParseStatus AndOpParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus AndOpParser::parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 
@@ -106,7 +106,7 @@ ParseStatus AndOpParser::parse(std::string inputProgram, int startCharacter, std
 	return and_and.parse(inputProgram, endCharacter);
 }
 
-ParseStatus OrOpParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus OrOpParser::parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 
@@ -123,7 +123,7 @@ ParseStatus OrOpParser::parse(std::string inputProgram, int startCharacter, std:
 	return or_or.parse(inputProgram, endCharacter);
 }
 
-ParseStatus NotOpParser::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus NotOpParser::parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 
@@ -135,12 +135,14 @@ ParseStatus NotOpParser::parse(std::string inputProgram, int startCharacter, std
 	return parser.parse(inputProgram, endCharacter);
 }
 
-ParseStatus RelationOperator::parse(std::string inputProgram, int startCharacter, std::string errorType) {
+ParseStatus RelationOperator::parse(std::string inputProgram, int startCharacter) {
 	EqualToOpParser equalTo;
-  GreaterThanOpParser greaterThan;
-  LessThanOpParser lessThan;
+
   GreaterThanOrEqualToOpParser greaterOrEqual;
   LessThanOrEqualToOpParser lessOrEqual;
+
+	GreaterThanOpParser greaterThan;
+  LessThanOpParser lessThan;
     // > or <
   OrCombinator greaterOrLess;
   greaterOrLess.firstParser = reinterpret_cast<NullParser *>(&greaterThan);
