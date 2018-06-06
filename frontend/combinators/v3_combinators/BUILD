@@ -4,15 +4,18 @@ cc_library(
 
 	hdrs = [
 	"helpers/relational_helper.h", 
+	"main/relation_body.h"
 	],
 
 	srcs = [
 	"helpers/relational_helper.cc",
+	"main/relation_body.cc"
 	],
 
 	deps = [
 	"//utility", 
 	"//frontend/combinators/basic_combinators",
+	"//frontend/combinators/v1_combinators:v1_combinators",
 	"//abstract_syntax:abstract_syntax",
 	"//abstract_syntax:print_visitor_v2"
 	],
