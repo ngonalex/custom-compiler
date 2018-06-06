@@ -15,7 +15,7 @@ class NullParser {
                    std::string errorMessage = "");
 
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
-
+protected:
   ParseStatus parse(std::string inputProgram,
                     int startCharacter,
                     std::string errorMessage);
