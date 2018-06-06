@@ -139,6 +139,7 @@ void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddress
   //cfg_nodes_ = std::move(cfg_vector);
 }
 
+//Apply a local optimization
 std::vector<std::unique_ptr<struct ThreeAddressCode>> MarkSweep(
     std::vector<std::string> &live_set,
     ControlFlowGraphNode * apply_sweep) {
