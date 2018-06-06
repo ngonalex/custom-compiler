@@ -1,5 +1,6 @@
 #include "frontend/combinators/basic_combinators/null.h"
 #include "frontend/combinators/basic_combinators/parsestatus.h"
+#include <map>
 
 using namespace cs160::frontend;
 
@@ -18,6 +19,18 @@ ParseStatus NullParser::fail(std::string inputProgram, int startCharacter, std::
   return status;
 }
 
-ParseStatus NullParser::parse(std::string inputProgram, int startCharacter){
-    return fail(inputProgram, startCharacter);
+ParseStatus NullParser::do_parse(std::string inputProgram, int startCharacter) {
+  return fail(inputProgram, startCharacter);
+}
+
+ParseStatus parse(std::string inputProgram, int startCharacter, std::string errorMessage) {
+  std::map<int, ParseStatus>::iterator iter;
+  iter = cache.find(startCharacter);
+
+  if(iter != cache.end()) {
+    ParseStatus result = iter->second;
+    return result;
+  } else {
+    do_parse(inputProgram, startCharacter);
+  }
 }

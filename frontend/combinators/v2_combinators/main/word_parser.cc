@@ -12,7 +12,7 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus WordParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus WordParser::do_parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
   	endCharacter += trim(inputProgram);
 
@@ -36,7 +36,7 @@ ParseStatus WordParser::parse(std::string inputProgram, int startCharacter) {
 	firstAnd.firstParser = reinterpret_cast<NullParser *>(&charParser);
 	firstAnd.secondParser = reinterpret_cast<NullParser *>(&zeroOrMore);
 
-	ParseStatus result = firstAnd.parse(inputProgram, endCharacter);
+	ParseStatus result = firstAnd.do_parse(inputProgram, endCharacter);
 
 	if (result.status){
 		result.ast = std::move(make_unique<const VariableExpr>(result.parsedCharacters));

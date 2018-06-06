@@ -13,7 +13,7 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus AssignmentParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus AssignmentParser::do_parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
   
@@ -36,13 +36,13 @@ ParseStatus AssignmentParser::parse(std::string inputProgram, int startCharacter
   firstAnd.firstParser = reinterpret_cast<NullParser *>(&varOrWord);
   firstAnd.secondParser = reinterpret_cast<NullParser *>(&equalSignParser);
 
-  ParseStatus firstResult = firstAnd.parse(inputProgram, endCharacter); // Will be used as cache result for second
+  ParseStatus firstResult = firstAnd.do_parse(inputProgram, endCharacter); // Will be used as cache result for second
 
   AndCombinator secondAnd;
   secondAnd.firstParser = reinterpret_cast<NullParser *>(&firstAnd);
   secondAnd.secondParser = reinterpret_cast<NullParser *>(&arithExprParser);
 
-  ParseStatus result = secondAnd.parse(inputProgram, endCharacter);
+  ParseStatus result = secondAnd.do_parse(inputProgram, endCharacter);
 
   if(result.status) {
     result.ast = std::move(make_unique<const Assignment>(

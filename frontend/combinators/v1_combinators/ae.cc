@@ -14,7 +14,7 @@ using namespace cs160::frontend;
    close_paren
 */
 
-ParseStatus ArithExprParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus ArithExprParser::do_parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
@@ -23,10 +23,10 @@ ParseStatus ArithExprParser::parse(std::string inputProgram, int startCharacter)
   }
   AddSubExprParser ae;
   SemiColonParser semiColonP;
-  ParseStatus aeParseResult = ae.parse(inputProgram, endCharacter);
+  ParseStatus aeParseResult = ae.do_parse(inputProgram, endCharacter);
   aeParseResult.startCharacter = startCharacter;
   if (aeParseResult.status) {
-    ParseStatus semiColonResult = semiColonP.parse(aeParseResult.remainingCharacters, aeParseResult.endCharacter);
+    ParseStatus semiColonResult = semiColonP.do_parse(aeParseResult.remainingCharacters, aeParseResult.endCharacter);
     aeParseResult.status = semiColonResult.status;
     if (semiColonResult.status) {
       aeParseResult.remainingCharacters = semiColonResult.remainingCharacters;

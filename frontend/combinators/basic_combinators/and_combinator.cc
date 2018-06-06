@@ -4,15 +4,15 @@
 
 using namespace cs160::frontend;
 
-ParseStatus AndCombinator::parse(std::string inputProgram, int startCharacter) {
-  ParseStatus firstStatus = firstParser->parse(inputProgram, startCharacter);
+ParseStatus AndCombinator::do_parse(std::string inputProgram, int startCharacter) {
+  ParseStatus firstStatus = firstParser->do_parse(inputProgram, startCharacter);
 
   if (!firstStatus.status) {
     return firstStatus;
   }
 
   ParseStatus secondStatus =
-      secondParser->parse(firstStatus.remainingCharacters, firstStatus.endCharacter);
+      secondParser->do_parse(firstStatus.remainingCharacters, firstStatus.endCharacter);
 
   if (!secondStatus.status) {
     secondStatus.startCharacter = startCharacter;

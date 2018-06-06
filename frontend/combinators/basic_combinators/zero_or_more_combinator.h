@@ -10,7 +10,7 @@ namespace frontend {
 class ZeroOrMoreCombinator : NullParser {
  public:
   NullParser *parser;
-  virtual ParseStatus parse(std::string inputProgram,
+  virtual ParseStatus do_parse(std::string inputProgram,
   				int startCharacter);
 };
 

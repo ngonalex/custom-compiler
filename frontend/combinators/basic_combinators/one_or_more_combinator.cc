@@ -5,16 +5,16 @@
 
 using namespace cs160::frontend;
 
-ParseStatus OneOrMoreCombinator::parse(std::string inputProgram,
+ParseStatus OneOrMoreCombinator::do_parse(std::string inputProgram,
                int startCharacter) {
-  ParseStatus pStatus = parser->parse(inputProgram, startCharacter);
+  ParseStatus pStatus = parser->do_parse(inputProgram, startCharacter);
 
   if (!pStatus.status) {
     return pStatus;
   }
 
   while (pStatus.status) {
-    ParseStatus pStatus2 = parser->parse(pStatus.remainingCharacters, pStatus.endCharacter);
+    ParseStatus pStatus2 = parser->do_parse(pStatus.remainingCharacters, pStatus.endCharacter);
     pStatus.status = pStatus2.status;
     pStatus.parsedCharacters += (pStatus2.parsedCharacters);
     pStatus.remainingCharacters = pStatus2.remainingCharacters;

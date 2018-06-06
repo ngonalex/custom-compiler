@@ -9,7 +9,7 @@ namespace frontend {
 
 class TermExprParser : NullParser {
  public:
-  virtual ParseStatus parse(std::string inputProgram,
+  virtual ParseStatus do_parse(std::string inputProgram,
   				int startCharacter);
 };
 

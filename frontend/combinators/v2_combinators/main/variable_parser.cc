@@ -12,7 +12,7 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus VariableParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus VariableParser::do_parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
@@ -29,7 +29,7 @@ ParseStatus VariableParser::parse(std::string inputProgram, int startCharacter) 
   AndCombinator firstAnd;
   firstAnd.firstParser = reinterpret_cast<NullParser *>(&varParser);
   firstAnd.secondParser = reinterpret_cast<NullParser *>(&wordParser);
-  ParseStatus intermediateValue = firstAnd.parse(inputProgram, endCharacter); // Will be used in cache
+  ParseStatus intermediateValue = firstAnd.do_parse(inputProgram, endCharacter); // Will be used in cache
   AndCombinator secondAnd;
   secondAnd.firstParser = reinterpret_cast<NullParser *>(&firstAnd);
   secondAnd.secondParser = reinterpret_cast<NullParser *>(&colonParser);
@@ -39,7 +39,7 @@ ParseStatus VariableParser::parse(std::string inputProgram, int startCharacter) 
   AndCombinator fourthAnd;
   fourthAnd.firstParser = reinterpret_cast<NullParser *>(&thirdAnd);
   fourthAnd.secondParser = reinterpret_cast<NullParser *>(&semiColonP);
-  ParseStatus result = fourthAnd.parse(inputProgram, endCharacter);
+  ParseStatus result = fourthAnd.do_parse(inputProgram, endCharacter);
 
   if(result.status) {
     result.ast = std::move(intermediateValue.second_ast);

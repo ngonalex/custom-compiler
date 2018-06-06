@@ -8,7 +8,7 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus MulDivExprParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus MulDivExprParser::do_parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
@@ -18,20 +18,20 @@ ParseStatus MulDivExprParser::parse(std::string inputProgram, int startCharacter
 
   // ae
   TermExprParser lhs;
-  ParseStatus result = lhs.parse(inputProgram, endCharacter);
+  ParseStatus result = lhs.do_parse(inputProgram, endCharacter);
   if (result.status) {
     // op
     MulDivOpParser op;
-    ParseStatus mdParseStatus = op.parse(result.remainingCharacters, result.endCharacter);
+    ParseStatus mdParseStatus = op.do_parse(result.remainingCharacters, result.endCharacter);
     while (mdParseStatus.status) {
       result.parsedCharacters += mdParseStatus.parsedCharacters;
       TermExprParser rhs;
-      ParseStatus rhsParseStatus = rhs.parse(mdParseStatus.remainingCharacters, mdParseStatus.endCharacter);
+      ParseStatus rhsParseStatus = rhs.do_parse(mdParseStatus.remainingCharacters, mdParseStatus.endCharacter);
       result.ast = std::move(make_node(
 	      (mdParseStatus.parsedCharacters),
 	        unique_cast<const ArithmeticExpr>(std::move(result.ast)),
 	        unique_cast<const ArithmeticExpr>(std::move(rhsParseStatus.ast))));
-      mdParseStatus = op.parse(rhsParseStatus.remainingCharacters, rhsParseStatus.endCharacter);
+      mdParseStatus = op.do_parse(rhsParseStatus.remainingCharacters, rhsParseStatus.endCharacter);
       result.parsedCharacters += (rhsParseStatus.parsedCharacters);
       result.startCharacter = startCharacter;
       result.endCharacter = rhsParseStatus.endCharacter;

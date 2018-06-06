@@ -15,7 +15,7 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus VarKeywordParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus VarKeywordParser::do_parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
@@ -35,13 +35,13 @@ ParseStatus VarKeywordParser::parse(std::string inputProgram, int startCharacter
   andTwo.firstParser = reinterpret_cast<NullParser *>(&andOne);
   andTwo.secondParser = reinterpret_cast<NullParser *>(&rParser);
 
-  ParseStatus result = andTwo.parse(inputProgram, endCharacter);
+  ParseStatus result = andTwo.do_parse(inputProgram, endCharacter);
   result.errorType = errorMessage;
   return result;
 }
 
 
-ParseStatus ColonParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus ColonParser::do_parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
@@ -52,14 +52,14 @@ ParseStatus ColonParser::parse(std::string inputProgram, int startCharacter) {
 	}
 
   auto vParser = AtomParser(':');
-  ParseStatus result = vParser.parse(inputProgram, endCharacter);
+  ParseStatus result = vParser.do_parse(inputProgram, endCharacter);
   result.errorType = errorMessage;
 
   return result;
 }
 
 
-ParseStatus TypeParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus TypeParser::do_parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
@@ -72,7 +72,7 @@ ParseStatus TypeParser::parse(std::string inputProgram, int startCharacter) {
   SingleCharParser charParser;
 
 	oneOrMore.parser = reinterpret_cast<NullParser *>(&charParser);
-  ParseStatus result = oneOrMore.parse(inputProgram, endCharacter);
+  ParseStatus result = oneOrMore.do_parse(inputProgram, endCharacter);
 
   if(!result.status) {
     result.errorType = errorMessage;
@@ -81,7 +81,7 @@ ParseStatus TypeParser::parse(std::string inputProgram, int startCharacter) {
   return result;
 }
 
-ParseStatus EqualSignParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus EqualSignParser::do_parse(std::string inputProgram, int startCharacter) {
    int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
@@ -92,7 +92,7 @@ ParseStatus EqualSignParser::parse(std::string inputProgram, int startCharacter)
   }
 
   auto vParser = AtomParser('=');
-  ParseStatus result = vParser.parse(inputProgram, endCharacter);
+  ParseStatus result = vParser.do_parse(inputProgram, endCharacter);
   result.errorType = errorMessage;
 
   return result;
@@ -100,7 +100,7 @@ ParseStatus EqualSignParser::parse(std::string inputProgram, int startCharacter)
 }
 
 
-ParseStatus HelperVariableParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus HelperVariableParser::do_parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
@@ -116,14 +116,14 @@ ParseStatus HelperVariableParser::parse(std::string inputProgram, int startChara
   AndCombinator firstAnd;
   firstAnd.firstParser = reinterpret_cast<NullParser *>(&varParser);
   firstAnd.secondParser = reinterpret_cast<NullParser *>(&wordParser);
-  ParseStatus intermediateValue = firstAnd.parse(inputProgram, endCharacter); // Will be used in cache
+  ParseStatus intermediateValue = firstAnd.do_parse(inputProgram, endCharacter); // Will be used in cache
   AndCombinator secondAnd;
   secondAnd.firstParser = reinterpret_cast<NullParser *>(&firstAnd);
   secondAnd.secondParser = reinterpret_cast<NullParser *>(&colonParser);
   AndCombinator thirdAnd;
   thirdAnd.firstParser = reinterpret_cast<NullParser *>(&secondAnd);
   thirdAnd.secondParser = reinterpret_cast<NullParser *>(&typeParser);
-  ParseStatus result = thirdAnd.parse(inputProgram, endCharacter);
+  ParseStatus result = thirdAnd.do_parse(inputProgram, endCharacter);
 
   if(result.status) {
     result.ast = std::move(intermediateValue.second_ast);

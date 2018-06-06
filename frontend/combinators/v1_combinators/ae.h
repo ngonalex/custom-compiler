@@ -10,7 +10,7 @@ namespace frontend {
 
 class ArithExprParser : NullParser {
  public:
-  virtual ParseStatus parse(std::string inputProgram,
+  virtual ParseStatus do_parse(std::string inputProgram,
   				int startCharacter);
 };
 

@@ -11,7 +11,7 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus TermExprParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus TermExprParser::do_parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
@@ -25,8 +25,8 @@ ParseStatus TermExprParser::parse(std::string inputProgram, int startCharacter) 
   orC.firstParser = reinterpret_cast<NullParser *>(&wordP);
   orC.secondParser = reinterpret_cast<NullParser *>(&num);
 
-  ParseStatus numParseStatus = orC.parse(inputProgram, endCharacter);
-  // ParseStatus numParseStatus = num.parse(inputProgram);
+  ParseStatus numParseStatus = orC.do_parse(inputProgram, endCharacter);
+  // ParseStatus numParseStatus = num.do_parse(inputProgram);
 
   if (numParseStatus.status) {
     return numParseStatus;  // Returning Success on Num
@@ -35,13 +35,13 @@ ParseStatus TermExprParser::parse(std::string inputProgram, int startCharacter) 
   ParseStatus result;
   // - ae
   NegativeParser negativeStatus;
-  ParseStatus negStatus = negativeStatus.parse(inputProgram, endCharacter);
+  ParseStatus negStatus = negativeStatus.do_parse(inputProgram, endCharacter);
   result.status = negStatus.status;
   if (negStatus.status) {
     result.parsedCharacters += negStatus.parsedCharacters;
     result.remainingCharacters = negStatus.remainingCharacters;
     AddSubExprParser ae;
-    ParseStatus aeParseStatus = ae.parse(negStatus.remainingCharacters, negStatus.endCharacter);
+    ParseStatus aeParseStatus = ae.do_parse(negStatus.remainingCharacters, negStatus.endCharacter);
 
     if (aeParseStatus.status) {
       result.parsedCharacters += aeParseStatus.parsedCharacters;
@@ -61,7 +61,7 @@ ParseStatus TermExprParser::parse(std::string inputProgram, int startCharacter) 
 
   // ( ae )
   OpenParenParser open_paren;
-  ParseStatus openParseStatus = open_paren.parse(inputProgram, endCharacter);
+  ParseStatus openParseStatus = open_paren.do_parse(inputProgram, endCharacter);
   result.status = openParseStatus.status;
   result.startCharacter = startCharacter;
   if (openParseStatus.status) {
@@ -69,12 +69,12 @@ ParseStatus TermExprParser::parse(std::string inputProgram, int startCharacter) 
     result.remainingCharacters = openParseStatus.remainingCharacters;
     // ae
     AddSubExprParser ae;
-    ParseStatus aeParseStatus = ae.parse(openParseStatus.remainingCharacters, openParseStatus.endCharacter);
+    ParseStatus aeParseStatus = ae.do_parse(openParseStatus.remainingCharacters, openParseStatus.endCharacter);
     if (aeParseStatus.status) {
       result.parsedCharacters += aeParseStatus.parsedCharacters;
       result.remainingCharacters = aeParseStatus.remainingCharacters;
       CloseParenParser close_paren;
-      ParseStatus cpParseStatus = close_paren.parse(aeParseStatus.remainingCharacters, aeParseStatus.endCharacter);
+      ParseStatus cpParseStatus = close_paren.do_parse(aeParseStatus.remainingCharacters, aeParseStatus.endCharacter);
       if (cpParseStatus.status) {
 	      result.parsedCharacters += cpParseStatus.parsedCharacters;
 	      result.remainingCharacters = cpParseStatus.remainingCharacters;

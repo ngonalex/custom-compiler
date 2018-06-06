@@ -9,7 +9,7 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus NumParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus NumParser::do_parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
   std::string errorMessage = "Number should only have digits (0-9)";
 
@@ -24,7 +24,7 @@ ParseStatus NumParser::parse(std::string inputProgram, int startCharacter) {
 
   oneOrMore.parser = reinterpret_cast<NullParser *>(&digitParser);  // Feels bad
   // Parse the integer
-  ParseStatus result = oneOrMore.parse(inputProgram, endCharacter);
+  ParseStatus result = oneOrMore.do_parse(inputProgram, endCharacter);
   if (result.status) {
     // Make an Integer expression
     result.ast =
