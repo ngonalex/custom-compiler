@@ -30,7 +30,13 @@ ParseStatus AssignmentParser::parse(std::string inputProgram, int startCharacter
   varOrWord.secondParser = reinterpret_cast<NullParser *>(&wordParser);
 
   EqualSignParser equalSignParser;
+
   ArithExprParser arithExprParser;
+  SemiColonParser semiColon;
+
+  AndCombinator aeSemi;
+  aeSemi.firstParser = reinterpret_cast<NullParser *>(&arithExprParser);
+  aeSemi.secondParser = reinterpret_cast<NullParser *>(&semiColon);
 
   // Grammar declaration
   AndCombinator firstAnd;
@@ -42,7 +48,7 @@ ParseStatus AssignmentParser::parse(std::string inputProgram, int startCharacter
 
   AndCombinator secondAnd;
   secondAnd.firstParser = reinterpret_cast<NullParser *>(&firstAnd);
-  secondAnd.secondParser = reinterpret_cast<NullParser *>(&arithExprParser);
+  secondAnd.secondParser = reinterpret_cast<NullParser *>(&aeSemi);
 
   ParseStatus result = secondAnd.parse(inputProgram, endCharacter);
 

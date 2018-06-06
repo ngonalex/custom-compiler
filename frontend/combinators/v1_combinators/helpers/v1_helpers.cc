@@ -100,18 +100,3 @@ ParseStatus MulDivOpParser::parse(std::string inputProgram, int startCharacter) 
 	auto result = mulOrDiv.parse(inputProgram, endCharacter);
 	return result;
 }
-
-// ;
-ParseStatus SemiColonParser::parse(std::string inputProgram, int startCharacter) {
-	int endCharacter = startCharacter;
-	endCharacter += trim(inputProgram);
-	std::string errorMessage = "Expecting ;";
-
-	if (inputProgram.size() == 0) {
-		return super::fail(inputProgram, endCharacter, errorMessage);
-	}
-
-	auto atomParser = AtomParser(';');
-	auto result = atomParser.parse(inputProgram, endCharacter);
-	return result;
-}

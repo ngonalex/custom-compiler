@@ -22,6 +22,12 @@ ParseStatus ProgramParser::parse(std::string inputProgram, int startCharacter) {
   }
 
   ArithExprParser arithExprParser;
+  SemiColonParser semiColon;
+
+  AndCombinator aeSemi;
+  aeSemi.firstParser = reinterpret_cast<NullParser *>(&arithExprParser);
+  aeSemi.secondParser = reinterpret_cast<NullParser *>(&semiColon);
+
   AssignmentParser assignParser;
   ZeroOrMoreCombinator zeroOrMore;
 
@@ -31,7 +37,7 @@ ParseStatus ProgramParser::parse(std::string inputProgram, int startCharacter) {
 
   AndCombinator firstAnd;
   firstAnd.firstParser = reinterpret_cast<NullParser *>(&zeroOrMore);
-  firstAnd.secondParser = reinterpret_cast<NullParser *>(&arithExprParser);
+  firstAnd.secondParser = reinterpret_cast<NullParser *>(&aeSemi);
 
   ParseStatus result = firstAnd.parse(inputProgram, endCharacter);
 

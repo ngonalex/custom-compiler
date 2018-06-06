@@ -21,24 +21,13 @@ ParseStatus ArithExprParser::parse(std::string inputProgram, int startCharacter)
   if (inputProgram.size() == 0) {
     return super::fail(inputProgram, endCharacter);
   }
+  
   AddSubExprParser ae;
-  SemiColonParser semiColonP;
   ParseStatus aeParseResult = ae.parse(inputProgram, endCharacter);
-  aeParseResult.startCharacter = startCharacter;
-  if (aeParseResult.status) {
-    ParseStatus semiColonResult = semiColonP.parse(
-        aeParseResult.remainingCharacters, aeParseResult.endCharacter);
-    aeParseResult.status = semiColonResult.status;
-    if (semiColonResult.status) {
-      aeParseResult.remainingCharacters = semiColonResult.remainingCharacters;
-      aeParseResult.parsedCharacters += semiColonResult.parsedCharacters;
-      aeParseResult.startCharacter = endCharacter;
-      aeParseResult.endCharacter = semiColonResult.endCharacter;
-    } else {
-      aeParseResult.errorType = semiColonResult.errorType;
-    }
+
+  if (!aeParseResult.status) {
+    aeParseResult.errorType = "Missing arithmetic expression";
   }
-  aeParseResult.errorType = "Missing arithmetic expression";
 
   return aeParseResult;
 }

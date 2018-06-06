@@ -31,11 +31,11 @@ class HelperVariableParser : NullParser {
  public:
    virtual ParseStatus parse(std::string inputProgram, int startCharacter);
 };
-/*
-class BOExpr : NullParser {
+
+class SemiColonParser : NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram);
-};*/
+	virtual ParseStatus parse(std::string inputProgram, int startCharacter);
+};
 
 }  // namespace frontend
 }  // namespace cs160
