@@ -982,4 +982,25 @@ TEST_F(LowererTest, AccessTupleTest) {
   EXPECT_EQ(lowerer_.GetOutput(), "bob <-  VARCHILDTUPLE \nt_0 <- 3\nbob <- t_0 NEWTUPLE \nt_1 <- 1\nbob->t_1 <- bob LHSDEREFERENCE Parent\nt_2 <- 2\nbob->t_1 <- t_2\n");
 }
 
+TEST_F(LowererTest, NestedTupleTest){
+
+  // bob = new Tuple(4)
+  // bob -> 1 = new Tuple(2)
+  // bob -> 1 -> 2 = 2 + 3
+  
+
+  auto assign = make_unique<AssignmentFromNewTuple>(make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(4));
+  auto dereference = make_unique<Dereference>(make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(1));
+  auto nestedassign = make_unique<AssignmentFromNewTuple>(std::move(dereference), make_unique<IntegerExpr>(2));
+  auto dereferenceagain = make_unique<Dereference>(make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(1));
+  auto nesteddereference = make_unique<Dereference>(std::move(dereferenceagain), make_unique<IntegerExpr>(2));
+  auto assignarith = make_unique<AssignmentFromArithExp>(std::move(nesteddereference), make_unique<AddExpr>(make_unique<IntegerExpr>(2), make_unique<IntegerExpr>(3)));
+
+  assign->Visit(&lowerer_);
+  nestedassign->Visit(&lowerer_);
+  assignarith->Visit(&lowerer_);
+
+  EXPECT_EQ(lowerer_.GetOutput(), "bob <-  VARCHILDTUPLE \nt_0 <- 4\nbob <- t_0 NEWTUPLE \nt_1 <- 1\nbob->t_1 <- bob LHSDEREFERENCE Parent\nt_2 <- 2\nbob->t_1 <- t_2 NEWTUPLE \nt_3 <- 1\nbob->t_3 <- bob LHSDEREFERENCE Child\nt_4 <- 2\nbob->t_3->t_4 <- bob LHSDEREFERENCE Parent\nt_5 <- 2\nt_6 <- 3\nt_7 <- t_5 + t_6\nbob->t_3->t_4 <- t_7\n");
+}
+
 // To do: Nested Branches + Nested Loops + LogicalNot
