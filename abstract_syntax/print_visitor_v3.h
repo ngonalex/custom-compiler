@@ -130,18 +130,30 @@ class PrintVisitor : public AstVisitor {
     output_ << "if ";
     conditional.guard().Visit(this);
     output_ << " {";
-    conditional.true_branch().Visit(this);
-    output_ << "} else";
-    conditional.false_branch().Visit(this);
+    for (auto& statement : conditional.true_branch()) {
+      statement->Visit(this);
+    }
+    output_ << "} else {";
+    for (auto& statement : conditional.false_branch()) {
+      statement->Visit(this);
+    }
+    output_ << "}";
   }
 
+  // Might be incorrect
   void VisitLoop(const Loop& loop) override {
-
+    output_ << "while ";
+    loop.guard().Visit(this);
+    output_ << " {";
+    for (auto& statement : loop.body()) {
+      statement->Visit(this);
+    }
+    output_ << "}";
   }
 
+  // Might be incorrect
   void VisitProgram(const Program& program) override {
-    
-    for (auto& assignment : program.assignments()) {
+    for (auto& assignment : program.statements()) {
       assignment->Visit(this);
       output_ << "; ";
     }
