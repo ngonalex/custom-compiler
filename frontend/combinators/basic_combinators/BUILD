@@ -3,7 +3,6 @@ cc_library(
 	copts = ["-Wall -g"],
 	hdrs = [
 	"parsestatus.h",
-	"parse_status.h",
 	"atom_parser.h", 
 	"null.h", 
 	"zero_or_more_combinator.h",
@@ -13,7 +12,6 @@ cc_library(
 	],
 	srcs = [
 	"parsestatus.cc",
-	"parse_status.cc",
 	"atom_parser.cc", 
 	"null.cc",
 	"zero_or_more_combinator.cc", 
