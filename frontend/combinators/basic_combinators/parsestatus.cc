@@ -1,6 +1,9 @@
 #include "frontend/combinators/basic_combinators/parsestatus.h"
 
 using namespace cs160::frontend;
+  ParseStatus::ParseStatus() {
+    
+  }
 
   ParseStatus::ParseStatus(ParseStatus&& other)
     : astNodes(std::move(other.astNodes)),
@@ -17,6 +20,8 @@ using namespace cs160::frontend;
   
   ParseStatus& ParseStatus::operator=(ParseStatus&& other) {
     ast = std::move(other.ast);
+    astNodes = std::move(other.astNodes);
+    second_ast = std::move(other.second_ast);
   }
 
 bool ParseStatus::operator==(const ParseStatus &b) const {

@@ -23,7 +23,7 @@ ParseStatus NullParser::do_parse(std::string inputProgram, int startCharacter) {
   return fail(inputProgram, startCharacter);
 }
 
-ParseStatus NullParser::parse(std::string inputProgram, int startCharacter, std::string errorMessage) {
+ParseStatus NullParser::parse(std::string inputProgram, int startCharacter, std::string errorMessage = "") {
   std::map<int, ParseStatus>::iterator iter;
   iter = cache.find(startCharacter);
 

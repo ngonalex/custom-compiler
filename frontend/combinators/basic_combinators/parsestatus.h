@@ -14,12 +14,13 @@ namespace frontend {
 
 class ParseStatus {  // Super class
  public:
+  ParseStatus();
   ParseStatus(ParseStatus&& other);
   ParseStatus& operator=(ParseStatus&& other);
   bool status;
   std::string remainingCharacters;
   std::string parsedCharacters;
-  
+
   // Only for the success case
   std::unique_ptr<const AstNode> ast;
 
