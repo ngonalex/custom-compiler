@@ -44,8 +44,11 @@ ParseStatus ProgramParser::do_parse(std::string inputProgram, int startCharacter
     }
 
     result.ast = make_unique<const Program>(std::move(temporaryAssign),
-    unique_cast<const ArithmeticExpr>(std::move(result.second_ast)));  
+    unique_cast<const ArithmeticExpr>(std::move(result.astNodes[intermediateResult.astNodes.size()])));  
   }
+    
+    result.parsedCharactersArray.erase(std::begin(result.parsedCharactersArray), std::end(result.parsedCharactersArray));
+    result.astNodes.erase(std::begin(result.astNodes), std::end(result.astNodes));
 
   return result;
 
