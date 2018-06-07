@@ -46,7 +46,6 @@ ParseStatus TermExprParser::do_parse(std::string inputProgram, int startCharacte
 
 
 
-
   // ( ae )
   OpenParenParser open_paren;
   CloseParenParser close_paren;
@@ -60,6 +59,8 @@ ParseStatus TermExprParser::do_parse(std::string inputProgram, int startCharacte
   firstAndClose.secondParser = reinterpret_cast<NullParser *>(&close_paren); 
 
 
+
+  // High Level Parse
 
   OrCombinator firstOr;
   firstOr.firstParser = reinterpret_cast<NullParser *>(&wordOrNum);
@@ -77,48 +78,10 @@ ParseStatus TermExprParser::do_parse(std::string inputProgram, int startCharacte
   secondOr.secondParser = reinterpret_cast<NullParser *>(&firstAndClose);
   ParseStatus aeResult = openParenAndExpr.do_parse(inputProgram, endCharacter);
   ParseStatus final_result = firstAndClose.do_parse(inputProgram, endCharacter);
+
   if(final_result.status) {
     final_result.ast = std::move(aeResult.second_ast);
   }
 
   return final_result;
 
-
-  // High level parse
-
-/*
-  // ( ae )
-  ParseStatus openParseStatus = open_paren.do_parse(inputProgram, endCharacter);
-  result.status = openParseStatus.status;
-  result.startCharacter = startCharacter;
-  if (openParseStatus.status) {
-    result.parsedCharacters += openParseStatus.parsedCharacters;
-    result.remainingCharacters = openParseStatus.remainingCharacters;
-    // ae
-    AddSubExprParser ae;
-    ParseStatus aeParseStatus = ae.do_parse(openParseStatus.remainingCharacters, openParseStatus.endCharacter);
-    if (aeParseStatus.status) {
-      result.parsedCharacters += aeParseStatus.parsedCharacters;
-      result.remainingCharacters = aeParseStatus.remainingCharacters;
-      CloseParenParser close_paren;
-      ParseStatus cpParseStatus = close_paren.do_parse(aeParseStatus.remainingCharacters, aeParseStatus.endCharacter);
-      if (cpParseStatus.status) {
-        result.parsedCharacters += cpParseStatus.parsedCharacters;
-        result.remainingCharacters = cpParseStatus.remainingCharacters;
-        result.endCharacter = cpParseStatus.endCharacter;
-        result.ast = std::move(aeParseStatus.ast);
-      } else {
-        result.status = cpParseStatus.status;
-        result.errorType = cpParseStatus.errorType;
-      }
-    } else {
-      result.status = aeParseStatus.status;
-      result.errorType = aeParseStatus.errorType;
-    }
-  } else {
-    result.status = openParseStatus.status;
-    result.errorType = openParseStatus.errorType;
-  }
-
-  return result;*/
-}
