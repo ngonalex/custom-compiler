@@ -1,5 +1,5 @@
 #include "abstract_syntax/abstract_syntax.h"
-#include "abstract_syntax/print_visitor_v2.h"
+#include "abstract_syntax/print_visitor_v3.h"
 // #include "frontend/combinators/v1_combinators/ae.h"
 #include "frontend/combinators/v3_combinators/helpers/relational_helper.h"
 #include "frontend/combinators/v3_combinators/main/relation_body.h"
@@ -114,15 +114,44 @@ TEST(RelationHelper, allParser) {
   EXPECT_EQ(result.parsedCharacters, ">=");
 }
 
-TEST(RelationBody, simpleRBody) {
+TEST(RelationBody, simpleRBody1) {
   RelationBodyParser parser;
   ParseStatus result = parser.parse("x == 3", 0);
 
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
+  
   EXPECT_EQ(result.status, true);
-  EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 5);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(result.parsedCharacters, "x == 3");
+  EXPECT_EQ(output, "(x == 3)");
+}
 
+TEST(RelationBody, simpleRBody2) {
+  RelationBodyParser parser;
+  ParseStatus result = parser.parse("-9+3 >= 222", 0);
 
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
+  
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.endCharacter, 11);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(output, "((0 - (9 + 3)) >= 222)");
+}
+
+TEST(RelationBody, simpleRBody3) {
+  RelationBodyParser parser;
+  ParseStatus result = parser.parse("-912981*128158+1919+(99-22) > x", 0);
+
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
+  
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.endCharacter, 30);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(output, "((0 - (((912981 * 128158) + 1919) + (99 - 22))) > x)");
 }

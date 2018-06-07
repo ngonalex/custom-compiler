@@ -164,8 +164,8 @@ class PrintVisitor : public AstVisitor {
   std::stringstream output_;
 };
 
-}  // namespace version_2
+}  // namespace version_3
 }  // namespace abstract_syntax
 }  // namespace cs160
 
-#endif  // ABSTRACT_SYNTAX_PRINT_VISITOR_V2_H_
+#endif  // ABSTRACT_SYNTAX_PRINT_VISITOR_V3_H_

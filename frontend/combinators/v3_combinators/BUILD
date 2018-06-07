@@ -17,7 +17,7 @@ cc_library(
 	"//frontend/combinators/basic_combinators",
 	"//frontend/combinators/v1_combinators:v1_combinators",
 	"//abstract_syntax:abstract_syntax",
-	"//abstract_syntax:print_visitor_v2"
+	"//abstract_syntax:print_visitor_v3"
 	],
 
 	visibility = ["//visibility:public"],
