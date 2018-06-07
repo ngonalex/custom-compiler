@@ -18,3 +18,4 @@ ParseStatus OrCombinator::do_parse(std::string inputProgram,
   }
   return secondStatus;
 }
+
