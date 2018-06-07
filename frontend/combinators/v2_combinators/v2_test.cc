@@ -442,7 +442,7 @@ TEST(BinaryOperatorExpr, successBinaryOperatorExpr1) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 1);
-  EXPECT_EQ(result.endCharacter, 24);
+  EXPECT_EQ(result.endCharacter, 27);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "(victor+490)-_foo+3;");
   EXPECT_EQ(output, "(((victor + 490) - _foo) + 3)");
