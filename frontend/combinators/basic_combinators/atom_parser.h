@@ -14,9 +14,9 @@ using namespace cs160::abstract_syntax::frontend;
 namespace cs160 {
 namespace frontend {
 
-class AtomParser : NullParser {
+class AtomParser : public NullParser {
  public:
-  virtual ParseStatus parse(std::string inputProgram,
+  virtual ParseStatus do_parse(std::string inputProgram,
   				int startCharacter);
 
   explicit AtomParser(char char_to_parse) { 

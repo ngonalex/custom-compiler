@@ -2,8 +2,8 @@
 #include "frontend/combinators/basic_combinators/atom_parser.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 
+#include <string>     // std::string, std::stoi
 #include <iostream>
-#include <string>  // std::string, std::stoi
 
 #define super NullParser
 
@@ -11,7 +11,7 @@ using namespace cs160::frontend;
 using namespace std;
 
 // )
-ParseStatus CloseParenParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus CloseParenParser::do_parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 	// Check in the cache if the character cuont parsestatus already exists, return that parsestatus if it does
@@ -22,45 +22,46 @@ ParseStatus CloseParenParser::parse(std::string inputProgram, int startCharacter
 	}
 
 	auto atomParser = AtomParser(')');
-	auto result = atomParser.parse(inputProgram, endCharacter);
+	auto result = atomParser.do_parse(inputProgram, endCharacter);
 
 	// append to cache startCharacter and ParseStatus
 	return result;
 }
 
 // (
-ParseStatus OpenParenParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus OpenParenParser::do_parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 
-  std::string errorMessage = "Expecting open parenthesis";
+	std::string errorMessage = "Expecting open parenthesis";
 
 	if (inputProgram.size() == 0) {
 		return super::fail(inputProgram, endCharacter, errorMessage);
 	}
 
-  auto atomParser = AtomParser('(');
-  auto result = atomParser.parse(inputProgram, endCharacter);
-  return result;
+	auto atomParser = AtomParser('(');
+	auto result = atomParser.do_parse(inputProgram, endCharacter);
+	return result;
 }
 
 // - 
-ParseStatus NegativeParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus NegativeParser::do_parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 	std::string errorMessage = "Expecting -";
 
-  if (inputProgram.size() == 0) {
-    return super::fail(inputProgram, endCharacter, errorMessage);
-  }
 
-  auto atomParser = AtomParser('-');
-  auto result = atomParser.parse(inputProgram, endCharacter);
-  return result;
+	if (inputProgram.size() == 0) {
+		return super::fail(inputProgram, endCharacter, errorMessage);
+	}
+
+	auto atomParser = AtomParser('-');
+	auto result = atomParser.do_parse(inputProgram, endCharacter);
+	return result;
 }
 
 // + - 
-ParseStatus AddSubOpParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus AddSubOpParser::do_parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 	std::string errorMessage = "Expecting + or -";
@@ -69,19 +70,18 @@ ParseStatus AddSubOpParser::parse(std::string inputProgram, int startCharacter) 
 		return super::fail(inputProgram, endCharacter, errorMessage);
 	}
 
-  auto addParser = AtomParser('+');
-  auto subParser = AtomParser('-');
+	auto plusParser = AtomParser('+');
+	auto minusParser = AtomParser('-');
+	OrCombinator plusOrMinus;
+	plusOrMinus.firstParser = reinterpret_cast<NullParser *>(&plusParser);
+	plusOrMinus.secondParser = reinterpret_cast<NullParser *>(&minusParser);
 
-  OrCombinator addOrSub;
-  addOrSub.firstParser = reinterpret_cast<NullParser *>(&addParser);
-  addOrSub.secondParser = reinterpret_cast<NullParser *>(&subParser);
-
-  auto result = addOrSub.parse(inputProgram, endCharacter);
+	auto result = plusOrMinus.do_parse(inputProgram, endCharacter);
 	return result;
 }
 
 // * /
-ParseStatus MulDivOpParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus MulDivOpParser::do_parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 	std::string errorMessage = "Expecting * or /";
@@ -97,6 +97,21 @@ ParseStatus MulDivOpParser::parse(std::string inputProgram, int startCharacter) 
 	mulOrDiv.firstParser = reinterpret_cast<NullParser *>(&mulParser);
 	mulOrDiv.secondParser = reinterpret_cast<NullParser *>(&divParser);
 	
-	auto result = mulOrDiv.parse(inputProgram, endCharacter);
+	auto result = mulOrDiv.do_parse(inputProgram, endCharacter);
+	return result;
+}
+
+// ;
+ParseStatus SemiColonParser::do_parse(std::string inputProgram, int startCharacter) {
+	int endCharacter = startCharacter;
+	endCharacter += trim(inputProgram);
+	std::string errorMessage = "Expecting ;";
+
+	if (inputProgram.size() == 0) {
+		return super::fail(inputProgram, endCharacter, errorMessage);
+	}
+
+	auto atomParser = AtomParser(';');
+	auto result = atomParser.do_parse(inputProgram, endCharacter);
 	return result;
 }
