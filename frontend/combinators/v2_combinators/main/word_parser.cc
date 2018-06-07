@@ -38,10 +38,10 @@ ParseStatus WordParser::do_parse(std::string inputProgram, int startCharacter) {
 
   ParseStatus result = firstAnd.do_parse(inputProgram, endCharacter);
 
-  if (result.status){
+  if (result.status) {
     result.ast = std::move(make_unique<const VariableExpr>(result.parsedCharacters));
   }
-  else{
+  else { 
     // Error type returned to user
     result.errorType = errorMessage;
   }

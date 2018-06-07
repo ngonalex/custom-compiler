@@ -1,5 +1,5 @@
 #include "abstract_syntax/abstract_syntax.h"
-#include "abstract_syntax/print_visitor_v2.h"
+#include "abstract_syntax/print_visitor_v3.h"
 #include "frontend/combinators/v1_combinators/ae.h"
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
 #include "frontend/combinators/v2_combinators/main/assignment_parser.h"

@@ -37,10 +37,10 @@ ParseStatus ProgramParser::do_parse(std::string inputProgram, int startCharacter
   ParseStatus result = firstAnd.do_parse(inputProgram, endCharacter);
 
   if(result.status) {
-    std::vector<std::unique_ptr<const Assignment>> temporaryAssign; 
+    std::vector<std::unique_ptr<const Statement>> temporaryAssign; 
 
     for(auto i = intermediateResult.astNodes.begin(); i != intermediateResult.astNodes.end(); ++i) {
-      temporaryAssign.push_back(unique_cast<const Assignment>(std::move(*i)));
+      temporaryAssign.push_back(unique_cast<const Statement>(std::move(*i)));
     }
 
     result.ast = make_unique<const Program>(std::move(temporaryAssign),
