@@ -40,6 +40,22 @@ ParseStatus MulDivExprParser::do_parse(std::string inputProgram, int startCharac
     mulDivExprFinal.secondParser = &rhs;
     
     ParseStatus result = mulDivExprFinal.do_parse(inputProgram, endCharacter);
+    
+    //AST Formation
+    int strIndex = 0;
+    for (int i = 0; i < result.astNodes.size(); i++){
+        if (i == 0){
+            result.ast = std::move(result.astNodes[i]);
+        } else {
+            std::string parsedCharacters = result.parsedCharactersArray[i-1];
+            std::string op = parsedCharacters.substr(parsedCharacters.size()-1, 1);
+            result.ast = make_node(op, unique_cast<const ArithmeticExpr>(std::move(result.ast)), unique_cast<const ArithmeticExpr>(std::move(result.astNodes[i])));
+        }
+    }
+    
+    result.parsedCharactersArray.erase(std::begin(result.parsedCharactersArray), std::end(result.parsedCharactersArray));
+    result.astNodes.erase(std::begin(result.astNodes), std::end(result.astNodes));
+    
   return result;  // Returning Success/Failure on TermExpr
 }
 

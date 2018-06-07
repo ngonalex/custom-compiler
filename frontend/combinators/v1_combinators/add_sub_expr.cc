@@ -29,20 +29,6 @@ ParseStatus AddSubExprParser::do_parse(std::string inputProgram, int startCharac
     OneOrMoreCombinator oneOrMore;
     oneOrMore.parser = &andExpr;
     
-    ParseStatus oneOrMoreResult = oneOrMore.do_parse(inputProgram, endCharacter);
-    
-    //AST Formation
-    int strIndex = 0;
-    for (int i = 0; i < oneOrMoreResult.astNodes.size(); i++){
-        if (i == 0){
-            oneOrMoreResult.ast = std::move(oneOrMoreResult.astNodes[i]);
-        } else {
-            std::string parsedCharacters = oneOrMoreResult.parsedCharactersArray[i-1];
-            std::string op = parsedCharacters.substr(parsedCharacters.size()-1, 1);
-            oneOrMoreResult.ast = make_node(op, unique_cast<const ArithmeticExpr>(std::move(oneOrMoreResult.ast)), unique_cast<const ArithmeticExpr>(std::move(oneOrMoreResult.astNodes[i])));
-        }
-    }
-    
     MulDivExprParser rhs;
     
     AndCombinator addSubExpr;
@@ -54,6 +40,21 @@ ParseStatus AddSubExprParser::do_parse(std::string inputProgram, int startCharac
     addSubExprFinal.secondParser = &rhs;
     
     ParseStatus result = addSubExprFinal.do_parse(inputProgram, endCharacter);
+    
+    //AST Formation
+    int strIndex = 0;
+    for (int i = 0; i < result.astNodes.size(); i++){
+        if (i == 0){
+            result.ast = std::move(result.astNodes[i]);
+        } else {
+            std::string parsedCharacters = result.parsedCharactersArray[i-1];
+            std::string op = parsedCharacters.substr(parsedCharacters.size()-1, 1);
+            result.ast = make_node(op, unique_cast<const ArithmeticExpr>(std::move(result.ast)), unique_cast<const ArithmeticExpr>(std::move(result.astNodes[i])));
+        }
+    }
+    
+    result.parsedCharactersArray.erase(std::begin(result.parsedCharactersArray), std::end(result.parsedCharactersArray));
+    result.astNodes.erase(std::begin(result.astNodes), std::end(result.astNodes));
     
     return result;  // Returning Success/Failure on MulDivExpr
 }

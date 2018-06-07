@@ -45,6 +45,8 @@ ParseStatus WordParser::do_parse(std::string inputProgram, int startCharacter) {
 		// Error type returned to user
 		result.errorType = errorMessage;
 	}
+    
+    result.parsedCharactersArray.erase(std::begin(result.parsedCharactersArray), std::end(result.parsedCharactersArray));
 
 	return result;
 }

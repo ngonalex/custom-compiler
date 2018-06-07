@@ -32,5 +32,7 @@ ParseStatus NumParser::do_parse(std::string inputProgram, int startCharacter) {
   } else {
     return super::fail(inputProgram, endCharacter, errorMessage);
   }
+    
+    result.parsedCharactersArray.erase(std::begin(result.parsedCharactersArray), std::end(result.parsedCharactersArray));
   return result;
 }
