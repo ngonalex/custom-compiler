@@ -28,7 +28,7 @@ ParseStatus AddSubExprParser::do_parse(std::string inputProgram, int startCharac
     
     OneOrMoreCombinator oneOrMore;
     oneOrMore.parser = &andExpr;
-    
+ 
     MulDivExprParser rhs;
     
     AndCombinator addSubExpr;
@@ -40,6 +40,7 @@ ParseStatus AddSubExprParser::do_parse(std::string inputProgram, int startCharac
     addSubExprFinal.secondParser = &rhs;
     
     ParseStatus result = addSubExprFinal.do_parse(inputProgram, endCharacter);
+    result.ast = 
     
     return result;  // Returning Success/Failure on MulDivExpr
 }
@@ -53,7 +54,6 @@ std::unique_ptr<const ArithmeticExpr> AddSubExprParser::make_node(
   } else if (op == "-") {
     return make_unique<SubtractExpr>(std::move(first_leaf),
 				     std::move(second_leaf));
-
   } else {
     return nullptr;
   }

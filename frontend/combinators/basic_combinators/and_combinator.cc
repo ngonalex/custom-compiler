@@ -31,8 +31,15 @@ ParseStatus AndCombinator::do_parse(std::string inputProgram, int startCharacter
   both.remainingCharacters = secondStatus.remainingCharacters;
   both.startCharacter = startCharacter;
   both.endCharacter = secondStatus.endCharacter;
-  both.ast = std::move(firstStatus.ast);
-  both.second_ast = std::move(secondStatus.ast);
+  if(firstStatus.ast == NULL)
+    both.ast = std::move(firstStatus.second_ast);
+  else 
+    both.ast = std::move(firstStatus.ast);
+  
+  if(secondStatus.ast == NULL)
+    both.ast = std::move(secondStatus.second_ast);
+  else 
+    both.second_ast = std::move(secondStatus.ast);
 
   return both;
 }
