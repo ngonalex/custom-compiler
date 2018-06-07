@@ -16,14 +16,18 @@ using namespace cs160::frontend;
       this->errorType = other.errorType;
       this->startCharacter = other.startCharacter;
       this->endCharacter = other.endCharacter;
+        this->parsedCharactersArray.erase(std::begin(this->parsedCharactersArray), std::end(this->parsedCharactersArray));
+        this->parsedCharactersArray.insert(std::end(this->parsedCharactersArray), std::begin(other.parsedCharactersArray), std::end(other.parsedCharactersArray));
     }
-  
+  /*
   ParseStatus& ParseStatus::operator=(ParseStatus&& other) {
+      parsedCharactersArray.erase(std::begin(parsedCharactersArray), std::end(parsedCharactersArray));
+      parsedCharactersArray.insert(std::end(parsedCharactersArray), std::begin(other.parsedCharactersArray), std::end(other.parsedCharactersArray));
     ast = std::move(other.ast);
     astNodes = std::move(other.astNodes);
     second_ast = std::move(other.second_ast);
     return *this;
-  }
+  }*/
 
 bool ParseStatus::operator==(const ParseStatus &b) const {
   if (this->status) {

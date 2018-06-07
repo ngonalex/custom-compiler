@@ -28,7 +28,7 @@ ParseStatus AddSubExprParser::do_parse(std::string inputProgram, int startCharac
     
     OneOrMoreCombinator oneOrMore;
     oneOrMore.parser = &andExpr;
- 
+    
     MulDivExprParser rhs;
     
     AndCombinator addSubExpr;
@@ -40,7 +40,21 @@ ParseStatus AddSubExprParser::do_parse(std::string inputProgram, int startCharac
     addSubExprFinal.secondParser = &rhs;
     
     ParseStatus result = addSubExprFinal.do_parse(inputProgram, endCharacter);
-    result.ast = 
+    
+    //AST Formation
+    int strIndex = 0;
+    for (int i = 0; i < result.astNodes.size(); i++){
+        if (i == 0){
+            result.ast = std::move(result.astNodes[i]);
+        } else {
+            std::string parsedCharacters = result.parsedCharactersArray[i-1];
+            std::string op = parsedCharacters.substr(parsedCharacters.size()-1, 1);
+            result.ast = make_node(op, unique_cast<const ArithmeticExpr>(std::move(result.ast)), unique_cast<const ArithmeticExpr>(std::move(result.astNodes[i])));
+        }
+    }
+    
+    result.parsedCharactersArray.erase(std::begin(result.parsedCharactersArray), std::end(result.parsedCharactersArray));
+    result.astNodes.erase(std::begin(result.astNodes), std::end(result.astNodes));
     
     return result;  // Returning Success/Failure on MulDivExpr
 }
@@ -53,7 +67,8 @@ std::unique_ptr<const ArithmeticExpr> AddSubExprParser::make_node(
     return make_unique<AddExpr>(std::move(first_leaf), std::move(second_leaf));
   } else if (op == "-") {
     return make_unique<SubtractExpr>(std::move(first_leaf),
-				     std::move(second_leaf));
+                     std::move(second_leaf));
+
   } else {
     return nullptr;
   }
