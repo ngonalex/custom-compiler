@@ -42,6 +42,12 @@ ParseStatus WordParser::parse(std::string inputProgram, int startCharacter) {
     result.ast =
         std::move(make_unique<const VariableExpr>(result.parsedCharacters));
   } else {
+
+    if (result.parsedCharacters == "heap" || result.parsedCharacters == "bumpptr" || 
+        result.parsedCharacters == "returnobj") {
+          
+      errorMessage = "heap, bumpptr and returnobj are reserved keywords";
+    }
     // Error type returned to user
     result.errorType = errorMessage;
   }

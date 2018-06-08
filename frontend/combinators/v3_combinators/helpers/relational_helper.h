@@ -47,7 +47,12 @@ class NotOpParser : NullParser {
    virtual ParseStatus parse(std::string inputProgram, int startCharacter);
 };
 
-class RelationOperator : NullParser {
+class RelationOperatorParser : NullParser {
+ public:
+   virtual ParseStatus parse(std::string inputProgram, int startCharacter);
+};
+
+class LogicOperatorParser : NullParser {
  public:
    virtual ParseStatus parse(std::string inputProgram, int startCharacter);
 };

@@ -135,7 +135,8 @@ ParseStatus NotOpParser::parse(std::string inputProgram, int startCharacter) {
 	return parser.parse(inputProgram, endCharacter);
 }
 
-ParseStatus RelationOperator::parse(std::string inputProgram, int startCharacter) {
+// ROP
+ParseStatus RelationOperatorParser::parse(std::string inputProgram, int startCharacter) {
 	EqualToOpParser equalTo;
 
   GreaterThanOrEqualToOpParser greaterOrEqual;
@@ -161,4 +162,17 @@ ParseStatus RelationOperator::parse(std::string inputProgram, int startCharacter
   all.secondParser = reinterpret_cast<NullParser *>(&both);
 	
 	return all.parse(inputProgram, startCharacter);
+}
+
+// LOP
+ParseStatus LogicOperatorParser::parse(std::string inputProgram, int startCharacter) {
+	AndOpParser andOp;
+	OrOpParser orOp;
+
+	// && or ||
+  OrCombinator and_or;
+  and_or.firstParser = reinterpret_cast<NullParser *>(&andOp);
+  and_or.secondParser = reinterpret_cast<NullParser *>(&orOp);
+	
+	return and_or.parse(inputProgram, startCharacter);
 }

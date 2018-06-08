@@ -4,12 +4,14 @@ cc_library(
 
 	hdrs = [
 	"helpers/relational_helper.h", 
-	"main/relation_body.h"
+	"main/relation_body.h",
+	"main/relation_parser.h"
 	],
 
 	srcs = [
 	"helpers/relational_helper.cc",
-	"main/relation_body.cc"
+	"main/relation_body.cc",
+	"main/relation_parser.cc"
 	],
 
 	deps = [

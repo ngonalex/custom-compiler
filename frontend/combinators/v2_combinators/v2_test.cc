@@ -329,6 +329,16 @@ TEST(WordParserCombinator, failVariableParser6) {
   EXPECT_EQ(result.endCharacter, 11);
   EXPECT_EQ(result.errorType, "Expecting ;");
 }
+// Failing using keyword
+TEST(WordParserCombinator, failVariableParser6) {
+  VariableParser test;
+  ParseStatus result = test.parse(" var heap : Integer", 10);
+
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 11);
+  EXPECT_EQ(result.endCharacter, 11);
+  EXPECT_EQ(result.errorType, "Expecting ;");
+}
 
 TEST(AssignmentParserCombinator, sucessArithParser1) {
   AndCombinator andCombinator;
