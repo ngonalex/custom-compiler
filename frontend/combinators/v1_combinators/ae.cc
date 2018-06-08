@@ -14,7 +14,7 @@ using namespace cs160::frontend;
    close_paren
 */
 
-ParseStatus ArithExprParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus ArithExprParser::do_parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
@@ -23,7 +23,7 @@ ParseStatus ArithExprParser::parse(std::string inputProgram, int startCharacter)
   }
   
   AddSubExprParser ae;
-  ParseStatus aeParseResult = ae.parse(inputProgram, endCharacter);
+  ParseStatus aeParseResult = ae.do_parse(inputProgram, endCharacter);
 
   if (!aeParseResult.status) {
     aeParseResult.errorType = "Missing arithmetic expression";

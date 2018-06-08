@@ -9,52 +9,52 @@ namespace frontend {
 
 class EqualToOpParser : NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, int startCharacter);
+   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class GreaterThanOpParser : NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, int startCharacter);
+   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class LessThanOpParser : NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, int startCharacter);
+   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class GreaterThanOrEqualToOpParser : NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, int startCharacter);
+   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class LessThanOrEqualToOpParser : NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, int startCharacter);
+   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class AndOpParser : NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, int startCharacter);
+   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class OrOpParser : NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, int startCharacter);
+   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class NotOpParser : NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, int startCharacter);
+   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class RelationOperatorParser : NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, int startCharacter);
+   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class LogicOperatorParser : NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, int startCharacter);
+   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 } // namespace frontend

@@ -14,7 +14,7 @@ using namespace cs160::frontend;
 
 std::string errorMessage = "Expected relational operator";
 
-ParseStatus EqualToOpParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus EqualToOpParser::do_parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 
@@ -28,10 +28,10 @@ ParseStatus EqualToOpParser::parse(std::string inputProgram, int startCharacter)
 	equals_equals.firstParser = reinterpret_cast<NullParser *>(&equalParser_1);
 	equals_equals.secondParser = reinterpret_cast<NullParser *>(&equalParser_2);
 
-	return equals_equals.parse(inputProgram, endCharacter);
+	return equals_equals.do_parse(inputProgram, endCharacter);
 }
 
-ParseStatus GreaterThanOpParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus GreaterThanOpParser::do_parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 
@@ -40,10 +40,10 @@ ParseStatus GreaterThanOpParser::parse(std::string inputProgram, int startCharac
 	}
 
 	auto parser = AtomParser('>');
-	return parser.parse(inputProgram, endCharacter);
+	return parser.do_parse(inputProgram, endCharacter);
 }
 
-ParseStatus LessThanOpParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus LessThanOpParser::do_parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 
@@ -52,10 +52,10 @@ ParseStatus LessThanOpParser::parse(std::string inputProgram, int startCharacter
 	}
 
 	auto parser = AtomParser('<');
-	return parser.parse(inputProgram, endCharacter);
+	return parser.do_parse(inputProgram, endCharacter);
 }
 
-ParseStatus GreaterThanOrEqualToOpParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus GreaterThanOrEqualToOpParser::do_parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 	
@@ -69,10 +69,10 @@ ParseStatus GreaterThanOrEqualToOpParser::parse(std::string inputProgram, int st
 	greater_or_equal.firstParser = reinterpret_cast<NullParser *>(&greaterThanParser);
 	greater_or_equal.secondParser = reinterpret_cast<NullParser *>(&equalsParser);
 
-	return greater_or_equal.parse(inputProgram, endCharacter);
+	return greater_or_equal.do_parse(inputProgram, endCharacter);
 }
 
-ParseStatus LessThanOrEqualToOpParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus LessThanOrEqualToOpParser::do_parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 
@@ -86,10 +86,10 @@ ParseStatus LessThanOrEqualToOpParser::parse(std::string inputProgram, int start
 	less_or_equal.firstParser = reinterpret_cast<NullParser *>(&lessThanParser);
 	less_or_equal.secondParser = reinterpret_cast<NullParser *>(&equalsParser);
 
-	return less_or_equal.parse(inputProgram, endCharacter);
+	return less_or_equal.do_parse(inputProgram, endCharacter);
 }
 
-ParseStatus AndOpParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus AndOpParser::do_parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 
@@ -103,10 +103,10 @@ ParseStatus AndOpParser::parse(std::string inputProgram, int startCharacter) {
 	and_and.firstParser = reinterpret_cast<NullParser *>(&andParser_1);
 	and_and.secondParser = reinterpret_cast<NullParser *>(&andParser_2);
 
-	return and_and.parse(inputProgram, endCharacter);
+	return and_and.do_parse(inputProgram, endCharacter);
 }
 
-ParseStatus OrOpParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus OrOpParser::do_parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 
@@ -120,10 +120,10 @@ ParseStatus OrOpParser::parse(std::string inputProgram, int startCharacter) {
 	or_or.firstParser = reinterpret_cast<NullParser *>(&orParser_1);
 	or_or.secondParser = reinterpret_cast<NullParser *>(&orParser_2);
 
-	return or_or.parse(inputProgram, endCharacter);
+	return or_or.do_parse(inputProgram, endCharacter);
 }
 
-ParseStatus NotOpParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus NotOpParser::do_parse(std::string inputProgram, int startCharacter) {
 	int endCharacter = startCharacter;
 	endCharacter += trim(inputProgram);
 
@@ -132,11 +132,11 @@ ParseStatus NotOpParser::parse(std::string inputProgram, int startCharacter) {
 	}
 
 	auto parser = AtomParser('!');
-	return parser.parse(inputProgram, endCharacter);
+	return parser.do_parse(inputProgram, endCharacter);
 }
 
 // ROP
-ParseStatus RelationOperatorParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus RelationOperatorParser::do_parse(std::string inputProgram, int startCharacter) {
 	EqualToOpParser equalTo;
 
   GreaterThanOrEqualToOpParser greaterOrEqual;
@@ -165,7 +165,7 @@ ParseStatus RelationOperatorParser::parse(std::string inputProgram, int startCha
 }
 
 // LOP
-ParseStatus LogicOperatorParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus LogicOperatorParser::do_parse(std::string inputProgram, int startCharacter) {
 	AndOpParser andOp;
 	OrOpParser orOp;
 

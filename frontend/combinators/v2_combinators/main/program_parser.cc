@@ -14,7 +14,7 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus ProgramParser::parse(std::string inputProgram, int startCharacter) {
+ParseStatus ProgramParser::do_parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
   if (inputProgram.size() == 0) {
@@ -33,13 +33,13 @@ ParseStatus ProgramParser::parse(std::string inputProgram, int startCharacter) {
 
   zeroOrMore.parser = reinterpret_cast<NullParser *>(&assignParser);
 
-  ParseStatus intermediateResult = zeroOrMore.parse(inputProgram, endCharacter);
+  ParseStatus intermediateResult = zeroOrMore.do_parse(inputProgram, endCharacter);
 
   AndCombinator firstAnd;
   firstAnd.firstParser = reinterpret_cast<NullParser *>(&zeroOrMore);
   firstAnd.secondParser = reinterpret_cast<NullParser *>(&aeSemi);
 
-  ParseStatus result = firstAnd.parse(inputProgram, endCharacter);
+  ParseStatus result = firstAnd.do_parse(inputProgram, endCharacter);
 
   if (result.status) {
     std::vector<std::unique_ptr<const Assignment>> temporaryAssign;

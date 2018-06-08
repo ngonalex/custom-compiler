@@ -14,9 +14,14 @@ namespace frontend {
 
 class ParseStatus {  // Super class
  public:
+  ParseStatus();
+  ParseStatus(ParseStatus&& other);
+  //ParseStatus operator=(ParseStatus& other);
   bool status;
   std::string remainingCharacters;
   std::string parsedCharacters;
+    
+    std::vector<std::string> parsedCharactersArray;
 
   // Only for the success case
   std::unique_ptr<const AstNode> ast;
@@ -26,7 +31,7 @@ class ParseStatus {  // Super class
 
   // Only for zero_or_more and one_or_more case when returning multiple ast
   // nodes
-  std::vector<std::unique_ptr<const AstNode>> astNodes;
+  std::vector<std::unique_ptr<const AstNode>> astNodes; // Overlapping first ast and second ast
 
   // Only for the failed case
   std::string errorType;
@@ -59,21 +64,8 @@ class ParseStatus {  // Super class
   parsedCharacters(g.parsedCharacters), ast(std::move(g.ast)), second_ast(std::move(g.second_ast)),
   astNodes(std::move(g.astNodes)), errorType(g.errorType), startCharacter(g.startCharacter),
   endCharacter(g.endCharacter) {}
-
-
-  ParseStatus& operator=(ParseStatus&& g) {
-        this->status = g.status;
-        this->remainingCharacters = g.remainingCharacters;
-        this->parsedCharacters = g.parsedCharacters;
-        this->ast = std::move(g.ast);
-        this->second_ast = std::move(g.second_ast);
-        this->astNodes = std::move(g.astNodes);
-        this->errorType = g.errorType;
-        this->startCharacter = g.startCharacter;
-        this->endCharacter = g.endCharacter;
-        return *this;
-  }
 */
+
 /*
   ParseStatus(&& g) {
         this->status = g.status;

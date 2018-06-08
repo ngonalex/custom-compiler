@@ -1,6 +1,5 @@
 #include "abstract_syntax/abstract_syntax.h"
-#include "abstract_syntax/print_visitor_v2.h"
-#include "frontend/combinators/basic_combinators/and_combinator.h"
+#include "abstract_syntax/print_visitor_v3.h"
 #include "frontend/combinators/v1_combinators/ae.h"
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
 #include "frontend/combinators/v2_combinators/main/assignment_parser.h"
@@ -319,16 +318,6 @@ TEST(VariableParserCombinator, failVariableParser5) {
   EXPECT_EQ(result.errorType, "Missing colon");
 }
 
-// Fail Case Missing semicolon
-TEST(WordParserCombinator, failVariableParser6) {
-  VariableParser test;
-  ParseStatus result = test.parse(" var _victor : Integer", 10);
-
-  EXPECT_EQ(result.status, false);
-  EXPECT_EQ(result.startCharacter, 11);
-  EXPECT_EQ(result.endCharacter, 11);
-  EXPECT_EQ(result.errorType, "Expecting ;");
-}
 // Failing using keyword
 TEST(WordParserCombinator, failVariableParser6) {
   VariableParser test;
@@ -337,14 +326,7 @@ TEST(WordParserCombinator, failVariableParser6) {
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.startCharacter, 11);
   EXPECT_EQ(result.endCharacter, 11);
-  EXPECT_EQ(result.errorType, "Expecting ;");
-}
-
-TEST(AssignmentParserCombinator, sucessArithParser1) {
-  AndCombinator andCombinator;
-  ArithExprParser ae;
-  SemiColonParser sc;
-
+  EXPECT_EQ(result.errorType, "");
 }
 
 // Success Case VariableParser
@@ -451,7 +433,7 @@ TEST(AssignmentParserCombinator, failAssignmentParser4) {
 TEST(BinaryOperatorExpr, successBinaryOperatorExpr1) {
   ArithExprParser parser;
 
-  ParseStatus result = parser.parse(" (victor + 490) - _foo + 3", 0);
+  ParseStatus result = parser.parse(" (victor + 490) - _foo + 3;", 0);
 
   // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
@@ -460,9 +442,9 @@ TEST(BinaryOperatorExpr, successBinaryOperatorExpr1) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 1);
-  EXPECT_EQ(result.endCharacter, 23);
+  EXPECT_EQ(result.endCharacter, 27);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(result.parsedCharacters, "(victor+490)-_foo+3");
+  EXPECT_EQ(result.parsedCharacters, "(victor+490)-_foo+3;");
   EXPECT_EQ(output, "(((victor + 490) - _foo) + 3)");
 
 }
@@ -493,7 +475,7 @@ TEST(AssignmentParserCombinator, failProgramParser1) {
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.startCharacter, 10);
   EXPECT_EQ(result.endCharacter, 10);
-  EXPECT_EQ(result.errorType, "Expecting character: ;");
+  EXPECT_EQ(result.errorType, "Missing arithmetic expression");
 }
 
 // Fail Case ProgramParser
@@ -504,7 +486,6 @@ TEST(AssignmentParserCombinator, failProgramParser2) {
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.startCharacter, 10);
   EXPECT_EQ(result.endCharacter, 10);
-  EXPECT_EQ(result.errorType, "Expecting ;");
+  EXPECT_EQ(result.errorType, "Missing arithmetic expression");
 }
-
 

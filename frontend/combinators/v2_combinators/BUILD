@@ -24,7 +24,7 @@ cc_library(
 	"//frontend/combinators/basic_combinators",
 	"//frontend/combinators/v1_combinators", 
 	"//abstract_syntax:abstract_syntax",
-	"//abstract_syntax:print_visitor_v2"
+	"//abstract_syntax:print_visitor_v3"
 	],
 
 	visibility = ["//visibility:public"],
@@ -46,7 +46,7 @@ cc_test(
 	"@gtest//:main", 
 	":v2_combinators", 
 	"//abstract_syntax:abstract_syntax",
-	"//abstract_syntax:print_visitor_v2"
+	"//abstract_syntax:print_visitor_v3"
 	],
 
 	srcs = ["v2_test.cc"],

@@ -21,7 +21,7 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus RelationBodyParser::parse(std::string inputProgram,
+ParseStatus RelationBodyParser::do_parse(std::string inputProgram,
                                       int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
@@ -37,25 +37,23 @@ ParseStatus RelationBodyParser::parse(std::string inputProgram,
   LogicOperatorParser logOpParser;
   RelationParser relParser;
 
-  auto firstAeResult = firstAeParser.parse(inputProgram, startCharacter);
+  auto firstAeResult = firstAeParser.do_parse(inputProgram, startCharacter);
   if (firstAeResult.status) {
-    auto relResult = relOpParser.parse(firstAeResult.remainingCharacters,
+    auto relResult = relOpParser.do_parse(firstAeResult.remainingCharacters,
                                        firstAeResult.endCharacter);
-    std::cout << relResult.parsedCharacters << std::endl;
     if (relResult.status) {
-      auto secondAeResult = secondAeParser.parse(relResult.remainingCharacters,
+      auto secondAeResult = secondAeParser.do_parse(relResult.remainingCharacters,
                                                  relResult.endCharacter);
       if (secondAeResult.status) {
-        std::cout << secondAeResult.parsedCharacters << std::endl;
         secondAeResult.ast = make_node(
             unique_cast<const ArithmeticExpr>(std::move(firstAeResult.ast)),
             relResult.parsedCharacters,
             unique_cast<const ArithmeticExpr>(std::move(secondAeResult.ast)));
 
         // Case where there's more logic bits at the end
-        auto logOpResult = logOpParser.parse(secondAeResult.remainingCharacters, secondAeResult.endCharacter);
+        auto logOpResult = logOpParser.do_parse(secondAeResult.remainingCharacters, secondAeResult.endCharacter);
         if (logOpResult.status) {
-          auto relParserResult = relParser.parse(
+          auto relParserResult = relParser.do_parse(
               logOpResult.remainingCharacters, logOpResult.endCharacter);
           if (relParserResult.status) {
             relParserResult.ast =

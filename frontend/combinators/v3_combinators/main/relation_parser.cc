@@ -17,7 +17,7 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus RelationParser::parse(std::string inputProgram,
+ParseStatus RelationParser::do_parse(std::string inputProgram,
                                   int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
@@ -28,13 +28,13 @@ ParseStatus RelationParser::parse(std::string inputProgram,
 
   RelationBodyParser re;
   NotOpParser notParser;
-  ParseStatus notResult = notParser.parse(inputProgram, startCharacter);
+  ParseStatus notResult = notParser.do_parse(inputProgram, startCharacter);
 
   // Only ! expr will work. !(expr) will not properly parse
   if (notResult.status) {
     // ! REXPR
     ParseStatus reResult =
-        re.parse(notResult.remainingCharacters, notResult.endCharacter);
+        re.do_parse(notResult.remainingCharacters, notResult.endCharacter);
     if (reResult.status) {
       reResult.ast = make_unique<const LogicalNotExpr>(
           unique_cast<const RelationalExpr>(std::move(reResult.ast)));
@@ -42,7 +42,7 @@ ParseStatus RelationParser::parse(std::string inputProgram,
     }
   } else {
     // REXPR
-    ParseStatus reResult = re.parse(inputProgram, startCharacter);
+    ParseStatus reResult = re.do_parse(inputProgram, startCharacter);
     if (reResult.status) {
       return reResult;
     }

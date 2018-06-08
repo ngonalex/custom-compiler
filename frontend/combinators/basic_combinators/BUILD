@@ -19,7 +19,7 @@ cc_library(
 	"and_combinator.cc",
 	"or_combinator.cc"
 	],
-	deps = ["//utility", "//abstract_syntax:abstract_syntax", "//abstract_syntax:print_visitor_v1"],
+	deps = ["//utility", "//abstract_syntax:abstract_syntax", "//abstract_syntax:print_visitor_v3"],
 	visibility = ["//visibility:public"],
 )
 

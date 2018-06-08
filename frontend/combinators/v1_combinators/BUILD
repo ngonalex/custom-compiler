@@ -30,7 +30,7 @@ cc_library(
 	"//frontend/combinators/v2_combinators:word_parser", 
 	"//frontend/combinators/basic_combinators", 
 	"//abstract_syntax:abstract_syntax",
-	"//abstract_syntax:print_visitor_v2"
+	"//abstract_syntax:print_visitor_v3"
 	],
 
 	visibility = ["//visibility:public"],
