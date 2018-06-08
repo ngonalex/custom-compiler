@@ -235,14 +235,17 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
         // Needs to be changed
         if (currscope_ == GLOBAL) {
           assignmentset_.insert(tac->target.reg().name());
-          outfile_ << "\tmov %rcx, %rax\n" << std::endl;
-          // Call on correct print function
-          outfile_ << "\t# Going to print " << tac->target.reg().name()
-            << std::endl;
-          GeneratePrintCall(tac->target.reg().name()+"ascii");
-          outfile_ << "\t# Returning from printing "
-            << tac->target.reg().name() << std::endl;
-          outfile_ << std::endl;
+
+          if (flag_ == PRINT_DEBUG || flag_ == PRINT_PROGRAM) {
+            outfile_ << "\tmov %rcx, %rax\n" << std::endl;
+            // Call on correct print function
+            outfile_ << "\t# Going to print " << tac->target.reg().name()
+              << std::endl;
+            GeneratePrintCall(tac->target.reg().name()+"ascii");
+            outfile_ << "\t# Returning from printing "
+              << tac->target.reg().name() << std::endl;
+            outfile_ << std::endl;
+          }
         }
       } else {
         // Handle Derefs
@@ -716,7 +719,7 @@ void CodeGen::GenerateRHSDerefEpilogue(std::string arg2) {
 }
 
 void CodeGen::Generate(
-    std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks, int flag) {
+    std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks) {
   // boiler code here
   GenerateBoiler();
 
@@ -840,7 +843,10 @@ void CodeGen::Generate(
         outfile_ << "\t# FunctionRetEpilogue (Restore Stack)" << std::endl;
         outfile_ << "\tadd $" << code->arg1.value() * 16 <<
           ", %rsp" << std::endl;
-        GeneratePrintCall("printfunctionresult");
+
+        if (flag_ == PRINT_DEBUG || flag_ == PRINT_PROGRAM) {
+          GeneratePrintCall("printfunctionresult");
+        }
         break;
       case FUNDEF:
         // Change scope
@@ -880,7 +886,6 @@ void CodeGen::Generate(
         outfile_ << "\tpop %rax" << std::endl;
         outfile_ << "\tpop %rbx" << std::endl;
         GeneratePrintCall("printresult");
-
         GenerateEpilogue();
         break;
       case LHSDEREFERENCE:
@@ -988,8 +993,11 @@ void CodeGen::Generate(
     }
   }
 
-  if (flag == 1) {
+  if (flag_ == PRINT_LAST_ARITHMETIC_EXPR) {
     TestPrint("printresult");
+  }
+
+  if (flag_ == PRINT_LAST_ARITHMETIC_EXPR || flag_ == PRINT_DEBUG) {
     GenerateEpilogue();
   }
 

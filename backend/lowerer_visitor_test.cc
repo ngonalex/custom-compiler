@@ -68,7 +68,7 @@ TEST_F(LowererTest, IntegerExprIsVisited) {
   number->Visit(&lowerer_);
 
   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 7\n");
-} 
+}
 
 TEST_F(LowererTest, IntegerExprIsVisited_0) {
   auto number = make_unique<IntegerExpr>(0);

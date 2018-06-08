@@ -179,6 +179,7 @@ void LowererVisitor::VisitAssignmentFromNewTuple(
     lhsbase = "";
     // Add to set
     globalset_.insert(lhstarget);
+    totalset_.insert(lhstarget);
 
     auto block = make_unique<struct ThreeAddressCode>();
     block->target = Target(Register(lhstarget, VARIABLEREG));
@@ -223,6 +224,7 @@ void LowererVisitor::VisitAssignmentFromArithExp(
     variablestack_.pop();
     lhsbase = "";
     globalset_.insert(lhstarget);
+    totalset_.insert(lhstarget);
   }
 
   // assign the right hand side to be equal to the left hand side

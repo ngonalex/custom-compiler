@@ -139,7 +139,7 @@ int main() {
   std::ofstream file = std::ofstream("test.s");
   CodeGen runner = CodeGen(file);
   auto test = lowerer_.GetIR();
-  runner.GenerateData(lowerer_.globalset());
+  runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -c test.s && ld test.o && ./a.out");
   std::cout << result << std::endl;

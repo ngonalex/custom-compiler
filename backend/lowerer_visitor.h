@@ -128,10 +128,9 @@ class LowererVisitor : public AstVisitor {
   }
 
   std::stack<std::string> variablestack() { return variablestack_; }
-
   std::vector<std::set<std::string>> localsets() { return localsets_; }
-
   std::set<std::string> globalset() { return globalset_; }
+  std::set<std::string> totalset() { return totalset_; }
 
  private:
   std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks_;

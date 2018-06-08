@@ -19,8 +19,10 @@ class CodeGen {
  public:
     explicit CodeGen(std::ofstream &filename) : outfile_(filename),
       currscope_(GLOBAL) {}
-    void Generate(std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks,
-      int flag);
+    CodeGen(std::ofstream &filename, PrintFlag flag) : outfile_(filename),
+      currscope_(GLOBAL), flag_(flag) {}
+
+    void Generate(std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks);
     void GenerateEpilogue();
     void ClearRegister(std::string reg);
     void GenerateBoiler();
@@ -68,6 +70,7 @@ class CodeGen {
   std::set<std::string> assignmentset_;
   Scope currscope_;
   std::map<std::string, int> symbollocations_;
+  PrintFlag flag_;
 };
 
 }  // namespace backend

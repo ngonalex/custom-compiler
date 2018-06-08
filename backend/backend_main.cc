@@ -28,6 +28,9 @@ using cs160::abstract_syntax::backend::FunctionCall;
 using cs160::abstract_syntax::backend::FunctionDef;
 using cs160::abstract_syntax::backend::Statement;
 using cs160::abstract_syntax::backend::SubtractExpr;
+using cs160::backend::PrintFlag::PRINT_DEBUG;
+using cs160::backend::PrintFlag::PRINT_LAST_ARITHMETIC_EXPR;
+using cs160::backend::PrintFlag::PRINT_ONLY_RESULT;
 using cs160::backend::CodeGen;
 using cs160::backend::LowererVisitor;
 using cs160::backend::ThreeAddressCode;
@@ -231,10 +234,10 @@ int main() {
   // expr->Visit(&lowerer_);
 
   std::ofstream file = std::ofstream("test.s");
-  CodeGen runner = CodeGen(file);
+  CodeGen runner = CodeGen(file, PRINT_DEBUG);
   auto test = lowerer_.GetIR();
-  runner.GenerateData(lowerer_.globalset());
-  runner.Generate(std::move(test), 0);
+  runner.GenerateData(lowerer_.totalset());
+  runner.Generate(std::move(test));
   system("gcc -g -static test.s -o run && ./run");
   // CHANGE TO GENERATEEPILOGUE LATER
   return 0;

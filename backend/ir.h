@@ -45,12 +45,19 @@ enum OpcodeType {
   LHSDEREFERENCE,
   RHSDEREFERENCE,
   NEWTUPLE,
-  VARCHILDTUPLE,  // change this later
+  VARCHILDTUPLE  // change this later
+};
+
+enum PrintFlag {
+  PRINT_ONLY_RESULT,
+  PRINT_LAST_ARITHMETIC_EXPR,
+  PRINT_DEBUG,
+  PRINT_PROGRAM
 };
 
 enum OperandType {
   OPREGISTER,
-  INT,
+  INT
 };
 
 
@@ -82,7 +89,7 @@ enum FlagType {
 
 enum VariableType {
   LEFTHANDVAR,
-  RIGHTHANDVAR,
+  RIGHTHANDVAR
 };
 
 class Label {
