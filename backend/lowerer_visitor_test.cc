@@ -797,6 +797,37 @@ TEST_F(LowererTest, SimpleLoop) {
   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 0\nx <- t_0\nMkLabel loop0\nt_1 <- x VARLOAD \nt_2 <- 5\nt_3 <- t_1 < t_2\nwhile t_3 == 0\nje continue0\nt_4 <- x VARLOAD \nt_5 <- 1\nt_6 <- t_4 + t_5\nx <- t_6\njmp loop0\nMkLabel continue0\n");
 }
 
+TEST_F(LowererTest, EmptyLoop) {
+
+  Statement::Block loop_body;
+
+  auto assign = make_unique<AssignmentFromArithExp>(make_unique<VariableExpr>("x"), make_unique<IntegerExpr>(0));
+  auto ast = make_unique<const Loop>(
+      make_unique<LessThanExpr>(make_unique<VariableExpr>("x"), make_unique<IntegerExpr>(5)),
+      std::move(loop_body));
+
+  // auto ae = make_unique<AddExpr>(make_unique<IntegerExpr>(5), make_unique<IntegerExpr>(7));
+  assign->Visit(&lowerer_);
+  ast->Visit(&lowerer_);
+  EXPECT_EQ(lowerer_.GetOutput(), "");
+}
+
+TEST_F(LowererTest, InfinityLoop) {
+
+  Statement::Block loop_body;
+
+  auto assign = make_unique<AssignmentFromArithExp>(make_unique<VariableExpr>("x"), make_unique<IntegerExpr>(0));
+  auto loopbody = make_unique<AssignmentFromArithExp>(make_unique<VariableExpr>("x"),make_unique<IntegerExpr>(0));
+  loop_body.push_back(std::move(loopbody));
+  auto ast = make_unique<const Loop>(
+      make_unique<LessThanExpr>(make_unique<VariableExpr>("x"), make_unique<IntegerExpr>(5)),
+      std::move(loop_body));
+
+  assign->Visit(&lowerer_);
+  ast->Visit(&lowerer_);
+  EXPECT_EQ(lowerer_.GetOutput(), "");
+}
+
 
 TEST_F(LowererTest, NestedLoop) {
 
