@@ -38,12 +38,12 @@ class CodeGen {
     // Different nodes + helpers
     void GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac);
     void GenerateArithmeticExpr(std::unique_ptr<ThreeAddressCode> tac,
-      OpcodeType type);
+                                OpcodeType type);
     void GenerateBinaryExprHelper(std::unique_ptr<ThreeAddressCode> tac);
     void GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
-      OpcodeType type);
+                                OpcodeType type);
     void GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
-      OpcodeType type);
+                             OpcodeType type);
 
     void GenerateDivisionByZeroCheck();
     void GenerateTupleFlagCheck();

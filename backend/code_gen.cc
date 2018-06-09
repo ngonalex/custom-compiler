@@ -281,8 +281,8 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
         << "(%rbp)\n" << std::endl;
       // Include it in the symbol table
       if (symbollocations_.count(varname) == 0) {
-        symbollocations_.insert(std::pair<std::string, int>(varname,
-        -16+-16*argumentnum));
+        symbollocations_.insert(
+            std::pair<std::string, int>(varname, -16+-16*argumentnum));
       } else {
         std::cerr << "FUNARGLOAD VARIABLE ASSIGNMENT PROBLEM\n";
         exit(1);
@@ -293,8 +293,9 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
       // variable
       if (symbollocations_.count(tac->target.reg().name()) == 0) {
         // Add it to the map then create a spot for it (if its a function)
-        symbollocations_.insert(std::pair<std::string, int>(
-        tac->target.reg().name(), -16+-16*(symbollocations_.size()+1)));
+        symbollocations_.insert(
+            std::pair<std::string, int>(
+                tac->target.reg().name(), -16+-16*(symbollocations_.size()+1)));
       }
       outfile_ << "\t# Returning from function and loading value" << std::endl;
       outfile_ << "\tmov (%rax), %rcx" << std::endl;
@@ -453,7 +454,7 @@ void CodeGen::GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
 }
 
 void CodeGen::GenerateBinaryExprHelper(
-  std::unique_ptr<ThreeAddressCode> tac) {
+    std::unique_ptr<ThreeAddressCode> tac) {
   outfile_ << "\tpop %r8" << std::endl;  // rbx = right value
   outfile_ << "\tpop %r9" << std::endl;  // rcx = right flag
   outfile_ << "\tpop %r10" << std::endl;  // rax = left value
@@ -483,7 +484,7 @@ std::string CodeGen::FlagHelper() {
 }
 
 std::string CodeGen::VariableNameHelper(std::string variablename,
-  FlagType flag) {
+                                        FlagType flag) {
   std::string mappedname;
   if (currscope_ == GLOBAL) {
     switch (flag) {
@@ -539,14 +540,14 @@ std::string CodeGen::VariableNameHelper(std::string variablename,
 }
 
 std::vector<std::string> CodeGen::DereferenceParserHelper(
-  std::string variablename) {
+    std::string variablename) {
   std::istringstream issvarname(variablename);
   std::string token;
   std::string result = "";
   std::vector<std::string> resultvector;
 
   while (std::getline(issvarname, token, '-')) {
-        result = result + token;
+    result = result + token;
   }
 
   issvarname = std::istringstream(result);
@@ -787,15 +788,15 @@ void CodeGen::Generate(
         outfile_ << "\t# LOOP\n";
         outfile_ << "\tpop %rax" << std::endl;
         outfile_ << "\tcmp $" << std::to_string(code->arg1.value())
-                 << ", %rax\n"
-                 << std::endl;
+          << ", %rax\n"
+          << std::endl;
         break;
       case CONDITIONAL:
         outfile_ << "\t# CONDITIONAL\n";
         outfile_ << "\tpop %rax" << std::endl;
         outfile_ << "\tcmp $" << std::to_string(code->arg1.value())
-                 << ", %rax\n"
-                 << std::endl;
+          << ", %rax\n"
+          << std::endl;
         break;
       // Note to self abstract jumps out later
       case JUMP:
@@ -881,7 +882,8 @@ void CodeGen::Generate(
         outfile_ << "\tpop %rbp" << std::endl;
         outfile_ << "\tret\n" << std::endl;
         break;
-      case PRINTARITH:  // Can be a tuple so if it's a tuple check and print it
+      case PRINTARITH:
+        // Can be a tuple so if it's a tuple check and print it
         // Correctly
         outfile_ << "\tpop %rax" << std::endl;
         outfile_ << "\tpop %rbx" << std::endl;
@@ -891,12 +893,12 @@ void CodeGen::Generate(
       case LHSDEREFERENCE:
         parsedstring = DereferenceParserHelper(code->target.reg().name());
         outfile_ << "\t# LHSDereference of variable "
-            << code->target.reg().name() << std::endl;
+          << code->target.reg().name() << std::endl;
         if (parsedstring.size() == 2) {
           if (currscope_ == GLOBAL) {
             outfile_ << "\tmov "
-            << VariableNameHelper(code->arg1.reg().name(), NOFLAG)
-            << ", %rbx" << std::endl;
+              << VariableNameHelper(code->arg1.reg().name(), NOFLAG)
+              << ", %rbx" << std::endl;
           }
           // Error Handling here to check the size
           // and if it's actually a tuple
@@ -905,17 +907,16 @@ void CodeGen::Generate(
         } else {
           GenerateNestedDeref();
         }
-
         break;
       case RHSDEREFERENCE:  // Needs to handle functions
         parsedstring = DereferenceParserHelper(code->target.reg().name());
         outfile_ << "\t#Dereference of variable "
-            << code->target.reg().name() << std::endl;
+          << code->target.reg().name() << std::endl;
         if (parsedstring.size() == 2) {
           if (currscope_ == GLOBAL) {
             outfile_ << "\tmov "
-            << VariableNameHelper(code->arg1.reg().name(), NOFLAG)
-            << ", %rbx" << std::endl;
+              << VariableNameHelper(code->arg1.reg().name(), NOFLAG)
+              << ", %rbx" << std::endl;
           }
 
           // Error Handling here to check the size
@@ -976,8 +977,10 @@ void CodeGen::Generate(
       case VARCHILDTUPLE:
         if (symbollocations_.count(code->target.reg().name()) == 0) {
           // Add it to the map then create a spot for it (if its a function)
-          symbollocations_.insert(std::pair<std::string, int>(
-          code->target.reg().name(), -16+-16*(symbollocations_.size()+1)));
+          symbollocations_.insert(
+              std::pair<std::string, int>(
+                  code->target.reg().name(),
+                  -16+-16*(symbollocations_.size()+1)));
         }
         outfile_ << "\t# Getting value of " << code->target.reg().name()
           << std::endl;

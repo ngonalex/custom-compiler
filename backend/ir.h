@@ -181,8 +181,6 @@ struct ThreeAddressCode {
   Operand arg1;
   Operand arg2;
 
-  struct ThreeAddressCode* next;
-  struct ThreeAddressCode* prev;
   ThreeAddressCode()
       : target(Register()), op(NOTYPE), arg1(Operand(0)), arg2(Operand(0)) {}
 };
