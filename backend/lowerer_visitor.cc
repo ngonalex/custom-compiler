@@ -304,8 +304,6 @@ void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
   std::set<std::string> originalglobalset(globalset_);
   globalset_.clear();
 
-  // We don't really need to do this but this may change later
-  // Save the state of the totalset
   std::set<std::string> originaltotalset(totalset_);
   totalset_.clear();
 
@@ -336,6 +334,7 @@ void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
   CreateFunctionDefEpilogue(def.function_name());
 
   globalset_ = originalglobalset;
+  totalset_ = originaltotalset;
 }
 
 void LowererVisitor::VisitLessThanExpr(const LessThanExpr& exp) {
@@ -645,6 +644,7 @@ void LowererVisitor::CreateLoadBlock(OpcodeType type, Operand arg1) {
 
       // Push variablename into the set (Flagging it as being assigned)
       globalset_.insert(varname);
+      totalset_.insert(varname);
 
       newblock->target = Target(Register(varname, VARIABLEREG));
       newblock->op = Opcode(FUNRETLOAD);
@@ -658,6 +658,7 @@ void LowererVisitor::CreateLoadBlock(OpcodeType type, Operand arg1) {
 
       // Push variablename into the set (Flagging it as being assigned)
       globalset_.insert(varname);
+      totalset_.insert(varname);
 
       newblock->target = Target(Register(varname, VARIABLEREG));
       newblock->op = Opcode(FUNARGLOAD);
