@@ -14,6 +14,7 @@ void CodeGen::GeneratePrinter() {
   GeneratePrintIntTuple();
   GeneratePrintNestedTuple();
   GeneratePrintUnassignedTuple();
+  GenerateTupleCreationSizeCheck();
 
   // printdivisionbyzeroerror
   outfile_ << "printdivisionbyzeroerror:" << std::endl;
@@ -52,6 +53,14 @@ void CodeGen::GeneratePrinter() {
   outfile_ << "printsizeerror:" << std::endl;
   outfile_ << "\tmov $printstring, %rdi" << std::endl;
   outfile_ << "\tmov $outofboundserrorasciz, %rsi" << std::endl;
+  outfile_ << "\tmov $0, %rax" << std::endl;
+  outfile_ << "\tcall printf" << std::endl;
+  outfile_ << "\tcall exit" << std::endl;
+
+  // printsizeerror
+  outfile_ << "printtuplecreationsizeerror:" << std::endl;
+  outfile_ << "\tmov $printstring, %rdi" << std::endl;
+  outfile_ << "\tmov $tuplesizeerrorascii, %rsi" << std::endl;
   outfile_ << "\tmov $0, %rax" << std::endl;
   outfile_ << "\tcall printf" << std::endl;
   outfile_ << "\tcall exit" << std::endl;
@@ -114,6 +123,11 @@ void CodeGen::GeneratePrinter() {
   outfile_ << "tupletypeasciz:" << std::endl;
   outfile_ << "\t.asciz \"Invalid type: must be a tuple\\n\"" << std::endl;
 
+  // tuplesizeerrorascii
+  outfile_ << "tuplesizeerrorascii:" << std::endl;
+  outfile_ << "\t.asciz \"Invalid size, tuple size "
+    << "must be greater than zero\\n\"" << std::endl;
+
   // inttypeascii
   outfile_ << "inttypeasciz:" << std::endl;
   outfile_ << "\t.asciz \"Invalid type: must be a int\\n\"" << std::endl;
@@ -121,7 +135,6 @@ void CodeGen::GeneratePrinter() {
   // Divisionbyzeroascii
   outfile_ << "\tdivisionbyzeroasciz:" << std::endl;
   outfile_ << "\t.asciz \"Error: Division by zero\\n\"" << std::endl;
-
 
   // outofboundserrorascii
   outfile_ << "outofboundserrorasciz:" << std::endl;
@@ -753,6 +766,12 @@ void CodeGen::GenerateExistenceCheck() {
   outfile_ << "\tjne printexistenceerror" << std::endl;
   outfile_ << "\tret" << std::endl;
 }
+void CodeGen::GenerateTupleCreationSizeCheck() {
+  outfile_ << "tuplecreationsizecheck:" << std::endl;
+  outfile_ << "cmp $0, %rdi" << std::endl;
+  outfile_ << "jle printtuplecreationsizeerror" << std::endl;
+  outfile_ << "\tret" << std::endl;
+}
 void CodeGen::GenerateTupleSizeCheck() {
   // rdi contains the address of what to check
   // rsi contains the integer of the size of the rhs
@@ -1094,6 +1113,12 @@ void CodeGen::Generate(
         // Check if the rhs is actually a integer
         outfile_ << "\tmovzbl %dl, %rdi" << std::endl;
         outfile_ << "\tcall integerflagcheck" << std::endl;
+        outfile_ << "\tpop %rcx" << std::endl;
+        outfile_ << "\tpush %rcx" << std::endl;
+
+        // Check if the rhs is greater than zero
+        outfile_ << "\tmov %rcx, %rdi" << std::endl;
+        outfile_ << "\tcall tuplecreationsizecheck" << std::endl;
         outfile_ << "\tpop %rcx" << std::endl;
         outfile_ << "\tpush %rcx" << std::endl;
 

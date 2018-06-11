@@ -54,6 +54,7 @@ class CodeGen {
     void GenerateIntegerFlagCheck();
     void GenerateExistenceCheck();
     void GenerateTupleSizeCheck();
+    void GenerateTupleCreationSizeCheck();
     void GenerateCreateNewTuple();
     void GenerateNestedDeref();
     void GenerateBaseDeref(std::string variablename);

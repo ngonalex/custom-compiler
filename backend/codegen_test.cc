@@ -4925,8 +4925,11 @@ TEST_F(CodeGenTest, RecursiveFactorialFunctionWorks) {
   EXPECT_EQ(result, "The program returned: 3628800\n");
 }
 
-// v5 tests
-TEST_F(CodeGenTest, SimpleTupleTest) {
+// V5 tests
+
+// Function def skipped as it is not used
+// bob = tuple(3)
+TEST_F(CodeGenTest, CanCreateEmptyTuple) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
@@ -4960,10 +4963,16 @@ TEST_F(CodeGenTest, SimpleTupleTest) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The program returned: a tuple\n");
+  EXPECT_EQ(result, "The program returned a tuple with indices:\n"
+            "1: Unassigned\n"
+            "2: Unassigned\n"
+            "3: Unassigned\n");
 }
 
-TEST_F(CodeGenTest, SimpleTupleTest2) {
+// Function def skipped as it is not used
+// bob = tuple(3)
+// bob->2 = 10
+TEST_F(CodeGenTest, CanCreateTupleWithOneIntegerAssignment) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
@@ -4989,12 +4998,6 @@ TEST_F(CodeGenTest, SimpleTupleTest2) {
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<Dereference>(
           make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(3)),
-      make_unique<IntegerExpr>(10))));
-
-  statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
           make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(10))));
 
@@ -5009,5 +5012,329 @@ TEST_F(CodeGenTest, SimpleTupleTest2) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The program returned: a tuple\n");
+  EXPECT_EQ(result, "The program returned a tuple with indices:\n"
+            "1: Unassigned\n"
+            "2: Integer with value: 10\n"
+            "3: Unassigned\n");
+}
+
+// Function def skipped as it is not used
+// bob = tuple(3)
+// bob->3 = tuple(20)
+TEST_F(CodeGenTest, CanCreateTupleWithOneTupleAssignment) {
+  Statement::Block foo_statements;
+
+  auto foo_retval = make_unique<const AddExpr>(
+      make_unique<const IntegerExpr>(5),
+      make_unique<const IntegerExpr>(10));
+
+  auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
+
+  auto foo_def = make_unique<const FunctionDef>("foo", std::move(foo_params),
+                                                std::move(foo_statements),
+                                                std::move(foo_retval));
+
+  FunctionDef::Block function_defs;
+  function_defs.push_back(std::move(foo_def));
+
+  auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
+
+  Statement::Block statements;
+  statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
+      make_unique<VariableExpr>("bob"),
+      make_unique<IntegerExpr>(3))));
+
+  statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
+      make_unique<Dereference>(
+          make_unique<VariableExpr>("bob"),
+          make_unique<IntegerExpr>(3)),
+      make_unique<IntegerExpr>(20))));
+
+  auto ae = make_unique<const VariableExpr>("bob");
+  auto ast = make_unique<const Program>(std::move(function_defs),
+                                        std::move(statements), std::move(ae));
+
+  ast->Visit(&lowerer_);
+  std::ofstream file = std::ofstream("test.s");
+  CodeGen runner = CodeGen(file, PRINT_ONLY_RESULT);
+  auto test = lowerer_.GetIR();
+  runner.GenerateData(lowerer_.totalset());
+  runner.Generate(std::move(test));
+  std::string result = exec("gcc -g -static test.s -o run && ./run");
+  EXPECT_EQ(result, "The program returned a tuple with indices:\n"
+            "1: Unassigned\n"
+            "2: Unassigned\n"
+            "3: Tuple with size: 20\n");
+}
+
+// Function def skipped as it is not used
+// bob = tuple(3)
+// bob->2 = -500
+// bob->3 = tuple(20)
+TEST_F(CodeGenTest, CanCreateTupleWithMixedTypes) {
+  Statement::Block foo_statements;
+
+  auto foo_retval = make_unique<const AddExpr>(
+      make_unique<const IntegerExpr>(5),
+      make_unique<const IntegerExpr>(10));
+
+  auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
+
+  auto foo_def = make_unique<const FunctionDef>("foo", std::move(foo_params),
+                                                std::move(foo_statements),
+                                                std::move(foo_retval));
+
+  FunctionDef::Block function_defs;
+  function_defs.push_back(std::move(foo_def));
+
+  auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
+
+  Statement::Block statements;
+  statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
+      make_unique<VariableExpr>("bob"),
+      make_unique<IntegerExpr>(3))));
+
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
+      make_unique<Dereference>(
+          make_unique<VariableExpr>("bob"),
+          make_unique<IntegerExpr>(2)),
+      make_unique<IntegerExpr>(-500))));
+
+  statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
+      make_unique<Dereference>(
+          make_unique<VariableExpr>("bob"),
+          make_unique<IntegerExpr>(3)),
+      make_unique<IntegerExpr>(20))));
+
+  auto ae = make_unique<const VariableExpr>("bob");
+  auto ast = make_unique<const Program>(std::move(function_defs),
+                                        std::move(statements), std::move(ae));
+
+  ast->Visit(&lowerer_);
+  std::ofstream file = std::ofstream("test.s");
+  CodeGen runner = CodeGen(file, PRINT_ONLY_RESULT);
+  auto test = lowerer_.GetIR();
+  runner.GenerateData(lowerer_.totalset());
+  runner.Generate(std::move(test));
+  std::string result = exec("gcc -g -static test.s -o run && ./run");
+  EXPECT_EQ(result, "The program returned a tuple with indices:\n"
+            "1: Unassigned\n"
+            "2: Integer with value: -500\n"
+            "3: Tuple with size: 20\n");
+}
+
+// Function def skipped as it is not used
+// bob = tuple(0)
+TEST_F(CodeGenTest, TupleCreationErrorsOutWhenArgumentSuppliedisZero) {
+  Statement::Block foo_statements;
+
+  auto foo_retval = make_unique<const AddExpr>(
+      make_unique<const IntegerExpr>(5),
+      make_unique<const IntegerExpr>(10));
+
+  auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
+
+  auto foo_def = make_unique<const FunctionDef>("foo", std::move(foo_params),
+                                                std::move(foo_statements),
+                                                std::move(foo_retval));
+
+  FunctionDef::Block function_defs;
+  function_defs.push_back(std::move(foo_def));
+
+  auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
+
+  Statement::Block statements;
+  statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
+      make_unique<VariableExpr>("bob"),
+      make_unique<IntegerExpr>(0))));
+
+  auto ae = make_unique<const VariableExpr>("bob");
+  auto ast = make_unique<const Program>(std::move(function_defs),
+                                        std::move(statements), std::move(ae));
+
+  ast->Visit(&lowerer_);
+  std::ofstream file = std::ofstream("test.s");
+  CodeGen runner = CodeGen(file, PRINT_ONLY_RESULT);
+  auto test = lowerer_.GetIR();
+  runner.GenerateData(lowerer_.totalset());
+  runner.Generate(std::move(test));
+  std::string result = exec("gcc -g -static test.s -o run && ./run");
+  EXPECT_EQ(result, "Invalid size, tuple size must be greater than zero\n");
+}
+
+// Function def skipped as it is not used
+// bob = tuple(-10)
+TEST_F(CodeGenTest, TupleCreationErrorsOutWhenArgumentSuppliedisNeg) {
+  Statement::Block foo_statements;
+
+  auto foo_retval = make_unique<const AddExpr>(
+      make_unique<const IntegerExpr>(5),
+      make_unique<const IntegerExpr>(10));
+
+  auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
+
+  auto foo_def = make_unique<const FunctionDef>("foo", std::move(foo_params),
+                                                std::move(foo_statements),
+                                                std::move(foo_retval));
+
+  FunctionDef::Block function_defs;
+  function_defs.push_back(std::move(foo_def));
+
+  auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
+
+  Statement::Block statements;
+  statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
+      make_unique<VariableExpr>("bob"),
+      make_unique<IntegerExpr>(-10))));
+
+  auto ae = make_unique<const VariableExpr>("bob");
+  auto ast = make_unique<const Program>(std::move(function_defs),
+                                        std::move(statements), std::move(ae));
+
+  ast->Visit(&lowerer_);
+  std::ofstream file = std::ofstream("test.s");
+  CodeGen runner = CodeGen(file, PRINT_ONLY_RESULT);
+  auto test = lowerer_.GetIR();
+  runner.GenerateData(lowerer_.totalset());
+  runner.Generate(std::move(test));
+  std::string result = exec("gcc -g -static test.s -o run && ./run");
+  EXPECT_EQ(result, "Invalid size, tuple size must be greater than zero\n");
+}
+
+// Function def skipped as it is not used
+// bob = tuple(3)
+// bob->4 = tuple(20)
+TEST_F(CodeGenTest, DereferenceAccessErrorsOutWhenArgumentIsAboveMaxSize) {
+  Statement::Block foo_statements;
+
+  auto foo_retval = make_unique<const AddExpr>(
+      make_unique<const IntegerExpr>(5),
+      make_unique<const IntegerExpr>(10));
+
+  auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
+
+  auto foo_def = make_unique<const FunctionDef>("foo", std::move(foo_params),
+                                                std::move(foo_statements),
+                                                std::move(foo_retval));
+
+  FunctionDef::Block function_defs;
+  function_defs.push_back(std::move(foo_def));
+
+  auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
+
+  Statement::Block statements;
+  statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
+      make_unique<VariableExpr>("bob"),
+      make_unique<IntegerExpr>(3))));
+
+  statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
+      make_unique<Dereference>(
+          make_unique<VariableExpr>("bob"),
+          make_unique<IntegerExpr>(4)),
+      make_unique<IntegerExpr>(20))));
+
+  auto ae = make_unique<const VariableExpr>("bob");
+  auto ast = make_unique<const Program>(std::move(function_defs),
+                                        std::move(statements), std::move(ae));
+
+  ast->Visit(&lowerer_);
+  std::ofstream file = std::ofstream("test.s");
+  CodeGen runner = CodeGen(file, PRINT_ONLY_RESULT);
+  auto test = lowerer_.GetIR();
+  runner.GenerateData(lowerer_.totalset());
+  runner.Generate(std::move(test));
+  std::string result = exec("gcc -g -static test.s -o run && ./run");
+  EXPECT_EQ(result, "Out of Bounds Error\n");
+}
+
+// Function def skipped as it is not used
+// bob = tuple(3)
+// bob->0 = tuple(20)
+TEST_F(CodeGenTest, DereferenceAccessErrorsOutWhenArgumentIsZero) {
+  Statement::Block foo_statements;
+
+  auto foo_retval = make_unique<const AddExpr>(
+      make_unique<const IntegerExpr>(5),
+      make_unique<const IntegerExpr>(10));
+
+  auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
+
+  auto foo_def = make_unique<const FunctionDef>("foo", std::move(foo_params),
+                                                std::move(foo_statements),
+                                                std::move(foo_retval));
+
+  FunctionDef::Block function_defs;
+  function_defs.push_back(std::move(foo_def));
+
+  auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
+
+  Statement::Block statements;
+  statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
+      make_unique<VariableExpr>("bob"),
+      make_unique<IntegerExpr>(3))));
+
+  statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
+      make_unique<Dereference>(
+          make_unique<VariableExpr>("bob"),
+          make_unique<IntegerExpr>(0)),
+      make_unique<IntegerExpr>(20))));
+
+  auto ae = make_unique<const VariableExpr>("bob");
+  auto ast = make_unique<const Program>(std::move(function_defs),
+                                        std::move(statements), std::move(ae));
+
+  ast->Visit(&lowerer_);
+  std::ofstream file = std::ofstream("test.s");
+  CodeGen runner = CodeGen(file, PRINT_ONLY_RESULT);
+  auto test = lowerer_.GetIR();
+  runner.GenerateData(lowerer_.totalset());
+  runner.Generate(std::move(test));
+  std::string result = exec("gcc -g -static test.s -o run && ./run");
+  EXPECT_EQ(result, "Out of Bounds Error\n");
+}
+
+// Function def skipped as it is not used
+// bob = tuple(3)
+// bob->-1 = tuple(20)
+TEST_F(CodeGenTest, DereferenceAccessErrorsOutWhenArgumentIsNegative) {
+  Statement::Block foo_statements;
+
+  auto foo_retval = make_unique<const AddExpr>(
+      make_unique<const IntegerExpr>(5),
+      make_unique<const IntegerExpr>(10));
+
+  auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
+
+  auto foo_def = make_unique<const FunctionDef>("foo", std::move(foo_params),
+                                                std::move(foo_statements),
+                                                std::move(foo_retval));
+
+  FunctionDef::Block function_defs;
+  function_defs.push_back(std::move(foo_def));
+
+  auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
+
+  Statement::Block statements;
+  statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
+      make_unique<VariableExpr>("bob"),
+      make_unique<IntegerExpr>(3))));
+
+  statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
+      make_unique<Dereference>(
+          make_unique<VariableExpr>("bob"),
+          make_unique<IntegerExpr>(-1)),
+      make_unique<IntegerExpr>(20))));
+
+  auto ae = make_unique<const VariableExpr>("bob");
+  auto ast = make_unique<const Program>(std::move(function_defs),
+                                        std::move(statements), std::move(ae));
+
+  ast->Visit(&lowerer_);
+  std::ofstream file = std::ofstream("test.s");
+  CodeGen runner = CodeGen(file, PRINT_ONLY_RESULT);
+  auto test = lowerer_.GetIR();
+  runner.GenerateData(lowerer_.totalset());
+  runner.Generate(std::move(test));
+  std::string result = exec("gcc -g -static test.s -o run && ./run");
+  EXPECT_EQ(result, "Out of Bounds Error\n");
 }
