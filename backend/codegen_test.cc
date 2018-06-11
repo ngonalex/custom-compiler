@@ -4924,3 +4924,90 @@ TEST_F(CodeGenTest, RecursiveFactorialFunctionWorks) {
   std::string result = exec("gcc -g -static test.s -o run && ./run");
   EXPECT_EQ(result, "The program returned: 3628800\n");
 }
+
+// v5 tests
+TEST_F(CodeGenTest, SimpleTupleTest) {
+  Statement::Block foo_statements;
+
+  auto foo_retval = make_unique<const AddExpr>(
+      make_unique<const IntegerExpr>(5),
+      make_unique<const IntegerExpr>(10));
+
+  auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
+
+  auto foo_def = make_unique<const FunctionDef>("foo", std::move(foo_params),
+                                                std::move(foo_statements),
+                                                std::move(foo_retval));
+
+  FunctionDef::Block function_defs;
+  function_defs.push_back(std::move(foo_def));
+
+  auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
+
+  Statement::Block statements;
+  statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
+      make_unique<VariableExpr>("bob"),
+      make_unique<IntegerExpr>(3))));
+
+  auto ae = make_unique<const VariableExpr>("bob");
+  auto ast = make_unique<const Program>(std::move(function_defs),
+                                        std::move(statements), std::move(ae));
+
+  ast->Visit(&lowerer_);
+  std::ofstream file = std::ofstream("test.s");
+  CodeGen runner = CodeGen(file, PRINT_ONLY_RESULT);
+  auto test = lowerer_.GetIR();
+  runner.GenerateData(lowerer_.totalset());
+  runner.Generate(std::move(test));
+  std::string result = exec("gcc -g -static test.s -o run && ./run");
+  EXPECT_EQ(result, "The program returned: a tuple\n");
+}
+
+TEST_F(CodeGenTest, SimpleTupleTest2) {
+  Statement::Block foo_statements;
+
+  auto foo_retval = make_unique<const AddExpr>(
+      make_unique<const IntegerExpr>(5),
+      make_unique<const IntegerExpr>(10));
+
+  auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
+
+  auto foo_def = make_unique<const FunctionDef>("foo", std::move(foo_params),
+                                                std::move(foo_statements),
+                                                std::move(foo_retval));
+
+  FunctionDef::Block function_defs;
+  function_defs.push_back(std::move(foo_def));
+
+  auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
+
+  Statement::Block statements;
+  statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
+      make_unique<VariableExpr>("bob"),
+      make_unique<IntegerExpr>(3))));
+
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
+      make_unique<Dereference>(
+          make_unique<VariableExpr>("bob"),
+          make_unique<IntegerExpr>(3)),
+      make_unique<IntegerExpr>(10))));
+
+  statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
+      make_unique<Dereference>(
+          make_unique<VariableExpr>("bob"),
+          make_unique<IntegerExpr>(2)),
+      make_unique<IntegerExpr>(10))));
+
+  auto ae = make_unique<const VariableExpr>("bob");
+  auto ast = make_unique<const Program>(std::move(function_defs),
+                                        std::move(statements), std::move(ae));
+
+  ast->Visit(&lowerer_);
+  std::ofstream file = std::ofstream("test.s");
+  CodeGen runner = CodeGen(file, PRINT_ONLY_RESULT);
+  auto test = lowerer_.GetIR();
+  runner.GenerateData(lowerer_.totalset());
+  runner.Generate(std::move(test));
+  std::string result = exec("gcc -g -static test.s -o run && ./run");
+  EXPECT_EQ(result, "The program returned: a tuple\n");
+}

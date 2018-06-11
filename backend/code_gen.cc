@@ -10,6 +10,10 @@ void CodeGen::GeneratePrinter() {
   GenerateExistenceCheck();
   GenerateTupleSizeCheck();
   GenerateCreateNewTuple();
+  GeneratePrintTuple();
+  GeneratePrintIntTuple();
+  GeneratePrintNestedTuple();
+  GeneratePrintUnassignedTuple();
 
   // printdivisionbyzeroerror
   outfile_ << "printdivisionbyzeroerror:" << std::endl;
@@ -60,6 +64,23 @@ void CodeGen::GeneratePrinter() {
   outfile_ << "printresult:" << std::endl;
   outfile_ << "\t.asciz \"The program returned: \"" << std::endl;
 
+  // printtupleascii
+  outfile_ << "printtupleascii:" << std::endl;
+  outfile_ << "\t.asciz \"The program returned a "
+   << "tuple with indices:\\n\"" << std::endl;
+
+  // printunassignedtupleascii
+  outfile_ << "printunassignedtupleascii:" << std::endl;
+  outfile_ << "\t.asciz \": Unassigned\\n\"" << std::endl;
+
+  // printinttupleascii
+  outfile_ << "printinttupleascii:" << std::endl;
+  outfile_ << "\t.asciz \": Integer with value: \"" << std::endl;
+
+  // printnestedtupleascii
+  outfile_ << "printnestedtupleascii:" << std::endl;
+  outfile_ << "\t.asciz \": Tuple with size: \"" << std::endl;
+
   // printfunctionresult
   outfile_ << "printfunctionresult:" << std::endl;
   outfile_ << "\t.asciz \"The function returned: \"" << std::endl;
@@ -75,6 +96,10 @@ void CodeGen::GeneratePrinter() {
   // printint
   outfile_ << "printint:" << std::endl;
   outfile_ << "\t.asciz \"%d\\n\""  << std::endl;
+
+  // printintnonewline
+  outfile_ << "printintnonewline:" << std::endl;
+  outfile_ << "\t.asciz \"%d\"" << std::endl;
 
   // printstringint
   outfile_ << "printstringint:" << std::endl;
@@ -573,6 +598,132 @@ void CodeGen::GenerateCreateNewTuple() {
   outfile_ << "\tret" << std::endl;
 }
 
+void CodeGen::GeneratePrintTuple() {
+  // rdi is the address
+  // rsi is the flags
+  outfile_ << "printtuple:" << std::endl;
+  outfile_ << "\tpush %rdi" << std::endl;
+  outfile_ << "\tpush %rsi" << std::endl;
+
+  outfile_ << "\tmov $printstring, %rdi" << std::endl;
+  outfile_ << "\tmov $printtupleascii, %rsi" << std::endl;
+  outfile_ << "\tmov $0, %rax" << std::endl;
+  outfile_ << "\tcall printf" << std::endl;
+
+  outfile_ << "\tpop %rsi" << std::endl;
+  outfile_ << "\tpop %rdi" << std::endl;
+  // comment this line out alter to finish the subroutine
+  // GenerateEpilogue();
+
+  outfile_ << "\tshr $16, %rsi" << std::endl;
+  outfile_ << "\txor %rdx, %rdx" << std::endl;
+  outfile_ << "\tcall printtupleloopguard" << std::endl;
+  outfile_ << "\tret" << std::endl;
+
+  outfile_ << "printtupleloopguard:" << std::endl;
+  outfile_ << "\tcmp %rsi, %rdx" << std::endl;
+  outfile_ << "\tjl printtupleloop" << std::endl;
+  outfile_ << "\tret" << std::endl;
+
+  outfile_ << "printtupleloop:" << std::endl;
+  outfile_ << "\tmov %rdx, %r8" << std::endl;
+  outfile_ << "\tmov %rdi, %r9" << std::endl;
+  outfile_ << "\timul $16, %r8" << std::endl;
+  outfile_ << "\tadd %r8, %r9" << std::endl;
+  outfile_ << "\tmov %r9, %r10" << std::endl;
+  outfile_ << "\tmovb 1(%r10), %r11b" << std::endl;
+  outfile_ << "\tcmp $0, %r11b" << std::endl;
+  outfile_ << "\tje unassignedtuple" << std::endl;
+
+  outfile_ << "\tmov (%r10), %r11b" << std::endl;
+  outfile_ << "\tcmp $0, %r11b" << std::endl;
+  outfile_ << "\tje inttuple" << std::endl;
+  outfile_ << "\tjmp nestedtuple" << std::endl;
+}
+
+void CodeGen::GeneratePrintIntTuple() {
+  outfile_ << "inttuple:" << std::endl;
+  outfile_ << "\tpush %rdi" << std::endl;
+  outfile_ << "\tpush %rsi" << std::endl;
+  outfile_ << "\tpush %rdx" << std::endl;
+  outfile_ << "\tpush %r10" << std::endl;
+
+  outfile_ << "\tmov $printintnonewline, %rdi" << std::endl;
+  outfile_ << "\tmov %rdx, %rsi" << std::endl;
+  outfile_ << "\tadd $1, %rsi" << std::endl;
+  outfile_ << "\tmov $0, %rax" << std::endl;
+  outfile_ << "\tcall printf" << std::endl;
+
+  outfile_ << "\tmov $printstring, %rdi" << std::endl;
+  outfile_ << "\tmov $printinttupleascii, %rsi" << std::endl;
+  outfile_ << "\tmov $0, %rax" << std::endl;
+  outfile_ << "\tcall printf" << std::endl;
+
+  outfile_ << "\tpop %r10" << std::endl;
+  outfile_ << "\tmovl 8(%r10), %esi"<< std::endl;
+  outfile_ << "\tmov $printint, %rdi" << std::endl;
+  outfile_ << "\tmov $0, %rax" << std::endl;
+  outfile_ << "\tcall printf" << std::endl;
+
+  outfile_ << "\tpop %rdx" << std::endl;
+  outfile_ << "\tpop %rsi" << std::endl;
+  outfile_ << "\tpop %rdi" << std::endl;
+  outfile_ << "\tadd $1, %rdx" << std::endl;
+  outfile_ << "\tjmp printtupleloopguard" << std::endl;
+}
+void CodeGen::GeneratePrintNestedTuple() {
+  outfile_ << "nestedtuple:" << std::endl;
+  outfile_ << "\tpush %rdi" << std::endl;
+  outfile_ << "\tpush %rsi" << std::endl;
+  outfile_ << "\tpush %rdx" << std::endl;
+  outfile_ << "\tpush %r10" << std::endl;
+
+  outfile_ << "\tmov $printintnonewline, %rdi" << std::endl;
+  outfile_ << "\tmov %rdx, %rsi" << std::endl;
+  outfile_ << "\tadd $1, %rsi" << std::endl;
+  outfile_ << "\tmov $0, %rax" << std::endl;
+  outfile_ << "\tcall printf" << std::endl;
+
+  outfile_ << "\tmov $printstring, %rdi" << std::endl;
+  outfile_ << "\tmov $printnestedtupleascii, %rsi" << std::endl;
+  outfile_ << "\tmov $0, %rax" << std::endl;
+  outfile_ << "\tcall printf" << std::endl;
+
+  outfile_ << "\tpop %r10" << std::endl;
+  outfile_ << "\tmovl 2(%r10), %esi"<< std::endl;
+  outfile_ << "\tmov $printint, %rdi" << std::endl;
+  outfile_ << "\tmov $0, %rax" << std::endl;
+  outfile_ << "\tcall printf" << std::endl;
+
+  outfile_ << "\tpop %rdx" << std::endl;
+  outfile_ << "\tpop %rsi" << std::endl;
+  outfile_ << "\tpop %rdi" << std::endl;
+  outfile_ << "\tadd $1, %rdx" << std::endl;
+  outfile_ << "\tjmp printtupleloopguard" << std::endl;
+}
+void CodeGen::GeneratePrintUnassignedTuple() {
+  outfile_ << "unassignedtuple:" << std::endl;
+  outfile_ << "\tpush %rdi" << std::endl;
+  outfile_ << "\tpush %rsi" << std::endl;
+  outfile_ << "\tpush %rdx" << std::endl;
+
+  outfile_ << "\tmov $printintnonewline, %rdi" << std::endl;
+  outfile_ << "\tmov %rdx, %rsi" << std::endl;
+  outfile_ << "\tadd $1, %rsi" << std::endl;
+  outfile_ << "\tmov $0, %rax" << std::endl;
+  outfile_ << "\tcall printf" << std::endl;
+
+  outfile_ << "\tmov $printstring, %rdi" << std::endl;
+  outfile_ << "\tmov $printunassignedtupleascii, %rsi" << std::endl;
+  outfile_ << "\tmov $0, %rax" << std::endl;
+  outfile_ << "\tcall printf" << std::endl;
+  outfile_ << "\tpop %rdx" << std::endl;
+  outfile_ << "\tpop %rsi" << std::endl;
+  outfile_ << "\tpop %rdi" << std::endl;
+  outfile_ << "\tadd $1, %rdx" << std::endl;
+  outfile_ << "\tjmp printtupleloopguard" << std::endl;
+}
+
 void CodeGen::GenerateDivisionByZeroCheck() {
   // rdi contains the address of what to check
   outfile_ << "divisionbyzerocheck:" << std::endl;
@@ -845,7 +996,6 @@ void CodeGen::Generate(
         outfile_ << "\t# FunctionRetEpilogue (Restore Stack)" << std::endl;
         outfile_ << "\tadd $" << code->arg1.value() * 16 <<
           ", %rsp" << std::endl;
-
         if (flag_ == PRINT_DEBUG || flag_ == PRINT_PROGRAM) {
           GeneratePrintCall("printfunctionresult");
         }
@@ -865,7 +1015,6 @@ void CodeGen::Generate(
           << std::endl;
         break;
       case FUNEPILOGUE:
-
         outfile_ << "\t# Function Epilogue " << std::endl;
         // Do a correct load
         outfile_ << "\tpop %rax" << std::endl;
@@ -887,6 +1036,12 @@ void CodeGen::Generate(
         // Correctly
         outfile_ << "\tpop %rax" << std::endl;
         outfile_ << "\tpop %rbx" << std::endl;
+
+        outfile_ << "\tmov %rax, %rdi" << std::endl;
+        outfile_ << "\tmov %rbx, %rsi" << std::endl;
+        outfile_ << "\tmovzbl %bl, %r12" << std::endl;
+        outfile_ << "\tcmp $0, %r12" << std::endl;
+        outfile_ << "\tjne printtuple" << std::endl;
         GeneratePrintCall("printresult");
         GenerateEpilogue();
         break;
@@ -990,7 +1145,6 @@ void CodeGen::Generate(
         outfile_ << "\tpush %rbx\n" << std::endl;
         break;
       default:
-        std::cerr << "Inside Generate and something really bad happened\n";
         std::cerr << "Unknown opcode " << std::to_string(opcode) << std::endl;
         exit(1);
     }
@@ -998,10 +1152,10 @@ void CodeGen::Generate(
 
   if (flag_ == PRINT_LAST_ARITHMETIC_EXPR) {
     TestPrint("printresult");
+    GenerateEpilogue();
   }
 
-  if (flag_ == PRINT_LAST_ARITHMETIC_EXPR || flag_ == PRINT_DEBUG
-      && currscope_ == GLOBAL) {
+  if ((flag_ == PRINT_DEBUG && currscope_ == GLOBAL)) {
     GenerateEpilogue();
   }
 

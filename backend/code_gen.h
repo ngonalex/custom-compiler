@@ -45,6 +45,10 @@ class CodeGen {
     void GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
                              OpcodeType type);
 
+    void GeneratePrintTuple();
+    void GeneratePrintIntTuple();
+    void GeneratePrintNestedTuple();
+    void GeneratePrintUnassignedTuple();
     void GenerateDivisionByZeroCheck();
     void GenerateTupleFlagCheck();
     void GenerateIntegerFlagCheck();
