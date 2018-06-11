@@ -186,7 +186,7 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
       outfile_ << "\tpush %rax\n" << std::endl;
       break;
     case VARLOAD:  // 2 pushes
-      outfile_ << "\t# Loading from a variable" << std::endl;
+      outfile_ << "\t# Loading from " << tac->arg1.reg().name() << std::endl;
       outfile_ << "\tmov " <<
         VariableNameHelper(tac->arg1.reg().name(), NOFLAG)
         << ", %rbx" << std::endl;
@@ -270,14 +270,14 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
       varname = tac->target.reg().name();
       outfile_ << "\t# Moving argument " << std::to_string(argumentnum)
         << " into the stack" << std::endl;
-      outfile_ << "\tmov " << std::to_string(8+argumentnum*8)
+      outfile_ << "\tmov " << std::to_string(16*argumentnum)
         << "(%rbp), %rax" << std::endl;
-      outfile_ << "\tmov %rax, -" << std::to_string(-8 + argumentnum*32)
+      outfile_ << "\tmov %rax, " << std::to_string(-8 + argumentnum*-16)
         << "(%rbp)" << std::endl;
       // Remake the objects flags
-      outfile_ << "\tmov " << std::to_string(16+argumentnum*8)
+      outfile_ << "\tmov " << std::to_string(16*argumentnum+8)
         << "(%rbp), %rax" << std::endl;
-      outfile_ << "\tmov %rax, -" << std::to_string(argumentnum*32)
+      outfile_ << "\tmov %rax, " << std::to_string(-16 + argumentnum*-16)
         << "(%rbp)\n" << std::endl;
       // Include it in the symbol table
       if (symbollocations_.count(varname) == 0) {
@@ -297,7 +297,8 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
             std::pair<std::string, int>(
                 tac->target.reg().name(), -16+-16*(symbollocations_.size()+1)));
       }
-      outfile_ << "\t# Returning from function and loading value" << std::endl;
+      outfile_ << "\t# Returning from function and loading value into "
+        << tac->target.reg().name() << std::endl;
       outfile_ << "\tmov (%rax), %rcx" << std::endl;
 
       if (currscope_ == GLOBAL) {
@@ -859,7 +860,6 @@ void CodeGen::Generate(
         outfile_ << "\t# Function Prologue " << std::endl;
         outfile_ << "\tpush %rbp" << std::endl;
         outfile_ << "\tmov %rsp, %rbp" << std::endl;
-        // May be unneeded
         outfile_ << "\tpush %rbx" << std::endl;
         outfile_ << "\tsub $" << 16+code->arg1.value()*16 << ", %rsp\n"
           << std::endl;
@@ -1000,7 +1000,8 @@ void CodeGen::Generate(
     TestPrint("printresult");
   }
 
-  if (flag_ == PRINT_LAST_ARITHMETIC_EXPR || flag_ == PRINT_DEBUG) {
+  if (flag_ == PRINT_LAST_ARITHMETIC_EXPR || flag_ == PRINT_DEBUG
+      && currscope_ == GLOBAL) {
     GenerateEpilogue();
   }
 

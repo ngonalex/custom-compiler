@@ -20,6 +20,7 @@ using cs160::abstract_syntax::backend::AddExpr;
 using cs160::abstract_syntax::backend::SubtractExpr;
 using cs160::abstract_syntax::backend::MultiplyExpr;
 using cs160::abstract_syntax::backend::DivideExpr;
+using cs160::abstract_syntax::backend::ArithmeticExpr;
 using cs160::backend::LowererVisitor;
 using cs160::backend::ThreeAddressCode;
 using cs160::backend::CodeGen;
@@ -3371,3 +3372,393 @@ TEST_F(CodeGenTest, LoopWithIfStatement) {
 }
 
 // V4 Tests
+
+// int foo() {
+//   return 5 + 10
+// }
+//
+// foo_retval = foo()
+TEST_F(CodeGenTest, BasicFunctionCallWithNoArguments) {
+  Statement::Block foo_statements;
+
+  auto foo_retval = make_unique<const AddExpr>(
+      make_unique<const IntegerExpr>(5),
+      make_unique<const IntegerExpr>(10));
+
+  auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
+
+  auto foo_def = make_unique<const FunctionDef>("foo", std::move(foo_params),
+                                                std::move(foo_statements),
+                                                std::move(foo_retval));
+
+  FunctionDef::Block function_defs;
+  function_defs.push_back(std::move(foo_def));
+
+  auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
+
+  Statement::Block statements;
+  statements.push_back(std::move(make_unique<const FunctionCall>(
+      make_unique<const VariableExpr>("foo_retval"), "foo",
+      std::move(arguments))));
+
+  auto ae = make_unique<const VariableExpr>("foo_retval");
+
+  auto ast = make_unique<const Program>(std::move(function_defs),
+                                        std::move(statements), std::move(ae));
+
+  ast->Visit(&lowerer_);
+
+  std::ofstream file = std::ofstream("test.s");
+  CodeGen runner = CodeGen(file, PRINT_DEBUG);
+  auto test = lowerer_.GetIR();
+  runner.GenerateData(lowerer_.totalset());
+  runner.Generate(std::move(test));
+  std::string result = exec("gcc -g -static test.s -o run && ./run");
+  EXPECT_EQ(result, "The function returned: 15\n"
+                    "The program returned: 15\n");
+}
+
+// def foo(a,b,c,d,e,f,g,h,j,k) {
+//    x = a + b + c + d + e + f + g + h+ j + k
+//    return x
+// }
+// x = 10
+// foo_retval = foo(1,2,3,4,5,6,7,8,9,x)
+TEST_F(CodeGenTest, BasicFunctionCallWithManyArguments) {
+  Statement::Block foo_statements;
+
+  foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
+      make_unique<VariableExpr>("x"),
+      make_unique<AddExpr>(
+          make_unique<AddExpr>(
+              make_unique<AddExpr>(
+                  make_unique<VariableExpr>("a"),
+                  make_unique<VariableExpr>("b")),
+              make_unique<AddExpr>(
+                  make_unique<VariableExpr>("c"),
+                  make_unique<VariableExpr>("d"))),
+          make_unique<AddExpr>(
+              make_unique<AddExpr>(
+                  make_unique<VariableExpr>("e"),
+                  make_unique<VariableExpr>("f")),
+              make_unique<AddExpr>(
+                  make_unique<AddExpr>(
+                      make_unique<VariableExpr>("g"),
+                      make_unique<VariableExpr>("h")),
+                  make_unique<AddExpr>(
+                      make_unique<VariableExpr>("j"),
+                      make_unique<VariableExpr>("k"))))))));
+  auto foo_retval = make_unique<const VariableExpr>("x");
+
+  auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
+  foo_params.push_back(std::move(make_unique<const VariableExpr>("a")));
+  foo_params.push_back(std::move(make_unique<const VariableExpr>("b")));
+  foo_params.push_back(std::move(make_unique<const VariableExpr>("c")));
+  foo_params.push_back(std::move(make_unique<const VariableExpr>("d")));
+  foo_params.push_back(std::move(make_unique<const VariableExpr>("e")));
+  foo_params.push_back(std::move(make_unique<const VariableExpr>("f")));
+  foo_params.push_back(std::move(make_unique<const VariableExpr>("g")));
+  foo_params.push_back(std::move(make_unique<const VariableExpr>("h")));
+  foo_params.push_back(std::move(make_unique<const VariableExpr>("j")));
+  foo_params.push_back(std::move(make_unique<const VariableExpr>("k")));
+
+  auto foo_def = make_unique<const FunctionDef>("foo", std::move(foo_params),
+                                                std::move(foo_statements),
+                                                std::move(foo_retval));
+
+  FunctionDef::Block function_defs;
+  function_defs.push_back(std::move(foo_def));
+
+  auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
+  arguments.push_back(std::move(make_unique<const IntegerExpr>(1)));
+  arguments.push_back(std::move(make_unique<const IntegerExpr>(2)));
+  arguments.push_back(std::move(make_unique<const IntegerExpr>(3)));
+  arguments.push_back(std::move(make_unique<const IntegerExpr>(4)));
+  arguments.push_back(std::move(make_unique<const IntegerExpr>(5)));
+  arguments.push_back(std::move(make_unique<const IntegerExpr>(6)));
+  arguments.push_back(std::move(make_unique<const IntegerExpr>(7)));
+  arguments.push_back(std::move(make_unique<const IntegerExpr>(8)));
+  arguments.push_back(std::move(make_unique<const IntegerExpr>(9)));
+  arguments.push_back(std::move(make_unique<const VariableExpr>("x")));
+
+  Statement::Block statements;
+
+  statements.push_back(std::move(
+      make_unique<const AssignmentFromArithExp>(
+          make_unique<VariableExpr>("x"),
+          make_unique<IntegerExpr>(10))));
+  statements.push_back(std::move(make_unique<const FunctionCall>(
+      make_unique<const VariableExpr>("foo_retval"), "foo",
+      std::move(arguments))));
+
+  auto ae = make_unique<const VariableExpr>("foo_retval");
+
+  auto ast = make_unique<const Program>(std::move(function_defs),
+                                        std::move(statements), std::move(ae));
+
+  ast->Visit(&lowerer_);
+
+  std::ofstream file = std::ofstream("test.s");
+  CodeGen runner = CodeGen(file, PRINT_DEBUG);
+  auto test = lowerer_.GetIR();
+  runner.GenerateData(lowerer_.totalset());
+  runner.Generate(std::move(test));
+  std::string result = exec("gcc -g -static test.s -o run && ./run");
+  EXPECT_EQ(result, "Variable x is equal to: 10\n"
+                    "The function returned: 55\n"
+                    "The program returned: 55\n");
+}
+
+// int foo() {
+//   x = 10 + 10
+//   return x
+// }
+//
+// foo_retval = foo()
+TEST_F(CodeGenTest, AssignmentsWithAdditionWorksInFunctions) {
+  Statement::Block foo_statements;
+
+  foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
+      make_unique<VariableExpr>("x"),
+      make_unique<AddExpr>(
+          make_unique<IntegerExpr>(10),
+          make_unique<IntegerExpr>(10)))));
+
+  auto foo_retval = make_unique<const VariableExpr>("x");
+
+  auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
+
+  auto foo_def = make_unique<const FunctionDef>("foo", std::move(foo_params),
+                                                std::move(foo_statements),
+                                                std::move(foo_retval));
+
+  FunctionDef::Block function_defs;
+  function_defs.push_back(std::move(foo_def));
+
+  auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
+
+  Statement::Block statements;
+
+  statements.push_back(std::move(make_unique<const FunctionCall>(
+      make_unique<const VariableExpr>("foo_retval"), "foo",
+      std::move(arguments))));
+
+  auto ae = make_unique<const VariableExpr>("foo_retval");
+
+  auto ast = make_unique<const Program>(std::move(function_defs),
+                                        std::move(statements), std::move(ae));
+
+  ast->Visit(&lowerer_);
+
+  std::ofstream file = std::ofstream("test.s");
+  CodeGen runner = CodeGen(file, PRINT_DEBUG);
+  auto test = lowerer_.GetIR();
+  runner.GenerateData(lowerer_.totalset());
+  runner.Generate(std::move(test));
+  std::string result = exec("gcc -g -static test.s -o run && ./run");
+  EXPECT_EQ(result, "The function returned: 20\n"
+                    "The program returned: 20\n");
+}
+
+// int foo() {
+//   x = 20 - 10
+//   return x
+// }
+//
+// foo_retval = foo()
+TEST_F(CodeGenTest, AssignmentsWithSubtractionWorksInFunctions) {
+  Statement::Block foo_statements;
+
+  foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
+      make_unique<VariableExpr>("x"),
+      make_unique<SubtractExpr>(
+          make_unique<IntegerExpr>(20),
+          make_unique<IntegerExpr>(10)))));
+
+  auto foo_retval = make_unique<const VariableExpr>("x");
+
+  auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
+
+  auto foo_def = make_unique<const FunctionDef>("foo", std::move(foo_params),
+                                                std::move(foo_statements),
+                                                std::move(foo_retval));
+
+  FunctionDef::Block function_defs;
+  function_defs.push_back(std::move(foo_def));
+
+  auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
+
+  Statement::Block statements;
+
+  statements.push_back(std::move(make_unique<const FunctionCall>(
+      make_unique<const VariableExpr>("foo_retval"), "foo",
+      std::move(arguments))));
+
+  auto ae = make_unique<const VariableExpr>("foo_retval");
+
+  auto ast = make_unique<const Program>(std::move(function_defs),
+                                        std::move(statements), std::move(ae));
+
+  ast->Visit(&lowerer_);
+
+  std::ofstream file = std::ofstream("test.s");
+  CodeGen runner = CodeGen(file, PRINT_DEBUG);
+  auto test = lowerer_.GetIR();
+  runner.GenerateData(lowerer_.totalset());
+  runner.Generate(std::move(test));
+  std::string result = exec("gcc -g -static test.s -o run && ./run");
+  EXPECT_EQ(result, "The function returned: 10\n"
+                    "The program returned: 10\n");
+}
+
+// int foo() {
+//   x = 20 * 10
+//   return x
+// }
+//
+// foo_retval = foo()
+TEST_F(CodeGenTest, AssignmentsWithMultiplicationWorksInFunctions) {
+  Statement::Block foo_statements;
+
+  foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
+      make_unique<VariableExpr>("x"),
+      make_unique<MultiplyExpr>(
+          make_unique<IntegerExpr>(20),
+          make_unique<IntegerExpr>(10)))));
+
+  auto foo_retval = make_unique<const VariableExpr>("x");
+
+  auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
+
+  auto foo_def = make_unique<const FunctionDef>("foo", std::move(foo_params),
+                                                std::move(foo_statements),
+                                                std::move(foo_retval));
+
+  FunctionDef::Block function_defs;
+  function_defs.push_back(std::move(foo_def));
+
+  auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
+
+  Statement::Block statements;
+
+  statements.push_back(std::move(make_unique<const FunctionCall>(
+      make_unique<const VariableExpr>("foo_retval"), "foo",
+      std::move(arguments))));
+
+  auto ae = make_unique<const VariableExpr>("foo_retval");
+
+  auto ast = make_unique<const Program>(std::move(function_defs),
+                                        std::move(statements), std::move(ae));
+
+  ast->Visit(&lowerer_);
+
+  std::ofstream file = std::ofstream("test.s");
+  CodeGen runner = CodeGen(file, PRINT_DEBUG);
+  auto test = lowerer_.GetIR();
+  runner.GenerateData(lowerer_.totalset());
+  runner.Generate(std::move(test));
+  std::string result = exec("gcc -g -static test.s -o run && ./run");
+  EXPECT_EQ(result, "The function returned: 200\n"
+                    "The program returned: 200\n");
+}
+
+// int foo() {
+//   x = 20 / 10
+//   return x
+// }
+//
+// foo_retval = foo()
+TEST_F(CodeGenTest, AssignmentsWithDivisionWorksInFunctions) {
+  Statement::Block foo_statements;
+
+  foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
+      make_unique<VariableExpr>("x"),
+      make_unique<DivideExpr>(
+          make_unique<IntegerExpr>(20),
+          make_unique<IntegerExpr>(10)))));
+
+  auto foo_retval = make_unique<const VariableExpr>("x");
+
+  auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
+
+  auto foo_def = make_unique<const FunctionDef>("foo", std::move(foo_params),
+                                                std::move(foo_statements),
+                                                std::move(foo_retval));
+
+  FunctionDef::Block function_defs;
+  function_defs.push_back(std::move(foo_def));
+
+  auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
+
+  Statement::Block statements;
+
+  statements.push_back(std::move(make_unique<const FunctionCall>(
+      make_unique<const VariableExpr>("foo_retval"), "foo",
+      std::move(arguments))));
+
+  auto ae = make_unique<const VariableExpr>("foo_retval");
+
+  auto ast = make_unique<const Program>(std::move(function_defs),
+                                        std::move(statements), std::move(ae));
+
+  ast->Visit(&lowerer_);
+
+  std::ofstream file = std::ofstream("test.s");
+  CodeGen runner = CodeGen(file, PRINT_DEBUG);
+  auto test = lowerer_.GetIR();
+  runner.GenerateData(lowerer_.totalset());
+  runner.Generate(std::move(test));
+  std::string result = exec("gcc -g -static test.s -o run && ./run");
+  EXPECT_EQ(result, "The function returned: 2\n"
+                    "The program returned: 2\n");
+}
+
+// int foo() {
+//   x = 20 / 10
+//   return x
+// }
+//
+// foo_retval = foo()
+TEST_F(CodeGenTest, AssignmentWithDivisionByZeroErrorsOutCorrectlyInFunctions) {
+  Statement::Block foo_statements;
+
+  foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
+      make_unique<VariableExpr>("x"),
+      make_unique<DivideExpr>(
+          make_unique<IntegerExpr>(20),
+          make_unique<IntegerExpr>(0)))));
+
+  auto foo_retval = make_unique<const VariableExpr>("x");
+
+  auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
+
+  auto foo_def = make_unique<const FunctionDef>("foo", std::move(foo_params),
+                                                std::move(foo_statements),
+                                                std::move(foo_retval));
+
+  FunctionDef::Block function_defs;
+  function_defs.push_back(std::move(foo_def));
+
+  auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
+
+  Statement::Block statements;
+
+  statements.push_back(std::move(make_unique<const FunctionCall>(
+      make_unique<const VariableExpr>("foo_retval"), "foo",
+      std::move(arguments))));
+
+  auto ae = make_unique<const VariableExpr>("foo_retval");
+
+  auto ast = make_unique<const Program>(std::move(function_defs),
+                                        std::move(statements), std::move(ae));
+
+  ast->Visit(&lowerer_);
+
+  std::ofstream file = std::ofstream("test.s");
+  CodeGen runner = CodeGen(file, PRINT_DEBUG);
+  auto test = lowerer_.GetIR();
+  runner.GenerateData(lowerer_.totalset());
+  runner.Generate(std::move(test));
+  std::string result = exec("gcc -g -static test.s -o run && ./run");
+  EXPECT_EQ(result, "Error: Division by zero\n");
+}
