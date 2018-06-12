@@ -130,7 +130,7 @@ void CodeGen::GeneratePrinter() {
 
   // inttypeascii
   outfile_ << "inttypeasciz:" << std::endl;
-  outfile_ << "\t.asciz \"Invalid type: must be a int\\n\"" << std::endl;
+  outfile_ << "\t.asciz \"Invalid type: must be an int\\n\"" << std::endl;
 
   // Divisionbyzeroascii
   outfile_ << "\tdivisionbyzeroasciz:" << std::endl;
