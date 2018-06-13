@@ -176,3 +176,101 @@ ParseStatus LogicOperatorParser::do_parse(std::string inputProgram, int startCha
 	
 	return and_or.parse(inputProgram, startCharacter);
 }
+
+ParseStatus OpenCurlyBrackets::do_parse(std::string inputProgram, int startCharacter) {
+    int endCharacter = startCharacter;
+    endCharacter += trim(inputProgram);
+
+    if (inputProgram.size() == 0) {
+      return super::fail(inputProgram, endCharacter);
+    }
+
+	auto openBracketsParser = AtomParser('{');
+
+	return openBracketsParser.do_parse(inputProgram, endCharacter);
+}
+
+
+ParseStatus CloseCurlyBrackets::do_parse(std::string inputProgram, int startCharacter) {
+    int endCharacter = startCharacter;
+    endCharacter += trim(inputProgram);
+
+    if (inputProgram.size() == 0) {
+      return super::fail(inputProgram, endCharacter);
+    }
+
+	auto openBracketsParser = AtomParser('}');
+
+	return openBracketsParser.do_parse(inputProgram, endCharacter);
+}
+
+ParseStatus RepeatKeyword::do_parse(std::string inputProgram, int startCharacter) {
+
+    int endCharacter = startCharacter;
+    endCharacter += trim(inputProgram);
+
+    if (inputProgram.size() == 0) {
+      return super::fail(inputProgram, endCharacter);
+    }
+
+    auto rParser = AtomParser('r');
+	auto eParser = AtomParser('e');
+	auto pParser = AtomParser('p'); 
+	auto aParser = AtomParser('a');
+	auto tParser = AtomParser('t');
+	AndCombinator andOne;
+	andOne.firstParser = reinterpret_cast<NullParser *>(&rParser);
+	andOne.secondParser = reinterpret_cast<NullParser *>(&eParser);
+	AndCombinator andTwo;
+	andTwo.firstParser = reinterpret_cast<NullParser *>(&andOne);
+	andTwo.secondParser = reinterpret_cast<NullParser *>(&pParser);
+	AndCombinator andThree;
+	andThree.firstParser = reinterpret_cast<NullParser *>(&andTwo);
+	andThree.secondParser = reinterpret_cast<NullParser *>(&eParser);
+	AndCombinator andFour;
+	andFour.firstParser = reinterpret_cast<NullParser *>(&andThree);
+	andFour.secondParser = reinterpret_cast<NullParser *>(&aParser);
+	AndCombinator andFive;
+	andFive.firstParser = reinterpret_cast<NullParser *>(&andFour);
+	andFive.secondParser = reinterpret_cast<NullParser *>(&tParser);
+
+	ParseStatus result = andFive.do_parse(inputProgram, endCharacter);
+	if(!result.status) {
+	  result.errorType = errorMessage;
+	}
+	return result;
+}
+
+ParseStatus WhileKeyword::do_parse(std::string inputProgram, int startCharacter) {
+
+    int endCharacter = startCharacter;
+    endCharacter += trim(inputProgram);
+
+    if (inputProgram.size() == 0) {
+      return super::fail(inputProgram, endCharacter);
+    }
+
+    auto wParser = AtomParser('w');
+	auto hParser = AtomParser('h');
+	auto iParser = AtomParser('i'); 
+	auto lParser = AtomParser('l');
+	auto eParser = AtomParser('e');
+	AndCombinator andOne;
+	andOne.firstParser = reinterpret_cast<NullParser *>(&wParser);
+	andOne.secondParser = reinterpret_cast<NullParser *>(&hParser);
+	AndCombinator andTwo;
+	andTwo.firstParser = reinterpret_cast<NullParser *>(&andOne);
+	andTwo.secondParser = reinterpret_cast<NullParser *>(&iParser);
+	AndCombinator andThree;
+	andThree.firstParser = reinterpret_cast<NullParser *>(&andTwo);
+	andThree.secondParser = reinterpret_cast<NullParser *>(&lParser);
+	AndCombinator andFour;
+	andFour.firstParser = reinterpret_cast<NullParser *>(&andThree);
+	andFour.secondParser = reinterpret_cast<NullParser *>(&eParser);
+
+	ParseStatus result = andFour.do_parse(inputProgram, endCharacter);
+	if(!result.status) {
+	  result.errorType = errorMessage;
+	}
+	return result;
+}

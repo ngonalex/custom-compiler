@@ -57,6 +57,27 @@ class LogicOperatorParser : NullParser {
    virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
+class OpenCurlyBrackets : NullParser {
+ public:
+   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+};
+
+class CloseCurlyBrackets : NullParser {
+ public:
+   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+};
+
+class RepeatKeyword : NullParser {
+ public:
+   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+};
+
+class WhileKeyword : NullParser {
+ public:
+   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+};
+
+
 } // namespace frontend
 } // namespace cs160
 

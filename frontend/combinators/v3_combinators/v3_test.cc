@@ -117,6 +117,87 @@ TEST(RelationHelper, allParser1) {
   EXPECT_EQ(result.parsedCharacters, ">=");
 }
 
+TEST(RelationHelper, OpenBrackets) {
+  OpenCurlyBrackets test;
+  ParseStatus result = test.do_parse("{", 0);
+
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 1);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "{");
+}
+
+TEST(RelationHelper, FailOpenBrackets) {
+  OpenCurlyBrackets test;
+  ParseStatus result = test.do_parse("j", 0);
+
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 0);
+}
+
+TEST(RelationHelper, CloseBrackets) {
+  CloseCurlyBrackets test;
+  ParseStatus result = test.do_parse("}", 0);
+
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 1);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "}");
+}
+
+TEST(RelationHelper, FailCloseBrackets) {
+  CloseCurlyBrackets test;
+  ParseStatus result = test.do_parse("j", 0);
+
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 0);
+}
+
+TEST(RelationHelper, RepeatKeyword) {
+  RepeatKeyword test;
+  ParseStatus result = test.do_parse("repeat", 0);
+
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 6);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "repeat");
+}
+
+TEST(RelationHelper, FailRepeatKeyword) {
+  RepeatKeyword test;
+  ParseStatus result = test.do_parse("not repeat", 0);
+
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 0);
+}
+
+TEST(RelationHelper, WhileKeyword) {
+  WhileKeyword test;
+  ParseStatus result = test.do_parse("while", 0);
+
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 5);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "while");
+}
+
+
+TEST(RelationHelper, FailWhileKeyword) {
+  WhileKeyword test;
+  ParseStatus result = test.do_parse("not while", 0);
+
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 0);
+}
+
 TEST(FailedRelationHelper, allParser1) {
   LogicOperatorParser test;
   ParseStatus result = test.do_parse("==", 0);
