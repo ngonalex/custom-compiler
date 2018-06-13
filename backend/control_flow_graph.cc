@@ -34,7 +34,9 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_s
       // temp1 = True
       // temp2 = False
       // temp3 = END
-      ControlFlowGraphNode * temp0 = RecursiveCreate(graph_set,edge_graph);
+      //ControlFlowGraphNode * temp0 = RecursiveCreate(graph_set,edge_graph);
+      ControlFlowGraphNode * temp0 = graph_set.front(); 
+      graph_set.erase(graph_set.begin());
       ControlFlowGraphNode * temp1 = RecursiveCreate(graph_set,edge_graph);
       ControlFlowGraphNode * temp2 = RecursiveCreate(graph_set,edge_graph);
       ControlFlowGraphNode * temp3 = RecursiveCreate(graph_set,edge_graph);
@@ -60,7 +62,9 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_s
       // temp0 = Loop
       // temp1 = True
       // temp2 = False
-      ControlFlowGraphNode * temp0 = RecursiveCreate(graph_set,edge_graph);
+      //ControlFlowGraphNode * temp0 = RecursiveCreate(graph_set,edge_graph);
+      ControlFlowGraphNode * temp0 = graph_set.front();
+      graph_set.erase(graph_set.begin());
       ControlFlowGraphNode * temp1 = RecursiveCreate(graph_set,edge_graph);
       ControlFlowGraphNode * temp2 = RecursiveCreate(graph_set,edge_graph);
       int node0 = temp0->GetCreationOrder();
@@ -259,14 +263,6 @@ ControlFlowGraphNode::ControlFlowGraphNode() {
 }
 
 ControlFlowGraphNode::ControlFlowGraphNode(std::vector<std::unique_ptr<struct ThreeAddressCode>> input) {
-  // for (const auto& iter: input) {
-  //   auto block = make_unique<struct ThreeAddressCode>();
-  //   block->target = iter->target;
-  //   block->op = iter->op;
-  //   block->arg1 = iter->arg1;
-  //   block->arg2 = iter->arg2;
-  //   localblock_.push_back(std::move(block));
-  // }
   localblock_ = std::move(input);
   creation_order = 0;
   blocktype_ = NO_TYPE;

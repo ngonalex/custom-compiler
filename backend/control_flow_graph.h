@@ -6,7 +6,7 @@
 #include <algorithm>
 
 #include "utility/memory.h"
-#include "backend/lowerer_visitor.h"
+//#include "backend/lowerer_visitor.h"
 #include "backend/ir.h"
 
 using cs160::make_unique;
@@ -44,18 +44,8 @@ class ControlFlowGraphNode {
   ControlFlowGraphNode(std::vector<std::unique_ptr<struct ThreeAddressCode>>);
   std::vector<std::unique_ptr<struct ThreeAddressCode>> GetLocalBlock() {
    return std::move(localblock_);
-    // std::vector<std::unique_ptr<struct ThreeAddressCode>> local_block_copy;
-    // for (auto& iter: localblock_) {
-    //   auto block = make_unique<struct ThreeAddressCode>();
-    //   block->target = iter->target;
-    //   block->op = iter->op;
-    //   block->arg1 = iter->arg1;
-    //   block->arg2 = iter->arg2;
-    //   local_block_copy.push_back(std::move(block));
-    // }
-    // return std::move(local_block_copy);
-
   }
+  void CreateCFG(std::vector<std::unique_ptr<struct ThreeAddressCode>>);
   ControlFlowGraphNode( ControlFlowGraphNode &copy);
   int GetCreationOrder() {
     return creation_order;
@@ -91,7 +81,7 @@ class ControlFlowGraph {
 
  private:
   //std::unique_ptr<ControlFlowGraphNode> root_;
-  std::vector<std::unique_ptr<ControlFlowGraphNode>> cfg_nodes_;
+  std::vector<std::unique_ptr<ControlFlowGraphNode>> cfg_nodes_; 
   std::vector<Edge> edges_;
 };
 
