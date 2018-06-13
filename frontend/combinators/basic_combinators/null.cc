@@ -17,7 +17,7 @@ ParseStatus NullParser::fail(std::string inputProgram, int startCharacter, std::
   if (errorMessage != "") {
     status.errorType = errorMessage;
   }
-  //cache.insert(std::pair<int, ParseStatus>(startCharacter, std::move(status)));
+  cache.insert(std::pair<int, ParseStatus>(startCharacter, std::move(status)));
   return status;
 }
 

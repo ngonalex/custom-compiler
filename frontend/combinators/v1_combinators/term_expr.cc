@@ -84,4 +84,5 @@ ParseStatus TermExprParser::do_parse(std::string inputProgram, int startCharacte
   }
 
   return final_result;
+}
 
