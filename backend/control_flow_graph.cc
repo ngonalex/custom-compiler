@@ -37,15 +37,18 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_s
       //ControlFlowGraphNode * temp0 = RecursiveCreate(graph_set,edge_graph);
       ControlFlowGraphNode * temp0 = graph_set.front(); 
       graph_set.erase(graph_set.begin());
+      ControlFlowGraphNode * next_true_node = graph_set.front();
       ControlFlowGraphNode * temp1 = RecursiveCreate(graph_set,edge_graph);
       ControlFlowGraphNode * temp2 = RecursiveCreate(graph_set,edge_graph);
       ControlFlowGraphNode * temp3 = RecursiveCreate(graph_set,edge_graph);
       int node0 = temp0->GetCreationOrder();
+      int next_true = next_true_node->GetCreationOrder();
       int node1 = temp1->GetCreationOrder();
+      int next_false = node1 + 1;
       int node2 = temp2->GetCreationOrder();
       int node3 = temp3->GetCreationOrder();
-      Edge edge1(std::make_pair(node0,node1), CONDITIONAL_TRUE);
-      Edge edge2(std::make_pair(node0,node2), CONDITIONAL_FALSE);
+      Edge edge1(std::make_pair(node0,next_true), CONDITIONAL_TRUE);
+      Edge edge2(std::make_pair(node0,next_false), CONDITIONAL_FALSE);
       Edge edge3(std::make_pair(node1,node3), CONDITIONAL_TRUE_RETURN);
       Edge edge4(std::make_pair(node2,node3), CONDITIONAL_FALSE_RETURN);
       edge_graph.push_back(edge1);
@@ -65,19 +68,21 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_s
       //ControlFlowGraphNode * temp0 = RecursiveCreate(graph_set,edge_graph);
       ControlFlowGraphNode * temp0 = graph_set.front();
       graph_set.erase(graph_set.begin());
+      ControlFlowGraphNode * next_node = graph_set.front(); //Needed for nested statements
       ControlFlowGraphNode * temp1 = RecursiveCreate(graph_set,edge_graph);
       ControlFlowGraphNode * temp2 = RecursiveCreate(graph_set,edge_graph);
       int node0 = temp0->GetCreationOrder();
+      int next = next_node->GetCreationOrder();
       int node1 = temp1->GetCreationOrder();
       int node2 = temp2->GetCreationOrder();
-      Edge edge1(std::make_pair(node0,node1), LOOP_TRUE);
+      Edge edge1(std::make_pair(node0,next_node), LOOP_TRUE);
       Edge edge2(std::make_pair(node1,node0), LOOP_FALSE);
       Edge edge3(std::make_pair(node0,node2), LOOP_RETURN);
       edge_graph.push_back(edge1);
       edge_graph.push_back(edge2);
       edge_graph.push_back(edge3);
       return temp2;
-    } else { // NO TYPE
+    } else { // It is a type that we don't need to branch on
       ControlFlowGraphNode * temp = graph_set[0];
       graph_set.erase(graph_set.begin());
       return temp; 
