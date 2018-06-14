@@ -153,7 +153,13 @@ std::vector<std::unique_ptr<struct ThreeAddressCode>> MarkSweep(
     std::vector<std::string> &live_set,
     ControlFlowGraphNode * apply_sweep) {
   std::vector<std::unique_ptr<struct ThreeAddressCode>> optimize_block = std::move(apply_sweep->GetLocalBlock());
-  return std::move(optimize_block); 
+  for (auto &iter: optimize_block) {
+    if(iter->target.type()) {
+
+    }
+  }
+  //return std::move(optimize_block); 
+
 
 }
 
@@ -217,6 +223,7 @@ std::pair<std::vector<std::string>, ControlFlowGraphNode *> RecursiveFindPath(
     } else if (edge1 == LOOP_TRUE) {
       RecursiveFindPath(passed_tac, edges, live_set, node1);
       if(block2 != -1) { //If there is something that branches off of this 
+        //Maybe I need a visited?
         RecursiveFindPath(passed_tac, edges, live_set, node2);
       }
     } else if (edge1 == LOOP_FALSE) {
@@ -227,10 +234,6 @@ std::pair<std::vector<std::string>, ControlFlowGraphNode *> RecursiveFindPath(
 
 
 }
-// std::vector<std::unique_ptr<struct ThreeAddressCode>> Sweep(
-//   std::pair<bool,std::vector<std::unique_ptr<struct ThreeAddressCode>>> marked_block) {
-
-// }
 
 std::vector<std::unique_ptr<ControlFlowGraphNode>> OptimizeHelp(
   std::vector<std::unique_ptr<ControlFlowGraphNode>> cfg_node,
