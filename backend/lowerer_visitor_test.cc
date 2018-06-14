@@ -156,6 +156,10 @@ TEST_F(LowererTest, SimpleAssignmentTest) {
   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nx <- t_0\n");
 }
 
+TEST_F(LowererTest, Variable2VariableTest) {
+
+}
+
 TEST_F(LowererTest, DoubleIntAssignmentTest) {
   auto expr = make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("x"),
@@ -809,7 +813,7 @@ TEST_F(LowererTest, EmptyLoop) {
   // auto ae = make_unique<AddExpr>(make_unique<IntegerExpr>(5), make_unique<IntegerExpr>(7));
   assign->Visit(&lowerer_);
   ast->Visit(&lowerer_);
-  EXPECT_EQ(lowerer_.GetOutput(), "");
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 0\nx <- t_0\nMkLabel loop0\nt_1 <- x VARLOAD \nt_2 <- 5\nt_3 <- t_1 < t_2\nwhile t_3 == 0\nje continue0\njmp loop0\nMkLabel continue0\n");
 }
 
 TEST_F(LowererTest, InfinityLoop) {
@@ -825,7 +829,7 @@ TEST_F(LowererTest, InfinityLoop) {
 
   assign->Visit(&lowerer_);
   ast->Visit(&lowerer_);
-  EXPECT_EQ(lowerer_.GetOutput(), "");
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 0\nx <- t_0\nMkLabel loop0\nt_1 <- x VARLOAD \nt_2 <- 5\nt_3 <- t_1 < t_2\nwhile t_3 == 0\nje continue0\nt_4 <- 0\nx <- t_4\njmp loop0\nMkLabel continue0\n");
 }
 
 
