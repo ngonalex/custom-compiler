@@ -101,8 +101,12 @@ TEST_F(ControlFlowGraphTest, ConditionalWithNestedLogicalsWithVariables) {
   auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
     make_unique<IntegerExpr>(5));
 
-  auto expr = make_unique<Program>(std::move(statements),
-    std::move(arithexpr));
+  FunctionDef::Block function_defs;
+  auto func_def = GenerateFuncDef();
+  function_defs.push_back(std::move(func_def));
+
+  auto expr = make_unique<Program>(std::move(function_defs),
+    std::move(statements), std::move(arithexpr));
 
   expr->Visit(&lowerer_);
   
@@ -111,7 +115,7 @@ TEST_F(ControlFlowGraphTest, ConditionalWithNestedLogicalsWithVariables) {
   grapher_.Optimize();
   grapher_.MakeThreeAddressCode();
 
-  EXPECT_EQ(grapher_.MakeThreeAddressCode(),"t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
+  EXPECT_EQ(grapher_.GetOutput(),"t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
     "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
     "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\nbob <- t_8\n"
     "t_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\nt_12 <- y VARLOAD \n"
@@ -123,5 +127,4 @@ TEST_F(ControlFlowGraphTest, ConditionalWithNestedLogicalsWithVariables) {
     "MkLabel continue0\nt_24 <- 7\nt_25 <- 5\nt_26 <- t_24 - t_25\n"
     " <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n <-  FUNPROLOGUE \n"
     "t_27 <- 0\n <-  FUNEPILOGUE \n");
-
 }

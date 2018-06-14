@@ -280,13 +280,13 @@ void ControlFlowGraph::Optimize() {
 
 void ControlFlowGraph::DebugPrint() {
   for (auto &iter: cfg_nodes_) {
-    std::cout << iter->GetCreationOrder() << std::endl;
-    std::cout << iter->GetBlockType() << std::endl;
+    std::cout << "Creation Order: "<< iter->GetCreationOrder() << 
+    " Block Type: "<< iter->GetBlockType() << std::endl;
   }
   std::cout << "EDGES: " << std::endl;
   for (auto iter1: edges_) {
     std::cout << "From: " << iter1.edge_pair.first << " To: " << iter1.edge_pair.second
-    << "Edge Type: " << iter1.edge_type << std::endl;
+    << " Edge Type: " << iter1.edge_type << std::endl;
   }
 }
 
@@ -306,6 +306,120 @@ std::vector<std::unique_ptr<struct ThreeAddressCode>> ControlFlowGraph::MakeThre
   return std::move(return_three_address);
 }
 
+std::string ControlFlowGraph::GetOutput() {
+  int creation_check = 0;
+  std::vector<std::unique_ptr<struct ThreeAddressCode>> return_three_address;
+  while(!cfg_nodes_.empty()) {
+    for(auto &iter: cfg_nodes_) {
+      if(iter->GetCreationOrder() == creation_check) {
+        for(auto &three_iter: iter->GetLocalBlock()) {
+          return_three_address.push_back(std::move(three_iter));
+        }
+      }
+    }
+    creation_check++;
+  }
+  // Iterate through the vector and print out each basic block
+  std::string output = "";
+  std::vector<std::string> printhelper = {"INTLOAD", "VARLOAD", "VARASSIGNLOAD",
+    "FUNARGLOAD", "FUNRETLOAD", "+", "-", "*", "/", "<", "<=", ">", ">=",
+    "==", "&&", "||", "¬", "while", "if", "jmp", "je", "jne", "jg", "jge",
+    "jl", "jle", "MkLabel", "FUNCTIONCALL", "FUNRETURNEPILOGUE",
+    "FUNCTIONDEF", "FUNPROLOGUE", "FUNEPILOGUE", "PRINTARITH", "NOTYPE",
+    "LHSDEREFERENCE", "RHSDEREFERENCE", "NEWTUPLE",
+    "VARCHILDTUPLE"};
+
+  for (unsigned int i = 0; i < return_three_address.size(); ++i) {
+    // If it's a just a int (Register without a name then access it's value)
+    // Otherwise access its name
+    OpcodeType opcodetype = return_three_address[i]->op.opcode();
+    switch (opcodetype) {
+      case INTLOAD:
+        output = output + return_three_address[i]->target.reg().name()
+          + " <- " + std::to_string(return_three_address[i]->arg1.value());
+        break;
+      case VARASSIGNLOAD:
+        output = output + return_three_address[i]->target.reg().name()
+              + " <- " + return_three_address[i]->arg1.reg().name();
+        break;
+      case FUNARGLOAD:
+        output = output + return_three_address[i]->target.reg().name()
+              + " <- " + std::to_string(return_three_address[i]->arg1.value());
+        break;
+      // case ADD:
+      //   GetOutputArithmeticHelper(output, i, printhelper);
+      //   break;
+      // case SUB:
+      //   GetOutputArithmeticHelper(output, i, printhelper);
+      //   break;
+      // case MULT:
+      //   GetOutputArithmeticHelper(output, i, printhelper);
+      //   break;
+      // case DIV:
+      //   GetOutputArithmeticHelper(output, i, printhelper);
+      //   break;
+      // case LESSTHAN:
+      //   GetOutputArithmeticHelper(output, i, printhelper);
+      //   break;
+      // case LESSTHANEQ:
+      case LOGNOT:
+        output = output + return_three_address[i]->target.reg().name() + " <- " +
+                 printhelper[LOGNOT] + return_three_address[i]->arg1.reg().name();
+        break;
+      case LOOP:
+        output = output + printhelper[LOOP] + " " +
+                 return_three_address[i]->arg2.reg().name() + " == 0";
+        break;
+      case CONDITIONAL:
+        output = output + printhelper[CONDITIONAL] + " " +
+                 return_three_address[i]->arg2.reg().name() + " == 0";
+        break;
+      // Abstract jumps out
+      case JUMP:
+        output = output + printhelper[JUMP] + " " +
+                 return_three_address[i]->target.label().name();
+        break;
+      case JEQUAL:
+        output = output + printhelper[JEQUAL] + " " +
+                 return_three_address[i]->target.label().name();
+        break;
+      case JNOTEQUAL:
+        output = output + printhelper[JNOTEQUAL] + " " +
+                 return_three_address[i]->target.label().name();
+        break;
+      case JGREATER:
+        output = output + printhelper[JGREATER] + " " +
+                 return_three_address[i]->target.label().name();
+        break;
+      case JGREATEREQ:
+        output = output + printhelper[JGREATEREQ] + " " +
+                 return_three_address[i]->target.label().name();
+        break;
+      case JLESS:
+        output = output + printhelper[JLESS] + " " +
+                 return_three_address[i]->target.label().name();
+        break;
+      case JLESSEQ:
+        output = output + printhelper[JLESSEQ] + " " +
+                 return_three_address[i]->target.label().name();
+        break;
+      case LABEL:
+        output = output + printhelper[LABEL] + " " +
+                 return_three_address[i]->target.label().name();
+        break;
+      default:
+        output = output + return_three_address[i]->target.reg().name() + " <- " +
+           return_three_address[i]->arg1.reg().name();
+
+        output = output + " " + printhelper[return_three_address[i]->op.opcode()] + " " +
+           return_three_address[i]->arg2.reg().name();
+        break;
+    }
+    output = output + "\n";
+  }
+
+  return output;
+}
 ControlFlowGraphNode::ControlFlowGraphNode() {
   creation_order = 0;
   blocktype_ = NO_TYPE;

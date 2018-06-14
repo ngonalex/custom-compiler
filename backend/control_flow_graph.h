@@ -79,6 +79,7 @@ class ControlFlowGraph {
   void CreateCFG(std::vector<std::unique_ptr<struct ThreeAddressCode>>);
   void Optimize();
   void DebugPrint();
+  std::string GetOutput();
   std::vector<std::unique_ptr<struct ThreeAddressCode>> MakeThreeAddressCode();
 
  private:
