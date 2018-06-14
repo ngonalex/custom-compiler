@@ -28,11 +28,9 @@ ParseStatus AndCombinator::do_parse(std::string inputProgram,
     firstStatus.characterStart + secondStatus.characterStart);*/
   ParseStatus both;
   both.status = true;
-  both.firstParsedCharacters = firstStatus.parsedCharacters;
-  both.secondParsedCharacters = secondStatus.parsedCharacters;
   both.parsedCharacters =
       firstStatus.parsedCharacters + secondStatus.parsedCharacters;
-  int parsedCharacterCount = firstStatus.parsedCharactersArray.size() +
+  size_t parsedCharacterCount = firstStatus.parsedCharactersArray.size() +
                              secondStatus.parsedCharactersArray.size();
   if (parsedCharacterCount > 0) {
     if (firstStatus.parsedCharactersArray.size() > 0)
@@ -49,6 +47,9 @@ ParseStatus AndCombinator::do_parse(std::string inputProgram,
           std::end(secondStatus.parsedCharactersArray));
     else if (secondStatus.parsedCharacters.size() > 0)
       both.parsedCharactersArray.push_back(secondStatus.parsedCharacters);
+  } else {
+      both.firstParsedCharacters = firstStatus.parsedCharacters;
+      both.secondParsedCharacters = secondStatus.parsedCharacters;
   }
   both.remainingCharacters = secondStatus.remainingCharacters;
   both.startCharacter = startCharacter;
@@ -63,7 +64,7 @@ ParseStatus AndCombinator::do_parse(std::string inputProgram,
     else
       both.second_ast = std::move(secondStatus.ast);
   */
-  int nodeCount = firstStatus.astNodes.size() + secondStatus.astNodes.size();
+  size_t nodeCount = firstStatus.astNodes.size() + secondStatus.astNodes.size();
   if (nodeCount > 0) {
     if (firstStatus.astNodes.size() > 0) {
       for (int i = 0; i < firstStatus.astNodes.size(); i++) {
