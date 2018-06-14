@@ -67,11 +67,17 @@ ParseStatus RelationBodyParser::do_parse(std::string inputProgram,
   ParseStatus secondStatus = lopRel.do_parse(firstStatus.remainingCharacters,
                                                firstStatus.endCharacter);
 
+  AndCombinator firstAndLopRel;
+  firstAndLopRel.firstParser = reinterpret_cast<NullParser *>(&firstAnd);
+  firstAndLopRel.secondParser = reinterpret_cast<NullParser *>(&lopRel);
+
   if (secondStatus.status) {
-    secondStatus.ast = make_node(
+    ParseStatus result = firstAndLopRel.do_parse(inputProgram, endCharacter);
+    result.ast = make_node(
         unique_cast<const RelationalExpr>(std::move(firstStatus.ast)),
         secondStatus.secondParsedCharacters,
         unique_cast<const RelationalExpr>(std::move(secondStatus.ast)));
+    return result;
   } else {
     // If it's a failure, that's fine, the logcical stuff is optional. Just
     // return the relexpr
