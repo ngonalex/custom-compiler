@@ -9,11 +9,13 @@ ParseStatus OrCombinator::do_parse(std::string inputProgram,
         int startCharacter) {
   ParseStatus firstStatus = firstParser->do_parse(inputProgram, startCharacter);
   if (firstStatus.status) {
+    firstStatus.firstOrSecond = true;
     return firstStatus;
   }
 
   ParseStatus secondStatus = secondParser->do_parse(inputProgram, startCharacter);
   if(!secondStatus.status) {
+    firstStatus.firstOrSecond = false;
     secondStatus.errorType += " or " + firstStatus.errorType;
   }
   return secondStatus;

@@ -21,13 +21,16 @@ class ParseStatus {  // Super class
   std::string remainingCharacters;
   std::string parsedCharacters;
     
-    std::vector<std::string> parsedCharactersArray;
+  std::vector<std::string> parsedCharactersArray;
 
   // Only for the success case
   std::unique_ptr<const AstNode> ast;
 
   // Only for And Combinator
   std::unique_ptr<const AstNode> second_ast;
+
+  // Only for Or Combinator True = firstParser passed, False = secondParser passed 
+  bool firstOrSecond;
 
   // Only for zero_or_more and one_or_more case when returning multiple ast
   // nodes
