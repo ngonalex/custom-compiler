@@ -1,11 +1,11 @@
 #include "frontend/combinators/basic_combinators/and_combinator.h"
-#include "frontend/combinators/basic_combinators/or_combinator.h"
 
-#include "frontend/combinators/v1_combinators/helpers/v1_helpers.h"
-#include "frontend/combinators/v3_combinators/helpers/relational_helper.h"
-#include "frontend/combinators/v3_combinators/main/statement_parser.h"
+#include "frontend/combinators/v1_combinators/helpers/v1_helpers.h" // ( )
+#include "frontend/combinators/v3_combinators/helpers/relational_helper.h" // { } if else
 
-#include "frontend/combinators/v3_combinators/main/conditional_parser.h" // cs160::frontend::LoopParser
+#include "frontend/combinators/v3_combinators/main/relation_parser.h" // cs160::frontend::RelationParser
+#include "frontend/combinators/v3_combinators/main/block_parser.h" // cs160::frontend::BlockParser
+#include "frontend/combinators/v3_combinators/main/conditional_parser.h" // cs160::frontend::ConditionalParser
 
 #include <iostream>
 #include <string>  // std::string, std::stoi
@@ -26,7 +26,7 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus LoopParser::do_parse(std::string inputProgram,
+ParseStatus ConditionalParser::do_parse(std::string inputProgram,
                                   int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
@@ -35,15 +35,17 @@ ParseStatus LoopParser::do_parse(std::string inputProgram,
     return super::fail(inputProgram, endCharacter, "");
   }
 
-  IfParser ifParser;
-  ElseParser elseParser;
+  ElseKeyword ifParser;
   OpenParenParser openParen;
+  RelationParser rel_expr;
   CloseParenParser closeParen;
-  OpenCurlyBrackets openBracket;
-  CloseCurlyBrackets closeBracket;
-  RelationalExpr rel_expr;
+  OpenCurlyBrackets openBracket1;
   BlockParser block1;
+  CloseCurlyBrackets closeBracket1;
+  ElseKeyword elseParser;  
+  OpenCurlyBrackets openBracket2;
   BlockParser block2;
+  CloseCurlyBrackets closeBracket2;
 
   // if (
   AndCombinator if_open;
@@ -60,33 +62,36 @@ ParseStatus LoopParser::do_parse(std::string inputProgram,
   // if (rel) {
   AndCombinator open_bracket;
   open_bracket.firstParser = reinterpret_cast<NullParser *>(&if_open_rel_close);
-	open_bracket.secondParser = reinterpret_cast<NullParser *>(&openBrackets);
+	open_bracket.secondParser = reinterpret_cast<NullParser *>(&openBracket1);
  // if (rel) { block1
   AndCombinator block_1;
   block_1.firstParser = reinterpret_cast<NullParser *>(&open_bracket);
 	block_1.secondParser = reinterpret_cast<NullParser *>(&block1);
   // if (rel) { block1 }
-  AndCombinator open_bracket;
-  if_open_rel_close.firstParser = reinterpret_cast<NullParser *>(&block_1);
-	if_open_rel_close.secondParser = reinterpret_cast<NullParser *>(&closeBracket);
+  AndCombinator block_1_close;
+  block_1_close.firstParser = reinterpret_cast<NullParser *>(&block_1);
+	block_1_close.secondParser = reinterpret_cast<NullParser *>(&closeBracket1);
   // if (rel) { block1 } else
   AndCombinator close_else;
-  close_else.firstParser = reinterpret_cast<NullParser *>(&open_bracket);
+  close_else.firstParser = reinterpret_cast<NullParser *>(&block_1_close);
 	close_else.secondParser = reinterpret_cast<NullParser *>(&elseParser);
   // if (rel) { block1 } else {
   AndCombinator else_bracket;
   else_bracket.firstParser = reinterpret_cast<NullParser *>(&close_else);
-	else_bracket.secondParser = reinterpret_cast<NullParser *>(&openBracket);
+	else_bracket.secondParser = reinterpret_cast<NullParser *>(&openBracket2);
   // if (rel) { block1 } else { block2
   AndCombinator block_2;
   block_2.firstParser = reinterpret_cast<NullParser *>(&else_bracket);
 	block_2.secondParser = reinterpret_cast<NullParser *>(&block2);
   // if (rel) { block1 } else { block2 }
-  AndCombinator close_else;
-  close_else.firstParser = reinterpret_cast<NullParser *>(&block_2);
-	close_else.secondParser = reinterpret_cast<NullParser *>(&closeBracket);
+  AndCombinator block2_close;
+  block2_close.firstParser = reinterpret_cast<NullParser *>(&block_2);
+	block2_close.secondParser = reinterpret_cast<NullParser *>(&closeBracket2);
 
-  closeBracket.parse(inputProgram, startCharacter);
+  auto result = block2_close.do_parse(inputProgram, startCharacter);
+  if (!result.status) {
+    result.errorType = "Issue parsing conditional";
+  }
 
-  return super::fail(inputProgram, endCharacter, "");
+  return result;
 }

@@ -1,8 +1,10 @@
-#include "frontend/combinators/v3_combinators/main/statement_parser.h"
+#include "frontend/combinators/basic_combinators/or_combinator.h" // cs160::frontend::OrCombinator
+
+#include "frontend/combinators/v3_combinators/main/statement_parser.h" // cs160::frontend::StatementParser
 
 #include "frontend/combinators/v2_combinators/main/assignment_parser.h" // cs160::frontend::AssignmentParser
 #include "frontend/combinators/v3_combinators/main/loop_parser.h" // cs160::frontend::LoopParser
-#include "frontend/combinators/v3_combinators/main/conditional_parser.h" // cs160::frontend::LoopParser
+#include "frontend/combinators/v3_combinators/main/conditional_parser.h" // cs160::frontend::ConditionalParser
 
 #include <iostream>
 #include <string>  // std::string, std::stoi
@@ -45,9 +47,12 @@ ParseStatus StatementParser::do_parse(std::string inputProgram,
   allStatement.firstParser = reinterpret_cast<NullParser *>(&assignOrConditional);
 	allStatement.secondParser = reinterpret_cast<NullParser *>(&loopParser);
 
-  allStatement.parse(inputProgram, startCharacter);
-  // TODO: Figure out the AST stuff like Prabal's
+  auto result = allStatement.do_parse(inputProgram, startCharacter);
+  if (!result.status) {
+    result.errorType = "Issue parsing statement";
+  }
 
+  // TODO: Form AST here
 
-  return super::fail(inputProgram, endCharacter, "");
+  return result;
 }

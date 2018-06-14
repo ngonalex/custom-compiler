@@ -1,24 +1,18 @@
-#include "frontend/combinators/v3_combinators/main/relation_body.h"
-#include "frontend/combinators/v3_combinators/main/relation_parser.h"
-#include "frontend/combinators/basic_combinators/and_combinator.h"
-#include "frontend/combinators/basic_combinators/or_combinator.h"
-#include "frontend/combinators/v1_combinators/ae.h"
-#include "frontend/combinators/v3_combinators/helpers/relational_helper.h"
+#include "frontend/combinators/basic_combinators/one_or_more_combinator.h"
+#include "frontend/combinators/v3_combinators/main/statement_parser.h" // cs160::frontend::StatementParser
 
 #include <iostream>
 #include <string>  // std::string, std::stoi
 
 /*
-  rel_start -> not rel_expr | rel_expr
-  rel_expr -> ae rop ae logic 
-  log_expr -> log_term {or log_term}
-  log_term -> log_factor { and log_factor }
-  log_factor -> constant | not log_factor | ( log_expr )
-  constant -> "True" | "False"
-  or -> '||'
-  and -> '&&'
-  not -> '!'
-  rop -> ">" | "<" | "<=" | ">=" | "=="
+  stmt ∈ Statement ⟵ assign | cond | loop
+  block ∈ Block ⟵ stmt...
+
+  assign ∈ Assignment ⟵ v := ae
+  cond ∈ Conditional ⟵ if re block1 block2
+  loop ∈ Loop ⟵ while re block
+
+  prog ∈ Program ⟵ block ae
 */
 
 #define super NullParser
@@ -39,7 +33,13 @@ ParseStatus BlockParser::do_parse(std::string inputProgram,
   OneOrMoreCombinator block_parser;
   block_parser.parser = &statement_parser;
   block_parser.parse(inputProgram, startCharacter);
-  // TODO: Figure out the AST stuff like Prabal's
 
-  return super::fail(inputProgram, endCharacter);
+  auto result = block_parser.do_parse(inputProgram, startCharacter);
+  if (!result.status) {
+    result.errorType = "Issue parsing block";
+  }
+
+  // TODO: Form AST here
+
+  return result;
 }
