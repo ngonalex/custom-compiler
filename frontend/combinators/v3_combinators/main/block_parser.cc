@@ -1,3 +1,4 @@
+#include "frontend/combinators/v3_combinators/main/block_parser.h" // cs160::frontend::StatementParser
 #include "frontend/combinators/basic_combinators/one_or_more_combinator.h"
 #include "frontend/combinators/v3_combinators/main/statement_parser.h" // cs160::frontend::StatementParser
 
@@ -31,7 +32,7 @@ ParseStatus BlockParser::do_parse(std::string inputProgram,
 
   StatementParser statement_parser;
   OneOrMoreCombinator block_parser;
-  block_parser.parser = &statement_parser;
+  block_parser.parser = reinterpret_cast<NullParser *>(&statement_parser);
   block_parser.parse(inputProgram, startCharacter);
 
   auto result = block_parser.do_parse(inputProgram, startCharacter);
