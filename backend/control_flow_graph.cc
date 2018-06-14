@@ -75,7 +75,7 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_s
       int next = next_node->GetCreationOrder();
       int node1 = temp1->GetCreationOrder();
       int node2 = temp2->GetCreationOrder();
-      Edge edge1(std::make_pair(node0,next_node), LOOP_TRUE);
+      Edge edge1(std::make_pair(node0,next), LOOP_TRUE);
       Edge edge2(std::make_pair(node1,node0), LOOP_FALSE);
       Edge edge3(std::make_pair(node0,node2), LOOP_RETURN);
       edge_graph.push_back(edge1);
@@ -100,7 +100,7 @@ void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddress
   int creation_order = 0;
   for (auto &iter: input) {
     //Move IR to the block
-    Type op_type = iter->op.opcode();
+    OpcodeType op_type = iter->op.opcode();
     bool is_end = (iter == input.back());
     new_block.push_back(std::move(iter));
     //Create a block if neccessary
@@ -160,7 +160,7 @@ std::vector<std::unique_ptr<struct ThreeAddressCode>> MarkSweep(
       //Check if the variable is in the liveset
       if (std::find(live_set.begin(),live_set.end(), iter->target.reg().name()) != live_set.end()) {
         //Check if variable isn't being used on the RHS
-        if(iter->target.reg.name() != iter->arg1.reg.name() || iter->target.reg.name() != iter->arg2.reg.name()) {
+        if(iter->target.reg().name() != iter->arg1.reg().name() || iter->target.reg().name() != iter->arg2.reg().name()) {
           //Delete if its not in the set
           iter.reset();
         }
