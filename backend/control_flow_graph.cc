@@ -162,11 +162,12 @@ std::vector<std::unique_ptr<struct ThreeAddressCode>> MarkSweep(
         //Check if variable isn't being used on the RHS
         if(iter->target.reg.name() != iter->arg1.reg.name() || iter->target.reg.name() != iter->arg2.reg.name()) {
           //Delete if its not in the set
-          iter = optimize_block.erase(iter);
+          iter.reset();
         }
       } else {
+        live_set.erase(std::remove(live_set.begin(),live_set.end(),iter->target.reg().name()),live_set.end());
         //Remove it from the live set
-        
+
       }
     } 
     if (iter->arg1.reg().type() == VARIABLEREG) {
