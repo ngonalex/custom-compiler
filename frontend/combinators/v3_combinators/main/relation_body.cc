@@ -34,28 +34,29 @@ ParseStatus RelationBodyParser::do_parse(std::string inputProgram,
     return super::fail(inputProgram, endCharacter);
   }
 
-  ArithExprParser firstAeParser;
+  ArithExprParser aeParser;
   RelationOperatorParser relOpParser;
-  ArithExprParser secondAeParser;
 
   LogicOperatorParser logOpParser;
   RelationParser relParser;
 
   // ae rop
   AndCombinator aeAndRop;
-  aeAndRop.firstParser = reinterpret_cast<NullParser *>(&firstAeParser);
+  aeAndRop.firstParser = reinterpret_cast<NullParser *>(&aeParser);
   aeAndRop.secondParser = reinterpret_cast<NullParser *>(&relOpParser);
   // ae rop ae
   AndCombinator firstAnd;
   firstAnd.firstParser = reinterpret_cast<NullParser *>(&aeAndRop);
-  firstAnd.secondParser = reinterpret_cast<NullParser *>(&secondAeParser);
+  firstAnd.secondParser = reinterpret_cast<NullParser *>(&aeParser);
+  ParseStatus grabOperatorResult = aeAndRop.do_parse(inputProgram, endCharacter);
   ParseStatus firstStatus = firstAnd.do_parse(inputProgram, endCharacter);
+
   // Cache the result for later
   if (firstStatus.status) {
     // TODO: Look at this, the parsedCharactersArray is empty
     firstStatus.ast = make_node(
         unique_cast<const ArithmeticExpr>(std::move(firstStatus.ast)),
-        firstStatus.parsedCharactersArray[0],
+        grabOperatorResult.secondParsedCharacters,
         unique_cast<const ArithmeticExpr>(std::move(firstStatus.second_ast)));
   }
 
@@ -63,13 +64,13 @@ ParseStatus RelationBodyParser::do_parse(std::string inputProgram,
   AndCombinator lopRel;
   lopRel.firstParser = reinterpret_cast<NullParser *>(&logOpParser);
   lopRel.secondParser = reinterpret_cast<NullParser *>(&relParser);
-  ParseStatus secondStatus = firstAnd.do_parse(firstStatus.remainingCharacters,
+  ParseStatus secondStatus = lopRel.do_parse(firstStatus.remainingCharacters,
                                                firstStatus.endCharacter);
 
   if (secondStatus.status) {
     secondStatus.ast = make_node(
         unique_cast<const RelationalExpr>(std::move(firstStatus.ast)),
-        secondStatus.parsedCharactersArray[0],
+        secondStatus.secondParsedCharacters,
         unique_cast<const RelationalExpr>(std::move(secondStatus.ast)));
   } else {
     // If it's a failure, that's fine, the logcical stuff is optional. Just

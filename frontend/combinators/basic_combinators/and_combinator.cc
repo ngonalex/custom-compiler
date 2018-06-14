@@ -28,6 +28,8 @@ ParseStatus AndCombinator::do_parse(std::string inputProgram,
     firstStatus.characterStart + secondStatus.characterStart);*/
   ParseStatus both;
   both.status = true;
+  both.firstParsedCharacters = firstStatus.parsedCharacters;
+  both.secondParsedCharacters = secondStatus.parsedCharacters;
   both.parsedCharacters =
       firstStatus.parsedCharacters + secondStatus.parsedCharacters;
   int parsedCharacterCount = firstStatus.parsedCharactersArray.size() +

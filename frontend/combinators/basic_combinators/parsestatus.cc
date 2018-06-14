@@ -10,6 +10,9 @@ ParseStatus::ParseStatus(ParseStatus &&other)
   this->status = other.status;
   this->remainingCharacters = other.remainingCharacters;
   this->parsedCharacters = other.parsedCharacters;
+  this->firstParsedCharacters = other.firstParsedCharacters;
+  this->secondParsedCharacters = other.secondParsedCharacters;
+  this->firstOrSecond = other.firstOrSecond;
   this->errorType = other.errorType;
   this->startCharacter = other.startCharacter;
   this->endCharacter = other.endCharacter;
@@ -50,17 +53,3 @@ bool ParseStatus::operator!=(const ParseStatus &b) const {
     return (this->status != b.status);
   }
 }
-/*
-
-ParseStatus ParseStatus::operator=(ParseStatus &g)  {
-    this->status = g.status;
-    this->remainingCharacters = g.remainingCharacters;
-    this->parsedCharacters = g.parsedCharacters;
-    this->ast = std::move(g.ast);
-    this->second_ast = std::move(g.second_ast);
-    this->astNodes = std::move(g.astNodes);
-    this->errorType = g.errorType;
-    this->startCharacter = g.startCharacter;
-    this->endCharacter = g.endCharacter;
-    return *this;
-  }*/

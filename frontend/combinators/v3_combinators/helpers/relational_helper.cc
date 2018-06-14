@@ -169,8 +169,8 @@ ParseStatus RelationOperatorParser::do_parse(std::string inputProgram,
   OrCombinator all;
   all.firstParser = reinterpret_cast<NullParser *>(&equalTo);
   all.secondParser = reinterpret_cast<NullParser *>(&both);
-
-  return all.parse(inputProgram, startCharacter);
+    ParseStatus result = all.parse(inputProgram, startCharacter);
+    return result;
 }
 
 // LOP
