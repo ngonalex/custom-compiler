@@ -154,8 +154,26 @@ std::vector<std::unique_ptr<struct ThreeAddressCode>> MarkSweep(
     ControlFlowGraphNode * apply_sweep) {
   std::vector<std::unique_ptr<struct ThreeAddressCode>> optimize_block = std::move(apply_sweep->GetLocalBlock());
   for (auto &iter: optimize_block) {
-    if(iter->target.type()) {
-
+    //Target is the LHS check
+    //Opcode is the RHS check
+    if (iter->target.reg().type() == VARIABLEREG) {
+      //Check if the variable is in the liveset
+      if (std::find(live_set.begin(),live_set.end(), iter->target.reg().name()) != live_set.end()) {
+        //Check if variable isn't being used on the RHS
+        if(iter->target.reg.name() != iter->arg1.reg.name() || iter->target.reg.name() != iter->arg2.reg.name()) {
+          //Delete if its not in the set
+          iter = optimize_block.erase(iter);
+        }
+      } else {
+        //Remove it from the live set
+        
+      }
+    } 
+    if (iter->arg1.reg().type() == VARIABLEREG) {
+      live_set.push_back(iter->arg1.reg().name());
+    }
+    if (iter->arg2.reg().type() == VARIABLEREG) {
+      live_set.push_back(iter->arg2.reg().name());
     }
   }
   //return std::move(optimize_block); 
@@ -226,10 +244,13 @@ std::pair<std::vector<std::string>, ControlFlowGraphNode *> RecursiveFindPath(
         //Maybe I need a visited?
         RecursiveFindPath(passed_tac, edges, live_set, node2);
       }
+      return std::make_pair(live_set, node1); //Dunno if I need any of these
     } else if (edge1 == LOOP_FALSE) {
       RecursiveFindPath(passed_tac, edges, live_set, node1);
+      return std::make_pair(live_set, node1);
     } else if (edge1 == LOOP_RETURN) {
       RecursiveFindPath(passed_tac, edges, live_set, node1);
+      return std::make_pair(live_set, node1);
     }
 
 
