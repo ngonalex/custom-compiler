@@ -3,6 +3,10 @@
 namespace cs160 {
 namespace backend {
 
+ControlFlowGraph::ControlFlowGraph() {
+  
+}
+
 ControlFlowGraph::ControlFlowGraph
 (std::vector<std::unique_ptr<struct ThreeAddressCode>> input) {
   CreateCFG(std::move(input));
@@ -272,6 +276,18 @@ std::vector<std::unique_ptr<ControlFlowGraphNode>> OptimizeHelp(
 
 void ControlFlowGraph::Optimize() {
   cfg_nodes_ = std::move(OptimizeHelp(std::move(cfg_nodes_),edges_));
+}
+
+void ControlFlowGraph::DebugPrint() {
+  for (auto &iter: cfg_nodes_) {
+    std::cout << iter->GetCreationOrder() << std::endl;
+    std::cout << iter->GetBlockType() << std::endl;
+  }
+  std::cout << "EDGES: " << std::endl;
+  for (auto iter1: edges_) {
+    std::cout << "From: " << iter1.edge_pair.first << " To: " << iter1.edge_pair.second
+    << "Edge Type: " << iter1.edge_type << std::endl;
+  }
 }
 
 std::vector<std::unique_ptr<struct ThreeAddressCode>> ControlFlowGraph::MakeThreeAddressCode() {

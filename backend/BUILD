@@ -34,6 +34,18 @@ cc_test(
 	size = "small",
 )
 
+cc_test(
+  name = "control_flow_graph_test",
+  deps = ["@gtest//:main", ":backend"],
+	srcs = [
+		"control_flow_graph_test.cc"
+	],
+	copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
+	timeout = "short",
+	size = "small",
+)
+
+
 cc_binary(
     name = "backend_main",
     copts = ["-Wall -g"],

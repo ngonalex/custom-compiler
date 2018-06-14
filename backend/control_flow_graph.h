@@ -71,12 +71,14 @@ class ControlFlowGraphNode {
 
 class ControlFlowGraph {
  public:
+  ControlFlowGraph();
   ControlFlowGraph(std::vector<std::unique_ptr<struct ThreeAddressCode>>);
   std::vector<std::unique_ptr<ControlFlowGraphNode>> GetRoot() {
    return std::move(cfg_nodes_);
   }
   void CreateCFG(std::vector<std::unique_ptr<struct ThreeAddressCode>>);
   void Optimize();
+  void DebugPrint();
   std::vector<std::unique_ptr<struct ThreeAddressCode>> MakeThreeAddressCode();
 
  private:
