@@ -14,11 +14,13 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus ProgramParser::do_parse(std::string inputProgram, int startCharacter) {
+ParseStatus ProgramParser::do_parse(std::string inputProgram,
+                                    int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
   if (inputProgram.size() == 0) {
-    return super::fail(inputProgram, endCharacter, "Empty inside of ProgramParser");
+    return super::fail(inputProgram, endCharacter,
+                       "Empty inside of ProgramParser");
   }
 
   ArithExprParser arithExprParser;
@@ -33,7 +35,8 @@ ParseStatus ProgramParser::do_parse(std::string inputProgram, int startCharacter
 
   zeroOrMore.parser = reinterpret_cast<NullParser *>(&assignParser);
 
-  ParseStatus intermediateResult = zeroOrMore.do_parse(inputProgram, endCharacter);
+  ParseStatus intermediateResult =
+      zeroOrMore.do_parse(inputProgram, endCharacter);
 
   AndCombinator firstAnd;
   firstAnd.firstParser = reinterpret_cast<NullParser *>(&zeroOrMore);
@@ -41,21 +44,23 @@ ParseStatus ProgramParser::do_parse(std::string inputProgram, int startCharacter
 
   ParseStatus result = firstAnd.do_parse(inputProgram, endCharacter);
 
- if(result.status) {
-    std::vector<std::unique_ptr<const Statement>> temporaryAssign; 
+  if (result.status) {
+    std::vector<std::unique_ptr<const Statement>> temporaryAssign;
 
-    for(auto i = intermediateResult.astNodes.begin(); i != intermediateResult.astNodes.end(); ++i) {
+    for (auto i = intermediateResult.astNodes.begin();
+         i != intermediateResult.astNodes.end(); ++i) {
       temporaryAssign.push_back(unique_cast<const Statement>(std::move(*i)));
     }
 
-    result.ast = make_unique<const Program>(std::move(temporaryAssign),
-    unique_cast<const ArithmeticExpr>(std::move(result.astNodes[intermediateResult.astNodes.size()])));  
+    result.ast = make_unique<const Program>(
+        std::move(temporaryAssign),
+        unique_cast<const ArithmeticExpr>(
+            std::move(result.astNodes[intermediateResult.astNodes.size()])));
   }
-    
-    result.parsedCharactersArray.erase(std::begin(result.parsedCharactersArray), std::end(result.parsedCharactersArray));
-    result.astNodes.erase(std::begin(result.astNodes), std::end(result.astNodes));
+
+  result.parsedCharactersArray.erase(std::begin(result.parsedCharactersArray),
+                                     std::end(result.parsedCharactersArray));
+  result.astNodes.erase(std::begin(result.astNodes), std::end(result.astNodes));
 
   return result;
-
 }
-

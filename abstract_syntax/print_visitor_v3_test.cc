@@ -25,8 +25,7 @@ class PrinterTest : public ::testing::Test {
 
 // TEST(PrinterTest, AssignmentIsVisited) {
 
-
-//   std::make_unique<const LessThanExpr>(std::move(first_ae), 
+//   std::make_unique<const LessThanExpr>(std::move(first_ae),
 //     std::move(second_ae))
 //   auto expr = std::make_unique<const RelationalBinaryOperator>(
 //     make_unique<const VariableExpr>(a),

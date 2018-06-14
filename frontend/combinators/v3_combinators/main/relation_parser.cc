@@ -1,10 +1,10 @@
 #include "frontend/combinators/v3_combinators/main/relation_parser.h"
 #include <iostream>
 #include <string>  // std::string, std::stoi
-#include "frontend/combinators/v3_combinators/helpers/relational_helper.h"
-#include "frontend/combinators/v3_combinators/main/relation_body.h"
 #include "frontend/combinators/basic_combinators/and_combinator.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
+#include "frontend/combinators/v3_combinators/helpers/relational_helper.h"
+#include "frontend/combinators/v3_combinators/main/relation_body.h"
 
 /*
   RSTART -> !(REXPR) | REXPR
@@ -20,7 +20,7 @@ using namespace cs160::frontend;
 using namespace std;
 
 ParseStatus RelationParser::do_parse(std::string inputProgram,
-                                  int startCharacter) {
+                                     int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
@@ -35,22 +35,22 @@ ParseStatus RelationParser::do_parse(std::string inputProgram,
 
   AndCombinator notRe;
   notRe.firstParser = reinterpret_cast<NullParser *>(&notParser);
-  notRe.secondParser = reinterpret_cast<NullParser *>(&re);  
-  ParseStatus notReResult = notRe.do_parse(inputProgram, startCharacter); // result saved on cache
-
+  notRe.secondParser = reinterpret_cast<NullParser *>(&re);
+  ParseStatus notReResult =
+      notRe.do_parse(inputProgram, startCharacter);  // result saved on cache
 
   OrCombinator notOrRe;
   notOrRe.firstParser = reinterpret_cast<NullParser *>(&notRe);
-  notOrRe.secondParser = reinterpret_cast<NullParser *>(&re); 
+  notOrRe.secondParser = reinterpret_cast<NullParser *>(&re);
 
   ParseStatus notResult = notOrRe.do_parse(inputProgram, startCharacter);
 
   // Ast Construction and error handling
-  if(notResult.status && notResult.firstOrSecond) {
+  if (notResult.status && notResult.firstOrSecond) {
     notResult.ast = make_unique<const LogicalNotExpr>(
-      unique_cast<const RelationalExpr>(std::move(notReResult.second_ast)));
+        unique_cast<const RelationalExpr>(std::move(notReResult.second_ast)));
   }
-  if(!notResult.status) {
+  if (!notResult.status) {
     return super::fail(inputProgram, endCharacter, errorMessage);
   }
 

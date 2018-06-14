@@ -1,5 +1,6 @@
-// Relation -> Expr > Expr | Expr < Expr | Expr >= Expr | Expr <= Expr | Expr == Expr | Logic
-// Logic -> Relation or Relation | Relation and Relation | not Relation
+// Relation -> Expr > Expr | Expr < Expr | Expr >= Expr | Expr <= Expr | Expr ==
+// Expr | Logic Logic -> Relation or Relation | Relation and Relation | not
+// Relation
 
 #ifndef RELATION_PARSER_H_
 #define RELATION_PARSER_H_
@@ -12,10 +13,10 @@ namespace frontend {
 
 class RelationParser : NullParser {
  public:
-   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-} // namespace frontend
-} // namespace cs160
+}  // namespace frontend
+}  // namespace cs160
 
-#endif // RELATION_PARSER_H_
+#endif  // RELATION_PARSER_H_

@@ -65,21 +65,21 @@ class PrintVisitor : public AstVisitor {
     output_ << ")";
   }
 
-   void VisitLessThanEqualToExpr(const LessThanEqualToExpr& exp) override {
+  void VisitLessThanEqualToExpr(const LessThanEqualToExpr& exp) override {
     output_ << "(";
     exp.lhs().Visit(this);
     output_ << " <= ";
     exp.rhs().Visit(this);
     output_ << ")";
-   }
+  }
 
-   void VisitGreaterThanExpr(const GreaterThanExpr& exp) override {
+  void VisitGreaterThanExpr(const GreaterThanExpr& exp) override {
     output_ << "(";
     exp.lhs().Visit(this);
     output_ << " > ";
     exp.rhs().Visit(this);
     output_ << ")";
-   }
+  }
 
   void VisitGreaterThanEqualToExpr(const GreaterThanEqualToExpr& exp) override {
     output_ << "(";
@@ -87,37 +87,37 @@ class PrintVisitor : public AstVisitor {
     output_ << " >= ";
     exp.rhs().Visit(this);
     output_ << ")";
-   }
+  }
 
-   void VisitEqualToExpr(const EqualToExpr& exp) override {
+  void VisitEqualToExpr(const EqualToExpr& exp) override {
     output_ << "(";
     exp.lhs().Visit(this);
     output_ << " == ";
     exp.rhs().Visit(this);
     output_ << ")";
-   }
+  }
 
-   void VisitLogicalAndExpr(const LogicalAndExpr& exp) override {
+  void VisitLogicalAndExpr(const LogicalAndExpr& exp) override {
     output_ << "(";
     exp.lhs().Visit(this);
     output_ << " && ";
     exp.rhs().Visit(this);
     output_ << ")";
-   }
+  }
 
-   void VisitLogicalOrExpr(const LogicalOrExpr& exp) override {
+  void VisitLogicalOrExpr(const LogicalOrExpr& exp) override {
     output_ << "(";
     exp.lhs().Visit(this);
     output_ << " || ";
     exp.rhs().Visit(this);
     output_ << ")";
-   }
+  }
 
-   void VisitLogicalNotExpr(const LogicalNotExpr& exp) override {
+  void VisitLogicalNotExpr(const LogicalNotExpr& exp) override {
     output_ << "! (";
     exp.operand().Visit(this);
     output_ << ")";
-   }
+  }
 
   void VisitAssignment(const Assignment& assignment) override {
     assignment.lhs().Visit(this);

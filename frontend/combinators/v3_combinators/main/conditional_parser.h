@@ -9,10 +9,10 @@ namespace frontend {
 
 class ConditionalParser : NullParser {
  public:
-   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-} // namespace frontend
-} // namespace cs160
+}  // namespace frontend
+}  // namespace cs160
 
-#endif // CONDITIONAL_PARSER_H_
+#endif  // CONDITIONAL_PARSER_H_

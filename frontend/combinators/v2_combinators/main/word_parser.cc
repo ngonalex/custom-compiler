@@ -1,22 +1,22 @@
 #include "frontend/combinators/v2_combinators/main/word_parser.h"
+#include <string>  // std::string, std::stoi
+#include "frontend/combinators/basic_combinators/and_combinator.h"
+#include "frontend/combinators/basic_combinators/or_combinator.h"
+#include "frontend/combinators/basic_combinators/zero_or_more_combinator.h"
 #include "frontend/combinators/v1_combinators/single_char.h"
 #include "frontend/combinators/v1_combinators/single_digit.h"
-#include "frontend/combinators/basic_combinators/zero_or_more_combinator.h"
-#include "frontend/combinators/basic_combinators/or_combinator.h"
-#include "frontend/combinators/basic_combinators/and_combinator.h"
-#include <string>     // std::string, std::stoi
 
 #define super NullParser
-
 
 using namespace cs160::frontend;
 using namespace std;
 
 ParseStatus WordParser::do_parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
-    endCharacter += trim(inputProgram);
+  endCharacter += trim(inputProgram);
 
-  std::string errorMessage = "Declare variable names with 'var variable_name : type = expression'";
+  std::string errorMessage =
+      "Declare variable names with 'var variable_name : type = expression'";
 
   if (inputProgram.size() == 0) {
     return super::fail(inputProgram, endCharacter);
@@ -38,18 +38,23 @@ ParseStatus WordParser::do_parse(std::string inputProgram, int startCharacter) {
 
   ParseStatus result = firstAnd.do_parse(inputProgram, endCharacter);
 
-  // Can't have these keywords b/c of backend https://github.ucsb.edu/CS160-S18/team-influx/issues/36
-  if (result.parsedCharacters == "heap" || result.parsedCharacters == "bumpptr" || result.parsedCharacters == "returnobj") { 
+  // Can't have these keywords b/c of backend
+  // https://github.ucsb.edu/CS160-S18/team-influx/issues/36
+  if (result.parsedCharacters == "heap" ||
+      result.parsedCharacters == "bumpptr" ||
+      result.parsedCharacters == "returnobj") {
     return super::fail(inputProgram, endCharacter);
   }
 
   if (result.status) {
-    result.ast = std::move(make_unique<const VariableExpr>(result.parsedCharacters));
-  } else { 
+    result.ast =
+        std::move(make_unique<const VariableExpr>(result.parsedCharacters));
+  } else {
     result.errorType = errorMessage;
   }
 
-  result.parsedCharactersArray.erase(std::begin(result.parsedCharactersArray), std::end(result.parsedCharactersArray));
+  result.parsedCharactersArray.erase(std::begin(result.parsedCharactersArray),
+                                     std::end(result.parsedCharactersArray));
 
   return result;
 }

@@ -9,11 +9,10 @@ namespace frontend {
 
 class BlockParser : NullParser {
  public:
-   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
-   
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-} // namespace frontend
-} // namespace cs160
+}  // namespace frontend
+}  // namespace cs160
 
-#endif // BLOCK_PARSER_H_
+#endif  // BLOCK_PARSER_H_

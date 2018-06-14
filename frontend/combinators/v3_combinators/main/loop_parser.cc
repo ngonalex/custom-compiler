@@ -1,19 +1,19 @@
 #include "frontend/combinators/v3_combinators/main/loop_parser.h"
-#include "frontend/combinators/v3_combinators/main/block_parser.h"
-#include "frontend/combinators/v3_combinators/main/relation_body.h"
-#include "frontend/combinators/v3_combinators/main/relation_parser.h"
 #include "frontend/combinators/basic_combinators/and_combinator.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 #include "frontend/combinators/v1_combinators/ae.h"
 #include "frontend/combinators/v1_combinators/helpers/v1_helpers.h"
 #include "frontend/combinators/v3_combinators/helpers/relational_helper.h"
+#include "frontend/combinators/v3_combinators/main/block_parser.h"
+#include "frontend/combinators/v3_combinators/main/relation_body.h"
+#include "frontend/combinators/v3_combinators/main/relation_parser.h"
 
 #include <iostream>
 #include <string>  // std::string, std::stoi
 
 /*
   rel_start -> not rel_expr | rel_expr
-  rel_expr -> ae rop ae logic 
+  rel_expr -> ae rop ae logic
   log_expr -> log_term {or log_term}
   log_term -> log_factor { and log_factor }
   log_factor -> constant | not log_factor | ( log_expr )
@@ -29,8 +29,7 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus LoopParser::do_parse(std::string inputProgram,
-                                      int startCharacter) {
+ParseStatus LoopParser::do_parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
@@ -70,8 +69,9 @@ ParseStatus LoopParser::do_parse(std::string inputProgram,
   AndCombinator doWhile7;
   doWhile7.firstParser = reinterpret_cast<NullParser *>(&doWhile6);
   doWhile7.secondParser = reinterpret_cast<NullParser *>(&closeParenP);
-  //ParseStatus doWhileBlock = block.do_parse(doWhile1.do_parse().remainingCharacters, doWhile1.endCharacter);
-
+  // ParseStatus doWhileBlock =
+  // block.do_parse(doWhile1.do_parse().remainingCharacters,
+  // doWhile1.endCharacter);
 
   AndCombinator while1;
   while1.firstParser = reinterpret_cast<NullParser *>(&whileP);
@@ -91,19 +91,19 @@ ParseStatus LoopParser::do_parse(std::string inputProgram,
   AndCombinator while6;
   while6.firstParser = reinterpret_cast<NullParser *>(&while5);
   while6.secondParser = reinterpret_cast<NullParser *>(&closeBracketP);
-  //ParseStatus whileBlock = block.do_parse(while4.remainingCharacters, while4.endCharacter);
-
+  // ParseStatus whileBlock = block.do_parse(while4.remainingCharacters,
+  // while4.endCharacter);
 
   OrCombinator loops;
   loops.firstParser = reinterpret_cast<NullParser *>(&doWhile7);
   loops.secondParser = reinterpret_cast<NullParser *>(&while6);
 
   ParseStatus result = loops.do_parse(inputProgram, endCharacter);
-  if(result.status) {
+  if (result.status) {
     /*
      std::unique_ptr<const RelationalExpr> relationAst;
       std::vector<std::unique_ptr<const AstNode>> blockAsts;
-      for() 
+      for()
      if(result.firstOrSecond) {
       tempAst = std::move(while2.secondAst);
      }
@@ -113,11 +113,9 @@ ParseStatus LoopParser::do_parse(std::string inputProgram,
      result.ast = std::move(make_unique<const Loop>(
         unique_cast<const RelationalExpr>(std::move(relationAst)),
         unique_cast<const Statement::Block>(std::move(while5))));*/
-      return result;
-  }
-  else {
+    return result;
+  } else {
     result.errorType = errorMessage;
     return super::fail(inputProgram, endCharacter);
   }
-
 }
