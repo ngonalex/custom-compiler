@@ -153,7 +153,7 @@ void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddress
 }
 
 //Apply a local optimization
-std::vector<std::unique_ptr<struct ThreeAddressCode>> MarkSweep(
+ControlFlowGraphNode * MarkSweep(
     std::vector<std::string> &live_set,
     ControlFlowGraphNode * apply_sweep) {
   std::vector<std::unique_ptr<struct ThreeAddressCode>> optimize_block = std::move(apply_sweep->GetLocalUniqueBlock());
@@ -167,7 +167,7 @@ std::vector<std::unique_ptr<struct ThreeAddressCode>> MarkSweep(
         if(iter->target.reg().name() != iter->arg1.reg().name() || iter->target.reg().name() != iter->arg2.reg().name()) {
           //Delete if its not in the set
           iter.reset();
-          //std::cout << "I'm actually deleting something" << std::endl;
+          std::cout << "I'm actually deleting something" << std::endl;
         }
       } else {
         live_set.erase(std::remove(live_set.begin(),live_set.end(),iter->target.reg().name()),live_set.end());
@@ -182,6 +182,8 @@ std::vector<std::unique_ptr<struct ThreeAddressCode>> MarkSweep(
       live_set.push_back(iter->arg2.reg().name());
     }
   }
+  apply_sweep->SetLocalBlock(std::move(optimize_block));
+  return apply_sweep;
   //return std::move(optimize_block); 
 
 
@@ -199,24 +201,24 @@ std::vector<std::string> MergeVector(std::vector<std::string> vector1, std::vect
 }
 
 std::pair<std::vector<std::string>, ControlFlowGraphNode *> RecursiveFindPath(
-  std::vector<ControlFlowGraphNode *> passed_tac,
+  std::vector<ControlFlowGraphNode *> passed_cfgn_vec,
   std::vector<Edge> edges, std::vector<std::string> live_set,
-   ControlFlowGraphNode * optimize_node) {
+  ControlFlowGraphNode * optimize_node) {
     //Optimize the local block
     int node_number = optimize_node->GetCreationOrder();
-    optimize_node->SetLocalBlock(std::move(MarkSweep(live_set, optimize_node)));
+    optimize_node = MarkSweep(live_set, optimize_node);
     EdgeType edge1 = TYPELESS_EDGE;
     EdgeType edge2 = TYPELESS_EDGE;
     int block1 = -1;
     int block2 = -1;
     for (auto iter : edges) {
       if (iter.edge_pair.second == node_number) {
-        if (edge1 = TYPELESS_EDGE) {
+        if (edge1 == TYPELESS_EDGE) {
           edge1 = iter.edge_type;
           block1 = iter.edge_pair.first;
-        } else if (edge2 = TYPELESS_EDGE) { 
+        } else if (edge2 == TYPELESS_EDGE) { 
           edge2 = iter.edge_type;
-          block2 = iter.edge_pair.second;
+          block2 = iter.edge_pair.first;
         } else {
           std::cerr << "More than 2 edges detected" << std::endl;
         }
@@ -224,7 +226,7 @@ std::pair<std::vector<std::string>, ControlFlowGraphNode *> RecursiveFindPath(
     }
     ControlFlowGraphNode * node1;
     ControlFlowGraphNode * node2;
-    for (auto tac_iter : passed_tac) {
+    for (auto tac_iter : passed_cfgn_vec) {
       if (tac_iter->GetCreationOrder() == block1) {
         node1 = tac_iter;
       } else if (tac_iter->GetCreationOrder() == block2) {
@@ -233,30 +235,43 @@ std::pair<std::vector<std::string>, ControlFlowGraphNode *> RecursiveFindPath(
     }
     if (edge1 == CONDITIONAL_TRUE_RETURN || edge1 == CONDITIONAL_FALSE_RETURN) {
       std::vector<std::string> live_set_copy = live_set;
-      std::pair<std::vector<std::string>,ControlFlowGraphNode * > return1, return2, return3;
       std::vector<std::string> str_return1, str_return2, merged_return;
-      return1 = RecursiveFindPath(passed_tac, edges, live_set, node1);
-      return2 = RecursiveFindPath(passed_tac, edges, live_set_copy, node2);
+      std::pair<std::vector<std::string>,ControlFlowGraphNode * >  return1 = RecursiveFindPath(passed_cfgn_vec, edges, live_set, node1);
+      std::pair<std::vector<std::string>,ControlFlowGraphNode * >  return2 = RecursiveFindPath(passed_cfgn_vec, edges, live_set_copy, node2);
       str_return1 = return1.first;
       str_return2 = return2.first;
       merged_return = MergeVector(str_return1,str_return2);
-      return3 = RecursiveFindPath(passed_tac, edges, merged_return, return1.second);
+      std::cout << "Printing out Vectors: " << std::endl << "Vector 1: " << std::endl;
+      for ( auto vec1_iter: str_return1) {
+        std::cout << vec1_iter << std::endl;
+      }
+      std::cout << std::endl << "Vector 2: " << std::endl;
+      for ( auto vec2_iter: str_return2) {
+        std::cout << vec2_iter << std::endl;
+      }
+      std::cout << std::endl << "Merged Vector: " << std::endl;
+      for ( auto merge_iter: merged_return) {
+        std::cout << merge_iter << std::endl;
+      }
+      std::pair<std::vector<std::string>,ControlFlowGraphNode * >  return3 = RecursiveFindPath(passed_cfgn_vec, edges, merged_return, return1.second);
       return return3; //Idunno actually
-    } else if (edge1 == CONDITIONAL_TRUE_RETURN || edge1 == CONDITIONAL_FALSE_RETURN) {
+    } else if (edge1 == CONDITIONAL_TRUE || edge1 == CONDITIONAL_FALSE) {
       return std::make_pair(live_set, node1);
     } else if (edge1 == LOOP_TRUE) {
-      RecursiveFindPath(passed_tac, edges, live_set, node1);
+      RecursiveFindPath(passed_cfgn_vec, edges, live_set, node1);
       if(block2 != -1) { //If there is something that branches off of this 
         //Maybe I need a visited?
-        RecursiveFindPath(passed_tac, edges, live_set, node2);
+        RecursiveFindPath(passed_cfgn_vec, edges, live_set, node2);
       }
       return std::make_pair(live_set, node1); //Dunno if I need any of these
     } else if (edge1 == LOOP_FALSE) {
-      RecursiveFindPath(passed_tac, edges, live_set, node1);
+      RecursiveFindPath(passed_cfgn_vec, edges, live_set, node1);
       return std::make_pair(live_set, node1);
     } else if (edge1 == LOOP_RETURN) {
-      RecursiveFindPath(passed_tac, edges, live_set, node1);
+      RecursiveFindPath(passed_cfgn_vec, edges, live_set, node1);
       return std::make_pair(live_set, node1);
+    } else {
+
     }
 
 
@@ -270,7 +285,7 @@ std::vector<std::unique_ptr<ControlFlowGraphNode>> OptimizeHelp(
       cfg_pointer.push_back(iter.get());
     }
     std::vector<std::string> live_set;
-    ControlFlowGraphNode * end = cfg_node.end()->get();
+    ControlFlowGraphNode * end = cfg_node.back().get();
     RecursiveFindPath(cfg_pointer,edges,live_set, end);
     return cfg_node;
  }
