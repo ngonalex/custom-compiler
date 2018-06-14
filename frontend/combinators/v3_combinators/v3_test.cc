@@ -378,7 +378,7 @@ TEST(KeywordParser, ElseKeyword) {
 }
 
 // NOTE NO AST TESTING STARTING HERE
-/*
+
 TEST(LoopParser, doWhileSuccess) {
   LoopParser parser;
   ParseStatus result = parser.do_parse("repeat {a = 3 + a;} while (3 == 2)", 0);
@@ -389,6 +389,17 @@ TEST(LoopParser, doWhileSuccess) {
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "repeat{a=3+a;}while(3==2)");
 }
-*/
+
+TEST(LoopParser, regularWhileSuccess) {
+  LoopParser parser;
+  ParseStatus result = parser.do_parse("while (3 != 3) {if(a = 2) {e = 4} else {e = 5} e = 4+5;}", 0);
+  
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 34);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "repeat{a=3+a;}while(3==2)");
+}
+
 
 

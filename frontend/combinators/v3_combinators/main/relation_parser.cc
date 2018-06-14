@@ -3,6 +3,8 @@
 #include <string>  // std::string, std::stoi
 #include "frontend/combinators/v3_combinators/helpers/relational_helper.h"
 #include "frontend/combinators/v3_combinators/main/relation_body.h"
+#include "frontend/combinators/basic_combinators/and_combinator.h"
+#include "frontend/combinators/basic_combinators/or_combinator.h"
 
 /*
   RSTART -> !(REXPR) | REXPR
@@ -22,12 +24,39 @@ ParseStatus RelationParser::do_parse(std::string inputProgram,
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
+  std::string errorMessage = "Error in relation parser";
+
   if (inputProgram.size() == 0) {
-    return super::fail(inputProgram, endCharacter, "");
+    return super::fail(inputProgram, endCharacter, errorMessage);
   }
 
-  RelationBodyParser re;
   NotOpParser notParser;
+  RelationBodyParser re;
+
+  AndCombinator notRe;
+  notRe.firstParser = reinterpret_cast<NullParser *>(&notParser);
+  notRe.secondParser = reinterpret_cast<NullParser *>(&re);  
+  ParseStatus notReResult = notRe.do_parse(inputProgram, startCharacter); // result saved on cache
+
+
+  OrCombinator notOrRe;
+  notOrRe.firstParser = reinterpret_cast<NullParser *>(&notRe);
+  notOrRe.secondParser = reinterpret_cast<NullParser *>(&re); 
+
+  ParseStatus notResult = notOrRe.do_parse(inputProgram, startCharacter);
+
+  // Ast Construction and error handling
+  if(notResult.status && notResult.firstOrSecond) {
+    notResult.ast = make_unique<const LogicalNotExpr>(
+      unique_cast<const RelationalExpr>(std::move(notReResult.second_ast)));
+  }
+  if(!notResult.status) {
+    return super::fail(inputProgram, endCharacter, errorMessage);
+  }
+
+  return notResult;
+
+  /*
   ParseStatus notResult = notParser.do_parse(inputProgram, startCharacter);
 
   // Only ! expr will work. !(expr) will not properly parse
@@ -46,6 +75,5 @@ ParseStatus RelationParser::do_parse(std::string inputProgram,
     if (reResult.status) {
       return reResult;
     }
-  }
-  return super::fail(inputProgram, endCharacter, "");
+  }*/
 }

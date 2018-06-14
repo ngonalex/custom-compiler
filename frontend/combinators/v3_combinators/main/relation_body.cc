@@ -99,6 +99,9 @@ std::unique_ptr<const RelationalBinaryOperator> RelationBodyParser::make_node(
     return make_unique<const EqualToExpr>(std::move(first_ae),
                                           std::move(second_ae));
   }
+  else {
+    return nullptr;
+  }
 }
 
 std::unique_ptr<const LogicalBinaryOperator> RelationBodyParser::make_node(
@@ -110,5 +113,8 @@ std::unique_ptr<const LogicalBinaryOperator> RelationBodyParser::make_node(
   } else if (lop == "||") {
     return make_unique<const LogicalOrExpr>(std::move(first_re),
                                             std::move(second_re));
+  }
+    else {
+    return nullptr;
   }
 }
