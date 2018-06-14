@@ -4,6 +4,12 @@
 #include "frontend/combinators/v3_combinators/helpers/relational_helper.h"
 #include "frontend/combinators/v3_combinators/main/relation_body.h"
 #include "frontend/combinators/v3_combinators/main/relation_parser.h"
+
+#include "frontend/combinators/v3_combinators/main/block_parser.h"
+#include "frontend/combinators/v3_combinators/main/conditional_parser.h"
+#include "frontend/combinators/v3_combinators/main/loop_parser.h"
+#include "frontend/combinators/v3_combinators/main/statement_parser.h"
+
 #include "gtest/gtest.h"
 
 #include <iostream>
