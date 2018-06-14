@@ -11,8 +11,32 @@ using cs160::abstract_syntax::backend::IntegerExpr;
 using cs160::abstract_syntax::backend::AssignmentFromArithExp;
 using cs160::backend::LowererVisitor;
 using cs160::abstract_syntax::backend::AddExpr;
+using cs160::abstract_syntax::backend::Statement;
 
 class LowererTestV2 : public ::testing::Test{
+   public:
+  std::unique_ptr<const FunctionDef> GenerateFuncDef() {
+    // empty params
+    auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
+
+  // empty fact_body
+    Statement::Block fact_body;
+
+  // return value
+    auto foo_retval = make_unique<const IntegerExpr>(0);
+
+    auto foo_def = make_unique<const FunctionDef>("func", std::move(foo_params),
+                                                std::move(fact_body),
+                                                std::move(foo_retval));
+    return foo_def;
+  }
+
+  std::string GenerateFuncDefOutPut(int blocksize) {
+    return  " <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n <-"
+    "FUNPROLOGUE \nt_" + std::to_string(blocksize) + " <- 0\n <-"
+    "  FUNEPILOGUE \n";
+  }
+
   protected:
    LowererVisitor lowerer_;
 };
@@ -28,9 +52,6 @@ TEST_F(LowererTestV2, SimpleAssignmentTest) {
   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nx <- t_0\n");
 }
 
-TEST_F(LowererTest, Variable2VariableTest) {
-
-}
 
 TEST_F(LowererTestV2, DoubleIntAssignmentTest) {
   auto expr = make_unique<AssignmentFromArithExp>(
