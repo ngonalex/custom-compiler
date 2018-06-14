@@ -215,11 +215,14 @@ std::pair<std::vector<std::string>, ControlFlowGraphNode *> RecursiveFindPath(
     } else if (edge1 == CONDITIONAL_TRUE_RETURN || edge1 == CONDITIONAL_FALSE_RETURN) {
       return std::make_pair(live_set, node1);
     } else if (edge1 == LOOP_TRUE) {
-      
+      RecursiveFindPath(passed_tac, edges, live_set, node1);
+      if(block2 != -1) { //If there is something that branches off of this 
+        RecursiveFindPath(passed_tac, edges, live_set, node2);
+      }
     } else if (edge1 == LOOP_FALSE) {
-
+      RecursiveFindPath(passed_tac, edges, live_set, node1);
     } else if (edge1 == LOOP_RETURN) {
-
+      RecursiveFindPath(passed_tac, edges, live_set, node1);
     }
 
 
