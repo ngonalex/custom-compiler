@@ -113,10 +113,11 @@ ParseStatus LoopParser::do_parse(std::string inputProgram,
      result.ast = std::move(make_unique<const Loop>(
         unique_cast<const RelationalExpr>(std::move(relationAst)),
         unique_cast<const Statement::Block>(std::move(while5))));*/
+      return result;
   }
   else {
     result.errorType = errorMessage;
+    return super::fail(inputProgram, endCharacter);
   }
 
-  return super::fail(inputProgram, endCharacter);
 }

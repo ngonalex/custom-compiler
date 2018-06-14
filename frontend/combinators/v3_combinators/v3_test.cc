@@ -290,6 +290,7 @@ TEST(RelationParser, simpleRelationParser1) {
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.endCharacter, 5);
   EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "x>y");  
   EXPECT_EQ(output, "(x > y)");
 }
 
@@ -304,6 +305,7 @@ TEST(RelationParser, simpleRelationParser2) {
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.endCharacter, 6);
   EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "!x>y");
   EXPECT_EQ(output, "! ((x > y))");
 }
 
@@ -318,6 +320,7 @@ TEST(LogicParser, simpleLogicParser1) {
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.endCharacter, 15);
   EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "!x>y&&x>=z");
   EXPECT_EQ(output, "! (((x > y) && (x >= z)))");
 }
 
@@ -332,7 +335,23 @@ TEST(LogicParser, simpleLogicParser2) {
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.endCharacter, 23);
   EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "x>y||x==2&&2>=0");
   EXPECT_EQ(output, "((x > y) || ((x == 2) && (2 >= 0)))");
+}
+
+TEST(LogicParser, simpleLogicParser3) {
+  RelationParser parser;
+  ParseStatus result = parser.do_parse("3 == 2", 0);
+
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
+  
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.endCharacter, 6);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "3 == 2");
+  EXPECT_EQ(output, "(3 == 2)");
 }
 
 TEST(KeywordParser, IfKeyword) {
@@ -354,3 +373,19 @@ TEST(KeywordParser, ElseKeyword) {
   EXPECT_EQ(result.remainingCharacters, " (this == that)");
   EXPECT_EQ(result.parsedCharacters, "else");
 }
+
+// NOTE NO AST TESTING STARTING HERE
+/*
+TEST(LoopParser, doWhileSuccess) {
+  LoopParser parser;
+  ParseStatus result = parser.do_parse("repeat {a = 3 + a;} while (3 == 2)", 0);
+  
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 34);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "repeat{a=3+a;}while(3==2)");
+}
+*/
+
+
