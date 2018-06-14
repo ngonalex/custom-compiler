@@ -65,7 +65,7 @@ ParseStatus RelationBodyParser::do_parse(std::string inputProgram,
   lopRel.firstParser = reinterpret_cast<NullParser *>(&logOpParser);
   lopRel.secondParser = reinterpret_cast<NullParser *>(&relParser);
   ParseStatus secondStatus = firstAnd.do_parse(
-    inputProgram, endCharacter);  
+    firstStatus.remainingCharacters, firstStatus.endCharacter);  
 
   if (secondStatus.status) {
     secondStatus.ast = make_node(unique_cast<const RelationalExpr>(std::move(firstStatus.ast)),
