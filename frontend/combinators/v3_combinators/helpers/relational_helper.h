@@ -67,6 +67,16 @@ class CloseCurlyBrackets : NullParser {
    virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
+class IfKeyword : NullParser {
+ public:
+   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+};
+
+class ElseKeyword : NullParser {
+ public:
+   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+};
+
 class RepeatKeyword : NullParser {
  public:
    virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);

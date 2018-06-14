@@ -328,3 +328,23 @@ TEST(LogicParser, simpleLogicParser2) {
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(output, "((x > y) || ((x == 2) && (2 >= 0)))");
 }
+
+TEST(KeywordParser, IfKeyword) {
+  IfKeyword parser;
+  ParseStatus result = parser.do_parse("if (this == that)", 0);
+  
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.endCharacter, 2);
+  EXPECT_EQ(result.remainingCharacters, " (this == that)");
+  EXPECT_EQ(result.parsedCharacters, "if");
+}
+
+TEST(KeywordParser, ElseKeyword) {
+  ElseKeyword parser;
+  ParseStatus result = parser.do_parse("else (this == that)", 0);
+  
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.endCharacter, 4);
+  EXPECT_EQ(result.remainingCharacters, " (this == that)");
+  EXPECT_EQ(result.parsedCharacters, "else");
+}
