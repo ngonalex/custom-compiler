@@ -10,7 +10,6 @@ using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::ArithmeticExpr;
 using cs160::abstract_syntax::backend::IntegerExpr;
 using cs160::abstract_syntax::backend::AddExpr;
-using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::Conditional;
 using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::EqualToExpr;
