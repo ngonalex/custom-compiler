@@ -9,32 +9,32 @@ namespace frontend {
 
 class VarKeywordParser : public NullParser {
  public:
-   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class ColonParser : public NullParser {
  public:
-   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class TypeParser : public NullParser {
  public:
-   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class EqualSignParser : public NullParser {
  public:
-   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class HelperVariableParser : public NullParser {
  public:
-   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class SemiColonParser : public NullParser {
  public:
-   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 }  // namespace frontend

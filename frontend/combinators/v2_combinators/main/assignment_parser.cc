@@ -13,7 +13,8 @@
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus AssignmentParser::do_parse(std::string inputProgram, int startCharacter) {
+ParseStatus AssignmentParser::do_parse(std::string inputProgram,
+                                       int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 

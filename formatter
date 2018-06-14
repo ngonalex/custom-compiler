@@ -1,0 +1,4 @@
+#!/bin/bash
+
+find ./ -type f -name "*.h" -exec clang-format -i -style=google *.h "{}" \;
+find ./ -type f -name "*.cc" -exec clang-format -i -style=google *.cc "{}" \;

@@ -194,7 +194,6 @@ TEST(RelationHelper, WhileKeyword) {
   EXPECT_EQ(result.parsedCharacters, "while");
 }
 
-
 TEST(RelationHelper, FailWhileKeyword) {
   WhileKeyword test;
   ParseStatus result = test.do_parse("not while", 0);
@@ -244,7 +243,7 @@ TEST(RelationBody, simpleRBody1) {
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
-  
+
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.endCharacter, 6);
   EXPECT_EQ(result.remainingCharacters, "");
@@ -259,7 +258,7 @@ TEST(RelationBody, simpleRBody2) {
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
-  
+
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.endCharacter, 11);
   EXPECT_EQ(result.remainingCharacters, "");
@@ -274,7 +273,7 @@ TEST(RelationBody, simpleRBody3) {
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
-  
+
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.endCharacter, 31);
   EXPECT_EQ(result.remainingCharacters, "");
@@ -289,7 +288,7 @@ TEST(RelationParser, simpleRelationParser1) {
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
-  
+
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.endCharacter, 5);
   EXPECT_EQ(result.remainingCharacters, "");
@@ -304,7 +303,7 @@ TEST(RelationParser, simpleRelationParser2) {
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
-  
+
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.endCharacter, 6);
   EXPECT_EQ(result.remainingCharacters, "");
@@ -319,7 +318,7 @@ TEST(LogicParser, simpleLogicParser1) {
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
-  
+
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.endCharacter, 15);
   EXPECT_EQ(result.remainingCharacters, "");
@@ -334,7 +333,7 @@ TEST(LogicParser, simpleLogicParser2) {
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
-  
+
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.endCharacter, 23);
   EXPECT_EQ(result.remainingCharacters, "");
@@ -349,7 +348,7 @@ TEST(LogicParser, simpleLogicParser3) {
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
-  
+
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.endCharacter, 6);
   EXPECT_EQ(result.remainingCharacters, "");
@@ -360,7 +359,7 @@ TEST(LogicParser, simpleLogicParser3) {
 TEST(KeywordParser, IfKeyword) {
   IfKeyword parser;
   ParseStatus result = parser.do_parse("if (this == that)", 0);
-  
+
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.endCharacter, 2);
   EXPECT_EQ(result.remainingCharacters, " (this == that)");
@@ -370,7 +369,7 @@ TEST(KeywordParser, IfKeyword) {
 TEST(KeywordParser, ElseKeyword) {
   ElseKeyword parser;
   ParseStatus result = parser.do_parse("else (this == that)", 0);
-  
+
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.endCharacter, 4);
   EXPECT_EQ(result.remainingCharacters, " (this == that)");
@@ -382,7 +381,7 @@ TEST(KeywordParser, ElseKeyword) {
 TEST(LoopParser, doWhileSuccess) {
   LoopParser parser;
   ParseStatus result = parser.do_parse("repeat {a = 3 + a;} while (3 == 2)", 0);
-  
+
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 34);
@@ -392,14 +391,12 @@ TEST(LoopParser, doWhileSuccess) {
 
 TEST(LoopParser, regularWhileSuccess) {
   LoopParser parser;
-  ParseStatus result = parser.do_parse("while (3 != 3) {if(a = 2) {e = 4} else {e = 5} e = 4+5;}", 0);
-  
+  ParseStatus result = parser.do_parse(
+      "while (3 != 3) {if(a = 2) {e = 4} else {e = 5} e = 4+5;}", 0);
+
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 34);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "repeat{a=3+a;}while(3==2)");
 }
-
-
-

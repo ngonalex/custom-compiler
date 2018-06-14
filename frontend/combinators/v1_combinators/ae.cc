@@ -14,14 +14,15 @@ using namespace cs160::frontend;
    close_paren
 */
 
-ParseStatus ArithExprParser::do_parse(std::string inputProgram, int startCharacter) {
+ParseStatus ArithExprParser::do_parse(std::string inputProgram,
+                                      int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
   if (inputProgram.size() == 0) {
     return super::fail(inputProgram, endCharacter);
   }
-  
+
   AddSubExprParser ae;
   ParseStatus aeParseResult = ae.do_parse(inputProgram, endCharacter);
 

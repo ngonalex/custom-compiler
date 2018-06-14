@@ -1,5 +1,5 @@
-#include "frontend/combinators/basic_combinators/one_or_more_combinator.h"
 #include "frontend/combinators/v1_combinators/num_parser.h"
+#include "frontend/combinators/basic_combinators/one_or_more_combinator.h"
 #include "frontend/combinators/v1_combinators/single_digit.h"
 
 #include <string>
@@ -28,11 +28,12 @@ ParseStatus NumParser::do_parse(std::string inputProgram, int startCharacter) {
   if (result.status) {
     // Make an Integer expression
     result.ast =
-  std::move(make_unique<IntegerExpr>(stoi(result.parsedCharacters)));
+        std::move(make_unique<IntegerExpr>(stoi(result.parsedCharacters)));
   } else {
     return super::fail(inputProgram, endCharacter, errorMessage);
   }
-    
-    result.parsedCharactersArray.erase(std::begin(result.parsedCharactersArray), std::end(result.parsedCharactersArray));
+
+  result.parsedCharactersArray.erase(std::begin(result.parsedCharactersArray),
+                                     std::end(result.parsedCharactersArray));
   return result;
 }

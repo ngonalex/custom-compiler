@@ -12,30 +12,30 @@ namespace frontend {
 
 class CloseParenParser : public NullParser {
  public:
-   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter); 
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class OpenParenParser : public NullParser {
  public:
-   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter); 
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class NegativeParser : public NullParser {
  public:
-	virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class AddSubOpParser : public NullParser {
  public:
-	virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class MulDivOpParser : public NullParser {
  public:
-	virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-} // namespace frontend
-} // namespace cs160
+}  // namespace frontend
+}  // namespace cs160
 
 #endif  // V1_HELPERS_H_

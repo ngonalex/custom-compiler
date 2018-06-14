@@ -9,14 +9,12 @@ namespace frontend {
 
 class SingleCharParser : public NullParser {
  public:
-  virtual ParseStatus do_parse(std::string inputProgram,
-  				int startCharacter);
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class SingleVarCharParser : public NullParser {
  public:
-  virtual ParseStatus do_parse(std::string inputProgram,
-  				int startCharacter);
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 }  // namespace frontend
