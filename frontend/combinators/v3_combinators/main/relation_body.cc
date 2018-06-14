@@ -5,10 +5,14 @@
 #include "frontend/combinators/v1_combinators/ae.h"
 #include "frontend/combinators/v3_combinators/helpers/relational_helper.h"
 
+#include "abstract_syntax/print_visitor_v3.h"
+
 #include <iostream>
 #include <string>  // std::string, std::stoi
 
 /*
+  rel -> ae rop ae (lop rel)
+
   RSTART -> !REXPR | REXPR
   REXPR -> AE ROP AE LOGIC
   LOGIC -> BIN RE | λ
@@ -37,41 +41,42 @@ ParseStatus RelationBodyParser::do_parse(std::string inputProgram,
   LogicOperatorParser logOpParser;
   RelationParser relParser;
 
-  auto firstAeResult = firstAeParser.do_parse(inputProgram, startCharacter);
-  if (firstAeResult.status) {
-    auto relResult = relOpParser.do_parse(firstAeResult.remainingCharacters,
-                                       firstAeResult.endCharacter);
-    if (relResult.status) {
-      auto secondAeResult = secondAeParser.do_parse(relResult.remainingCharacters,
-                                                 relResult.endCharacter);
-      if (secondAeResult.status) {
-        secondAeResult.ast = make_node(
-            unique_cast<const ArithmeticExpr>(std::move(firstAeResult.ast)),
-            relResult.parsedCharacters,
-            unique_cast<const ArithmeticExpr>(std::move(secondAeResult.ast)));
-
-        // Case where there's more logic bits at the end
-        auto logOpResult = logOpParser.do_parse(secondAeResult.remainingCharacters, secondAeResult.endCharacter);
-        if (logOpResult.status) {
-          auto relParserResult = relParser.do_parse(
-              logOpResult.remainingCharacters, logOpResult.endCharacter);
-          if (relParserResult.status) {
-            relParserResult.ast =
-                make_node(unique_cast<const RelationalExpr>(
-                              std::move(secondAeResult.ast)),
-                          logOpResult.parsedCharacters,
-                          unique_cast<const RelationalExpr>(
-                              std::move(relParserResult.ast)));
-            return relParserResult;
-          }
-        } else {
-          return secondAeResult;
-        }
-      }
-    }
+  // ae rop
+  AndCombinator aeAndRop;
+  aeAndRop.firstParser = reinterpret_cast<NullParser *>(&firstAeParser);
+  aeAndRop.secondParser = reinterpret_cast<NullParser *>(&relOpParser);
+  // ae rop ae
+  AndCombinator firstAnd;
+  firstAnd.firstParser = reinterpret_cast<NullParser *>(&aeAndRop);
+  firstAnd.secondParser = reinterpret_cast<NullParser *>(&secondAeParser);
+  ParseStatus firstStatus = firstAnd.do_parse(
+    inputProgram, endCharacter);
+  // Cache the result for later
+  if (firstStatus.status) {
+    // TODO: Look at this, the parsedCharactersArray is empty
+    firstStatus.ast = make_node(
+      unique_cast<const ArithmeticExpr>(std::move(firstStatus.ast)),
+            firstStatus.parsedCharactersArray[0],
+            unique_cast<const ArithmeticExpr>(std::move(firstStatus.second_ast)));
   }
 
-  return super::fail(inputProgram, endCharacter);
+  // Optional logical operator stuff
+  AndCombinator lopRel;
+  lopRel.firstParser = reinterpret_cast<NullParser *>(&logOpParser);
+  lopRel.secondParser = reinterpret_cast<NullParser *>(&relParser);
+  ParseStatus secondStatus = firstAnd.do_parse(
+    inputProgram, endCharacter);  
+
+  if (secondStatus.status) {
+    secondStatus.ast = make_node(unique_cast<const RelationalExpr>(std::move(firstStatus.ast)),
+                          secondStatus.parsedCharactersArray[0], 
+                          unique_cast<const RelationalExpr>(std::move(secondStatus.ast)));
+  } else {
+    // If it's a failure, that's fine, the logcical stuff is optional. Just return the relexpr
+    return firstStatus;
+  }
+
+  return secondStatus;
 }
 
 // ae rop ae
