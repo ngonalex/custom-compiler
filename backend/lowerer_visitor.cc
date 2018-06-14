@@ -4,13 +4,13 @@
 namespace cs160 {
 namespace backend {
 
-std::string LowererVisitor::GetOutputArithmeticHelper(std::string output,
-  int index, std::vector<std::string> printhelper) {
-  output = output + blocks_[index]->target.reg().name()
-    + " <- " + blocks_[index]->arg1.reg().name();
+std::string LowererVisitor::GetOutputArithmeticHelper(
+    std::string output, int index, std::vector<std::string> printhelper) {
+  output = output + blocks_[index]->target.reg().name() + " <- " +
+           blocks_[index]->arg1.reg().name();
 
-  output = output + " " + printhelper[blocks_[index]->op.opcode()]
-    + " " + blocks_[index]->arg2.reg().name();
+  output = output + " " + printhelper[blocks_[index]->op.opcode()] + " " +
+           blocks_[index]->arg2.reg().name();
 
   return output;
 }
@@ -18,17 +18,18 @@ std::string LowererVisitor::GetOutputArithmeticHelper(std::string output,
 std::string LowererVisitor::GetOutput() {
   // Iterate through the vector and print out each basic block
   std::string output = "";
-
-  // Probably make this a private variable or something?
-  std::vector<std::string> printhelper = {"intload", "VARLOAD", "VARASSIGNLOAD"
-    "FUNARGLOAD", "FUNRETLOAD, ""+", "-", "*", "/", "<", "<=", ">", ">=",
+  std::vector<std::string> printhelper = {"INTLOAD", "VARLOAD", "VARASSIGNLOAD",
+    "FUNARGLOAD", "FUNRETLOAD", "+", "-", "*", "/", "<", "<=", ">", ">=",
     "==", "&&", "||", "¬", "while", "if", "jmp", "je", "jne", "jg", "jge",
-    "jl", "jle", "MkLabel"};
+    "jl", "jle", "MkLabel", "FUNCTIONCALL", "FUNRETURNEPILOGUE",
+    "FUNCTIONDEF", "FUNPROLOGUE", "FUNEPILOGUE", "PRINTARITH", "NOTYPE",
+    "LHSDEREFERENCE", "RHSDEREFERENCE", "NEWTUPLE",
+    "VARCHILDTUPLE"};
 
   for (unsigned int i = 0; i < blocks_.size(); ++i) {
     // If it's a just a int (Register without a name then access it's value)
     // Otherwise access its name
-    Type opcodetype = blocks_[i]->op.opcode();
+    OpcodeType opcodetype = blocks_[i]->op.opcode();
     switch (opcodetype) {
       case INTLOAD:
         output = output + blocks_[i]->target.reg().name()
@@ -37,7 +38,10 @@ std::string LowererVisitor::GetOutput() {
       case VARASSIGNLOAD:
         output = output + blocks_[i]->target.reg().name()
               + " <- " + blocks_[i]->arg1.reg().name();
+        break;
       case FUNARGLOAD:
+        output = output + blocks_[i]->target.reg().name()
+              + " <- " + std::to_string(blocks_[i]->arg1.value());
         break;
       // case ADD:
       //   GetOutputArithmeticHelper(output, i, printhelper);
@@ -56,49 +60,49 @@ std::string LowererVisitor::GetOutput() {
       //   break;
       // case LESSTHANEQ:
       case LOGNOT:
-        output = output + blocks_[i]->target.reg().name()
-          + " <- " + printhelper[LOGNOT] + blocks_[i]->arg1.reg().name();
+        output = output + blocks_[i]->target.reg().name() + " <- " +
+                 printhelper[LOGNOT] + blocks_[i]->arg1.reg().name();
         break;
       case LOOP:
         output = output + printhelper[LOOP] + " " +
-          blocks_[i]->arg2.reg().name() + " == 0";
+                 blocks_[i]->arg2.reg().name() + " == 0";
         break;
       case CONDITIONAL:
         output = output + printhelper[CONDITIONAL] + " " +
-          blocks_[i]->arg2.reg().name() + " == 0";
+                 blocks_[i]->arg2.reg().name() + " == 0";
         break;
       // Abstract jumps out
       case JUMP:
         output = output + printhelper[JUMP] + " " +
-          blocks_[i]->target.label().name();
+                 blocks_[i]->target.label().name();
         break;
       case JEQUAL:
         output = output + printhelper[JEQUAL] + " " +
-          blocks_[i]->target.label().name();
+                 blocks_[i]->target.label().name();
         break;
       case JNOTEQUAL:
         output = output + printhelper[JNOTEQUAL] + " " +
-          blocks_[i]->target.label().name();
+                 blocks_[i]->target.label().name();
         break;
       case JGREATER:
         output = output + printhelper[JGREATER] + " " +
-          blocks_[i]->target.label().name();
+                 blocks_[i]->target.label().name();
         break;
       case JGREATEREQ:
         output = output + printhelper[JGREATEREQ] + " " +
-          blocks_[i]->target.label().name();
+                 blocks_[i]->target.label().name();
         break;
       case JLESS:
         output = output + printhelper[JLESS] + " " +
-          blocks_[i]->target.label().name();
+                 blocks_[i]->target.label().name();
         break;
       case JLESSEQ:
         output = output + printhelper[JLESSEQ] + " " +
-          blocks_[i]->target.label().name();
+                 blocks_[i]->target.label().name();
         break;
       case LABEL:
         output = output + printhelper[LABEL] + " " +
-          blocks_[i]->target.label().name();
+                 blocks_[i]->target.label().name();
         break;
       default:
         output = GetOutputArithmeticHelper(output, i, printhelper);
@@ -141,7 +145,6 @@ void LowererVisitor::VisitDereference(const Dereference& exp) {
       leftderefvariable = leftbasevariable+"->"+rhsvirtualreg;
       variablestack_.push(leftderefvariable);
       indexoflastchild = -1;
-
       break;
     default:
       std::cerr << "Inside Dereference Something went very wrong\n";
@@ -157,12 +160,10 @@ void LowererVisitor::VisitAssignmentFromNewTuple(
   const AssignmentFromNewTuple& assignment) {
   // Visit the left which will add its variable name to the stack
 
-  // left hand side can't be a variable used to hold integer cause : x or x->1
-  // (may not be true in the future)
   currvariabletype_ = LEFTHANDVAR;
   currdereferencetype_ = LHSDEREFERENCE;
   assignment.lhs().Visit(const_cast<LowererVisitor*>(this));
-  currdereferencetype_ = RHSINTDEREFERENCE;
+  currdereferencetype_ = RHSDEREFERENCE;
   currvariabletype_ = RIGHTHANDVAR;
 
   std::string lhstarget;
@@ -178,9 +179,10 @@ void LowererVisitor::VisitAssignmentFromNewTuple(
     lhsbase = "";
     // Add to set
     globalset_.insert(lhstarget);
+    totalset_.insert(lhstarget);
 
     auto block = make_unique<struct ThreeAddressCode>();
-    block->target = Target(Label(lhstarget));
+    block->target = Target(Register(lhstarget, VARIABLEREG));
     block->op = Opcode(VARCHILDTUPLE);
     blocks_.push_back(std::move(block));
   }
@@ -201,7 +203,7 @@ void LowererVisitor::VisitAssignmentFromArithExp(
   currvariabletype_ = LEFTHANDVAR;
   currdereferencetype_ = LHSDEREFERENCE;
   assignment.lhs().Visit(const_cast<LowererVisitor*>(this));
-  currdereferencetype_ = RHSINTDEREFERENCE;
+  currdereferencetype_ = RHSDEREFERENCE;
   currvariabletype_ = RIGHTHANDVAR;
 
   std::string lhstarget;
@@ -222,6 +224,7 @@ void LowererVisitor::VisitAssignmentFromArithExp(
     variablestack_.pop();
     lhsbase = "";
     globalset_.insert(lhstarget);
+    totalset_.insert(lhstarget);
   }
 
   // assign the right hand side to be equal to the left hand side
@@ -301,8 +304,6 @@ void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
   std::set<std::string> originalglobalset(globalset_);
   globalset_.clear();
 
-  // We don't really need to do this but this may change later
-  // Save the state of the totalset
   std::set<std::string> originaltotalset(totalset_);
   totalset_.clear();
 
@@ -333,6 +334,7 @@ void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
   CreateFunctionDefEpilogue(def.function_name());
 
   globalset_ = originalglobalset;
+  totalset_ = originaltotalset;
 }
 
 void LowererVisitor::VisitLessThanExpr(const LessThanExpr& exp) {
@@ -363,8 +365,8 @@ void LowererVisitor::VisitGreaterThanExpr(const GreaterThanExpr& exp) {
   BinaryOperatorHelper(GREATERTHAN, arg1, arg2);
 }
 void LowererVisitor::VisitGreaterThanEqualToExpr(
-  const GreaterThanEqualToExpr& exp) {
-    // Visit left hand side (Last thing should be the target where it stores it)
+    const GreaterThanEqualToExpr& exp) {
+  // Visit left hand side (Last thing should be the target where it stores it)
   exp.lhs().Visit(const_cast<LowererVisitor*>(this));
   Register arg1 = GetArgument(lastchildtype_);
   exp.rhs().Visit(const_cast<LowererVisitor*>(this));
@@ -451,8 +453,8 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
 
   std::set<std::string> s1 = localsets_[localsets_.size()-1];
   std::set<std::string> s2 = localsets_[localsets_.size()-2];
-  std::set<std::string> intersectionset(SetIntersectionHelper(s1, s2));
-  std::set<std::string> differenceset(SetDifferenceHelper(s1, s2));
+  std::set<std::string> intersectionset(GetSetIntersection(s1, s2));
+  std::set<std::string> differenceset(GetSetDifference(s1, s2));
 
   // std::cerr << "SIZE OF SET1: " << s1.size() << std::endl;
   // std::cerr << "SIZE OF SET2: " << s2.size() << std::endl;
@@ -469,8 +471,8 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
     globalset_ = localsets_[localsets_.size()-1];
   } else {
     // otherwise use only the intersection set
-    std::cerr << "A variable assignment in only one branch has been detected"
-      << ", may cause problems later" << std::endl;
+    // std::cerr << "A variable assignment in only one branch has been detected"
+    //   << ", may cause problems later" << std::endl;
     globalset_ = intersectionset;
   }
 
@@ -511,9 +513,9 @@ void LowererVisitor::VisitLoop(const Loop& loop) {
     statement->Visit(this);
   }
 
-  std::set<std::string> intersectionset(SetIntersectionHelper(originalset_,
+  std::set<std::string> intersectionset(GetSetIntersection(originalset_,
     globalset_));
-  std::set<std::string> differenceset(SetDifferenceHelper(originalset_,
+  std::set<std::string> differenceset(GetSetDifference(originalset_,
     globalset_));
 
   // Add set difference to the totalset
@@ -521,8 +523,8 @@ void LowererVisitor::VisitLoop(const Loop& loop) {
   totalset_.insert(differenceset.begin(), differenceset.end());
 
   if (differenceset.size() > 0) {
-    std::cerr << "Unassigned Variable Detected (Loop)"
-      <<", may cause problems later\n";
+    // std::cerr << "Unassigned Variable Detected (Loop)"
+    //   <<", may cause problems later\n";
 
     // reset the global set
     globalset_ = originalset_;
@@ -539,7 +541,7 @@ void LowererVisitor::VisitProgram(const Program& program) {
   // Do all the Assignments, then the AE, then the functions
 
   for (auto& statement : program.statements()) {
-      statement->Visit(this);
+    statement->Visit(this);
   }
 
   program.arithmetic_exp().Visit(this);
@@ -558,7 +560,6 @@ void LowererVisitor::VisitIntegerExpr(const IntegerExpr& exp) {
 
   Operand arg1 = Operand(exp.value());
   CreateLoadBlock(INTLOAD, arg1);
-
   lastchildtype_ = INTCHILD;
   ++counter_.variablecount;
 }
@@ -601,7 +602,7 @@ void LowererVisitor::VisitDivideExpr(const DivideExpr& exp) {
   BinaryOperatorHelper(DIV, arg1, arg2);
 }
 
-void LowererVisitor::CreateLoadBlock(Type type, Operand arg1) {
+void LowererVisitor::CreateLoadBlock(OpcodeType type, Operand arg1) {
   ASSERT(type == INTLOAD || type == VARASSIGNLOAD || type == FUNARGLOAD
   || type == FUNRETLOAD || type == VARLOAD,
   "Must be an Int, Variable, or function load\n");
@@ -643,6 +644,7 @@ void LowererVisitor::CreateLoadBlock(Type type, Operand arg1) {
 
       // Push variablename into the set (Flagging it as being assigned)
       globalset_.insert(varname);
+      totalset_.insert(varname);
 
       newblock->target = Target(Register(varname, VARIABLEREG));
       newblock->op = Opcode(FUNRETLOAD);
@@ -656,6 +658,7 @@ void LowererVisitor::CreateLoadBlock(Type type, Operand arg1) {
 
       // Push variablename into the set (Flagging it as being assigned)
       globalset_.insert(varname);
+      totalset_.insert(varname);
 
       newblock->target = Target(Register(varname, VARIABLEREG));
       newblock->op = Opcode(FUNARGLOAD);
@@ -668,12 +671,12 @@ void LowererVisitor::CreateLoadBlock(Type type, Operand arg1) {
   }
 }
 
-void LowererVisitor::CreateComparisionBlock(Type type) {
+void LowererVisitor::CreateComparisionBlock(OpcodeType type) {
   ASSERT(type == CONDITIONAL || type == LOOP,
-    "Must be a loop or a conditional type");
+         "Must be a loop or a conditional type");
 
   auto newblock = make_unique<struct ThreeAddressCode>();
-  newblock->arg2 = Operand(blocks_[blocks_.size()-1]->target.reg());
+  newblock->arg2 = Operand(blocks_[blocks_.size() - 1]->target.reg());
   // Flip the comparision so it jumps if it's negative
   newblock->arg1 = Operand(0);
 
@@ -683,22 +686,20 @@ void LowererVisitor::CreateComparisionBlock(Type type) {
 }
 
 void LowererVisitor::CreateLabelBlock(std::string labelname) {
-  auto labelblock  = make_unique<struct ThreeAddressCode>();
+  auto labelblock = make_unique<struct ThreeAddressCode>();
   labelblock->target = Target(Label(labelname));
   labelblock->op = Opcode(LABEL);
   blocks_.push_back(std::move(labelblock));
 }
 
-void LowererVisitor::CreateJumpBlock(std::string jumpname, Type type) {
-  // Probably a better way to do this
-  ASSERT(type == JUMP || type == JEQUAL || type == JGREATER
-    || type == JGREATEREQ || type == JLESS || type == JLESSEQ
-    || type == JNOTEQUAL, "Must be a jump type");
+void LowererVisitor::CreateJumpBlock(std::string jumpname, OpcodeType type) {
+  ASSERT(type == JUMP || type == JEQUAL || type == JGREATER ||
+         type == JGREATEREQ || type == JLESS || type == JLESSEQ ||
+         type == JNOTEQUAL, "Must be a jump type");
 
   auto jumpblock = make_unique<struct ThreeAddressCode>();
   jumpblock->target = Target(Label(jumpname));
   jumpblock->op = Opcode(type);
-
   blocks_.push_back(std::move(jumpblock));
 }
 
@@ -745,7 +746,7 @@ void LowererVisitor::CreateFunctionDefEpilogue(std::string name) {
 void LowererVisitor::CreateDereference(std::string basevariable,
   std::string targetvariable, int indexofchild) {
   auto block = make_unique<struct ThreeAddressCode>();
-  block->target = Target(Label(targetvariable));
+  block->target = Target(Register(targetvariable, DEREFREG));
   block->op = Opcode(currdereferencetype_);
   block->arg1 = Operand(Register(basevariable, DEREFREG));
   block->arg2 = Operand(Register("Parent", DEREFREG));
@@ -755,10 +756,12 @@ void LowererVisitor::CreateDereference(std::string basevariable,
   blocks_.push_back(std::move(block));
 }
 
+// Can combine CreateTupleAssignment and CreateArithmeticAssignment
+// into one function
 void LowererVisitor::CreateTupleAssignment(std::string target,
   Operand operand) {
   auto block = make_unique<struct ThreeAddressCode>();
-  block->target = Target(Label(target));
+  block->target = Target(Register(target, VARIABLEREG));
   block->op = Opcode(NEWTUPLE);
   block->arg1 = operand;
 
@@ -768,22 +771,12 @@ void LowererVisitor::CreateTupleAssignment(std::string target,
 void LowererVisitor::CreateArithmeticAssignment(std::string target,
   Operand operand) {
   auto block = make_unique<struct ThreeAddressCode>();
-  block->target = Target(Label(target));
+  block->target = Target(Register(target, VARIABLEREG));
   block->op = Opcode(VARASSIGNLOAD);
   block->arg1 = operand;
 
   blocks_.push_back(std::move(block));
 }
-
-// void LowererVisitor::CreateRHSINTDEREFERENCEAssignment(std::string target,
-//   Operand operand) {
-//   auto block = make_unique<struct ThreeAddressCode>();
-//   block->target = Target(Label(target));
-//   block->op = Opcode(RHSDEFERENCEASSIGNMENT);
-//   block->arg1 = operand;
-
-//   blocks_.push_back(std::move(block));
-// }
 
 std::string LowererVisitor::JumpLabelHelper() {
   std::string newlabel = "falsebranch" + std::to_string(counter_.branchcount);
@@ -803,31 +796,13 @@ std::string LowererVisitor::ContinueLabelHelper() {
   return newcontinue;
 }
 
-// Obsolete Function now, remove later
+// Obsolete Function now
 Register LowererVisitor::GetArgument(ChildType type) {
   Register arg = blocks_[blocks_.size()-1]->target.reg();
-  // switch (type) {
-  //   case INTCHILD:
-  //     // arg = blocks_[blocks_.size()-1]->target.reg();
-  //     break;
-  //   case VARCHILD:
-  //     // Check if variable has been assigned here?
-  //     // arg = Register(variablestack_.top(), VARIABLEREG);
-  //     variablestack_.pop();
-
-  //     if ( globalset_.count(arg.name()) == 0 ) {
-  //       std::cerr << "Variable "+ arg.name() +" not assigned\n";
-  //       exit(1);
-  //     }
-  //     break;
-  //   default:
-  //     // There should be type throw error?
-  //     break;
-  // }
   return arg;
 }
 
-void LowererVisitor::BinaryOperatorHelper(Type type,
+void LowererVisitor::BinaryOperatorHelper(OpcodeType type,
   Register arg1, Register arg2) {
   // Load value into target (t <- prev->target + prev->prev->target)
   // Last two elements of the vector should be the integers to load in
@@ -841,10 +816,7 @@ void LowererVisitor::BinaryOperatorHelper(Type type,
     newblock->arg2 = Operand(arg2);
   }
 
-  // if (type == DIV) {check for div zero?}
-
   newblock->op = Opcode(type);
-  // look at this later, just going to do this now to test some things
   newblock->target = Target(Register("t_" +
     std::to_string(counter_.variablecount), VIRTUALREG));
 
@@ -855,7 +827,7 @@ void LowererVisitor::BinaryOperatorHelper(Type type,
   lastchildtype_ = BINOPCHILD;
 }
 
-std::set<std::string> LowererVisitor::SetDifferenceHelper(
+std::set<std::string> LowererVisitor::GetSetDifference(
   std::set<std::string> set1, std::set<std::string> set2) {
   std::set<std::string> differenceset;
   set_symmetric_difference(set1.begin(), set1.end(), set2.begin(), set2.end(),
@@ -863,7 +835,7 @@ std::set<std::string> LowererVisitor::SetDifferenceHelper(
     return differenceset;
 }
 
-std::set<std::string> LowererVisitor::SetIntersectionHelper(
+std::set<std::string> LowererVisitor::GetSetIntersection(
   std::set<std::string> set1, std::set<std::string> set2) {
     // get the intersection of the two sets
     std::set<std::string> intersectionset;

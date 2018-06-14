@@ -23,6 +23,17 @@ cc_test(
 	size = "small",
 )
 
+cc_test(
+  name = "lowerer_test",
+  deps = ["@gtest//:main", ":backend"],
+	srcs = [
+		"lowerer_visitor_test.cc"
+	],
+	copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
+	timeout = "short",
+	size = "small",
+)
+
 cc_binary(
     name = "backend_main",
     copts = ["-Wall -g"],

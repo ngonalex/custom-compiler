@@ -1,6 +1,6 @@
 
-#include "backend/code_gen.h"
 #include "abstract_syntax/abstract_syntax.h"
+#include "backend/code_gen.h"
 #include "backend/lowerer_visitor.h"
 #include "utility/memory.h"
 
@@ -12,13 +12,9 @@ using cs160::abstract_syntax::backend::SubtractExpr;
 using cs160::abstract_syntax::backend::MultiplyExpr;
 using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::IntegerExpr;
-using cs160::abstract_syntax::backend::LessThanExpr;
 using cs160::abstract_syntax::backend::LessThanEqualToExpr;
-using cs160::abstract_syntax::backend::GreaterThanExpr;
-using cs160::abstract_syntax::backend::GreaterThanEqualToExpr;
-using cs160::abstract_syntax::backend::EqualToExpr;
+using cs160::abstract_syntax::backend::LessThanExpr;
 using cs160::abstract_syntax::backend::LogicalAndExpr;
-using cs160::abstract_syntax::backend::LogicalOrExpr;
 using cs160::abstract_syntax::backend::LogicalNotExpr;
 using cs160::abstract_syntax::backend::Statement;
 using cs160::abstract_syntax::backend::AssignmentFromArithExp;
@@ -26,31 +22,37 @@ using cs160::abstract_syntax::backend::AssignmentFromNewTuple;
 using cs160::abstract_syntax::backend::Dereference;
 using cs160::abstract_syntax::backend::Conditional;
 using cs160::abstract_syntax::backend::Loop;
+using cs160::abstract_syntax::backend::MultiplyExpr;
 using cs160::abstract_syntax::backend::Program;
 using cs160::abstract_syntax::backend::FunctionCall;
 using cs160::abstract_syntax::backend::FunctionDef;
+using cs160::abstract_syntax::backend::Statement;
+using cs160::abstract_syntax::backend::SubtractExpr;
+using cs160::backend::PrintFlag::PRINT_DEBUG;
+using cs160::backend::PrintFlag::PRINT_LAST_ARITHMETIC_EXPR;
+using cs160::backend::PrintFlag::PRINT_ONLY_RESULT;
+using cs160::backend::CodeGen;
 using cs160::backend::LowererVisitor;
 using cs160::backend::ThreeAddressCode;
-using cs160::backend::CodeGen;
 using cs160::make_unique;
 
 std::string exec(const char* cmd) {
-    std::array<char, 128> buffer;
-    std::string result;
-    std::shared_ptr<FILE> pipe(popen(cmd, "r"), pclose);
-    if (!pipe) throw std::runtime_error("popen() failed!");
-    while (!feof(pipe.get())) {
-        if (fgets(buffer.data(), 128, pipe.get()) != nullptr)
-            result += buffer.data();
-    }
-    return result;
+  std::array<char, 128> buffer;
+  std::string result;
+  std::shared_ptr<FILE> pipe(popen(cmd, "r"), pclose);
+  if (!pipe) throw std::runtime_error("popen() failed!");
+  while (!feof(pipe.get())) {
+    if (fgets(buffer.data(), 128, pipe.get()) != nullptr)
+      result += buffer.data();
+  }
+  return result;
 }
 
 int main() {
   LowererVisitor lowerer_;
   Statement::Block statements;
-  auto expr = make_unique<DivideExpr>(
-    make_unique<IntegerExpr>(7), make_unique<IntegerExpr>(5));
+  auto expr = make_unique<DivideExpr>(make_unique<IntegerExpr>(7),
+                                      make_unique<IntegerExpr>(5));
 
   statements.push_back(std::move(
       make_unique<const AssignmentFromArithExp>(
@@ -75,20 +77,24 @@ int main() {
       statements.push_back(std::move(make_unique<const AssignmentFromArithExp>(
       make_unique<const Dereference>(
         make_unique<const VariableExpr>("x"),
-        make_unique<const IntegerExpr>(2)),
+        make_unique<const AddExpr>(
+          make_unique<const IntegerExpr>(1),
+          make_unique<const IntegerExpr>(1))),
       make_unique<const IntegerExpr>(1000))));
 
       statements.push_back(std::move(make_unique<const AssignmentFromNewTuple>(
      make_unique<const VariableExpr>("h"),
      make_unique<const Dereference>(
        make_unique<const VariableExpr>("x"),
-       make_unique<const IntegerExpr>(1)))));
-
-        statements.push_back(std::move(make_unique<const AssignmentFromArithExp>(
-     make_unique<const VariableExpr>("y"),
-     make_unique<const Dereference>(
-       make_unique<const VariableExpr>("x"),
        make_unique<const IntegerExpr>(2)))));
+
+    statements.push_back(std::move(make_unique<const AssignmentFromArithExp>(
+     make_unique<const VariableExpr>("y"),
+     make_unique<const AddExpr>(
+      make_unique<const Dereference>(
+        make_unique<const VariableExpr>("x"),
+        make_unique<const IntegerExpr>(2)),
+      make_unique<const IntegerExpr>(5)))));
 
   statements.push_back(std::move(make_unique<const AssignmentFromArithExp>(
       make_unique<const Dereference>(
@@ -177,6 +183,13 @@ int main() {
         make_unique<const IntegerExpr>(2)),
       make_unique<const IntegerExpr>(1000))));
 
+      // change 1 to a 2 for full compilation
+      fact_body.push_back(std::move(make_unique<const AssignmentFromNewTuple>(
+     make_unique<const VariableExpr>("h"),
+     make_unique<const Dereference>(
+       make_unique<const VariableExpr>("x"),
+       make_unique<const IntegerExpr>(2)))));
+
   fact_body.push_back(std::move(make_unique<const AssignmentFromArithExp>(
       make_unique<const Dereference>(
         make_unique<const Dereference>(
@@ -221,9 +234,9 @@ int main() {
   // expr->Visit(&lowerer_);
 
   std::ofstream file = std::ofstream("test.s");
-  CodeGen runner = CodeGen(file);
+  CodeGen runner = CodeGen(file, PRINT_DEBUG);
   auto test = lowerer_.GetIR();
-  runner.GenerateData(lowerer_.globalset());
+  runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   system("gcc -g -static test.s -o run && ./run");
   // CHANGE TO GENERATEEPILOGUE LATER
