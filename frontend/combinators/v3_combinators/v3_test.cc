@@ -28,7 +28,7 @@ TEST(RelationlHelper, gtoet) {
   EXPECT_EQ(result.parsedCharacters, ">=");
 }
 
-// // Success Case <=
+// Success Case <=
 TEST(RelationlHelper, ltoet) {
   LessThanOrEqualToOpParser test;
   ParseStatus result = test.do_parse("<=", 0);
@@ -248,6 +248,7 @@ TEST(RelationBody, simpleRBody1) {
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.endCharacter, 6);
   EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "x==3");
   EXPECT_EQ(output, "(x == 3)");
 }
 
@@ -262,6 +263,7 @@ TEST(RelationBody, simpleRBody2) {
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.endCharacter, 11);
   EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "-9+3>=222");
   EXPECT_EQ(output, "((0 - (9 + 3)) >= 222)");
 }
 
@@ -276,6 +278,7 @@ TEST(RelationBody, simpleRBody3) {
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.endCharacter, 31);
   EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "-912981*128158+1919+(99-22)>x");
   EXPECT_EQ(output, "((0 - (((912981 * 128158) + 1919) + (99 - 22))) > x)");
 }
 
@@ -290,7 +293,7 @@ TEST(RelationParser, simpleRelationParser1) {
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.endCharacter, 5);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(result.parsedCharacters, "x>y");  
+  EXPECT_EQ(result.parsedCharacters, "x>y");
   EXPECT_EQ(output, "(x > y)");
 }
 
