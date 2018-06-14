@@ -42,8 +42,15 @@ class ControlFlowGraphNode {
  public:
   ControlFlowGraphNode();
   ControlFlowGraphNode(std::vector<std::unique_ptr<struct ThreeAddressCode>>);
-  std::vector<std::unique_ptr<struct ThreeAddressCode>> GetLocalBlock() {
-   return std::move(localblock_);
+  std::vector<ThreeAddressCode *> GetLocalBlock() {
+    std::vector<ThreeAddressCode *> return_tac;
+    for (auto &iter: localblock_) {
+      return_tac.push_back(iter.get());
+    }
+    return return_tac;
+  }
+  std::vector<std::unique_ptr<struct ThreeAddressCode>> GetLocalUniqueBlock() {
+    return std::move(localblock_);
   }
   void CreateCFG(std::vector<std::unique_ptr<struct ThreeAddressCode>>);
   ControlFlowGraphNode( ControlFlowGraphNode &copy);
@@ -62,6 +69,7 @@ class ControlFlowGraphNode {
   void SetBlockType(BlockType settype) {
     blocktype_ = settype;
   }
+  void DebugNode();
 
  private:
   BlockType blocktype_;
@@ -80,6 +88,7 @@ class ControlFlowGraph {
   void Optimize();
   void DebugPrint();
   std::string GetOutput();
+  std::string GetOutputNoConsume();
   std::vector<std::unique_ptr<struct ThreeAddressCode>> MakeThreeAddressCode();
 
  private:

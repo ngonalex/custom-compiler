@@ -112,8 +112,17 @@ TEST_F(ControlFlowGraphTest, ConditionalWithNestedLogicalsWithVariables) {
   
   grapher_.CreateCFG(std::move(lowerer_.GetIR()));
   grapher_.DebugPrint();
+  std::string prestring = grapher_.GetOutput();
   grapher_.Optimize();
-  grapher_.MakeThreeAddressCode();
+  std::string poststring = grapher_.GetOutput();
+  int compared = prestring.compare(poststring);
+  std::cout << "--- SEE IF IT GOT REDUCED ---" << std::endl;
+  std::cout << "--- FIRST STRING ---" << std::endl;
+  std::cout << prestring << std::endl;
+  std::cout << "--- SECOND STRING ---" << std::endl;
+  std::cout << poststring << std::endl;
+  std::cout << "--- STRINGCOMPARE INT VALUE ---" << std::endl;
+  std::cout << ".compare() strings: " << compared << std::endl;
 
   EXPECT_EQ(grapher_.GetOutput(),"t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
     "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"

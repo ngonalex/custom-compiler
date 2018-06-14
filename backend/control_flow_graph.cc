@@ -13,7 +13,7 @@ ControlFlowGraph::ControlFlowGraph
 }
 
 //Use Recursion to find all the edges in the graph
-ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> graph_set, 
+ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> &graph_set, 
   std::vector<Edge> &edge_graph) {
   if (graph_set.empty()) {    
     //If this occurs then there's a bigger problem
@@ -156,7 +156,7 @@ void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddress
 std::vector<std::unique_ptr<struct ThreeAddressCode>> MarkSweep(
     std::vector<std::string> &live_set,
     ControlFlowGraphNode * apply_sweep) {
-  std::vector<std::unique_ptr<struct ThreeAddressCode>> optimize_block = std::move(apply_sweep->GetLocalBlock());
+  std::vector<std::unique_ptr<struct ThreeAddressCode>> optimize_block = std::move(apply_sweep->GetLocalUniqueBlock());
   for (auto &iter: optimize_block) {
     //Target is the LHS check
     //Opcode is the RHS check
@@ -167,6 +167,7 @@ std::vector<std::unique_ptr<struct ThreeAddressCode>> MarkSweep(
         if(iter->target.reg().name() != iter->arg1.reg().name() || iter->target.reg().name() != iter->arg2.reg().name()) {
           //Delete if its not in the set
           iter.reset();
+          //std::cout << "I'm actually deleting something" << std::endl;
         }
       } else {
         live_set.erase(std::remove(live_set.begin(),live_set.end(),iter->target.reg().name()),live_set.end());
@@ -280,8 +281,10 @@ void ControlFlowGraph::Optimize() {
 
 void ControlFlowGraph::DebugPrint() {
   for (auto &iter: cfg_nodes_) {
+    std::cout << "--- NEW BLOCK ---" << std::endl;
     std::cout << "Creation Order: "<< iter->GetCreationOrder() << 
     " Block Type: "<< iter->GetBlockType() << std::endl;
+    iter->DebugNode();
   }
   std::cout << "EDGES: " << std::endl;
   for (auto iter1: edges_) {
@@ -296,7 +299,7 @@ std::vector<std::unique_ptr<struct ThreeAddressCode>> ControlFlowGraph::MakeThre
   while(!cfg_nodes_.empty()) {
     for(auto &iter: cfg_nodes_) {
       if(iter->GetCreationOrder() == creation_check) {
-        for(auto &three_iter: iter->GetLocalBlock()) {
+        for(auto &three_iter: iter->GetLocalUniqueBlock()) {
           return_three_address.push_back(std::move(three_iter));
         }
       }
@@ -306,20 +309,8 @@ std::vector<std::unique_ptr<struct ThreeAddressCode>> ControlFlowGraph::MakeThre
   return std::move(return_three_address);
 }
 
-std::string ControlFlowGraph::GetOutput() {
-  int creation_check = 0;
-  std::vector<std::unique_ptr<struct ThreeAddressCode>> return_three_address;
-  while(!cfg_nodes_.empty()) {
-    for(auto &iter: cfg_nodes_) {
-      if(iter->GetCreationOrder() == creation_check) {
-        for(auto &three_iter: iter->GetLocalBlock()) {
-          return_three_address.push_back(std::move(three_iter));
-        }
-      }
-    }
-    creation_check++;
-  }
   // Iterate through the vector and print out each basic block
+  std::string OutputHelper(std::vector<ThreeAddressCode*> return_three_address ){
   std::string output = "";
   std::vector<std::string> printhelper = {"INTLOAD", "VARLOAD", "VARASSIGNLOAD",
     "FUNARGLOAD", "FUNRETLOAD", "+", "-", "*", "/", "<", "<=", ">", ">=",
@@ -420,6 +411,23 @@ std::string ControlFlowGraph::GetOutput() {
 
   return output;
 }
+
+std::string ControlFlowGraph::GetOutput() {
+  int creation_check = 0;
+  std::vector<ThreeAddressCode *> return_three_address;
+  for(auto &iter: cfg_nodes_) {
+    //if(iter->GetCreationOrder() == creation_check) {
+      for(auto &three_iter: iter->GetLocalBlock()) {
+        return_three_address.push_back(three_iter);
+      }
+    }
+  //creation_check++;
+  //}
+    
+  //}
+  return OutputHelper(return_three_address);
+}
+
 ControlFlowGraphNode::ControlFlowGraphNode() {
   creation_order = 0;
   blocktype_ = NO_TYPE;
@@ -474,7 +482,7 @@ ControlFlowGraphNode ControlFlowGraphNode::operator=(ControlFlowGraphNode copy) 
   //   block->arg2 = iter->arg2;
   //   localblock_.push_back(std::move(block));
   // }
-  localblock_ = std::move(copy.GetLocalBlock());
+  localblock_ = std::move(copy.GetLocalUniqueBlock());
   creation_order = copy.GetCreationOrder();
   blocktype_ = copy.GetBlockType();
   return *this;
@@ -488,6 +496,16 @@ void ControlFlowGraphNode::SetLocalBlock(std::vector<std::unique_ptr<struct Thre
   //   localblock_.push_back(std::move(block));
   // }
   localblock_ = std::move(input);
+}
+
+void ControlFlowGraphNode::DebugNode() {
+  for (auto &iter : localblock_) {
+    std::cout << "Target name: " << iter->target.reg().name() << " Arg1 name: " << 
+    iter->arg1.reg().name() << " Arg2 name: " << iter->arg2.reg().name() << std::endl;
+    std::cout << "Target type: " << iter->target.type() << " Arg1 value: " << 
+    iter->arg1.value() << " Arg2 value: " << iter->arg2.value() << std::endl;
+    std::cout << "Op code type: " << iter->op.opcode() << std::endl;
+  }
 }
 
 } //backend
