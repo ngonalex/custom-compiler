@@ -1,5 +1,5 @@
-#ifndef LOOP_PARSER_H_
-#define LOOP_PARSER_H_
+#ifndef CONDITIONAL_PARSER_H_
+#define CONDITIONAL_PARSER_H_
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
@@ -15,4 +15,4 @@ class ConditionalParser : NullParser {
 } // namespace frontend
 } // namespace cs160
 
-#endif // LOOP_PARSER_H_
+#endif // CONDITIONAL_PARSER_H_

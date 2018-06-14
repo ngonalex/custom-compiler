@@ -1,3 +1,5 @@
+#include "frontend/combinators/v3_combinators/main/loop_parser.h"
+#include "frontend/combinators/v3_combinators/main/block_parser.h"
 #include "frontend/combinators/v3_combinators/main/relation_body.h"
 #include "frontend/combinators/v3_combinators/main/relation_parser.h"
 #include "frontend/combinators/basic_combinators/and_combinator.h"
@@ -44,7 +46,7 @@ ParseStatus LoopParser::do_parse(std::string inputProgram,
   CloseCurlyBrackets closeBracketP;
   OpenParenParser openParenP;
   CloseParenParser closeParenP;
-  RelationalExpr relationExpr;
+  RelationParser relationP;
   BlockParser block;
 
   AndCombinator doWhile1;
@@ -64,11 +66,11 @@ ParseStatus LoopParser::do_parse(std::string inputProgram,
   doWhile5.secondParser = reinterpret_cast<NullParser *>(&openParenP);
   AndCombinator doWhile6;
   doWhile6.firstParser = reinterpret_cast<NullParser *>(&doWhile5);
-  doWhile6.secondParser = reinterpret_cast<NullParser *>(&relationExpr);
+  doWhile6.secondParser = reinterpret_cast<NullParser *>(&relationP);
   AndCombinator doWhile7;
   doWhile7.firstParser = reinterpret_cast<NullParser *>(&doWhile6);
   doWhile7.secondParser = reinterpret_cast<NullParser *>(&closeParenP);
-  ParseStatus doWhileBlock = block.do_parse(doWhile1.remainingCharacters, doWhile1.endCharacter);
+  //ParseStatus doWhileBlock = block.do_parse(doWhile1.do_parse().remainingCharacters, doWhile1.endCharacter);
 
 
   AndCombinator while1;
@@ -76,7 +78,7 @@ ParseStatus LoopParser::do_parse(std::string inputProgram,
   while1.secondParser = reinterpret_cast<NullParser *>(&openParenP);
   AndCombinator while2;
   while2.firstParser = reinterpret_cast<NullParser *>(&while1);
-  while2.secondParser = reinterpret_cast<NullParser *>(&relationExpr);
+  while2.secondParser = reinterpret_cast<NullParser *>(&relationP);
   AndCombinator while3;
   while3.firstParser = reinterpret_cast<NullParser *>(&while2);
   while3.secondParser = reinterpret_cast<NullParser *>(&closeParenP);
@@ -89,7 +91,7 @@ ParseStatus LoopParser::do_parse(std::string inputProgram,
   AndCombinator while6;
   while6.firstParser = reinterpret_cast<NullParser *>(&while5);
   while6.secondParser = reinterpret_cast<NullParser *>(&closeBracketP);
-  ParseStatus whileBlock = block.do_parse(while4.remainingCharacters, while4.endCharacter);
+  //ParseStatus whileBlock = block.do_parse(while4.remainingCharacters, while4.endCharacter);
 
 
   OrCombinator loops;
