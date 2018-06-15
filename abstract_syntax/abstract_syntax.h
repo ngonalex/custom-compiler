@@ -7,10 +7,12 @@
 #include "abstract_syntax/abstract_syntax_tree_v4.h"
 #include "abstract_syntax/abstract_syntax_tree_v5.h"
 
+#include "utility/memory.h"
+
 namespace cs160 {
 namespace abstract_syntax {
 
-namespace frontend = version_2;
+namespace frontend = version_4;
 namespace backend = version_4;
 
 }  // namespace abstract_syntax

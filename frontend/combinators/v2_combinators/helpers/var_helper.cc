@@ -1,187 +1,149 @@
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
+#include "frontend/combinators/basic_combinators/and_combinator.h"
+#include "frontend/combinators/basic_combinators/atom_parser.h"
 #include "frontend/combinators/basic_combinators/one_or_more_combinator.h"
+#include "frontend/combinators/v1_combinators/helpers/v1_helpers.h"
+#include "frontend/combinators/v1_combinators/num_parser.h"
 #include "frontend/combinators/v1_combinators/single_char.h"
 #include "frontend/combinators/v2_combinators/main/word_parser.h"
-#include "frontend/combinators/v1_combinators/semicolon_parser.h"
-#include "frontend/combinators/v1_combinators/num_parser.h"
-#include "frontend/combinators/basic_combinators/or_combinator.h"
 
-#include <string>     // std::string, std::stoi
+#include <string>  // std::string, std::stoi
 
 #define super NullParser
 
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus VarKeywordParser::parse(std::string inputProgram, std::string errorType) {
-	trim(inputProgram);
+ParseStatus VarKeywordParser::do_parse(std::string inputProgram,
+                                       int startCharacter) {
+  int endCharacter = startCharacter;
+  endCharacter += trim(inputProgram);
 
   std::string errorMessage = "Start variable declaration with var";
 
-	if (inputProgram.size() == 0) {
-		return super::parse(inputProgram, errorMessage);
-	}
-
-  ParseStatus result;
-
-  if(inputProgram.substr(0,3) == "var") {
-    result.status = true;
-    result.parsedCharacters = "var";
-    result.remainingCharacters = inputProgram.erase(0,3);
+  if (inputProgram.size() == 0) {
+    return super::fail(inputProgram, endCharacter, errorMessage);
   }
-  else {
-    result.status = false;
-    result.errorType = errorMessage;
-  }
+
+  auto vParser = AtomParser('v');
+  auto aParser = AtomParser('a');
+  auto rParser = AtomParser('r');
+  AndCombinator andOne;
+  andOne.firstParser = reinterpret_cast<NullParser *>(&vParser);
+  andOne.secondParser = reinterpret_cast<NullParser *>(&aParser);
+  AndCombinator andTwo;
+  andTwo.firstParser = reinterpret_cast<NullParser *>(&andOne);
+  andTwo.secondParser = reinterpret_cast<NullParser *>(&rParser);
+
+  ParseStatus result = andTwo.do_parse(inputProgram, endCharacter);
+  result.errorType = errorMessage;
   return result;
 }
 
-
-ParseStatus ColonParser::parse(std::string inputProgram, std::string errorType) {
-	trim(inputProgram);
+ParseStatus ColonParser::do_parse(std::string inputProgram,
+                                  int startCharacter) {
+  int endCharacter = startCharacter;
+  endCharacter += trim(inputProgram);
 
   std::string errorMessage = "Missing colon";
 
-	if (inputProgram.size() == 0) {
-		return super::parse(inputProgram, errorMessage);
-	}
-
-  ParseStatus result;
-
-  if(inputProgram.substr(0,1) == ":") {
-    result.status = true;
-    result.parsedCharacters = ":";
-    result.remainingCharacters = inputProgram.erase(0,1);
+  if (inputProgram.size() == 0) {
+    return super::fail(inputProgram, endCharacter, errorMessage);
   }
-  else {
-    result.status = false;
-    result.errorType = errorMessage;
-  }
+
+  auto vParser = AtomParser(':');
+  ParseStatus result = vParser.do_parse(inputProgram, endCharacter);
+  result.errorType = errorMessage;
+
   return result;
 }
 
-
-ParseStatus TypeParser::parse(std::string inputProgram, std::string errorType) {
-	trim(inputProgram);
+ParseStatus TypeParser::do_parse(std::string inputProgram, int startCharacter) {
+  int endCharacter = startCharacter;
+  endCharacter += trim(inputProgram);
 
   std::string errorMessage = "Incorrect type in variable declaration";
-	if (inputProgram.size() == 0) {
-		return super::parse(inputProgram, errorMessage);
-	}
+  if (inputProgram.size() == 0) {
+    return super::fail(inputProgram, endCharacter, errorMessage);
+  }
 
   OneOrMoreCombinator oneOrMore;
   SingleCharParser charParser;
 
-	oneOrMore.parser = reinterpret_cast<NullParser *>(&charParser);
-  ParseStatus result = oneOrMore.parse(inputProgram);
+  oneOrMore.parser = reinterpret_cast<NullParser *>(&charParser);
+  ParseStatus result = oneOrMore.do_parse(inputProgram, endCharacter);
 
-  if(!result.status) {
+  if (!result.status) {
     result.errorType = errorMessage;
   }
 
   return result;
 }
 
-ParseStatus EqualSignParser::parse(std::string inputProgram, std::string errorType) {
-	trim(inputProgram);
+ParseStatus EqualSignParser::do_parse(std::string inputProgram,
+                                      int startCharacter) {
+  int endCharacter = startCharacter;
+  endCharacter += trim(inputProgram);
+
   std::string errorMessage = "Missing equal sign";
-	if (inputProgram.size() == 0) {
-		return super::parse(inputProgram, errorMessage);
-	}
 
-  ParseStatus result;
+  if (inputProgram.size() == 0) {
+    return super::fail(inputProgram, endCharacter, errorMessage);
+  }
 
-  if(inputProgram.substr(0,1) == "=") {
-    result.status = true;
-    result.parsedCharacters = "=";
-    result.remainingCharacters = inputProgram.erase(0,1);
-  }
-  else {
-    result.status = false;
-    result.errorType = errorMessage;
-  }
+  auto vParser = AtomParser('=');
+  ParseStatus result = vParser.do_parse(inputProgram, endCharacter);
+  result.errorType = errorMessage;
+
   return result;
 }
-/*
-ParseStatus BOExpr::parse(std::string inputProgram, std::string errorType) {
-  trim(inputProgram);
-  std::string errorMessage = "Invalid Binary Operator Expression";
-  if (inputProgram.size() == 0) {
-    return super::parse(inputProgram, errorMessage);
-  }
 
-  OrCombinator orC;
-  NumParser numParser;
-  WordParser wordParser;
-  orC.firstParser = &reinterpret_cast<NullParser *>(&wordParse);
-  orC.secondParser = &reinterpret_cast<NullParser *>(&numParser);
-  ParseStatus result = orC.parse(inputProgram);
-
-  if(result.status) {
-
-  }
-
-  if(inputProgram.substr(0,1) == "=") {
-    result.status = true;
-    result.parsedCharacters = "=";
-    result.remainingCharacters = inputProgram.erase(0,1);
-  }
-  else {
-    result.status = false;
-    result.errorType = errorMessage;
-  }
-  return result;
-}*/
-
-ParseStatus HelperVariableParser::parse(std::string inputProgram, std::string errorType) {
-  trim(inputProgram);
+ParseStatus HelperVariableParser::do_parse(std::string inputProgram,
+                                           int startCharacter) {
+  int endCharacter = startCharacter;
+  endCharacter += trim(inputProgram);
 
   if (inputProgram.size() == 0) {
-    return super::parse(inputProgram);
+    return super::fail(inputProgram, endCharacter);
   }
 
   VarKeywordParser varParser;
   WordParser wordParser;
   ColonParser colonParser;
   TypeParser typeParser;
-  SemiColonParser semiColonP;
 
-  // Parse the first character
-  ParseStatus result = varParser.parse(inputProgram);
+  AndCombinator firstAnd;
+  firstAnd.firstParser = reinterpret_cast<NullParser *>(&varParser);
+  firstAnd.secondParser = reinterpret_cast<NullParser *>(&wordParser);
+  ParseStatus intermediateValue =
+      firstAnd.do_parse(inputProgram, endCharacter);  // Will be used in cache
+  AndCombinator secondAnd;
+  secondAnd.firstParser = reinterpret_cast<NullParser *>(&firstAnd);
+  secondAnd.secondParser = reinterpret_cast<NullParser *>(&colonParser);
+  AndCombinator thirdAnd;
+  thirdAnd.firstParser = reinterpret_cast<NullParser *>(&secondAnd);
+  thirdAnd.secondParser = reinterpret_cast<NullParser *>(&typeParser);
+  ParseStatus result = thirdAnd.do_parse(inputProgram, endCharacter);
 
   if (result.status) {
-    ParseStatus wordResult = wordParser.parse(result.remainingCharacters);
-    if (wordResult.status) {
-      result.parsedCharacters += (" " + wordResult.parsedCharacters);
-      result.remainingCharacters = wordResult.remainingCharacters;
-      ParseStatus colonStatus = colonParser.parse(result.remainingCharacters);
-
-      if (colonStatus.status) {
-        result.parsedCharacters += (" " + colonStatus.parsedCharacters);
-        result.remainingCharacters = colonStatus.remainingCharacters;
-        ParseStatus typeStatus =
-            typeParser.parse(result.remainingCharacters);
-        if (typeStatus.status) {
-          result.parsedCharacters += (" " + typeStatus.parsedCharacters);
-          result.remainingCharacters = typeStatus.remainingCharacters;
-          result.ast = std::move(make_unique<const VariableExpr>(wordResult.parsedCharacters));
-
-        }
-        else {
-          result.status = typeStatus.status;
-          result.errorType = typeStatus.errorType; 
-        }
-      }
-      else {
-        result.status = colonStatus.status;
-        result.errorType = colonStatus.errorType;
-      }
-    }
-    else {
-      result.status = wordResult.status;
-      result.errorType = wordResult.errorType;
-    }
+    result.ast = std::move(intermediateValue.second_ast);
   }
 
+  return result;
+}
+
+// ;
+ParseStatus SemiColonParser::do_parse(std::string inputProgram,
+                                      int startCharacter) {
+  int endCharacter = startCharacter;
+  endCharacter += trim(inputProgram);
+  std::string errorMessage = "Expecting ;";
+
+  if (inputProgram.size() == 0) {
+    return super::fail(inputProgram, endCharacter, errorMessage);
+  }
+
+  auto atomParser = AtomParser(';');
+  auto result = atomParser.do_parse(inputProgram, endCharacter);
   return result;
 }

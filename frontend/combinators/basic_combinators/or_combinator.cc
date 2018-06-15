@@ -1,15 +1,23 @@
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 
+#include <iostream>
 #define super NullParser
 
 using namespace cs160::frontend;
 
-ParseStatus OrCombinator::parse(std::string inputProgram, std::string errorType){
-	ParseStatus firstStatus = firstParser->parse(inputProgram);
-	if (firstStatus.status){
-		return firstStatus;
-	}
+ParseStatus OrCombinator::do_parse(std::string inputProgram,
+                                   int startCharacter) {
+  ParseStatus firstStatus = firstParser->do_parse(inputProgram, startCharacter);
+  if (firstStatus.status) {
+    firstStatus.firstOrSecond = true;
+    return firstStatus;
+  }
 
-	ParseStatus secondStatus = secondParser->parse(inputProgram);
-	return secondStatus;
+  ParseStatus secondStatus =
+      secondParser->do_parse(inputProgram, startCharacter);
+  if (!secondStatus.status) {
+    secondStatus.firstOrSecond = false;
+    secondStatus.errorType += " or " + firstStatus.errorType;
+  }
+  return secondStatus;
 }
