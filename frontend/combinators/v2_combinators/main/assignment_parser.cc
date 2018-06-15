@@ -54,9 +54,21 @@ ParseStatus AssignmentParser::do_parse(std::string inputProgram,
   ParseStatus result = secondAnd.do_parse(inputProgram, endCharacter);
 
   if (result.status) {
-    result.ast = std::move(make_unique<const Assignment>(
+    /*
+    if (firstResult.firstOrSecond) {
+        std::string temp = firstResult.parsedCharacters.erase(0,3);    
+         std::unique_ptr<const AstNode> temp_ast = 
+          std::move(make_unique<const VariableExpr>(temp));
+
+      result.ast = std::move(make_unique<const Assignment>(
+        unique_cast<const VariableExpr>(std::move(temp_ast)),
+        unique_cast<const ArithmeticExpr>(std::move(result.second_ast))));
+    }
+    else {*/
+          result.ast = std::move(make_unique<const Assignment>(
         unique_cast<const VariableExpr>(std::move(firstResult.ast)),
         unique_cast<const ArithmeticExpr>(std::move(result.second_ast))));
+    //}
   }
 
   return result;

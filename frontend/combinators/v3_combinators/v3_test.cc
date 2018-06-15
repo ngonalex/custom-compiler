@@ -642,7 +642,7 @@ TEST(ProgramParser, sucessProgramParser1) {
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
-  EXPECT_EQ(output, "varz = 0; if (z == 0) {z = 100} else {}; x");
+  EXPECT_EQ(output, "z = 0; if (z == 0) {z = 100} else {}; x");
 }
 
 TEST(ProgramParser, sucessProgramParser2) {
@@ -676,7 +676,7 @@ TEST(ProgramParser, sucessProgramParser3) {
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
-  EXPECT_EQ(output, "varz = 0; if (z == 0) {z = 100} else {}; z");
+  EXPECT_EQ(output, "z = 0; if (z == 0) {z = 100} else {}; z");
 }
 
 TEST(ProgramParser, failedProgramParser1) {
