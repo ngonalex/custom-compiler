@@ -23,11 +23,11 @@ using namespace cs160::frontend;
 // Success case for Single Character test :: single_char.cc
 TEST(Combinators, SingleCharTest) {
   SingleCharParser test;
-  ParseStatus result = test.parse("  a123", 0);
+  ParseStatus result = test.parse("a123", 0);
 
   EXPECT_EQ(result.status, true);
-  EXPECT_EQ(result.startCharacter, 2);
-  EXPECT_EQ(result.endCharacter, 3);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 1);
   EXPECT_EQ(result.remainingCharacters, "123");
   EXPECT_EQ(result.parsedCharacters, "a");
 }

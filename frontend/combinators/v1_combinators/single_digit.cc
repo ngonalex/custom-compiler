@@ -7,7 +7,6 @@ using namespace cs160::frontend;
 ParseStatus SingleDigitParser::do_parse(std::string inputProgram,
                                         int startCharacter) {
   int endCharacter = startCharacter;
-  endCharacter += trim(inputProgram);
   std::string errorMessage = "Digit should be between 0 and 9";
 
   if (inputProgram.size() == 0) {
