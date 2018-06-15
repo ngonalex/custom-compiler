@@ -108,7 +108,7 @@ int main() {
   grapher_.CreateCFG(std::move(lowerer_.GetIR()));
   grapher_.Optimize();
 
-  std::cout << "Hello\n" << std::endl;
+  std::cout << grapher_.GetOutput() << std::endl;
 
   return 0;
 
