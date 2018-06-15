@@ -11,15 +11,15 @@ class CommaOp : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
-    
+
 class ReturnTypeOp : public NullParser {
-public:
-    virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+ public:
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
-    
+
 class FuncKeyword : public NullParser {
-public:
-    virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+ public:
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class FunctionVariableParsers : public NullParser {

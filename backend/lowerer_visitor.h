@@ -1,6 +1,7 @@
 #ifndef BACKEND_LOWERER_VISITOR_H_
 #define BACKEND_LOWERER_VISITOR_H_
 
+#include <algorithm>
 #include <iostream>
 #include <set>
 #include <stack>
@@ -20,6 +21,8 @@ using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::Conditional;
 using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::EqualToExpr;
+using cs160::abstract_syntax::backend::FunctionCall;
+using cs160::abstract_syntax::backend::FunctionDef;
 using cs160::abstract_syntax::backend::GreaterThanEqualToExpr;
 using cs160::abstract_syntax::backend::GreaterThanExpr;
 using cs160::abstract_syntax::backend::IntegerExpr;
@@ -42,12 +45,15 @@ enum ChildType { INTCHILD, VARCHILD, NOCHILD };
 
 class LowererVisitor : public AstVisitor {
  public:
-  LowererVisitor() : counter_() {}
-  ~LowererVisitor() {}
+  LowererVisitor() : counter_(), currvariabletype_(RIGHTHAND) {}
 
   std::string GetOutput();
 
-  // V3 (Assignment + Program updated) Fill
+  // V4 (Program Updated)
+  void VisitFunctionCall(const FunctionCall& call);
+  void VisitFunctionDef(const FunctionDef& def);
+
+  // V3 (Assignment + Program updated)
   void VisitLessThanExpr(const LessThanExpr& exp);
   void VisitLessThanEqualToExpr(const LessThanEqualToExpr& exp);
   void VisitGreaterThanExpr(const GreaterThanExpr& exp);
@@ -71,6 +77,13 @@ class LowererVisitor : public AstVisitor {
   void VisitMultiplyExpr(const MultiplyExpr& exp);
   void VisitDivideExpr(const DivideExpr& exp);
 
+  void CreateFunctionDefPrologue(std::string name);
+  void CreateFunctionDefEpilogue(std::string name);
+  void CreateFunctionDefReturnBlock();
+  void CreateFunctionDefSignal(std::string name);
+  void CreateFunctionCallBlock(std::string funname);
+  void CreateFunctionCallReturnEpilogue(int numofregs);
+  void CreateLoadBlock(Type type, Operand arg1);
   void CreateComparisionBlock(Type type);
   void CreateLabelBlock(std::string labelname);
   void CreateJumpBlock(std::string jumpname, Type type);
@@ -82,9 +95,11 @@ class LowererVisitor : public AstVisitor {
   std::string JumpLabelHelper();
   std::string ContinueLabelHelper();
   std::string LoopLabelHelper();
-  // bool CheckVarFlag() {return variableflag_;}
-  // void ClearVarFlag() {variableflag_ = false;}
   Register GetArgument(ChildType type);
+  std::set<std::string> SetDifferenceHelper(std::set<std::string> set1,
+                                            std::set<std::string> set2);
+  std::set<std::string> SetIntersectionHelper(std::set<std::string> set1,
+                                              std::set<std::string> set2);
 
   std::vector<std::unique_ptr<ThreeAddressCode>> GetIR() {
     return std::move(blocks_);
@@ -100,9 +115,11 @@ class LowererVisitor : public AstVisitor {
   std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks_;
   std::stack<std::string> variablestack_;
   std::vector<std::set<std::string>> localsets_;
+  std::set<std::string> totalset_;
   std::set<std::string> globalset_;
   ChildType lastchildtype_;
   struct Counter counter_;
+  VariableType currvariabletype_;
 };
 
 }  // namespace backend

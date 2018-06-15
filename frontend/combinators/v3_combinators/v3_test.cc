@@ -5,11 +5,11 @@
 #include "frontend/combinators/v3_combinators/main/or_relation_parser.h"
 #include "frontend/combinators/v3_combinators/main/relation_body.h"
 
+#include "frontend/combinators/v2_combinators/main/program_parser.h"
 #include "frontend/combinators/v3_combinators/main/block_parser.h"
 #include "frontend/combinators/v3_combinators/main/conditional_parser.h"
 #include "frontend/combinators/v3_combinators/main/loop_parser.h"
 #include "frontend/combinators/v3_combinators/main/statement_parser.h"
-#include "frontend/combinators/v2_combinators/main/program_parser.h"
 
 #include "gtest/gtest.h"
 
@@ -647,13 +647,15 @@ TEST(ProgramParser, sucessProgramParser1) {
 
 TEST(ProgramParser, sucessProgramParser2) {
   ProgramParser parser;
-  ParseStatus result = parser.do_parse("var x : Integer = 10; while(x > 0) { x = x - 1; } x;", 0);
+  ParseStatus result = parser.do_parse(
+      "var x : Integer = 10; while(x > 0) { x = x - 1; } x;", 0);
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 50);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(result.parsedCharacters, "varx:Integer=10;while(x>0){x=x-1;}x;"); EXPECT_EQ(result.errorType, "");
+  EXPECT_EQ(result.parsedCharacters, "varx:Integer=10;while(x>0){x=x-1;}x;");
+  EXPECT_EQ(result.errorType, "");
 
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
@@ -686,7 +688,7 @@ TEST(ProgramParser, failedProgramParser1) {
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 0);
-  //EXPECT_EQ(result.remainingCharacters, "var z = 0 if (z == 0) { z = 100;}");
-  //EXPECT_EQ(result.parsedCharacters, "");
-  //EXPECT_EQ(result.errorType, "Missing AE");
+  // EXPECT_EQ(result.remainingCharacters, "var z = 0 if (z == 0) { z = 100;}");
+  // EXPECT_EQ(result.parsedCharacters, "");
+  // EXPECT_EQ(result.errorType, "Missing AE");
 }

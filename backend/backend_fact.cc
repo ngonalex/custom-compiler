@@ -31,6 +31,17 @@ using cs160::backend::CodeGen;
 using cs160::backend::LowererVisitor;
 using cs160::backend::ThreeAddressCode;
 
+/*
+fact(int bob)
+  if(bob >1)
+    bobMoney = fact(bob-1)
+    ret_val = bobMoney * bob
+  else
+    ret_value = 1
+  return ret_value
+
+*/
+
 std::string exec(const char* cmd) {
   std::array<char, 128> buffer;
   std::string result;

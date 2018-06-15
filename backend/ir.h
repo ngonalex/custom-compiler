@@ -9,7 +9,11 @@ namespace backend {
 
 // Somewhat unwieldy and long is there a better way to do this?
 enum Type {
-  LOAD,
+  INTLOAD,
+  VARLOAD,
+  VARASSIGNLOAD,
+  FUNARGLOAD,
+  FUNRETLOAD,
   ADD,
   SUB,
   MULT,
@@ -32,7 +36,18 @@ enum Type {
   JLESS,
   JLESSEQ,
   LABEL,
-  NOTYPE
+  FUNCALL,
+  FUNRETEP,
+  FUNDEF,
+  FUNPROLOGUE,
+  FUNEPILOGUE,
+  PRINTARITH,
+  NOTYPE,
+  LHSDEREFERENCE,
+  RHSINTDEFERENCE,
+  RHSTUPLEDEREFENCE,
+  NEWTUPLE,
+  VARCHILDTUPLE,  // change this later
 };
 
 enum OperandType { OPREGISTER, INT };
@@ -40,6 +55,14 @@ enum OperandType { OPREGISTER, INT };
 enum TargetType { TARGETREGISTER, TARGETLABEL };
 
 enum RegisterType { VIRTUALREG, VARIABLEREG, NOREG };
+
+// Maybe unneeded
+enum Scope { GLOBAL, FUNCTION };
+
+enum VariableType {
+  LEFTHAND,
+  RIGHTHAND,
+};
 
 class Label {
  public:

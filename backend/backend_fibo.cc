@@ -31,6 +31,14 @@ using cs160::backend::CodeGen;
 using cs160::backend::LowererVisitor;
 using cs160::backend::ThreeAddressCode;
 
+/*
+fibo(int n)
+  if (n == 1 || n == 2)
+    return 1
+  else
+    return fibo_recur(n-1) + fibo_recur(n-2)
+*/
+
 std::string exec(const char* cmd) {
   std::array<char, 128> buffer;
   std::string result;
@@ -51,14 +59,14 @@ int main() {
 
   statements.push_back(std::move(
       make_unique<const Assignment>(make_unique<const VariableExpr>("bob"),
-                                    make_unique<const IntegerExpr>(10))));
+                                    make_unique<const IntegerExpr>(9))));
 
   auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
 
   arguments.push_back(std::move(make_unique<const VariableExpr>("bob")));
 
   statements.push_back(std::move(make_unique<const FunctionCall>(
-      make_unique<const VariableExpr>("foo_retval"), "fact",
+      make_unique<const VariableExpr>("foo_retval"), "fib",
       std::move(arguments))));
 
   auto ae = make_unique<const VariableExpr>("foo_retval");
@@ -78,24 +86,36 @@ int main() {
   arguments1.push_back(std::move(make_unique<const SubtractExpr>(
       make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(1))));
 
-  false_fact.push_back(std::move(make_unique<Assignment>(
-      make_unique<VariableExpr>("foo_retval"), make_unique<IntegerExpr>(1))));
+  auto arguments2 = std::vector<std::unique_ptr<const ArithmeticExpr>>();
 
-  true_fact.push_back(std::move(make_unique<const FunctionCall>(
-      make_unique<const VariableExpr>("bobMONEY"), "fact",
-      std::move(arguments1))));
+  arguments2.push_back(std::move(make_unique<const SubtractExpr>(
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(2))));
 
   true_fact.push_back(std::move(make_unique<Assignment>(
+      make_unique<VariableExpr>("foo_retval"), make_unique<IntegerExpr>(1))));
+
+  false_fact.push_back(std::move(make_unique<const FunctionCall>(
+      make_unique<const VariableExpr>("bobMONEY"), "fib",
+      std::move(arguments1))));
+
+  false_fact.push_back(std::move(make_unique<const FunctionCall>(
+      make_unique<const VariableExpr>("cashMONEY"), "fib",
+      std::move(arguments2))));
+
+  false_fact.push_back(std::move(make_unique<Assignment>(
       make_unique<VariableExpr>("foo_retval"),
-      make_unique<MultiplyExpr>(make_unique<VariableExpr>("bobMONEY"),
-                                make_unique<VariableExpr>("bob")))));
+      make_unique<AddExpr>(make_unique<VariableExpr>("bobMONEY"),
+                           make_unique<VariableExpr>("cashMONEY")))));
 
   fact_body.push_back(std::move(make_unique<Conditional>(
-      make_unique<GreaterThanExpr>(make_unique<VariableExpr>("bob"),
+      make_unique<LogicalOrExpr>(
+          make_unique<EqualToExpr>(make_unique<VariableExpr>("bob"),
                                    make_unique<IntegerExpr>(1)),
+          make_unique<EqualToExpr>(make_unique<VariableExpr>("bob"),
+                                   make_unique<IntegerExpr>(2))),
       std::move(true_fact), std::move(false_fact))));
 
-  auto foo_def = make_unique<const FunctionDef>("fact", std::move(foo_params),
+  auto foo_def = make_unique<const FunctionDef>("fib", std::move(foo_params),
                                                 std::move(fact_body),
                                                 std::move(foo_retval));
 
