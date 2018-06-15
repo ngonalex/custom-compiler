@@ -320,10 +320,10 @@ TEST(LogicParser, simpleLogicParser1) {
   std::string output = a->GetOutput();
 
   EXPECT_EQ(result.status, true);
-  EXPECT_EQ(result.endCharacter, 15);
+  EXPECT_EQ(result.endCharacter, 16);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "!x>y&&x>=z");
-  EXPECT_EQ(output, "! (((x > y) && (x >= z)))");
+  EXPECT_EQ(output, "! ((x > y) && (x >= z))");
 }
 
 TEST(LogicParser, simpleLogicParser2) {
@@ -335,7 +335,7 @@ TEST(LogicParser, simpleLogicParser2) {
   std::string output = a->GetOutput();
 
   EXPECT_EQ(result.status, true);
-  EXPECT_EQ(result.endCharacter, 23);
+  EXPECT_EQ(result.endCharacter, 25);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "x>y||x==2&&2>=0");
   EXPECT_EQ(output, "((x > y) || ((x == 2) && (2 >= 0)))");
@@ -352,7 +352,7 @@ TEST(LogicParser, simpleLogicParser3) {
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.endCharacter, 6);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(result.parsedCharacters, "3 == 2");
+  EXPECT_EQ(result.parsedCharacters, "3==2");
   EXPECT_EQ(output, "(3 == 2)");
 }
 
@@ -393,7 +393,7 @@ TEST(LoopParser, doWhileSuccess) {
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 34);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(result.parsedCharacters, "repeat {a = 3 + a;} while (3 == 2)");
+  EXPECT_EQ(result.parsedCharacters, "repeat{a=3+a;}while(3==2)");
   EXPECT_EQ(result.errorType, "");
 
   // PrintVisitor *a = new PrintVisitor();
@@ -405,14 +405,14 @@ TEST(LoopParser, doWhileSuccess) {
 TEST(LoopParser, regularWhileSuccess1) {
   LoopParser parser;
   ParseStatus result = parser.do_parse(
-      "while (3 != 3) {if(a = 2) {e = 4;} else {e = 5;} e = 4+5;", 0);
+      "while (3 != 3) {if(a = 2) {e = 4;} else {e = 5;} e = 4+5;}", 0);
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 58);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters,
-            "while (3 != 3) {if(a = 2) {e = 4;} else {e = 5;} e = 4+5;}");
+            "while(3!=3){if(a=2){e=4;}else{e=5;}e=4+5;}");
   EXPECT_EQ(result.errorType, "");
 
   // PrintVisitor *a = new PrintVisitor();
