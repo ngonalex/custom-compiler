@@ -15,7 +15,7 @@ cc_test(
 	name = "backend_test",
 	deps = ["@gtest//:main", ":backend"],
 	srcs = [
-		"lowerer_visitor_test.cc", "codegen_test.cc"
+	  "codegen_test.cc"
 	],
 	copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
 	timeout = "short",
@@ -33,11 +33,3 @@ cc_test(
 	size = "small",
 )
 
-cc_binary(
-    name = "backend_main",
-    copts = ["-Wall -g"],
-    deps = [
-        ":backend"
-    ],
-    srcs = ["backend_main.cc"],
-)

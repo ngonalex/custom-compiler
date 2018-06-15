@@ -43,22 +43,6 @@ std::string LowererVisitor::GetOutput() {
         output = output + blocks_[i]->target.reg().name()
               + " <- " + std::to_string(blocks_[i]->arg1.value());
         break;
-      // case ADD:
-      //   GetOutputArithmeticHelper(output, i, printhelper);
-      //   break;
-      // case SUB:
-      //   GetOutputArithmeticHelper(output, i, printhelper);
-      //   break;
-      // case MULT:
-      //   GetOutputArithmeticHelper(output, i, printhelper);
-      //   break;
-      // case DIV:
-      //   GetOutputArithmeticHelper(output, i, printhelper);
-      //   break;
-      // case LESSTHAN:
-      //   GetOutputArithmeticHelper(output, i, printhelper);
-      //   break;
-      // case LESSTHANEQ:
       case LOGNOT:
         output = output + blocks_[i]->target.reg().name() + " <- " +
                  printhelper[LOGNOT] + blocks_[i]->arg1.reg().name();
