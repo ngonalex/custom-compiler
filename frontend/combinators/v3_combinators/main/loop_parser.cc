@@ -6,7 +6,7 @@
 #include "frontend/combinators/v3_combinators/helpers/relational_helper.h"
 #include "frontend/combinators/v3_combinators/main/block_parser.h"
 #include "frontend/combinators/v3_combinators/main/relation_body.h"
-#include "frontend/combinators/v3_combinators/main/relation_parser.h"
+#include "frontend/combinators/v3_combinators/main/or_relation_parser.h"
 
 #include <iostream>
 #include <string>  // std::string, std::stoi
@@ -45,7 +45,7 @@ ParseStatus LoopParser::do_parse(std::string inputProgram, int startCharacter) {
   CloseCurlyBrackets closeBracketP;
   OpenParenParser openParenP;
   CloseParenParser closeParenP;
-  RelationParser relationP;
+  OrRelationParser relationP;
   BlockParser block;
 
   AndCombinator doWhile1;

@@ -3,7 +3,7 @@
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 #include "frontend/combinators/v1_combinators/ae.h"
 #include "frontend/combinators/v3_combinators/helpers/relational_helper.h"
-#include "frontend/combinators/v3_combinators/main/relation_parser.h"
+#include "frontend/combinators/v3_combinators/main/or_relation_parser.h"
 
 #include "abstract_syntax/print_visitor_v3.h"
 
@@ -36,18 +36,16 @@ ParseStatus RelationBodyParser::do_parse(std::string inputProgram,
 
   ArithExprParser aeParser;
   RelationOperatorParser relOpParser;
-
-  LogicOperatorParser logOpParser;
-  RelationParser relParser;
+  OrRelationParser relParser;
 
   // ae rop
   AndCombinator aeAndRop;
-  aeAndRop.firstParser = reinterpret_cast<NullParser *>(&aeParser);
-  aeAndRop.secondParser = reinterpret_cast<NullParser *>(&relOpParser);
+  aeAndRop.firstParser = &aeParser;
+  aeAndRop.secondParser = &relOpParser;
   // ae rop ae
   AndCombinator firstAnd;
-  firstAnd.firstParser = reinterpret_cast<NullParser *>(&aeAndRop);
-  firstAnd.secondParser = reinterpret_cast<NullParser *>(&aeParser);
+  firstAnd.firstParser = &aeAndRop;
+  firstAnd.secondParser = &aeParser;
   ParseStatus grabOperatorResult =
       aeAndRop.do_parse(inputProgram, endCharacter);
   ParseStatus firstStatus = firstAnd.do_parse(inputProgram, endCharacter);
@@ -61,31 +59,7 @@ ParseStatus RelationBodyParser::do_parse(std::string inputProgram,
         unique_cast<const ArithmeticExpr>(std::move(firstStatus.second_ast)));
   }
 
-  // Optional logical operator stuff
-  AndCombinator lopRel;
-  lopRel.firstParser = reinterpret_cast<NullParser *>(&logOpParser);
-  lopRel.secondParser = reinterpret_cast<NullParser *>(&relParser);
-  ParseStatus secondStatus = lopRel.do_parse(firstStatus.remainingCharacters,
-                                             firstStatus.endCharacter);
-
-  AndCombinator firstAndLopRel;
-  firstAndLopRel.firstParser = reinterpret_cast<NullParser *>(&firstAnd);
-  firstAndLopRel.secondParser = reinterpret_cast<NullParser *>(&lopRel);
-
-  if (secondStatus.status) {
-    ParseStatus result = firstAndLopRel.do_parse(inputProgram, endCharacter);
-    result.ast = make_node(
-        unique_cast<const RelationalExpr>(std::move(firstStatus.ast)),
-        secondStatus.secondParsedCharacters,
-        unique_cast<const RelationalExpr>(std::move(secondStatus.ast)));
-    return result;
-  } else {
-    // If it's a failure, that's fine, the logcical stuff is optional. Just
-    // return the relexpr
-    return firstStatus;
-  }
-
-  return secondStatus;
+  return firstStatus;
 }
 
 // ae rop ae
@@ -107,20 +81,6 @@ std::unique_ptr<const RelationalBinaryOperator> RelationBodyParser::make_node(
   } else if (rop == "==") {
     return make_unique<const EqualToExpr>(std::move(first_ae),
                                           std::move(second_ae));
-  } else {
-    return nullptr;
-  }
-}
-
-std::unique_ptr<const LogicalBinaryOperator> RelationBodyParser::make_node(
-    std::unique_ptr<const RelationalExpr> first_re, std::string lop,
-    std::unique_ptr<const RelationalExpr> second_re) {
-  if (lop == "&&") {
-    return make_unique<const LogicalAndExpr>(std::move(first_re),
-                                             std::move(second_re));
-  } else if (lop == "||") {
-    return make_unique<const LogicalOrExpr>(std::move(first_re),
-                                            std::move(second_re));
   } else {
     return nullptr;
   }

@@ -35,7 +35,7 @@ ParseStatus BlockParser::do_parse(std::string inputProgram,
   block_parser.parser = reinterpret_cast<NullParser *>(&statement_parser);
   block_parser.parse(inputProgram, startCharacter);
 
-  auto result = block_parser.do_parse(inputProgram, startCharacter);
+  auto result = block_parser.parse(inputProgram, startCharacter);
   if (!result.status) {
     result.errorType = "Issue parsing block";
   }
