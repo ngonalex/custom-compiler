@@ -7,7 +7,6 @@
 #include <stack>
 #include <string>
 #include <vector>
-#include <algorithm>
 #include <map>
 #include <utility>
 
@@ -60,8 +59,8 @@ enum ChildType {
 
 class LowererVisitor : public AstVisitor {
  public:
-  LowererVisitor() : counter_(), currvariabletype_(RIGHTHANDVAR),
-    currdereferencetype_(RHSDEREFERENCE) {}
+  LowererVisitor() : counter_(), currvariabletype_(RIGHT_HAND_VAR),
+    currdereferencetype_(RHS_DEREFERENCE) {}
 
   std::string GetOutput();
 

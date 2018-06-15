@@ -18,34 +18,34 @@ std::string LowererVisitor::GetOutputArithmeticHelper(
 std::string LowererVisitor::GetOutput() {
   // Iterate through the vector and print out each basic block
   std::string output = "";
-  std::vector<std::string> printhelper = {"INTLOAD", "VARLOAD", "VARASSIGNLOAD",
-    "FUNARGLOAD", "FUNRETLOAD", "+", "-", "*", "/", "<", "<=", ">", ">=",
-    "==", "&&", "||", "¬", "while", "if", "jmp", "je", "jne", "jg", "jge",
-    "jl", "jle", "MkLabel", "FUNCTIONCALL", "FUNRETURNEPILOGUE",
-    "FUNCTIONDEF", "FUNPROLOGUE", "FUNEPILOGUE", "PRINTARITH", "NOTYPE",
-    "LHSDEREFERENCE", "RHSDEREFERENCE", "NEWTUPLE",
-    "VARCHILDTUPLE"};
+  std::vector<std::string> printhelper = {"INT_LOAD", "VAR_LOAD",
+    "VAR_ASSIGN_LOAD", "FUN_ARG_LOAD", "FUN_RET_LOAD", "+", "-", "*",
+    "/", "<", "<=", ">", ">=", "==", "&&", "||", "¬", "while", "if",
+    "jmp", "je", "jne", "jg", "jge", "jl", "jle", "MkLabel", "FUNCTIONCALL",
+    "FUNRETURNEPILOGUE", "FUNCTIONDEF", "FUN_PROLOGUE", "FUN_EPILOGUE",
+    "PRINT_ARITH", "NO_TYPE", "LHS_DEREFERENCE", "RHS_DEREFERENCE", "NEW_TUPLE",
+    "VAR_CHILD_TUPLE"};
 
   for (unsigned int i = 0; i < blocks_.size(); ++i) {
     // If it's a just a int (Register without a name then access it's value)
     // Otherwise access its name
     OpcodeType opcodetype = blocks_[i]->op.opcode();
     switch (opcodetype) {
-      case INTLOAD:
+      case INT_LOAD:
         output = output + blocks_[i]->target.reg().name() + " <- " +
                  std::to_string(blocks_[i]->arg1.value());
         break;
-      case VARASSIGNLOAD:
+      case VAR_ASSIGN_LOAD:
         output = output + blocks_[i]->target.reg().name() + " <- " +
                  blocks_[i]->arg1.reg().name();
         break;
-      case FUNARGLOAD:
+      case FUN_ARG_LOAD:
         output = output + blocks_[i]->target.reg().name() + " <- " +
                  std::to_string(blocks_[i]->arg1.value());
         break;
-      case LOGNOT:
+      case LOG_NOT:
         output = output + blocks_[i]->target.reg().name() + " <- " +
-                 printhelper[LOGNOT] + blocks_[i]->arg1.reg().name();
+                 printhelper[LOG_NOT] + blocks_[i]->arg1.reg().name();
         break;
       case LOOP:
         output = output + printhelper[LOOP] + " " +
@@ -60,28 +60,28 @@ std::string LowererVisitor::GetOutput() {
         output = output + printhelper[JUMP] + " " +
                  blocks_[i]->target.label().name();
         break;
-      case JEQUAL:
-        output = output + printhelper[JEQUAL] + " " +
+      case JMP_EQUAL:
+        output = output + printhelper[JMP_EQUAL] + " " +
                  blocks_[i]->target.label().name();
         break;
-      case JNOTEQUAL:
-        output = output + printhelper[JNOTEQUAL] + " " +
+      case JMP_NOT_EQUAL:
+        output = output + printhelper[JMP_NOT_EQUAL] + " " +
                  blocks_[i]->target.label().name();
         break;
-      case JGREATER:
-        output = output + printhelper[JGREATER] + " " +
+      case JMP_GREATER_THAN:
+        output = output + printhelper[JMP_GREATER_THAN] + " " +
                  blocks_[i]->target.label().name();
         break;
-      case JGREATEREQ:
-        output = output + printhelper[JGREATEREQ] + " " +
+      case JMP_GREATER_THAN_EQ:
+        output = output + printhelper[JMP_GREATER_THAN_EQ] + " " +
                  blocks_[i]->target.label().name();
         break;
-      case JLESS:
-        output = output + printhelper[JLESS] + " " +
+      case JMP_LESS_THAN:
+        output = output + printhelper[JMP_LESS_THAN] + " " +
                  blocks_[i]->target.label().name();
         break;
-      case JLESSEQ:
-        output = output + printhelper[JLESSEQ] + " " +
+      case JMP_LESS_THAN_EQ:
+        output = output + printhelper[JMP_LESS_THAN_EQ] + " " +
                  blocks_[i]->target.label().name();
         break;
       case LABEL:
@@ -99,10 +99,10 @@ std::string LowererVisitor::GetOutput() {
 }
 
 void LowererVisitor::VisitDereference(const Dereference& exp) {
-  currvariabletype_ = LEFTHANDVAR;
+  currvariabletype_ = LEFT_HAND_VAR;
   exp.lhs().Visit(const_cast<LowererVisitor*>(this));
   ChildType lhschildtype = lastchildtype_;
-  currvariabletype_ = RIGHTHANDVAR;
+  currvariabletype_ = RIGHT_HAND_VAR;
   int indexoflastchild = blocks_.size()-1;
 
   exp.rhs().Visit(const_cast<LowererVisitor*>(this));
@@ -144,11 +144,11 @@ void LowererVisitor::VisitAssignmentFromNewTuple(
   const AssignmentFromNewTuple& assignment) {
   // Visit the left which will add its variable name to the stack
 
-  currvariabletype_ = LEFTHANDVAR;
-  currdereferencetype_ = LHSDEREFERENCE;
+  currvariabletype_ = LEFT_HAND_VAR;
+  currdereferencetype_ = LHS_DEREFERENCE;
   assignment.lhs().Visit(const_cast<LowererVisitor*>(this));
-  currdereferencetype_ = RHSDEREFERENCE;
-  currvariabletype_ = RIGHTHANDVAR;
+  currdereferencetype_ = RHS_DEREFERENCE;
+  currvariabletype_ = RIGHT_HAND_VAR;
 
   std::string lhstarget;
   std::string lhsbase;
@@ -166,8 +166,8 @@ void LowererVisitor::VisitAssignmentFromNewTuple(
     totalset_.insert(lhstarget);
 
     auto block = make_unique<struct ThreeAddressCode>();
-    block->target = Target(Register(lhstarget, VARIABLEREG));
-    block->op = Opcode(VARCHILDTUPLE);
+    block->target = Target(Register(lhstarget, VARIABLE_REG));
+    block->op = Opcode(VAR_CHILD_TUPLE);
     blocks_.push_back(std::move(block));
   }
 
@@ -184,11 +184,11 @@ void LowererVisitor::VisitAssignmentFromNewTuple(
 void LowererVisitor::VisitAssignmentFromArithExp(
   const AssignmentFromArithExp& assignment) {
   // Visit the left which will add its variable name to the stack
-  currvariabletype_ = LEFTHANDVAR;
-  currdereferencetype_ = LHSDEREFERENCE;
+  currvariabletype_ = LEFT_HAND_VAR;
+  currdereferencetype_ = LHS_DEREFERENCE;
   assignment.lhs().Visit(const_cast<LowererVisitor*>(this));
-  currdereferencetype_ = RHSDEREFERENCE;
-  currvariabletype_ = RIGHTHANDVAR;
+  currdereferencetype_ = RHS_DEREFERENCE;
+  currvariabletype_ = RIGHT_HAND_VAR;
 
   std::string lhstarget;
   std::string lhsbase;
@@ -227,7 +227,7 @@ void LowererVisitor::VisitVariableExpr(const VariableExpr& exp) {
   // Just get the string stored in VariableExpr and push it to
   // the stack
   variablestack_.push(exp.name());
-  if (currvariabletype_ == LEFTHANDVAR) {
+  if (currvariabletype_ == LEFT_HAND_VAR) {
     // It's a load into operation
     // Var assignload will take care of it
     lastchildtype_ = VARCHILD;
@@ -235,7 +235,7 @@ void LowererVisitor::VisitVariableExpr(const VariableExpr& exp) {
   } else {
     // It's a right hand side so just access its
     // value and put it in a virt reg
-    CreateLoadBlock(VARLOAD, Operand(0));
+    CreateLoadBlock(VAR_LOAD, Operand(0));
     ++counter_.variablecount;
   }
 }
@@ -265,12 +265,12 @@ void LowererVisitor::VisitFunctionCall(const FunctionCall& call) {
 
   // Function should return here, get its return value
   // lhs is a variable expr
-  currvariabletype_ = LEFTHANDVAR;
+  currvariabletype_ = LEFT_HAND_VAR;
   call.lhs().Visit(this);
-  currvariabletype_ = RIGHTHANDVAR;
+  currvariabletype_ = RIGHT_HAND_VAR;
 
   // Basically do an assignment here
-  CreateLoadBlock(FUNRETLOAD, Operand(0));
+  CreateLoadBlock(FUN_RET_LOAD, Operand(0));
 
   // Restore the stack (Based on # of args)
   // (add $8*#args %esp)
@@ -299,12 +299,12 @@ void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
   totalset_.clear();
 
   // Move arguments into the local stack
-  currvariabletype_ = LEFTHANDVAR;
+  currvariabletype_ = LEFT_HAND_VAR;
   for (int i = def.parameters().size() - 1 ; i >= 0 ; --i) {
     def.parameters()[i]->Visit(this);
-    CreateLoadBlock(FUNARGLOAD, Operand(i));
+    CreateLoadBlock(FUN_ARG_LOAD, Operand(i));
   }
-  currvariabletype_ = RIGHTHANDVAR;
+  currvariabletype_ = RIGHT_HAND_VAR;
 
   // Eval the body
   for (auto& statement : def.function_body()) {
@@ -335,7 +335,7 @@ void LowererVisitor::VisitLessThanExpr(const LessThanExpr& exp) {
   exp.rhs().Visit(const_cast<LowererVisitor*>(this));
   Register arg2 = GetArgument(lastchildtype_);
 
-  BinaryOperatorHelper(LESSTHAN, arg1, arg2);
+  BinaryOperatorHelper(LESS_THAN, arg1, arg2);
 }
 void LowererVisitor::VisitLessThanEqualToExpr(const LessThanEqualToExpr& exp) {
   // Visit left hand side (Last thing should be the target where it stores it)
@@ -344,7 +344,7 @@ void LowererVisitor::VisitLessThanEqualToExpr(const LessThanEqualToExpr& exp) {
   exp.rhs().Visit(const_cast<LowererVisitor*>(this));
   Register arg2 = GetArgument(lastchildtype_);
 
-  BinaryOperatorHelper(LESSTHANEQ, arg1, arg2);
+  BinaryOperatorHelper(LESS_THAN_EQ, arg1, arg2);
 }
 void LowererVisitor::VisitGreaterThanExpr(const GreaterThanExpr& exp) {
   // Visit left hand side (Last thing should be the target where it stores it)
@@ -353,7 +353,7 @@ void LowererVisitor::VisitGreaterThanExpr(const GreaterThanExpr& exp) {
   exp.rhs().Visit(const_cast<LowererVisitor*>(this));
   Register arg2 = GetArgument(lastchildtype_);
 
-  BinaryOperatorHelper(GREATERTHAN, arg1, arg2);
+  BinaryOperatorHelper(GREATER_THAN, arg1, arg2);
 }
 void LowererVisitor::VisitGreaterThanEqualToExpr(
     const GreaterThanEqualToExpr& exp) {
@@ -363,7 +363,7 @@ void LowererVisitor::VisitGreaterThanEqualToExpr(
   exp.rhs().Visit(const_cast<LowererVisitor*>(this));
   Register arg2 = GetArgument(lastchildtype_);
 
-  BinaryOperatorHelper(GREATERTHANEQ, arg1, arg2);
+  BinaryOperatorHelper(GREATER_THAN_EQ, arg1, arg2);
 }
 void LowererVisitor::VisitEqualToExpr(const EqualToExpr& exp) {
   // Visit left hand side (Last thing should be the target where it stores it)
@@ -381,7 +381,7 @@ void LowererVisitor::VisitLogicalAndExpr(const LogicalAndExpr& exp) {
   exp.rhs().Visit(const_cast<LowererVisitor*>(this));
   Register arg2 = GetArgument(lastchildtype_);
 
-  BinaryOperatorHelper(LOGAND, arg1, arg2);
+  BinaryOperatorHelper(LOG_AND, arg1, arg2);
 }
 void LowererVisitor::VisitLogicalOrExpr(const LogicalOrExpr& exp) {
   // Visit left hand side (Last thing should be the target where it stores it)
@@ -390,14 +390,14 @@ void LowererVisitor::VisitLogicalOrExpr(const LogicalOrExpr& exp) {
   exp.rhs().Visit(const_cast<LowererVisitor*>(this));
   Register arg2 = GetArgument(lastchildtype_);
 
-  BinaryOperatorHelper(LOGOR, arg1, arg2);
+  BinaryOperatorHelper(LOG_OR, arg1, arg2);
 }
 void LowererVisitor::VisitLogicalNotExpr(const LogicalNotExpr& exp) {
   // Visit left hand side (Last thing should be the target where it stores it)
   exp.operand().Visit(const_cast<LowererVisitor*>(this));
   Register arg1 = GetArgument(lastchildtype_);
 
-  BinaryOperatorHelper(LOGNOT, arg1, Register());
+  BinaryOperatorHelper(LOG_NOT, arg1, Register());
 }
 void LowererVisitor::VisitConditional(const Conditional& conditional) {
   // Make the IR of the guard first
@@ -410,7 +410,7 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
 
   // Jump conditional to the false branch here
   std::string falselabel = JumpLabelHelper();
-  CreateJumpBlock(falselabel, JEQUAL);
+  CreateJumpBlock(falselabel, JMP_EQUAL);
 
   // Save the state of the last variable set
   std::set<std::string> originalset_ = globalset_;
@@ -493,7 +493,7 @@ void LowererVisitor::VisitLoop(const Loop& loop) {
 
   // Jump conditional to the continue here
   std::string continuelabel = ContinueLabelHelper();
-  CreateJumpBlock(continuelabel, JEQUAL);
+  CreateJumpBlock(continuelabel, JMP_EQUAL);
 
   // Save the state of the last variable set
   // Not as tested as the conditional version
@@ -551,7 +551,7 @@ void LowererVisitor::VisitProgram(const Program& program) {
   program.arithmetic_exp().Visit(this);
   // Make a print block
   auto newblock = make_unique<struct ThreeAddressCode>();
-  newblock->op = Opcode(PRINTARITH);
+  newblock->op = Opcode(PRINT_ARITH);
   blocks_.push_back(std::move(newblock));
 
   for (auto& def : program.function_defs()) {
@@ -563,7 +563,7 @@ void LowererVisitor::VisitIntegerExpr(const IntegerExpr& exp) {
   // Load value into a target (t <- value)
 
   Operand arg1 = Operand(exp.value());
-  CreateLoadBlock(INTLOAD, arg1);
+  CreateLoadBlock(INT_LOAD, arg1);
   lastchildtype_ = INTCHILD;
   ++counter_.variablecount;
 }
@@ -607,14 +607,14 @@ void LowererVisitor::VisitDivideExpr(const DivideExpr& exp) {
 }
 
 void LowererVisitor::CreateLoadBlock(OpcodeType type, Operand arg1) {
-  ASSERT(type == INTLOAD || type == VARASSIGNLOAD || type == FUNARGLOAD
-  || type == FUNRETLOAD || type == VARLOAD,
+  ASSERT(type == INT_LOAD || type == VAR_ASSIGN_LOAD || type == FUN_ARG_LOAD
+  || type == FUN_RET_LOAD || type == VAR_LOAD,
   "Must be an Int, Variable, or function load\n");
 
   auto newblock = make_unique<struct ThreeAddressCode>();
   std::string varname;
   switch (type) {
-    case VARLOAD:
+    case VAR_LOAD:
       varname = variablestack_.top();
       variablestack_.pop();
 
@@ -624,25 +624,25 @@ void LowererVisitor::CreateLoadBlock(OpcodeType type, Operand arg1) {
       }
 
       newblock->target = Target(
-          Register("t_" + std::to_string(counter_.variablecount), VIRTUALREG));
-      newblock->op = Opcode(VARLOAD);
+          Register("t_" + std::to_string(counter_.variablecount), VIRTUAL_REG));
+      newblock->op = Opcode(VAR_LOAD);
       // Not consistent rework later
-      newblock->arg1 = Operand(Register(varname, VARIABLEREG));
+      newblock->arg1 = Operand(Register(varname, VARIABLE_REG));
 
       blocks_.push_back(std::move(newblock));
       break;
-    case INTLOAD:
+    case INT_LOAD:
       newblock->arg1 = arg1;
-      newblock->op = Opcode(INTLOAD);
+      newblock->op = Opcode(INT_LOAD);
 
       // look at this later,just going to do this now to test some things
       newblock->target = Target(
-          Register("t_" + std::to_string(counter_.variablecount), VIRTUALREG));
+          Register("t_" + std::to_string(counter_.variablecount), VIRTUAL_REG));
 
       // Push into vector
       blocks_.push_back(std::move(newblock));
       break;
-    case FUNRETLOAD:
+    case FUN_RET_LOAD:
       varname = variablestack_.top();
       variablestack_.pop();
 
@@ -650,13 +650,13 @@ void LowererVisitor::CreateLoadBlock(OpcodeType type, Operand arg1) {
       globalset_.insert(varname);
       totalset_.insert(varname);
 
-      newblock->target = Target(Register(varname, VARIABLEREG));
-      newblock->op = Opcode(FUNRETLOAD);
-      newblock->arg1 = Operand(Register("FUNRETLOAD", VIRTUALREG));
+      newblock->target = Target(Register(varname, VARIABLE_REG));
+      newblock->op = Opcode(FUN_RET_LOAD);
+      newblock->arg1 = Operand(Register("FUN_RET_LOAD", VIRTUAL_REG));
 
       blocks_.push_back(std::move(newblock));
       break;
-    case FUNARGLOAD:
+    case FUN_ARG_LOAD:
       varname = variablestack_.top();
       variablestack_.pop();
 
@@ -664,8 +664,8 @@ void LowererVisitor::CreateLoadBlock(OpcodeType type, Operand arg1) {
       globalset_.insert(varname);
       totalset_.insert(varname);
 
-      newblock->target = Target(Register(varname, VARIABLEREG));
-      newblock->op = Opcode(FUNARGLOAD);
+      newblock->target = Target(Register(varname, VARIABLE_REG));
+      newblock->op = Opcode(FUN_ARG_LOAD);
       newblock->arg1 = arg1;
 
       blocks_.push_back(std::move(newblock));
@@ -697,9 +697,10 @@ void LowererVisitor::CreateLabelBlock(std::string labelname) {
 }
 
 void LowererVisitor::CreateJumpBlock(std::string jumpname, OpcodeType type) {
-  ASSERT(type == JUMP || type == JEQUAL || type == JGREATER ||
-         type == JGREATEREQ || type == JLESS || type == JLESSEQ ||
-         type == JNOTEQUAL, "Must be a jump type");
+  ASSERT(type == JUMP || type == JMP_EQUAL || type == JMP_GREATER_THAN ||
+         type == JMP_GREATER_THAN_EQ || type == JMP_LESS_THAN ||
+         type == JMP_LESS_THAN_EQ ||
+         type == JMP_NOT_EQUAL, "Must be a jump type");
 
   auto jumpblock = make_unique<struct ThreeAddressCode>();
   jumpblock->target = Target(Label(jumpname));
@@ -710,7 +711,7 @@ void LowererVisitor::CreateJumpBlock(std::string jumpname, OpcodeType type) {
 void LowererVisitor::CreateFunctionCallBlock(std::string funname) {
   auto callblock = make_unique<struct ThreeAddressCode>();
   callblock->target = Target(Label(funname));
-  callblock->op = Opcode(FUNCALL);
+  callblock->op = Opcode(FUN_CALL);
 
   blocks_.push_back(std::move(callblock));
 }
@@ -718,7 +719,7 @@ void LowererVisitor::CreateFunctionCallBlock(std::string funname) {
 void LowererVisitor::CreateFunctionCallReturnEpilogue(int numofregs) {
   auto callblock = make_unique<struct ThreeAddressCode>();
   callblock->target = Target(Register());
-  callblock->op = Opcode(FUNRETEP);
+  callblock->op = Opcode(FUN_RET_EP);
   callblock->arg1 = Operand(numofregs);
   blocks_.push_back(std::move(callblock));
 }
@@ -726,7 +727,7 @@ void LowererVisitor::CreateFunctionCallReturnEpilogue(int numofregs) {
 void LowererVisitor::CreateFunctionDefSignal(std::string name) {
   auto block = make_unique<struct ThreeAddressCode>();
   block->target = Target(Label(name));
-  block->op = Opcode(FUNDEF);
+  block->op = Opcode(FUN_DEF);
 
   blocks_.push_back(std::move(block));
 }
@@ -734,7 +735,7 @@ void LowererVisitor::CreateFunctionDefSignal(std::string name) {
 void LowererVisitor::CreateFunctionDefPrologue(std::string name) {
   auto block = make_unique<struct ThreeAddressCode>();
   block->target = Target(Label(name));
-  block->op = Opcode(FUNPROLOGUE);
+  block->op = Opcode(FUN_PROLOGUE);
 
   blocks_.push_back(std::move(block));
 }
@@ -742,7 +743,7 @@ void LowererVisitor::CreateFunctionDefPrologue(std::string name) {
 void LowererVisitor::CreateFunctionDefEpilogue(std::string name) {
   auto block = make_unique<struct ThreeAddressCode>();
   block->target = Target(Label(name));
-  block->op = Opcode(FUNEPILOGUE);
+  block->op = Opcode(FUN_EPILOGUE);
 
   blocks_.push_back(std::move(block));
 }
@@ -750,12 +751,12 @@ void LowererVisitor::CreateFunctionDefEpilogue(std::string name) {
 void LowererVisitor::CreateDereference(std::string basevariable,
   std::string targetvariable, int indexofchild) {
   auto block = make_unique<struct ThreeAddressCode>();
-  block->target = Target(Register(targetvariable, DEREFREG));
+  block->target = Target(Register(targetvariable, DEREF_REG));
   block->op = Opcode(currdereferencetype_);
-  block->arg1 = Operand(Register(basevariable, DEREFREG));
-  block->arg2 = Operand(Register("Parent", DEREFREG));
+  block->arg1 = Operand(Register(basevariable, DEREF_REG));
+  block->arg2 = Operand(Register("Parent", DEREF_REG));
   if (indexofchild > 0) {
-    blocks_[indexofchild]->arg2 = Operand(Register("Child", DEREFREG));
+    blocks_[indexofchild]->arg2 = Operand(Register("Child", DEREF_REG));
   }
   blocks_.push_back(std::move(block));
 }
@@ -765,8 +766,8 @@ void LowererVisitor::CreateDereference(std::string basevariable,
 void LowererVisitor::CreateTupleAssignment(std::string target,
   Operand operand) {
   auto block = make_unique<struct ThreeAddressCode>();
-  block->target = Target(Register(target, VARIABLEREG));
-  block->op = Opcode(NEWTUPLE);
+  block->target = Target(Register(target, VARIABLE_REG));
+  block->op = Opcode(NEW_TUPLE);
   block->arg1 = operand;
 
   blocks_.push_back(std::move(block));
@@ -775,8 +776,8 @@ void LowererVisitor::CreateTupleAssignment(std::string target,
 void LowererVisitor::CreateArithmeticAssignment(std::string target,
   Operand operand) {
   auto block = make_unique<struct ThreeAddressCode>();
-  block->target = Target(Register(target, VARIABLEREG));
-  block->op = Opcode(VARASSIGNLOAD);
+  block->target = Target(Register(target, VARIABLE_REG));
+  block->op = Opcode(VAR_ASSIGN_LOAD);
   block->arg1 = operand;
 
   blocks_.push_back(std::move(block));
@@ -822,7 +823,7 @@ void LowererVisitor::BinaryOperatorHelper(OpcodeType type,
 
   newblock->op = Opcode(type);
   newblock->target = Target(Register("t_" +
-    std::to_string(counter_.variablecount), VIRTUALREG));
+    std::to_string(counter_.variablecount), VIRTUAL_REG));
 
   // Push into vector
   blocks_.push_back(std::move(newblock));

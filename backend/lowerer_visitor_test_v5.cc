@@ -33,9 +33,9 @@ class LowererTestV5 : public ::testing::Test {
   }
 
   std::string GenerateFuncDefOutPut(int blocksize) {
-    return  " <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n <-"
-    "FUNPROLOGUE \nt_" + std::to_string(blocksize) + " <- 0\n <-"
-    "  FUNEPILOGUE \n";
+    return  " <-  PRINT_ARITH \n <-  FUNCTIONDEF \nMkLabel func\n <-"
+    "FUN_PROLOGUE \nt_" + std::to_string(blocksize) + " <- 0\n <-"
+    "  FUN_EPILOGUE \n";
   }
 
  protected:
@@ -48,7 +48,7 @@ TEST_F(LowererTestV5, SimpleTupleTest) {
   ast->Visit(&lowerer_);
 
   EXPECT_EQ(lowerer_.GetOutput(),
-            "bob <-  VARCHILDTUPLE \nt_0 <- 3\nbob <- t_0 NEWTUPLE \n");
+            "bob <-  VAR_CHILD_TUPLE \nt_0 <- 3\nbob <- t_0 NEW_TUPLE \n");
 }
 
 
@@ -64,9 +64,9 @@ TEST_F(LowererTestV5, AccessTupleTest) {
   ast->Visit(&lowerer_);
   access->Visit(&lowerer_);
 
-  EXPECT_EQ(lowerer_.GetOutput(), "bob <-  VARCHILDTUPLE \nt_0 <- 3\n"
-            "bob <- t_0 NEWTUPLE \nt_1 <- 1\n"
-            "bob->t_1 <- bob LHSDEREFERENCE Parent\n"
+  EXPECT_EQ(lowerer_.GetOutput(), "bob <-  VAR_CHILD_TUPLE \nt_0 <- 3\n"
+            "bob <- t_0 NEW_TUPLE \nt_1 <- 1\n"
+            "bob->t_1 <- bob LHS_DEREFERENCE Parent\n"
             "t_2 <- 2\nbob->t_1 <- t_2\n");
 }
 
@@ -89,11 +89,11 @@ TEST_F(LowererTestV5, TupleRHSDERTest) {
   access->Visit(&lowerer_);
   assign->Visit(&lowerer_);
 
-  EXPECT_EQ(lowerer_.GetOutput(), "bob <-  VARCHILDTUPLE \n"
-            "t_0 <- 3\nbob <- t_0 NEWTUPLE \nt_1 <- 1\n"
-            "bob->t_1 <- bob LHSDEREFERENCE Parent\n"
+  EXPECT_EQ(lowerer_.GetOutput(), "bob <-  VAR_CHILD_TUPLE \n"
+            "t_0 <- 3\nbob <- t_0 NEW_TUPLE \nt_1 <- 1\n"
+            "bob->t_1 <- bob LHS_DEREFERENCE Parent\n"
             "t_2 <- 2\nbob->t_1 <- t_2\nt_3 <- 1\n"
-            "bob->t_3 <- bob RHSDEREFERENCE Parent\n"
+            "bob->t_3 <- bob RHS_DEREFERENCE Parent\n"
             "y <- bob->t_3\n");
 }
 
@@ -123,12 +123,12 @@ TEST_F(LowererTestV5, NestedTupleTest) {
   nestedassign->Visit(&lowerer_);
   assignarith->Visit(&lowerer_);
 
-  EXPECT_EQ(lowerer_.GetOutput(), "bob <-  VARCHILDTUPLE \nt_0 <- 4\n"
-            "bob <- t_0 NEWTUPLE \nt_1 <- 1\n"
-            "bob->t_1 <- bob LHSDEREFERENCE Parent\n"
-            "t_2 <- 2\nbob->t_1 <- t_2 NEWTUPLE \nt_3 <- 1\n"
-            "bob->t_3 <- bob LHSDEREFERENCE Child\nt_4 <- 2\n"
-            "bob->t_3->t_4 <- bob LHSDEREFERENCE Parent\nt_5 <- 2\n"
+  EXPECT_EQ(lowerer_.GetOutput(), "bob <-  VAR_CHILD_TUPLE \nt_0 <- 4\n"
+            "bob <- t_0 NEW_TUPLE \nt_1 <- 1\n"
+            "bob->t_1 <- bob LHS_DEREFERENCE Parent\n"
+            "t_2 <- 2\nbob->t_1 <- t_2 NEW_TUPLE \nt_3 <- 1\n"
+            "bob->t_3 <- bob LHS_DEREFERENCE Child\nt_4 <- 2\n"
+            "bob->t_3->t_4 <- bob LHS_DEREFERENCE Parent\nt_5 <- 2\n"
             "t_6 <- 3\nt_7 <- t_5 + t_6\nbob->t_3->t_4 <- t_7\n");
 }
 
@@ -164,14 +164,14 @@ TEST_F(LowererTestV5, AddTupleValueTest) {
   access2->Visit(&lowerer_);
   assigny->Visit(&lowerer_);
 
-  EXPECT_EQ(lowerer_.GetOutput(), "bob <-  VARCHILDTUPLE \nt_0 <- 3\n"
-            "bob <- t_0 NEWTUPLE \nt_1 <- 1\n"
-            "bob->t_1 <- bob LHSDEREFERENCE Parent\n"
+  EXPECT_EQ(lowerer_.GetOutput(), "bob <-  VAR_CHILD_TUPLE \nt_0 <- 3\n"
+            "bob <- t_0 NEW_TUPLE \nt_1 <- 1\n"
+            "bob->t_1 <- bob LHS_DEREFERENCE Parent\n"
             "t_2 <- 2\nbob->t_1 <- t_2\nt_3 <- 2\n"
-            "bob->t_3 <- bob LHSDEREFERENCE Parent\n"
+            "bob->t_3 <- bob LHS_DEREFERENCE Parent\n"
             "t_4 <- 3\nbob->t_3 <- t_4\nt_5 <- 1\n"
-            "bob->t_5 <- bob RHSDEREFERENCE Parent\n"
-            "t_6 <- 2\nbob->t_6 <- bob RHSDEREFERENCE Parent\n"
+            "bob->t_5 <- bob RHS_DEREFERENCE Parent\n"
+            "t_6 <- 2\nbob->t_6 <- bob RHS_DEREFERENCE Parent\n"
             "t_7 <- bob->t_5 + bob->t_6\n"
             "y <- t_7\n");
 }

@@ -33,9 +33,9 @@ class LowererTestV4 : public ::testing::Test {
   }
 
   std::string GenerateFuncDefOutPut(int blocksize) {
-    return  " <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n <-"
-    "FUNPROLOGUE \nt_" + std::to_string(blocksize) + " <- 0\n <-"
-    "  FUNEPILOGUE \n";
+    return  " <-  PRINT_ARITH \n <-  FUNCTIONDEF \nMkLabel func\n <-"
+    "FUN_PROLOGUE \nt_" + std::to_string(blocksize) + " <- 0\n <-"
+    "  FUN_EPILOGUE \n";
   }
 
  protected:
@@ -59,8 +59,8 @@ TEST_F(LowererTestV4, FunctionDefTest) {
 
   foo_def->Visit(&lowerer_);
   EXPECT_EQ(lowerer_.GetOutput(), " <-  FUNCTIONDEF \nMkLabel func\n"
-            " <-  FUNPROLOGUE \nt_0 <- 1\nt_1 <- 0\n"
-            "t_2 <- t_0 + t_1\n <-  FUNEPILOGUE \n");
+            " <-  FUN_PROLOGUE \nt_0 <- 1\nt_1 <- 0\n"
+            "t_2 <- t_0 + t_1\n <-  FUN_EPILOGUE \n");
 }
 
 
@@ -119,13 +119,13 @@ TEST_F(LowererTestV4, FunctionCallTest) {
   ast->Visit(&lowerer_);
 
   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 10\nbob <- t_0\n"
-            "t_1 <- bob VARLOAD \n <-  FUNCTIONCALL \n"
-            "foo_retval <- FUNRETLOAD FUNRETLOAD \n <-  FUNRETURNEPILOGUE \n"
-            "t_2 <- foo_retval VARLOAD \n <-  PRINTARITH \n <-  FUNCTIONDEF \n"
-            "MkLabel fact\n <-  FUNPROLOGUE \nbob <- 0\n"
-            "t_3 <- 1\nfoo_retval <- t_3\n"
-            "t_4 <- foo_retval VARLOAD \nt_5 <- 0\nt_6 <- t_4 + t_5\n"
-            " <-  FUNEPILOGUE \n");
+            "t_1 <- bob VAR_LOAD \n <-  FUNCTIONCALL \n"
+            "foo_retval <- FUN_RET_LOAD FUN_RET_LOAD \n"
+            " <-  FUNRETURNEPILOGUE \nt_2 <- foo_retval VAR_LOAD \n"
+            " <-  PRINT_ARITH \n <-  FUNCTIONDEF \nMkLabel fact\n"
+            " <-  FUN_PROLOGUE \nbob <- 0\nt_3 <- 1\nfoo_retval <- t_3\n"
+            "t_4 <- foo_retval VAR_LOAD \nt_5 <- 0\nt_6 <- t_4 + t_5\n"
+            " <-  FUN_EPILOGUE \n");
 }
 
 TEST_F(LowererTestV4, UndefinedFunctionCallTest) {

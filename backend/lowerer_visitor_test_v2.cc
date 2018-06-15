@@ -32,9 +32,9 @@ class LowererTestV2 : public ::testing::Test{
   }
 
   std::string GenerateFuncDefOutPut(int blocksize) {
-    return  " <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n <-"
-    "FUNPROLOGUE \nt_" + std::to_string(blocksize) + " <- 0\n <-"
-    "  FUNEPILOGUE \n";
+    return  " <-  PRINT_ARITH \n <-  FUNCTIONDEF \nMkLabel func\n <-"
+    "FUN_PROLOGUE \nt_" + std::to_string(blocksize) + " <- 0\n <-"
+    "  FUN_EPILOGUE \n";
   }
 
  protected:
@@ -127,8 +127,8 @@ TEST_F(LowererTestV2, VariabletoVariableAssignmentTest) {
   // t_7 <- t_5 - t_6
 
   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
-            "x <- t_2\nt_3 <- x VARLOAD \nt_4 <- 10\nt_5 <- t_3 - t_4\n"
+            "x <- t_2\nt_3 <- x VAR_LOAD \nt_4 <- 10\nt_5 <- t_3 - t_4\n"
             "y <- t_5\nt_6 <- 7\nt_7 <- 5\nt_8 <- t_6 - t_7\n"
-            " <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n"
-            " <-  FUNPROLOGUE \nt_9 <- 0\n <-  FUNEPILOGUE \n");
+            " <-  PRINT_ARITH \n <-  FUNCTIONDEF \nMkLabel func\n"
+            " <-  FUN_PROLOGUE \nt_9 <- 0\n <-  FUN_EPILOGUE \n");
 }
