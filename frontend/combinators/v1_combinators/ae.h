@@ -8,10 +8,9 @@
 namespace cs160 {
 namespace frontend {
 
-class ArithExprParser : public NullParser {
+class ArithExprParser : NullParser {
  public:
-  virtual ParseStatus do_parse(std::string inputProgram,
-  				int startCharacter);
+   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
 };
 
 }  // namespace frontend

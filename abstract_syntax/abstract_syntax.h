@@ -7,8 +7,6 @@
 #include "abstract_syntax/abstract_syntax_tree_v4.h"
 #include "abstract_syntax/abstract_syntax_tree_v5.h"
 
-#include "utility/memory.h"
-
 namespace cs160 {
 namespace abstract_syntax {
 

@@ -1,7 +1,6 @@
 #include "abstract_syntax/abstract_syntax_tree_v1.h"
-#include "utility/memory.h"
-
 #include "gtest/gtest.h"
+#include "utility/memory.h"
 
 using cs160::abstract_syntax::version_1::AddExpr;
 using cs160::abstract_syntax::version_1::AstVisitor;

@@ -7,16 +7,14 @@
 namespace cs160 {
 namespace frontend {
 
-class SingleCharParser : public NullParser {
+class SingleCharParser : NullParser {
  public:
-  virtual ParseStatus do_parse(std::string inputProgram,
-  				int startCharacter);
+	virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
 };
 
-class SingleVarCharParser : public NullParser {
+class SingleVarCharParser : NullParser {
  public:
-  virtual ParseStatus do_parse(std::string inputProgram,
-  				int startCharacter);
+	virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
 };
 
 }  // namespace frontend

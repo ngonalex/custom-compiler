@@ -7,34 +7,34 @@
 namespace cs160 {
 namespace frontend {
 
-class VarKeywordParser : public NullParser {
+class VarKeywordParser : NullParser {
  public:
-   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
 };
 
-class ColonParser : public NullParser {
+class ColonParser : NullParser {
  public:
-   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
 };
 
-class TypeParser : public NullParser {
+class TypeParser : NullParser {
  public:
-   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
 };
 
-class EqualSignParser : public NullParser {
+class EqualSignParser : NullParser {
  public:
-   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
 };
 
-class HelperVariableParser : public NullParser {
+class HelperVariableParser : NullParser {
  public:
-   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
 };
 /*
-class BOExpr : public NullParser {
+class BOExpr : NullParser {
  public:
-   virtual ParseStatus do_parse(std::string inputProgram);
+   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
 };*/
 
 } // namespace frontend
