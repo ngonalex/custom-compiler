@@ -1,72 +1,43 @@
 #include "frontend/combinators/v1_combinators/mul_div_expr.h"
-#include "frontend/combinators/basic_combinators/and_combinator.h"
-#include "frontend/combinators/basic_combinators/one_or_more_combinator.h"
-#include "frontend/combinators/basic_combinators/or_combinator.h"
-#include "frontend/combinators/v1_combinators/helpers/v1_helpers.h"
-#include "frontend/combinators/v1_combinators/num_parser.h"
-#include "frontend/combinators/v1_combinators/term_expr.h"
 
 #define super NullParser
 
 using namespace cs160::frontend;
 using namespace std;
 
-ParseStatus MulDivExprParser::do_parse(std::string inputProgram,
-                                       int startCharacter) {
-  int endCharacter = startCharacter;
-  endCharacter += trim(inputProgram);
+ParseStatus MulDivExprParser::parse(std::string inputProgram, std::string errorType) {
+	trim(inputProgram);
 
-  if (inputProgram.size() == 0) {
-    return super::fail(inputProgram, endCharacter);
-  }
+	if (inputProgram.size() == 0) {
+		return super::parse(inputProgram);
+	}
 
+  // ae
   TermExprParser lhs;
-  MulDivOpParser op;
-
-  AndCombinator andExpr;
-  andExpr.firstParser = &lhs;
-  andExpr.secondParser = &op;
-
-  OneOrMoreCombinator oneOrMore;
-  oneOrMore.parser = &andExpr;
-
-  TermExprParser rhs;
-
-  AndCombinator mulDivExpr;
-  mulDivExpr.firstParser = &oneOrMore;
-  mulDivExpr.secondParser = &rhs;
-
-  OrCombinator mulDivExprFinal;
-  mulDivExprFinal.firstParser = &mulDivExpr;
-  mulDivExprFinal.secondParser = &rhs;
-
-  ParseStatus result = mulDivExprFinal.do_parse(inputProgram, endCharacter);
-
-  // AST Formation
-  int strIndex = 0;
-  for (int i = 0; i < result.astNodes.size(); i++) {
-    if (i == 0) {
-      result.ast = std::move(result.astNodes[i]);
-    } else {
-      std::string parsedCharacters = result.parsedCharactersArray[i - 1];
-      std::string op = parsedCharacters.substr(parsedCharacters.size() - 1, 1);
-      result.ast = make_node(
-          op, unique_cast<const ArithmeticExpr>(std::move(result.ast)),
-          unique_cast<const ArithmeticExpr>(std::move(result.astNodes[i])));
-    }
-  }
-
-  result.parsedCharactersArray.erase(std::begin(result.parsedCharactersArray),
-                                     std::end(result.parsedCharactersArray));
-  result.astNodes.erase(std::begin(result.astNodes), std::end(result.astNodes));
-
-  return result;  // Returning Success/Failure on TermExpr
+  ParseStatus result = lhs.parse(inputProgram);
+	if (result.status) {
+		// op
+	  	MulDivOpParser op;
+		ParseStatus mdParseStatus = op.parse(result.remainingCharacters);
+		while (mdParseStatus.status) {
+			result.parsedCharacters += mdParseStatus.parsedCharacters;
+		    TermExprParser rhs;
+		    ParseStatus rhsParseStatus = rhs.parse(mdParseStatus.remainingCharacters);
+		    result.ast = std::move(make_node((mdParseStatus.parsedCharacters),
+		    	unique_cast<const ArithmeticExpr>(std::move(result.ast)),
+		    	unique_cast<const ArithmeticExpr>(std::move(rhsParseStatus.ast))));
+		    mdParseStatus = op.parse(rhsParseStatus.remainingCharacters);
+			result.parsedCharacters += (rhsParseStatus.parsedCharacters);
+	    }	  		
+		result.remainingCharacters = mdParseStatus.remainingCharacters;
+	}
+	return result;	// Returning Success/Failure on TermExpr
 }
 
 // Creating the AST Node
-std::unique_ptr<const ArithmeticExpr> MulDivExprParser::make_node(
-    std::string op, std::unique_ptr<const ArithmeticExpr> first_leaf,
-    std::unique_ptr<const ArithmeticExpr> second_leaf) {
+std::unique_ptr<const ArithmeticExpr> MulDivExprParser::make_node(std::string op,
+  std::unique_ptr<const ArithmeticExpr> first_leaf,
+  std::unique_ptr<const ArithmeticExpr> second_leaf) {
   if (op == "*") {
     return make_unique<MultiplyExpr>(std::move(first_leaf),
                                      std::move(second_leaf));

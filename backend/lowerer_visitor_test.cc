@@ -6,14 +6,14 @@
 #include "gtest/gtest.h"
 #include "utility/memory.h"
 
-using cs160::abstract_syntax::backend::AddExpr;
+using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::ArithmeticExpr;
+using cs160::abstract_syntax::backend::IntegerExpr;
+using cs160::abstract_syntax::backend::AddExpr;
 using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::Conditional;
 using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::EqualToExpr;
-using cs160::abstract_syntax::backend::FunctionCall;
-using cs160::abstract_syntax::backend::FunctionDef;
 using cs160::abstract_syntax::backend::GreaterThanEqualToExpr;
 using cs160::abstract_syntax::backend::GreaterThanExpr;
 using cs160::abstract_syntax::backend::IntegerExpr;
@@ -26,6 +26,8 @@ using cs160::abstract_syntax::backend::LogicalOrExpr;
 using cs160::abstract_syntax::backend::Loop;
 using cs160::abstract_syntax::backend::MultiplyExpr;
 using cs160::abstract_syntax::backend::Statement;
+using cs160::abstract_syntax::backend::FunctionCall;
+using cs160::abstract_syntax::backend::FunctionDef;
 using cs160::backend::LowererVisitor;
 
 // TO DO: Write tests for variables as AEs
@@ -35,24 +37,22 @@ class LowererTest : public ::testing::Test {
     // empty params
     auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
-    // empty fact_body
+  // empty fact_body
     Statement::Block fact_body;
 
-    // return value
+  // return value
     auto foo_retval = make_unique<const IntegerExpr>(0);
 
     auto foo_def = make_unique<const FunctionDef>("func", std::move(foo_params),
-                                                  std::move(fact_body),
-                                                  std::move(foo_retval));
+                                                std::move(fact_body),
+                                                std::move(foo_retval));
     return foo_def;
   }
 
   std::string GenerateFuncDefOutPut(int blocksize) {
-    return " <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n <-"
-           "FUNPROLOGUE \nt_" +
-           std::to_string(blocksize) +
-           " <- 0\n <-"
-           "  FUNEPILOGUE \n";
+    return  " <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n <-"
+    "FUNPROLOGUE \nt_" + std::to_string(blocksize) + " <- 0\n <-"
+    "  FUNEPILOGUE \n";
   }
 
  protected:
@@ -173,18 +173,19 @@ TEST_F(LowererTest, FunctionDefTest) {
 
   // return value
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(1), make_unique<const IntegerExpr>(0));
+    make_unique<const IntegerExpr>(1),
+    make_unique<const IntegerExpr>(0));
 
   auto foo_def = make_unique<const FunctionDef>("func", std::move(foo_params),
                                                 std::move(fact_body),
                                                 std::move(foo_retval));
 
   foo_def->Visit(&lowerer_);
-  EXPECT_EQ(lowerer_.GetOutput(),
-            " <-  FUNCTIONDEF \nMkLabel func\n"
-            " <-  FUNPROLOGUE \nt_0 <- 1\nt_1 <- 0\n"
-            "t_2 <- t_0 + t_1\n <-  FUNEPILOGUE \n");
+  EXPECT_EQ(lowerer_.GetOutput(), " <-  FUNCTIONDEF \nMkLabel func\n"
+  " <-  FUNPROLOGUE \nt_0 <- 1\nt_1 <- 0\n"
+  "t_2 <- t_0 + t_1\n <-  FUNEPILOGUE \n");
 }
+
 
 TEST_F(LowererTest, FunctionCallTest) {
   Statement::Block statements;
@@ -195,9 +196,9 @@ TEST_F(LowererTest, FunctionCallTest) {
   //    returnval = 1
   //    return retunval + 0
   // }
-  statements.push_back(
-      make_unique<const Assignment>(make_unique<const VariableExpr>("bob"),
-                                    make_unique<const IntegerExpr>(10)));
+  statements.push_back(make_unique<const Assignment>(
+    make_unique<const VariableExpr>("bob"),
+    make_unique<const IntegerExpr>(10)));
 
   auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
   arguments.push_back(std::move(make_unique<const VariableExpr>("bob")));
@@ -210,9 +211,9 @@ TEST_F(LowererTest, FunctionCallTest) {
   // getting the return value
   auto ae = make_unique<const VariableExpr>("foo_retval");
 
-  auto foo_retval =
-      make_unique<const AddExpr>(make_unique<const VariableExpr>("foo_retval"),
-                                 make_unique<const IntegerExpr>(0));
+  auto foo_retval = make_unique<const AddExpr>(
+    make_unique<const VariableExpr>("foo_retval"),
+    make_unique<const IntegerExpr>(0));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
   foo_params.push_back(std::move(make_unique<const VariableExpr>("bob")));
@@ -220,7 +221,8 @@ TEST_F(LowererTest, FunctionCallTest) {
   Statement::Block fact_body;
 
   fact_body.push_back(std::move(make_unique<Assignment>(
-      make_unique<VariableExpr>("foo_retval"), make_unique<IntegerExpr>(1))));
+    make_unique<VariableExpr>("foo_retval"),
+    make_unique<IntegerExpr>(1))));
 
   // fact_body.push_back(std::move(make_unique<const AddExpr>(
   //  make_unique<const VariableExpr>("foo_reval"),
@@ -234,19 +236,18 @@ TEST_F(LowererTest, FunctionCallTest) {
   function_defs.push_back(std::move(foo_def));
 
   auto ast = make_unique<const Program>(std::move(function_defs),
-                                        std::move(statements), std::move(ae));
+    std::move(statements), std::move(ae));
+
 
   ast->Visit(&lowerer_);
 
-  EXPECT_EQ(
-      lowerer_.GetOutput(),
-      "t_0 <- 10\nbob <- t_0\n"
-      "t_1 <- bob VARLOAD \n <-  FUNCTIONCALL \n"
-      "foo_retval <- FUNRETLOAD FUNRETLOAD \n <-  FUNRETURNEPILOGUE \n"
-      "t_2 <- foo_retval VARLOAD \n <-  PRINTARITH \n <-  FUNCTIONDEF \n"
-      "MkLabel fact\n <-  FUNPROLOGUE \nbob <- 0\nt_3 <- 1\nfoo_retval <- t_3\n"
-      "t_4 <- foo_retval VARLOAD \nt_5 <- 0\nt_6 <- t_4 + t_5\n"
-      " <-  FUNEPILOGUE \n");
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 10\nbob <- t_0\n"
+    "t_1 <- bob VARLOAD \n <-  FUNCTIONCALL \n"
+    "foo_retval <- FUNRETLOAD FUNRETLOAD \n <-  FUNRETURNEPILOGUE \n"
+    "t_2 <- foo_retval VARLOAD \n <-  PRINTARITH \n <-  FUNCTIONDEF \n"
+    "MkLabel fact\n <-  FUNPROLOGUE \nbob <- 0\nt_3 <- 1\nfoo_retval <- t_3\n"
+    "t_4 <- foo_retval VARLOAD \nt_5 <- 0\nt_6 <- t_4 + t_5\n"
+    " <-  FUNEPILOGUE \n");
 }
 
 TEST_F(LowererTest, UnassignedVariable) {
@@ -304,6 +305,8 @@ TEST_F(LowererTest, NestedLogicalsWithInts) {
             "t_12 <- t_10 >= t_11\nt_13 <- t_9 && t_12\nt_14 <- t_6 || t_13\n");
 }
 
+
+
 TEST_F(LowererTest, VariabletoVariableAssignmentTest) {
   Statement::Block statements;
 
@@ -325,7 +328,7 @@ TEST_F(LowererTest, VariabletoVariableAssignmentTest) {
   function_defs.push_back(std::move(func_def));
 
   auto expr = make_unique<Program>(std::move(function_defs),
-                                   std::move(statements), std::move(arithexpr));
+    std::move(statements), std::move(arithexpr));
 
   expr->Visit(&lowerer_);
 
@@ -340,13 +343,11 @@ TEST_F(LowererTest, VariabletoVariableAssignmentTest) {
   // t_6 <- 5
   // t_7 <- t_5 - t_6
 
-  EXPECT_EQ(
-      lowerer_.GetOutput(),
-      "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
-      "x <- t_2\nt_3 <- x VARLOAD \nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
-      "t_6 <- 7\nt_7 <- 5\nt_8 <- t_6 - t_7\n <-  PRINTARITH \n"
-      " <-  FUNCTIONDEF \nMkLabel func\n <-  FUNPROLOGUE \nt_9 <- 0\n"
-      " <-  FUNEPILOGUE \n");
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
+    "x <- t_2\nt_3 <- x VARLOAD \nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
+    "t_6 <- 7\nt_7 <- 5\nt_8 <- t_6 - t_7\n <-  PRINTARITH \n"
+    " <-  FUNCTIONDEF \nMkLabel func\n <-  FUNPROLOGUE \nt_9 <- 0\n"
+    " <-  FUNEPILOGUE \n");
 }
 
 TEST_F(LowererTest, ConditionalWithNestedLogicalsWithVariables) {
@@ -392,7 +393,7 @@ TEST_F(LowererTest, ConditionalWithNestedLogicalsWithVariables) {
   function_defs.push_back(std::move(func_def));
 
   auto expr = make_unique<Program>(std::move(function_defs),
-                                   std::move(statements), std::move(arithexpr));
+    std::move(statements), std::move(arithexpr));
 
   expr->Visit(&lowerer_);
 
@@ -425,20 +426,18 @@ TEST_F(LowererTest, ConditionalWithNestedLogicalsWithVariables) {
   // t_17 <- 7
   // t_18 <- 5
   // t_19 <- t_17 - t_18
-  EXPECT_EQ(
-      lowerer_.GetOutput(),
-      "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
-      "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
-      "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\nbob <- t_8\n"
-      "t_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\nt_12 <- y VARLOAD \n"
-      "t_13 <- x VARLOAD \nt_14 <- t_12 > t_13\nt_15 <- t_11 && t_14\n"
-      "t_16 <- bob VARLOAD \nt_17 <- 100\nt_18 <- t_16 <= t_17\n"
-      "t_19 <- bob VARLOAD \nt_20 <- 0\nt_21 <- t_19 >= t_20\n"
-      "t_22 <- t_18 && t_21\nt_23 <- t_15 || t_22\nif t_23 == 0\n"
-      "je falsebranch0\njmp continue0\nMkLabel falsebranch0\njmp continue0\n"
-      "MkLabel continue0\nt_24 <- 7\nt_25 <- 5\nt_26 <- t_24 - t_25\n"
-      " <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n <-  FUNPROLOGUE \n"
-      "t_27 <- 0\n <-  FUNEPILOGUE \n");
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
+    "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
+    "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\nbob <- t_8\n"
+    "t_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\nt_12 <- y VARLOAD \n"
+    "t_13 <- x VARLOAD \nt_14 <- t_12 > t_13\nt_15 <- t_11 && t_14\n"
+    "t_16 <- bob VARLOAD \nt_17 <- 100\nt_18 <- t_16 <= t_17\n"
+    "t_19 <- bob VARLOAD \nt_20 <- 0\nt_21 <- t_19 >= t_20\n"
+    "t_22 <- t_18 && t_21\nt_23 <- t_15 || t_22\nif t_23 == 0\n"
+    "je falsebranch0\njmp continue0\nMkLabel falsebranch0\njmp continue0\n"
+    "MkLabel continue0\nt_24 <- 7\nt_25 <- 5\nt_26 <- t_24 - t_25\n"
+    " <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n <-  FUNPROLOGUE \n"
+    "t_27 <- 0\n <-  FUNEPILOGUE \n");
 }
 
 TEST_F(LowererTest, LoopWithNestedLogicalsWithVariables) {
@@ -482,8 +481,9 @@ TEST_F(LowererTest, LoopWithNestedLogicalsWithVariables) {
   auto func_def = GenerateFuncDef();
   function_defs.push_back(std::move(func_def));
 
+
   auto expr = make_unique<Program>(std::move(function_defs),
-                                   std::move(statements), std::move(arithexpr));
+    std::move(statements), std::move(arithexpr));
 
   expr->Visit(&lowerer_);
 
@@ -515,19 +515,17 @@ TEST_F(LowererTest, LoopWithNestedLogicalsWithVariables) {
   // t_17 <- 7
   // t_18 <- 5
   // t_19 <- t_17 - t_18
-  EXPECT_EQ(
-      lowerer_.GetOutput(),
-      "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
-      "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
-      "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\nbob <- t_8\n"
-      "MkLabel loop0\nt_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\n"
-      "t_12 <- y VARLOAD \nt_13 <- x VARLOAD \nt_14 <- t_12 > t_13\n"
-      "t_15 <- t_11 && t_14\nt_16 <- bob VARLOAD \nt_17 <- 100\n"
-      "t_18 <- t_16 <= t_17\nt_19 <- bob VARLOAD \nt_20 <- 0\n"
-      "t_21 <- t_19 >= t_20\nt_22 <- t_18 && t_21\nt_23 <- t_15 || t_22\n"
-      "while t_23 == 0\nje continue0\njmp loop0\nMkLabel continue0\nt_24 <- 7\n"
-      "t_25 <- 5\nt_26 <- t_24 - t_25\n <-  PRINTARITH \n <-  FUNCTIONDEF \n"
-      "MkLabel func\n <-  FUNPROLOGUE \nt_27 <- 0\n <-  FUNEPILOGUE \n");
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
+    "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
+    "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\nbob <- t_8\n"
+    "MkLabel loop0\nt_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\n"
+    "t_12 <- y VARLOAD \nt_13 <- x VARLOAD \nt_14 <- t_12 > t_13\n"
+    "t_15 <- t_11 && t_14\nt_16 <- bob VARLOAD \nt_17 <- 100\n"
+    "t_18 <- t_16 <= t_17\nt_19 <- bob VARLOAD \nt_20 <- 0\n"
+    "t_21 <- t_19 >= t_20\nt_22 <- t_18 && t_21\nt_23 <- t_15 || t_22\n"
+    "while t_23 == 0\nje continue0\njmp loop0\nMkLabel continue0\nt_24 <- 7\n"
+    "t_25 <- 5\nt_26 <- t_24 - t_25\n <-  PRINTARITH \n <-  FUNCTIONDEF \n"
+    "MkLabel func\n <-  FUNPROLOGUE \nt_27 <- 0\n <-  FUNEPILOGUE \n");
 }
 
 TEST_F(LowererTest, ConditionalsWithTrueBranch) {
@@ -579,7 +577,7 @@ TEST_F(LowererTest, ConditionalsWithTrueBranch) {
   function_defs.push_back(std::move(func_def));
 
   auto expr = make_unique<Program>(std::move(function_defs),
-                                   std::move(statements), std::move(arithexpr));
+    std::move(statements), std::move(arithexpr));
 
   expr->Visit(&lowerer_);
 
@@ -614,21 +612,19 @@ TEST_F(LowererTest, ConditionalsWithTrueBranch) {
   // t_18 <- 7
   // t_19 <- 5
   // t_20 <- t_18 - t_19
-  EXPECT_EQ(
-      lowerer_.GetOutput(),
-      "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
-      "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
-      "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\nbob <- t_8\n"
-      "t_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\nt_12 <- y VARLOAD \n"
-      "t_13 <- x VARLOAD \nt_14 <- t_12 > t_13\nt_15 <- t_11 && t_14\n"
-      "t_16 <- bob VARLOAD \nt_17 <- 100\nt_18 <- t_16 <= t_17\n"
-      "t_19 <- bob VARLOAD \nt_20 <- 0\nt_21 <- t_19 >= t_20\n"
-      "t_22 <- t_18 && t_21\nt_23 <- t_15 || t_22\nif t_23 == 0\n"
-      "je falsebranch0\nt_24 <- y VARLOAD \nt_25 <- x VARLOAD \n"
-      "t_26 <- t_24 + t_25\nbob <- t_26\njmp continue0\nMkLabel falsebranch0\n"
-      "jmp continue0\nMkLabel continue0\nt_27 <- 7\nt_28 <- 5\n"
-      "t_29 <- t_27 - t_28\n <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n"
-      " <-  FUNPROLOGUE \nt_30 <- 0\n <-  FUNEPILOGUE \n");
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
+    "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
+    "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\nbob <- t_8\n"
+    "t_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\nt_12 <- y VARLOAD \n"
+    "t_13 <- x VARLOAD \nt_14 <- t_12 > t_13\nt_15 <- t_11 && t_14\n"
+    "t_16 <- bob VARLOAD \nt_17 <- 100\nt_18 <- t_16 <= t_17\n"
+    "t_19 <- bob VARLOAD \nt_20 <- 0\nt_21 <- t_19 >= t_20\n"
+    "t_22 <- t_18 && t_21\nt_23 <- t_15 || t_22\nif t_23 == 0\n"
+    "je falsebranch0\nt_24 <- y VARLOAD \nt_25 <- x VARLOAD \n"
+    "t_26 <- t_24 + t_25\nbob <- t_26\njmp continue0\nMkLabel falsebranch0\n"
+    "jmp continue0\nMkLabel continue0\nt_27 <- 7\nt_28 <- 5\n"
+    "t_29 <- t_27 - t_28\n <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n"
+    " <-  FUNPROLOGUE \nt_30 <- 0\n <-  FUNEPILOGUE \n");
 }
 
 TEST_F(LowererTest, ConditionalsWithFalseBranch) {
@@ -680,7 +676,7 @@ TEST_F(LowererTest, ConditionalsWithFalseBranch) {
   function_defs.push_back(std::move(func_def));
 
   auto expr = make_unique<Program>(std::move(function_defs),
-                                   std::move(statements), std::move(arithexpr));
+    std::move(statements), std::move(arithexpr));
 
   expr->Visit(&lowerer_);
 
@@ -715,21 +711,19 @@ TEST_F(LowererTest, ConditionalsWithFalseBranch) {
   // t_18 <- 7
   // t_19 <- 5
   // t_20 <- t_18 - t_19
-  EXPECT_EQ(
-      lowerer_.GetOutput(),
-      "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
-      "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
-      "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\nbob <- t_8\n"
-      "t_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\nt_12 <- y VARLOAD \n"
-      "t_13 <- x VARLOAD \nt_14 <- t_12 > t_13\nt_15 <- t_11 && t_14\n"
-      "t_16 <- bob VARLOAD \nt_17 <- 100\nt_18 <- t_16 <= t_17\n"
-      "t_19 <- bob VARLOAD \nt_20 <- 0\nt_21 <- t_19 >= t_20\n"
-      "t_22 <- t_18 && t_21\nt_23 <- t_15 || t_22\nif t_23 == 0\n"
-      "je falsebranch0\njmp continue0\nMkLabel falsebranch0\n"
-      "t_24 <- y VARLOAD \nt_25 <- x VARLOAD \nt_26 <- t_24 + t_25\n"
-      "bob <- t_26\njmp continue0\nMkLabel continue0\nt_27 <- 7\nt_28 <- 5\n"
-      "t_29 <- t_27 - t_28\n <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n"
-      " <-  FUNPROLOGUE \nt_30 <- 0\n <-  FUNEPILOGUE \n");
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
+    "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
+    "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\nbob <- t_8\n"
+    "t_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\nt_12 <- y VARLOAD \n"
+    "t_13 <- x VARLOAD \nt_14 <- t_12 > t_13\nt_15 <- t_11 && t_14\n"
+    "t_16 <- bob VARLOAD \nt_17 <- 100\nt_18 <- t_16 <= t_17\n"
+    "t_19 <- bob VARLOAD \nt_20 <- 0\nt_21 <- t_19 >= t_20\n"
+    "t_22 <- t_18 && t_21\nt_23 <- t_15 || t_22\nif t_23 == 0\n"
+    "je falsebranch0\njmp continue0\nMkLabel falsebranch0\n"
+    "t_24 <- y VARLOAD \nt_25 <- x VARLOAD \nt_26 <- t_24 + t_25\n"
+    "bob <- t_26\njmp continue0\nMkLabel continue0\nt_27 <- 7\nt_28 <- 5\n"
+    "t_29 <- t_27 - t_28\n <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n"
+    " <-  FUNPROLOGUE \nt_30 <- 0\n <-  FUNEPILOGUE \n");
 }
 
 TEST_F(LowererTest, ConditionalsWithBothBranch) {
@@ -787,7 +781,7 @@ TEST_F(LowererTest, ConditionalsWithBothBranch) {
   function_defs.push_back(std::move(func_def));
 
   auto expr = make_unique<Program>(std::move(function_defs),
-                                   std::move(statements), std::move(arithexpr));
+    std::move(statements), std::move(arithexpr));
 
   expr->Visit(&lowerer_);
 
@@ -824,22 +818,20 @@ TEST_F(LowererTest, ConditionalsWithBothBranch) {
   // t_19 <- 7
   // t_20 <- 5
   // t_21 <- t_19 - t_20
-  EXPECT_EQ(
-      lowerer_.GetOutput(),
-      "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
-      "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
-      "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\nbob <- t_8\n"
-      "t_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\nt_12 <- y VARLOAD \n"
-      "t_13 <- x VARLOAD \nt_14 <- t_12 > t_13\nt_15 <- t_11 && t_14\n"
-      "t_16 <- bob VARLOAD \nt_17 <- 100\nt_18 <- t_16 <= t_17\n"
-      "t_19 <- bob VARLOAD \nt_20 <- 0\nt_21 <- t_19 >= t_20\n"
-      "t_22 <- t_18 && t_21\nt_23 <- t_15 || t_22\nif t_23 == 0\n"
-      "je falsebranch0\nt_24 <- y VARLOAD \nt_25 <- x VARLOAD \n"
-      "t_26 <- t_24 + t_25\nbob <- t_26\njmp continue0\nMkLabel falsebranch0\n"
-      "t_27 <- y VARLOAD \nt_28 <- x VARLOAD \nt_29 <- t_27 - t_28\n"
-      "bob <- t_29\njmp continue0\nMkLabel continue0\nt_30 <- 7\nt_31 <- 5\n"
-      "t_32 <- t_30 - t_31\n <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n"
-      " <-  FUNPROLOGUE \nt_33 <- 0\n <-  FUNEPILOGUE \n");
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
+    "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
+    "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\nbob <- t_8\n"
+    "t_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\nt_12 <- y VARLOAD \n"
+    "t_13 <- x VARLOAD \nt_14 <- t_12 > t_13\nt_15 <- t_11 && t_14\n"
+    "t_16 <- bob VARLOAD \nt_17 <- 100\nt_18 <- t_16 <= t_17\n"
+    "t_19 <- bob VARLOAD \nt_20 <- 0\nt_21 <- t_19 >= t_20\n"
+    "t_22 <- t_18 && t_21\nt_23 <- t_15 || t_22\nif t_23 == 0\n"
+    "je falsebranch0\nt_24 <- y VARLOAD \nt_25 <- x VARLOAD \n"
+    "t_26 <- t_24 + t_25\nbob <- t_26\njmp continue0\nMkLabel falsebranch0\n"
+    "t_27 <- y VARLOAD \nt_28 <- x VARLOAD \nt_29 <- t_27 - t_28\n"
+    "bob <- t_29\njmp continue0\nMkLabel continue0\nt_30 <- 7\nt_31 <- 5\n"
+    "t_32 <- t_30 - t_31\n <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n"
+    " <-  FUNPROLOGUE \nt_33 <- 0\n <-  FUNEPILOGUE \n");
 }
 
 TEST_F(LowererTest, LoopWithBody) {
@@ -891,7 +883,7 @@ TEST_F(LowererTest, LoopWithBody) {
   function_defs.push_back(std::move(func_def));
 
   auto expr = make_unique<Program>(std::move(function_defs),
-                                   std::move(statements), std::move(arithexpr));
+    std::move(statements), std::move(arithexpr));
 
   expr->Visit(&lowerer_);
 
@@ -925,21 +917,19 @@ TEST_F(LowererTest, LoopWithBody) {
   // t_18 <- 7
   // t_19 <- 5
   // t_20 <- t_18 - t_19
-  EXPECT_EQ(
-      lowerer_.GetOutput(),
-      "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
-      "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
-      "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\nbob <- t_8\n"
-      "MkLabel loop0\nt_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\n"
-      "t_12 <- y VARLOAD \nt_13 <- x VARLOAD \nt_14 <- t_12 > t_13\n"
-      "t_15 <- t_11 && t_14\nt_16 <- bob VARLOAD \nt_17 <- 100\n"
-      "t_18 <- t_16 <= t_17\nt_19 <- bob VARLOAD \nt_20 <- 0\n"
-      "t_21 <- t_19 >= t_20\nt_22 <- t_18 && t_21\nt_23 <- t_15 || t_22\n"
-      "while t_23 == 0\nje continue0\nt_24 <- y VARLOAD \nt_25 <- x VARLOAD \n"
-      "t_26 <- t_24 - t_25\nbob <- t_26\njmp loop0\nMkLabel continue0\n"
-      "t_27 <- 7\nt_28 <- 5\nt_29 <- t_27 - t_28\n <-  PRINTARITH \n"
-      " <-  FUNCTIONDEF \nMkLabel func\n <-  FUNPROLOGUE \nt_30 <- 0\n"
-      " <-  FUNEPILOGUE \n");
+  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
+    "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
+    "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\nbob <- t_8\n"
+    "MkLabel loop0\nt_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\n"
+    "t_12 <- y VARLOAD \nt_13 <- x VARLOAD \nt_14 <- t_12 > t_13\n"
+    "t_15 <- t_11 && t_14\nt_16 <- bob VARLOAD \nt_17 <- 100\n"
+    "t_18 <- t_16 <= t_17\nt_19 <- bob VARLOAD \nt_20 <- 0\n"
+    "t_21 <- t_19 >= t_20\nt_22 <- t_18 && t_21\nt_23 <- t_15 || t_22\n"
+    "while t_23 == 0\nje continue0\nt_24 <- y VARLOAD \nt_25 <- x VARLOAD \n"
+    "t_26 <- t_24 - t_25\nbob <- t_26\njmp loop0\nMkLabel continue0\n"
+    "t_27 <- 7\nt_28 <- 5\nt_29 <- t_27 - t_28\n <-  PRINTARITH \n"
+    " <-  FUNCTIONDEF \nMkLabel func\n <-  FUNPROLOGUE \nt_30 <- 0\n"
+    " <-  FUNEPILOGUE \n");
 }
 
 // To do: Nested Branches + Nested Loops + LogicalNot

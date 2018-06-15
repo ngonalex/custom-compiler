@@ -7,12 +7,12 @@
 namespace cs160 {
 namespace frontend {
 
-class ProgramParser : public NullParser {
+class ProgramParser : NullParser {
  public:
-  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
 };
 
-}  // namespace frontend
-}  // namespace cs160
+} // namespace frontend
+} // namespace cs160
 
-#endif  // PROGRAM_PARSER_H_
+#endif // PROGRAM_PARSER_H_

@@ -3,16 +3,19 @@
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
+#include "frontend/combinators/v1_combinators/add_sub_op.h"
+#include "frontend/combinators/v1_combinators/mul_div_expr.h"
+#include "frontend/combinators/v1_combinators/num_parser.h"
 
 namespace cs160 {
 namespace frontend {
 
-class AddSubExprParser : public NullParser {
+class AddSubExprParser : NullParser {
  public:
-  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
-  std::unique_ptr<const ArithmeticExpr> make_node(
-      std::string op, std::unique_ptr<const ArithmeticExpr> first_leaf,
-      std::unique_ptr<const ArithmeticExpr> second_leaf);
+   virtual ParseStatus parse(std::string inputProgram, std::string errorType = ""); 
+   std::unique_ptr<const ArithmeticExpr> make_node(std::string op, 
+     std::unique_ptr<const ArithmeticExpr> first_leaf,
+     std::unique_ptr<const ArithmeticExpr> second_leaf);
 };
 
 }  // namespace frontend

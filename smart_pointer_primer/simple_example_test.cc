@@ -1,5 +1,5 @@
-#include "smart_pointer_primer/simple_example.h"
 #include "gtest/gtest.h"
+#include "smart_pointer_primer/simple_example.h"
 
 // If we were using C++14, we'd #include <memory>; this is our poor-man
 // substitute: if you want to use this, don't forget to add the dependency to
