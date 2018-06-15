@@ -1,10 +1,10 @@
-#ifndef PARSE_STATUS_H_
-#define PARSE_STATUS_H_
+#ifndef FRONTEND_COMBINATORS_BASIC_COMBINATORS_PARSE_STATUS_H_
+#define FRONTEND_COMBINATORS_BASIC_COMBINATORS_PARSE_STATUS_H_
+
+#include <string>  // std::string
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "utility/memory.h"
-
-#include <string>  // std::string
 
 using namespace cs160::abstract_syntax::frontend;
 /*
@@ -81,4 +81,4 @@ std::move(ast_result);
 } // namespace frontend
 } // namespace cs160*/
 
-#endif  // PARSE_STATUS_H_
+#endif  // FRONTEND_COMBINATORS_BASIC_COMBINATORS_PARSE_STATUS_H_

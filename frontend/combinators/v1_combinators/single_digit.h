@@ -1,5 +1,7 @@
-#ifndef SINGLE_DIGIT_H_
-#define SINGLE_DIGIT_H_
+#ifndef FRONTEND_COMBINATORS_V1_COMBINATORS_SINGLE_DIGIT_H_
+#define FRONTEND_COMBINATORS_V1_COMBINATORS_SINGLE_DIGIT_H_
+
+#include <string>
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
@@ -15,4 +17,4 @@ class SingleDigitParser : public NullParser {
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // SINGLE_DIGIT_H_
+#endif  // FRONTEND_COMBINATORS_V1_COMBINATORS_SINGLE_DIGIT_H_

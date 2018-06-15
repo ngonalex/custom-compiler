@@ -1,5 +1,7 @@
-#ifndef ATOM_PARSER_H_
-#define ATOM_PARSER_H_
+#ifndef FRONTEND_COMBINATORS_PEG_LIBRARY_PEG_LIBRARY_H_
+#define FRONTEND_COMBINATORS_PEG_LIBRARY_PEG_LIBRARY_H_
+
+#include <string>
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/peg_library/parse_result.h"
@@ -13,7 +15,7 @@ class AtomParser {
  public:
   explicit AtomParser(char char_to_parse) { char_to_parse_ = char_to_parse; }
 
-  explicit AtomParser() { char_to_parse_ = '\0'; }
+  AtomParser() { char_to_parse_ = '\0'; }
 
   // return ParseResult<Assignment>::failure("Missing ':' inside an
   // assignment");
@@ -34,4 +36,4 @@ class AtomParser {
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // ATOM_PARSER_H_
+#endif  // FRONTEND_COMBINATORS_PEG_LIBRARY_PEG_LIBRARY_H_

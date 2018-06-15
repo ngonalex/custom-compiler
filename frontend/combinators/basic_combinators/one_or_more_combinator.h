@@ -1,5 +1,7 @@
-#ifndef ONE_OR_MORE_COMBINATOR_H_
-#define ONE_OR_MORE_COMBINATOR_H_
+#ifndef FRONTEND_COMBINATORS_BASIC_COMBINATORS_ONE_OR_MORE_COMBINATOR_H_
+#define FRONTEND_COMBINATORS_BASIC_COMBINATORS_ONE_OR_MORE_COMBINATOR_H_
+
+#include <string>
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
@@ -16,4 +18,4 @@ class OneOrMoreCombinator : public NullParser {
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // ONE_OR_MORE_COMBINATOR_H_
+#endif  // FRONTEND_COMBINATORS_BASIC_COMBINATORS_ONE_OR_MORE_COMBINATOR_H_

@@ -1,5 +1,7 @@
-#ifndef AE_H_
-#define AE_H_
+#ifndef FRONTEND_COMBINATORS_V1_COMBINATORS_AE_H_
+#define FRONTEND_COMBINATORS_V1_COMBINATORS_AE_H_
+
+#include <string>
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
@@ -16,4 +18,4 @@ class ArithExprParser : public NullParser {
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // AE_H_
+#endif  // FRONTEND_COMBINATORS_V1_COMBINATORS_AE_H_

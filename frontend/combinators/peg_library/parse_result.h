@@ -1,5 +1,5 @@
-#ifndef PARSE_RESULT_H_
-#define PARSE_RESULT_H_
+#ifndef FRONTEND_COMBINATORS_PEG_LIBRARY_PARSE_RESULT_H_
+#define FRONTEND_COMBINATORS_PEG_LIBRARY_PARSE_RESULT_H_
 
 #include <string>  // std::string
 
@@ -37,4 +37,4 @@ class ParseResult {
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // PARSE_RESULT_H_
+#endif  // FRONTEND_COMBINATORS_PEG_LIBRARY_PARSE_RESULT_H_

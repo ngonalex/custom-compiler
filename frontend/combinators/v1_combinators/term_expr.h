@@ -1,5 +1,7 @@
-#ifndef TERM_EXPR_H_
-#define TERM_EXPR_H_
+#ifndef FRONTEND_COMBINATORS_V1_COMBINATORS_TERM_EXPR_H_
+#define FRONTEND_COMBINATORS_V1_COMBINATORS_TERM_EXPR_H_
+
+#include <string>
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
@@ -15,4 +17,4 @@ class TermExprParser : public NullParser {
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // TERM_EXPR_H
+#endif  // FRONTEND_COMBINATORS_V1_COMBINATORS_TERM_EXPR_H_

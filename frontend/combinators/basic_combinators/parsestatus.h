@@ -1,11 +1,11 @@
-#ifndef PARSESTATUS_H_
-#define PARSESTATUS_H_
-
-#include "abstract_syntax/abstract_syntax.h"
-#include "utility/memory.h"
+#ifndef FRONTEND_COMBINATORS_BASIC_COMBINATORS_PARSESTATUS_H_
+#define FRONTEND_COMBINATORS_BASIC_COMBINATORS_PARSESTATUS_H_
 
 #include <string>
 #include <vector>
+
+#include "abstract_syntax/abstract_syntax.h"
+#include "utility/memory.h"
 
 using namespace cs160::abstract_syntax::frontend;
 
@@ -162,4 +162,4 @@ secondStatus){ this->ast = firstStatus.ast; this->second_ast = secondStatus.ast;
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // PARSESTATUS_H_
+#endif  // FRONTEND_COMBINATORS_BASIC_COMBINATORS_PARSESTATUS_H_

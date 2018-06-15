@@ -1,7 +1,9 @@
-#ifndef NULL_PARSER_H
-#define NULL_PARSER_H
+#ifndef FRONTEND_COMBINATORS_BASIC_COMBINATORS_NULL_H_
+#define FRONTEND_COMBINATORS_BASIC_COMBINATORS_NULL_H_
 
 #include <map>
+#include <string>
+
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/parsestatus.h"
 
@@ -24,4 +26,4 @@ class NullParser {
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // NULL_PARSER_H
+#endif  // FRONTEND_COMBINATORS_BASIC_COMBINATORS_NULL_H_

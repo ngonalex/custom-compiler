@@ -1,5 +1,7 @@
-#ifndef NUM_PARSER_H_
-#define NUM_PARSER_H_
+#ifndef FRONTEND_COMBINATORS_V1_COMBINATORS_NUM_PARSER_H_
+#define FRONTEND_COMBINATORS_V1_COMBINATORS_NUM_PARSER_H_
+
+#include <string>
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
@@ -15,4 +17,4 @@ class NumParser : public NullParser {
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // NUM_PARSER_H_
+#endif  // FRONTEND_COMBINATORS_V1_COMBINATORS_NUM_PARSER_H_

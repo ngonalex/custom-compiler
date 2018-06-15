@@ -1,5 +1,7 @@
-#ifndef MUL_DIV_EXPR_H_
-#define MUL_DIV_EXPR_H_
+#ifndef FRONTEND_COMBINATORS_V1_COMBINATORS_MUL_DIV_EXPR_H_
+#define FRONTEND_COMBINATORS_V1_COMBINATORS_MUL_DIV_EXPR_H_
+
+#include <string>
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
@@ -18,4 +20,4 @@ class MulDivExprParser : public NullParser {
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // MUL_DIV_EXPR_H_
+#endif  // FRONTEND_COMBINATORS_V1_COMBINATORS_MUL_DIV_EXPR_H_
