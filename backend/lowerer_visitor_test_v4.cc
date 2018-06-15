@@ -50,8 +50,8 @@ TEST_F(LowererTestV4, FunctionDefTest) {
 
   // return value
   auto foo_retval = make_unique<const AddExpr>(
-    make_unique<const IntegerExpr>(1),
-    make_unique<const IntegerExpr>(0));
+      make_unique<const IntegerExpr>(1),
+      make_unique<const IntegerExpr>(0));
 
   auto foo_def = make_unique<const FunctionDef>("func", std::move(foo_params),
                                                 std::move(fact_body),

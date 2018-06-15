@@ -43,8 +43,8 @@ class LowererTestV2 : public ::testing::Test{
 
 TEST_F(LowererTestV2, SimpleAssignmentTest) {
   auto expr = make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("x"),
-    make_unique<IntegerExpr>(5));
+      make_unique<VariableExpr>("x"),
+      make_unique<IntegerExpr>(5));
 
   expr->Visit(&lowerer_);
   // t_0 <- 5
