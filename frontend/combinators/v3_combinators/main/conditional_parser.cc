@@ -35,7 +35,7 @@ ParseStatus ConditionalParser::do_parse(std::string inputProgram,
     return super::fail(inputProgram, endCharacter, "");
   }
 
-  ElseKeyword ifParser;
+  IfKeyword ifParser;
   OpenParenParser openParen;
   OrRelationParser rel_expr;
   CloseParenParser closeParen;
@@ -71,6 +71,20 @@ ParseStatus ConditionalParser::do_parse(std::string inputProgram,
   AndCombinator block_1_close;
   block_1_close.firstParser = reinterpret_cast<NullParser *>(&block_1);
   block_1_close.secondParser = reinterpret_cast<NullParser *>(&closeBracket1);
+    
+    Statement::Block trueBlock;
+    
+  ParseStatus trueBlockResult = block_1_close.do_parse(inputProgram, startCharacter);
+    if (!trueBlockResult.status) {
+        trueBlockResult.errorType = "Issue parsing conditional";
+        return trueBlockResult;
+    }
+    std::unique_ptr<const RelationalExpr> guard = unique_cast<const RelationalExpr>(std::move(trueBlockResult.astNodes[0]));
+    for (int i = 1; i < trueBlockResult.astNodes.size(); i++){
+        trueBlock.push_back(unique_cast<const Statement>(std::move(trueBlockResult.astNodes[i])));
+    }
+    trueBlockResult.astNodes.erase(std::begin(trueBlockResult.astNodes), std::end(trueBlockResult.astNodes));
+    
   // if (rel) { block1 } else
   AndCombinator close_else;
   close_else.firstParser = reinterpret_cast<NullParser *>(&block_1_close);
@@ -88,10 +102,18 @@ ParseStatus ConditionalParser::do_parse(std::string inputProgram,
   block2_close.firstParser = reinterpret_cast<NullParser *>(&block_2);
   block2_close.secondParser = reinterpret_cast<NullParser *>(&closeBracket2);
 
-  auto result = block2_close.do_parse(inputProgram, startCharacter);
-  if (!result.status) {
-    result.errorType = "Issue parsing conditional";
-  }
+  ParseStatus result = block2_close.do_parse(inputProgram, startCharacter);
+    if (!result.status){
+        Statement::Block falseBlock;
+        result.ast = std::move(make_unique<const Conditional>(std::move(guard), std::move(trueBlock), std::move(falseBlock)));
+        return trueBlockResult;
+    }
+    Statement::Block falseBlock;
+    for (int i = trueBlock.size() + 1; i < result.astNodes.size(); i++){
+        falseBlock.push_back(unique_cast<const Statement>(std::move(result.astNodes[i])));
+    }
+    result.ast = std::move(make_unique<const Conditional>(std::move(guard), std::move(trueBlock), std::move(falseBlock)));
+    result.astNodes.erase(std::begin(result.astNodes), std::end(result.astNodes));
 
   return result;
 }
