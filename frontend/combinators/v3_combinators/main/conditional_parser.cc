@@ -109,7 +109,7 @@ ParseStatus ConditionalParser::do_parse(std::string inputProgram,
   ParseStatus result = block2_close.do_parse(inputProgram, startCharacter);
   if (!result.status) {
     Statement::Block falseBlock;
-    result.ast = std::move(make_unique<const Conditional>(
+    trueBlockResult.ast = std::move(make_unique<const Conditional>(
         std::move(guard), std::move(trueBlock), std::move(falseBlock)));
     return trueBlockResult;
   }
