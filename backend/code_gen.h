@@ -16,35 +16,32 @@ namespace backend {
 
 class CodeGen {
  public:
-    explicit CodeGen(std::ofstream &filename) : outfile_(filename),
-      currscope_(GLOBAL) {}
-    void Generate(std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks);
-    void GenerateEpilogue();
-    void ClearRegister(std::string reg);
-    void GenerateBoiler();
+  explicit CodeGen(std::ofstream& filename)
+      : outfile_(filename), currscope_(GLOBAL) {}
+  void Generate(std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks);
+  void GenerateEpilogue();
+  void ClearRegister(std::string reg);
+  void GenerateBoiler();
 
-    // Printing functions
-    void GeneratePrinter();
-    void GeneratePrintHeader();
-    void GeneratePrintAssignment(std::string);
-    void GeneratePrintFunctionResult();
-    void GeneratePrintResult();
-    void GenerateData(std::set<std::string>);
-    // Different nodes + helpers
-    void GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac);
-    void GenerateArithmeticExpr(std::unique_ptr<ThreeAddressCode> tac,
-      Type type);
-    void GenerateBinaryExprHelper(std::unique_ptr<ThreeAddressCode> tac);
-    void GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
-      Type type);
-    void GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
-      Type type);
+  // Printing functions
+  void GeneratePrinter();
+  void GeneratePrintHeader();
+  void GeneratePrintAssignment(std::string);
+  void GeneratePrintFunctionResult();
+  void GeneratePrintResult();
+  void GenerateData(std::set<std::string>);
+  // Different nodes + helpers
+  void GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac);
+  void GenerateArithmeticExpr(std::unique_ptr<ThreeAddressCode> tac, Type type);
+  void GenerateBinaryExprHelper(std::unique_ptr<ThreeAddressCode> tac);
+  void GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac, Type type);
+  void GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac, Type type);
 
-    // This function checks if the current scope is function or global
-    // If it's global then it just returns the name of the variable
-    // otherwise it checks the map for the function and returns the correct
-    // offset inside the stacks
-    std::string VariableNameHelper(std::string variablename);
+  // This function checks if the current scope is function or global
+  // If it's global then it just returns the name of the variable
+  // otherwise it checks the map for the function and returns the correct
+  // offset inside the stacks
+  std::string VariableNameHelper(std::string variablename);
 
  private:
   std::ofstream& outfile_;

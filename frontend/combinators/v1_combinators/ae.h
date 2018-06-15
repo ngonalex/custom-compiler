@@ -1,5 +1,7 @@
-#ifndef AE_H_
-#define AE_H_
+#ifndef FRONTEND_COMBINATORS_V1_COMBINATORS_AE_H_
+#define FRONTEND_COMBINATORS_V1_COMBINATORS_AE_H_
+
+#include <string>
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
@@ -8,12 +10,12 @@
 namespace cs160 {
 namespace frontend {
 
-class ArithExprParser : NullParser {
+class ArithExprParser : public NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // AE_H_
+#endif  // FRONTEND_COMBINATORS_V1_COMBINATORS_AE_H_

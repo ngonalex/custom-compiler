@@ -1,5 +1,7 @@
-#ifndef AND_COMBINATOR_H_
-#define AND_COMBINATOR_H_
+#ifndef FRONTEND_COMBINATORS_BASIC_COMBINATORS_AND_COMBINATOR_H_
+#define FRONTEND_COMBINATORS_BASIC_COMBINATORS_AND_COMBINATOR_H_
+
+#include <string>
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
@@ -7,14 +9,14 @@
 namespace cs160 {
 namespace frontend {
 
-class AndCombinator : NullParser {
+class AndCombinator : public NullParser {
  public:
-	virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
-	NullParser* firstParser;
-	NullParser* secondParser;
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+  NullParser* firstParser;
+  NullParser* secondParser;
 };
 
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // AND_COMBINATOR_H_
+#endif  // FRONTEND_COMBINATORS_BASIC_COMBINATORS_AND_COMBINATOR_H_

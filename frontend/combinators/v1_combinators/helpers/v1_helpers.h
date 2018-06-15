@@ -1,43 +1,46 @@
-#ifndef VAR_HELPER_H_
-#define VAR_HELPER_H_
+#ifndef V1_HELPERS_H_
+#define V1_HELPERS_H_
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
 
+#include <iostream>
+#include <map>
+
 namespace cs160 {
 namespace frontend {
 
-class VarKeywordParser : public NullParser {
+class CloseParenParser : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class ColonParser : public NullParser {
+class OpenParenParser : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class TypeParser : public NullParser {
+class NegativeParser : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class EqualSignParser : public NullParser {
+class AddSubOpParser : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class HelperVariableParser : public NullParser {
+class MulDivOpParser : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
-/*
-class BOExpr : public NullParser {
+
+class SemiColonParser : public NullParser {
  public:
-   virtual ParseStatus do_parse(std::string inputProgram);
-};*/
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+};
 
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // VAR_HELPER_H_
+#endif  // V1_HELPERS_H_
