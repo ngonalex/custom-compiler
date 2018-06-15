@@ -629,14 +629,14 @@ TEST(StatementParser, sucessWhileLoop2) {
 
 TEST(ProgramParser, sucessProgramParser1) {
   ProgramParser parser;
-  ParseStatus result = parser.do_parse("var z = 0; if (z == 0) { z = 100;} x;",
+  ParseStatus result = parser.do_parse("var z : Integer = 0; if (z == 0) { z = 100;} x;",
 0);
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
-  EXPECT_EQ(result.endCharacter, 34);
+  EXPECT_EQ(result.endCharacter, 45);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(result.parsedCharacters, "varz=0;if(z==0){z=100;}x;");
+  EXPECT_EQ(result.parsedCharacters, "varz:Integer=0;if(z==0){z=100;}x;");
   EXPECT_EQ(result.errorType, "");
 
   PrintVisitor *a = new PrintVisitor();
@@ -663,14 +663,14 @@ TEST(ProgramParser, sucessProgramParser2) {
 
 TEST(ProgramParser, sucessProgramParser3) {
   ProgramParser parser;
-  ParseStatus result = parser.do_parse("var z = 0; if (z == 0) { z = 100;} z;",
+  ParseStatus result = parser.do_parse("var z : Integer = 0; if (z == 0) { z = 100;} z;",
 0);
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
-  EXPECT_EQ(result.endCharacter, 34);
+  EXPECT_EQ(result.endCharacter, 45);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(result.parsedCharacters, "varz=0;if(z==0){z=100;}z;");
+  EXPECT_EQ(result.parsedCharacters, "varz:Integer=0;if(z==0){z=100;}z;");
   EXPECT_EQ(result.errorType, "");
 
   PrintVisitor *a = new PrintVisitor();
