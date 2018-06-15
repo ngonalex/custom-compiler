@@ -32,15 +32,12 @@ ParseStatus BlockParser::do_parse(std::string inputProgram,
 
   StatementParser statement_parser;
   OneOrMoreCombinator block_parser;
-  block_parser.parser = reinterpret_cast<NullParser *>(&statement_parser);
-  block_parser.parse(inputProgram, startCharacter);
+  block_parser.parser = &statement_parser;
 
-  auto result = block_parser.parse(inputProgram, startCharacter);
+  ParseStatus result = block_parser.parse(inputProgram, startCharacter);
   if (!result.status) {
     result.errorType = "Issue parsing block";
   }
-
-  // TODO: Form AST here
 
   return result;
 }

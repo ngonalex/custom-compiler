@@ -396,10 +396,10 @@ TEST(LoopParser, doWhileSuccess) {
   EXPECT_EQ(result.parsedCharacters, "repeat{a=3+a;}while(3==2)");
   EXPECT_EQ(result.errorType, "");
 
-  // PrintVisitor *a = new PrintVisitor();
-  // result.ast->Visit(a);
-  // std::string output = a->GetOutput();
-  // EXPECT_EQ(output, //TODO: Check appropriate ast formation);
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
+  EXPECT_EQ(output, "while (3 == 2) {a = (3 + a)}");
 }
 
 TEST(LoopParser, regularWhileSuccess1) {

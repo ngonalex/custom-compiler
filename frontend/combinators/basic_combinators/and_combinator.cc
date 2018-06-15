@@ -74,7 +74,7 @@ ParseStatus AndCombinator::do_parse(std::string inputProgram,
       both.astNodes.push_back(std::move(firstStatus.ast));
     }
     if (secondStatus.astNodes.size() > 0) {
-      for (int i = 0; i < firstStatus.astNodes.size(); i++) {
+      for (int i = 0; i < secondStatus.astNodes.size(); i++) {
         both.astNodes.push_back(std::move(secondStatus.astNodes[i]));
       }
     } else if (secondStatus.ast != NULL) {
