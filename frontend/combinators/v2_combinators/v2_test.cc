@@ -305,7 +305,9 @@ TEST(VariableParserCombinator, failVariableParser4) {
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.startCharacter, 10);
   EXPECT_EQ(result.endCharacter, 10);
-  EXPECT_EQ(result.errorType, "Declare variable names with 'var variable_name : type = expression'");
+  EXPECT_EQ(
+      result.errorType,
+      "Declare variable names with 'var variable_name : type = expression'");
 }
 
 // Fail Case VariableParser : colon missing
