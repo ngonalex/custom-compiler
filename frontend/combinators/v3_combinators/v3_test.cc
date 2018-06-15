@@ -386,17 +386,129 @@ TEST(LoopParser, doWhileSuccess) {
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 34);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(result.parsedCharacters, "repeat{a=3+a;}while(3==2)");
+  EXPECT_EQ(result.errorType, "");
 }
 
-TEST(LoopParser, regularWhileSuccess) {
+TEST(LoopParser, regularWhileSuccess1) {
   LoopParser parser;
-  ParseStatus result = parser.do_parse(
-      "while (3 != 3) {if(a = 2) {e = 4} else {e = 5} e = 4+5;}", 0);
+  ParseStatus result = parser.do_parse("while (3 != 3) {if(a = 2) {e = 4;} else {e = 5;} e = 4+5;", 0);
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
-  EXPECT_EQ(result.endCharacter, 34);
+  EXPECT_EQ(result.endCharacter, 58);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(result.parsedCharacters, "repeat{a=3+a;}while(3==2)");
+  EXPECT_EQ(result.parsedCharacters,"while (3 != 3) {if(a = 2) {e = 4;} else {e = 5;} e = 4+5;}");
+  EXPECT_EQ(result.errorType, "");
+
+  // PrintVisitor *a = new PrintVisitor();
+  // result.ast->Visit(a);
+  // std::string output = a->GetOutput();
+  // EXPECT_EQ(output, //TODO: Check appropriate ast formation);
+}
+
+TEST(LoopParser, regularWhileSuccess2) {
+  LoopParser parser;
+  ParseStatus result = parser.do_parse("while (x >= 3 && e < 0) { if (x == 5) { e = 4; } else { x = x + 5; } e = 4 + 5;", 0);
+
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 79);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "while (x >= 3 && e < 0) { if (x == 5) { e = 4; } else { x = x + 5; } e = 4 + 5;");
+  EXPECT_EQ(result.errorType, "");
+  // PrintVisitor *a = new PrintVisitor();
+  // result.ast->Visit(a);
+  // std::string output = a->GetOutput();
+  // EXPECT_EQ(output, //TODO: Check appropriate ast formation);
+}
+
+TEST(LoopParser, doWhileFailure1) {
+  LoopParser parser;
+  ParseStatus result = parser.do_parse("repeat {a = 3 + a; while (3 == 2)", 0);
+
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 0);
+  EXPECT_EQ(result.remainingCharacters, "repeat {a = 3 + a; while (3 == 2)");
+  EXPECT_EQ(result.parsedCharacters, 0);
+  EXPECT_EQ(result.errorType, "");
+}
+
+TEST(LoopParser, regularWhileFalure1) {
+  LoopParser parser;
+  ParseStatus result = parser.do_parse("while (x >= 3 && e < 0 { if (x == 5) { e = 4; } else { x = x + 5; } e = 4 + 5;", 0);
+
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 0);
+  EXPECT_EQ(result.remainingCharacters, "while (x >= 3 && e < 0 { if (x == 5) { e = 4; } else { x = x + 5; } e = 4 + 5;");
+  EXPECT_EQ(result.parsedCharacters, 0);
+  EXPECT_EQ(result.errorType, "");
+}
+
+TEST(StatementParser, sucessAssignment1) {
+  StatementParser parser;
+  ParseStatus result = parser.do_parse("var x: int = 5; x;", 0);
+
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 18);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "var x: Integer = 5; x;");
+  EXPECT_EQ(result.errorType, "");
+  // PrintVisitor *a = new PrintVisitor();
+  // result.ast->Visit(a);
+  // std::string output = a->GetOutput();
+  // EXPECT_EQ(output, //TODO: Check appropriate ast formation);
+}
+
+TEST(StatementParser, sucessConditional1) {
+  StatementParser parser;
+  ParseStatus result = parser.do_parse("if (x == 3) { x = 5; } else { x = 6;} x;", 0);
+
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 40);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "if (x == 3) { x = 5; } else { x = 6;} x;");
+  EXPECT_EQ(result.errorType, "");
+
+  // PrintVisitor *a = new PrintVisitor();
+  // result.ast->Visit(a);
+  // std::string output = a->GetOutput();
+  // EXPECT_EQ(output, //TODO: Check appropriate ast formation);
+}
+
+TEST(StatementParser, sucessConditional2) {
+  StatementParser parser;
+  ParseStatus result = parser.do_parse("if ( x == 3 || y >= 2) { x = 5; y = z; } else { if (z == 3) { y = x+z;} else {z = z;}} z;", 0);
+
+  EXPECT_EQ(result.status, true);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 89);
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "if ( x == 3 || y >= 2) { x = 5; y = z; } else { if (z == 3) { y = x+z;} else {z = z;}} z;");
+  EXPECT_EQ(result.errorType, "");
+
+  // PrintVisitor *a = new PrintVisitor();
+  // result.ast->Visit(a);
+  // std::string output = a->GetOutput();
+  // EXPECT_EQ(output, //TODO: Check appropriate ast formation);
+}
+
+TEST(StatementParser, failedConditional) {
+  StatementParser parser;
+  ParseStatus result = parser.do_parse("if (x == 3) { x=  3+3 = 6; ", 0);
+
+  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 0);
+  EXPECT_EQ(result.remainingCharacters, "if (x == 3) { x=  3+3 = 6; ");
+  EXPECT_EQ(result.parsedCharacters, "");
+  EXPECT_EQ(result.errorType, "");
+
+  // PrintVisitor *a = new PrintVisitor();
+  // result.ast->Visit(a);
+  // std::string output = a->GetOutput();
+  // EXPECT_EQ(output, //TODO: Check appropriate ast formation);
 }
