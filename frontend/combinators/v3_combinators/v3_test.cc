@@ -424,12 +424,12 @@ TEST(LoopParser, regularWhileSuccess1) {
 TEST(LoopParser, regularWhileSuccess2) {
   LoopParser parser;
   ParseStatus result = parser.do_parse(
-      "while (x >= 3 && e < 0) { if (x == 5) { e = 4; } else { x = x + 5; }",
+      "while (x >= 3 && e < 0) { if (x == 5) { e = 4; } else { x = x + 5; }}",
       0);
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
-  EXPECT_EQ(result.endCharacter, 68);
+  EXPECT_EQ(result.endCharacter, 66);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(
       result.parsedCharacters,
