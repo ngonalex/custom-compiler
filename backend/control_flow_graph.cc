@@ -157,6 +157,7 @@ ControlFlowGraphNode * MarkSweep(
     std::vector<std::string> &live_set,
     ControlFlowGraphNode * apply_sweep) {
   std::vector<std::unique_ptr<struct ThreeAddressCode>> optimize_block = std::move(apply_sweep->GetLocalUniqueBlock());
+  std::vector<std::string> virtual_register_list;
   for (std::vector<std::unique_ptr<struct ThreeAddressCode>>::reverse_iterator iter = 
   optimize_block.rbegin(); iter != optimize_block.rend(); ++iter) {
     //Target is the LHS check
@@ -169,14 +170,52 @@ ControlFlowGraphNode * MarkSweep(
         if(iter->get()->target.reg().name() != iter->get()->arg1.reg().name() 
         || iter->get()->target.reg().name() != iter->get()->arg2.reg().name()) {
           //Delete if its not in the set
-          bool test = (std::find(live_set.begin(),live_set.end(), iter->get()->target.reg().name()) == live_set.end());
-          bool truehope = test;
+          //Check if the variable is not in the liveset
+          // if (iter->get()->arg1.reg().type() == VIRTUALREG) {
+          //   if (std::find(virtual_register_list.begin(),virtual_register_list.end(), iter->get()->target.reg().name()) == virtual_register_list.end()) {
+          //     virtual_register_list.push_back(iter->get()->arg1.reg().name());
+          //   }
+          // }
+          // if (iter->get()->arg2.reg().type() == VIRTUALREG) {
+          //   if (std::find(virtual_register_list.begin(),virtual_register_list.end(), iter->get()->target.reg().name()) == virtual_register_list.end()) {
+          //     virtual_register_list.push_back(iter->get()->arg2.reg().name());
+          //   }
+          // }
+          iter->reset();
+          //std::cout << "I'm actually deleting something" << std::endl;
+          deletionperformed = true;
+        }
+      } else {
+        live_set.erase(std::remove(live_set.begin(),live_set.end(),iter->get()->target.reg().name()),live_set.end());
+        //Remove it from the live set
+
+      }
+    } 
+    if (!deletionperformed && iter->get()->target.reg().type() == VIRTUALREG) {
+      //Check if the variable is not in the liveset
+      if (std::find(virtual_register_list.begin(),virtual_register_list.end(), 
+      iter->get()->target.reg().name()) == virtual_register_list.end()) {
+        //Check if variable isn't being used on the RHS
+        if(iter->get()->target.reg().name() != iter->get()->arg1.reg().name() 
+        || iter->get()->target.reg().name() != iter->get()->arg2.reg().name()) {
+          //Delete if its not in the set
+          //Check if the variable is not in the liveset
+          // if (iter->get()->arg1.reg().type() == VIRTUALREG) {
+          //   if (std::find(virtual_register_list.begin(),virtual_register_list.end(), iter->get()->target.reg().name()) == virtual_register_list.end()) {
+          //     virtual_register_list.push_back(iter->get()->arg1.reg().name());
+          //   }
+          // }
+          // if (iter->get()->arg2.reg().type() == VIRTUALREG) {
+          //   if (std::find(virtual_register_list.begin(),virtual_register_list.end(), iter->get()->target.reg().name()) == virtual_register_list.end()) {
+          //     virtual_register_list.push_back(iter->get()->arg2.reg().name());
+          //   }
+          // }
           iter->reset();
           std::cout << "I'm actually deleting something" << std::endl;
           deletionperformed = true;
         }
       } else {
-        live_set.erase(std::remove(live_set.begin(),live_set.end(),iter->get()->target.reg().name()),live_set.end());
+        virtual_register_list.erase(std::remove(virtual_register_list.begin(),virtual_register_list.end(),iter->get()->target.reg().name()),virtual_register_list.end());
         //Remove it from the live set
 
       }
@@ -187,9 +226,22 @@ ControlFlowGraphNode * MarkSweep(
         live_set.push_back(iter->get()->arg1.reg().name());
       }
     }
-    if (!deletionperformed &&iter->get()->arg2.reg().type() == VARIABLEREG) {
+    if (!deletionperformed && iter->get()->arg2.reg().type() == VARIABLEREG) {
       if (std::find(live_set.begin(),live_set.end(), iter->get()->target.reg().name()) == live_set.end()) {
         live_set.push_back(iter->get()->arg2.reg().name());
+      }
+    }
+    if (!deletionperformed && iter->get()->arg1.reg().type() == VIRTUALREG) {
+      //Check if the variable is not in the liveset
+      if (std::find(virtual_register_list.begin(),virtual_register_list.end(), 
+      iter->get()->target.reg().name()) == virtual_register_list.end()) {
+        virtual_register_list.push_back(iter->get()->arg1.reg().name());
+      }
+    }
+    if (!deletionperformed && iter->get()->arg2.reg().type() == VIRTUALREG) {
+      if (std::find(virtual_register_list.begin(),virtual_register_list.end(), 
+      iter->get()->target.reg().name()) == virtual_register_list.end()) {
+        virtual_register_list.push_back(iter->get()->arg2.reg().name());
       }
     }
     //deletionperformed = false;

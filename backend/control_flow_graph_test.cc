@@ -59,7 +59,7 @@ class ControlFlowGraphTest : public ::testing::Test {
   ControlFlowGraph grapher_;
 };
 
-// TEST_F(ControlFlowGraphTest, ConditionalWithNestedLogicalsWithVariables) {
+// TEST_F(ControlFlowGraphTest, ConditionalWithNestedLogicalsWithVariablesNoElimination) {
 //   Statement::Block statements;
 
 //   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
@@ -202,46 +202,55 @@ TEST_F(ControlFlowGraphTest, LoopWithNestedLogicalsWithVariables) {
   grapher_.CreateCFG(std::move(lowerer_.GetIR()));
   //grapher_.DebugPrint();
   grapher_.DebugEdgeAndBlock();
-  std::string prestring = grapher_.GetOutput();
+  //std::string prestring = grapher_.GetOutput();
   grapher_.Optimize();
-  std::string poststring = grapher_.GetOutput();
-  int compared = prestring.compare(poststring);
-  std::cout << "--- SEE IF IT GOT REDUCED ---" << std::endl;
-  std::cout << "--- FIRST STRING ---" << std::endl;
-  std::cout << prestring << std::endl;
-  std::cout << "--- SECOND STRING ---" << std::endl;
-  std::cout << poststring << std::endl;
-  std::cout << "--- STRINGCOMPARE INT VALUE ---" << std::endl;
-  std::cout << ".compare() strings: " << compared << std::endl;
+  //std::string poststring = grapher_.GetOutput();
+  // int compared = prestring.compare(poststring);
+  // std::cout << "--- SEE IF IT GOT REDUCED ---" << std::endl;
+  // std::cout << "--- FIRST STRING ---" << std::endl;
+  // std::cout << prestring << std::endl;
+  // std::cout << "--- SECOND STRING ---" << std::endl;
+  // std::cout << poststring << std::endl;
+  // std::cout << "--- STRINGCOMPARE INT VALUE ---" << std::endl;
+  // std::cout << ".compare() strings: " << compared << std::endl;
   //grapher_.Optimize();
-  // t_0 <- 5
-  // t_1 <- 10
-  // t_2 <- t_0 + t_1
-  // x <- t_2
-  // t_3 <- 5
-  // t_4 <- 10
-  // t_5 <- t_3 - t_4
-  // y <- t_5
-  // t_6 <- y + x
-  // bob <- t_6
+  // t_6 <- 5
+  // t_7 <- 10
+  // t_8 <- t_6 + t_7
+  // x <- t_8
+  // t_9 <- 5
+  // t_10 <- 10
+  // t_11 <- t_9 - t_10
+  // y <- t_11
+  // t_12 <- y VARLOAD 
+  // t_13 <- x VARLOAD 
+  // t_14 <- t_12 + t_13
+  // bob <- t_14
   // MkLabel loop0
-  // t_7 <- 100
-  // t_8 <- x < t_7
-  // t_9 <- y > x
-  // t_10 <- t_8 && t_9
-  // t_11 <- 100
-  // t_12 <- bob <= t_11
-  // t_13 <- 0
-  // t_14 <- bob >= t_13
-  // t_15 <- t_12 && t_14
-  // t_16 <- t_10 || t_15
-  // while t_16 == 0
+  // t_15 <- x VARLOAD 
+  // t_16 <- 100
+  // t_17 <- t_15 < t_16
+  // t_18 <- y VARLOAD 
+  // t_19 <- x VARLOAD 
+  // t_20 <- t_18 > t_19
+  // t_21 <- t_17 && t_20
+  // t_22 <- bob VARLOAD 
+  // t_23 <- 100
+  // t_24 <- t_22 <= t_23
+  // t_25 <- bob VARLOAD 
+  // t_26 <- 0
+  // t_27 <- t_25 >= t_26
+  // t_28 <- t_24 && t_27
+  // t_29 <- t_21 || t_28
+  // while t_29 == 0
   // je continue0
   // jmp loop0
   // MkLabel continue0
-  // t_17 <- 7
-  // t_18 <- 5
-  // t_19 <- t_17 - t_18
+  // <-  PRINTARITH 
+  // <-  FUNCTIONDEF 
+  // MkLabel func
+  // <-  FUNPROLOGUE 
+  // <-  FUNEPILOGUE 
   EXPECT_EQ(grapher_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
     "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
     "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\nbob <- t_8\n"
