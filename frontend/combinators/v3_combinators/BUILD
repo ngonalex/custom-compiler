@@ -5,7 +5,8 @@ cc_library(
 	hdrs = [
 	"helpers/relational_helper.h", 
 	"main/relation_body.h",
-	"main/relation_parser.h",
+	"main/or_relation_parser.h",
+	"main/and_relation_parser.h",
 	"main/block_parser.h",
 	"main/conditional_parser.h",
 	"main/loop_parser.h",
@@ -15,7 +16,8 @@ cc_library(
 	srcs = [
 	"helpers/relational_helper.cc",
 	"main/relation_body.cc",
-	"main/relation_parser.cc",
+	"main/or_relation_parser.cc",
+	"main/and_relation_parser.cc",
 	"main/block_parser.cc",
 	"main/conditional_parser.cc",
 	"main/loop_parser.cc",

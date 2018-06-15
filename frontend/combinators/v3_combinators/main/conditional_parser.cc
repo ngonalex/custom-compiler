@@ -5,7 +5,7 @@
 
 #include "frontend/combinators/v3_combinators/main/block_parser.h"  // cs160::frontend::BlockParser
 #include "frontend/combinators/v3_combinators/main/conditional_parser.h"  // cs160::frontend::ConditionalParser
-#include "frontend/combinators/v3_combinators/main/relation_parser.h"  // cs160::frontend::RelationParser
+#include "frontend/combinators/v3_combinators/main/or_relation_parser.h"  // cs160::frontend::RelationParser
 
 #include <iostream>
 #include <string>  // std::string, std::stoi
@@ -37,7 +37,7 @@ ParseStatus ConditionalParser::do_parse(std::string inputProgram,
 
   ElseKeyword ifParser;
   OpenParenParser openParen;
-  RelationParser rel_expr;
+  OrRelationParser rel_expr;
   CloseParenParser closeParen;
   OpenCurlyBrackets openBracket1;
   BlockParser block1;

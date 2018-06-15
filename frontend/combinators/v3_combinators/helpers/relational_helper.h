@@ -7,82 +7,82 @@
 namespace cs160 {
 namespace frontend {
 
-class EqualToOpParser : NullParser {
+class EqualToOpParser : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class GreaterThanOpParser : NullParser {
+class GreaterThanOpParser : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class LessThanOpParser : NullParser {
+class LessThanOpParser : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class GreaterThanOrEqualToOpParser : NullParser {
+class GreaterThanOrEqualToOpParser : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class LessThanOrEqualToOpParser : NullParser {
+class LessThanOrEqualToOpParser : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class AndOpParser : NullParser {
+class AndOpParser : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class OrOpParser : NullParser {
+class OrOpParser : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class NotOpParser : NullParser {
+class NotOpParser : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class RelationOperatorParser : NullParser {
+class RelationOperatorParser : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class LogicOperatorParser : NullParser {
+class LogicOperatorParser : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class OpenCurlyBrackets : NullParser {
+class OpenCurlyBrackets : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class CloseCurlyBrackets : NullParser {
+class CloseCurlyBrackets : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class IfKeyword : NullParser {
+class IfKeyword : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class ElseKeyword : NullParser {
+class ElseKeyword : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class RepeatKeyword : NullParser {
+class RepeatKeyword : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class WhileKeyword : NullParser {
+class WhileKeyword : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
