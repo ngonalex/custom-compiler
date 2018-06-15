@@ -6,6 +6,8 @@
 #include "frontend/combinators/v3_combinators/main/conditional_parser.h"  // cs160::frontend::ConditionalParser
 #include "frontend/combinators/v3_combinators/main/loop_parser.h"  // cs160::frontend::LoopParser
 
+#include "frontend/combinators/v4_combinators/main/function_call_parser.h" // cs160::frontend::FunctionCallParser
+
 #include <iostream>
 #include <string>  // std::string, std::stoi
 
@@ -34,21 +36,24 @@ ParseStatus StatementParser::do_parse(std::string inputProgram,
     return super::fail(inputProgram, endCharacter, "");
   }
 
+    FunctionCallParser functionCallParser;
   AssignmentParser assignParser;
   ConditionalParser conditionalParser;
   LoopParser loopParser;
 
-  // assign | cond | loop
+  // func call | assign | cond | loop
+    OrCombinator funcCallOrAssign;
   OrCombinator assignOrConditional;
   OrCombinator allStatement;
 
-  assignOrConditional.firstParser =
-      reinterpret_cast<NullParser *>(&assignParser);
-  assignOrConditional.secondParser =
-      reinterpret_cast<NullParser *>(&conditionalParser);
-  allStatement.firstParser =
-      reinterpret_cast<NullParser *>(&assignOrConditional);
-  allStatement.secondParser = reinterpret_cast<NullParser *>(&loopParser);
+    funcCallOrAssign.firstParser = &functionCallParser;
+    funcCallOrAssign.secondParser = &assignParser;
+    
+    assignOrConditional.firstParser = &funcCallOrAssign;
+    assignOrConditional.secondParser = &conditionalParser;
+    
+  allStatement.firstParser = &assignOrConditional;
+  allStatement.secondParser = &loopParser;
 
   ParseStatus result = allStatement.do_parse(inputProgram, startCharacter);
   if (!result.status) {
