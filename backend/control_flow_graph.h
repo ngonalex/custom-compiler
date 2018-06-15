@@ -89,7 +89,6 @@ class ControlFlowGraph {
   void DebugPrint();
   void DebugEdgeAndBlock();
   std::string GetOutput();
-  std::string GetOutputNoConsume();
   std::vector<std::unique_ptr<struct ThreeAddressCode>> MakeThreeAddressCode();
 
  private:
