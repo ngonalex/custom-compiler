@@ -49,57 +49,75 @@ ParseStatus LoopParser::do_parse(std::string inputProgram, int startCharacter) {
   BlockParser block;
 
   AndCombinator doWhile1;
-  doWhile1.firstParser = reinterpret_cast<NullParser *>(&repeatP);
-  doWhile1.secondParser = reinterpret_cast<NullParser *>(&openBracketP);
+  doWhile1.firstParser = &repeatP;
+  doWhile1.secondParser = &openBracketP;
   AndCombinator doWhile2;
-  doWhile2.firstParser = reinterpret_cast<NullParser *>(&doWhile1);
-  doWhile2.secondParser = reinterpret_cast<NullParser *>(&block);
+  doWhile2.firstParser = &doWhile1;
+  doWhile2.secondParser = &block;
   AndCombinator doWhile3;
-  doWhile3.firstParser = reinterpret_cast<NullParser *>(&doWhile2);
-  doWhile3.secondParser = reinterpret_cast<NullParser *>(&closeBracketP);
+  doWhile3.firstParser = &doWhile2;
+  doWhile3.secondParser = &closeBracketP;
   AndCombinator doWhile4;
-  doWhile4.firstParser = reinterpret_cast<NullParser *>(&doWhile3);
-  doWhile4.secondParser = reinterpret_cast<NullParser *>(&whileP);
+  doWhile4.firstParser = &doWhile3;
+  doWhile4.secondParser = &whileP;
   AndCombinator doWhile5;
-  doWhile5.firstParser = reinterpret_cast<NullParser *>(&doWhile4);
-  doWhile5.secondParser = reinterpret_cast<NullParser *>(&openParenP);
+  doWhile5.firstParser = &doWhile4;
+  doWhile5.secondParser = &openParenP;
   AndCombinator doWhile6;
-  doWhile6.firstParser = reinterpret_cast<NullParser *>(&doWhile5);
-  doWhile6.secondParser = reinterpret_cast<NullParser *>(&relationP);
+  doWhile6.firstParser = &doWhile5;
+  doWhile6.secondParser = &relationP;
   AndCombinator doWhile7;
-  doWhile7.firstParser = reinterpret_cast<NullParser *>(&doWhile6);
-  doWhile7.secondParser = reinterpret_cast<NullParser *>(&closeParenP);
+  doWhile7.firstParser = &doWhile6;
+  doWhile7.secondParser = &closeParenP;
   // ParseStatus doWhileBlock =
   // block.do_parse(doWhile1.do_parse().remainingCharacters,
   // doWhile1.endCharacter);
 
   AndCombinator while1;
-  while1.firstParser = reinterpret_cast<NullParser *>(&whileP);
-  while1.secondParser = reinterpret_cast<NullParser *>(&openParenP);
+  while1.firstParser = &whileP;
+  while1.secondParser = &openParenP;
   AndCombinator while2;
-  while2.firstParser = reinterpret_cast<NullParser *>(&while1);
-  while2.secondParser = reinterpret_cast<NullParser *>(&relationP);
+  while2.firstParser = &while1;
+  while2.secondParser = &relationP;
   AndCombinator while3;
-  while3.firstParser = reinterpret_cast<NullParser *>(&while2);
-  while3.secondParser = reinterpret_cast<NullParser *>(&closeParenP);
+  while3.firstParser = &while2;
+  while3.secondParser = &closeParenP;
   AndCombinator while4;
-  while4.firstParser = reinterpret_cast<NullParser *>(&while3);
-  while4.secondParser = reinterpret_cast<NullParser *>(&openBracketP);
+  while4.firstParser = &while3;
+  while4.secondParser = &openBracketP;
   AndCombinator while5;
-  while5.firstParser = reinterpret_cast<NullParser *>(&while4);
-  while5.secondParser = reinterpret_cast<NullParser *>(&block);
+  while5.firstParser = &while4;
+  while5.secondParser = &block;
   AndCombinator while6;
-  while6.firstParser = reinterpret_cast<NullParser *>(&while5);
-  while6.secondParser = reinterpret_cast<NullParser *>(&closeBracketP);
+  while6.firstParser = &while5;
+  while6.secondParser = &closeBracketP;
   // ParseStatus whileBlock = block.do_parse(while4.remainingCharacters,
   // while4.endCharacter);
 
   OrCombinator loops;
-  loops.firstParser = reinterpret_cast<NullParser *>(&doWhile7);
-  loops.secondParser = reinterpret_cast<NullParser *>(&while6);
+  loops.firstParser = &doWhile7;
+  loops.secondParser = &while6;
 
   ParseStatus result = loops.do_parse(inputProgram, endCharacter);
   if (result.status) {
+      Statement::Block block;
+      if (result.firstOrSecond){
+          for (int i = 0; i < result.astNodes.size()-1; i++){
+              block.push_back(unique_cast<const Statement>(std::move(result.astNodes[i])));
+          }
+          std::unique_ptr<const RelationalExpr> guard = unique_cast<const RelationalExpr>(std::move(result.astNodes[result.astNodes.size()-1]));
+          
+          result.ast = std::move(make_unique<const Loop>(std::move(guard), std::move(block)));
+      } else {
+          for (int i = 1; i < result.astNodes.size(); i++){
+              block.push_back(unique_cast<const Statement>(std::move(result.astNodes[i])));
+          }
+          std::unique_ptr<const RelationalExpr> guard = unique_cast<const RelationalExpr>(std::move(result.astNodes[0]));
+          result.ast = std::move(make_unique<const Loop>(std::move(guard), std::move(block)));
+      }
+      
+      result.astNodes.erase(std::begin(result.astNodes), std::end(result.astNodes));
+      
     /*
      std::unique_ptr<const RelationalExpr> relationAst;
       std::vector<std::unique_ptr<const AstNode>> blockAsts;

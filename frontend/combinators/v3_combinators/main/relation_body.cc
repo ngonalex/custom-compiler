@@ -63,7 +63,7 @@ ParseStatus RelationBodyParser::do_parse(std::string inputProgram,
 }
 
 // ae rop ae
-std::unique_ptr<const RelationalBinaryOperator> RelationBodyParser::make_node(
+std::unique_ptr<const RelationalExpr> RelationBodyParser::make_node(
     std::unique_ptr<const ArithmeticExpr> first_ae, std::string rop,
     std::unique_ptr<const ArithmeticExpr> second_ae) {
   if (rop == "<") {
@@ -81,6 +81,9 @@ std::unique_ptr<const RelationalBinaryOperator> RelationBodyParser::make_node(
   } else if (rop == "==") {
     return make_unique<const EqualToExpr>(std::move(first_ae),
                                           std::move(second_ae));
+  } else if (rop == "!="){
+    return make_unique<const LogicalNotExpr>(make_unique<const EqualToExpr>(std::move(first_ae),
+                                            std::move(second_ae)));
   } else {
     return nullptr;
   }

@@ -50,7 +50,7 @@ ParseStatus StatementParser::do_parse(std::string inputProgram,
       reinterpret_cast<NullParser *>(&assignOrConditional);
   allStatement.secondParser = reinterpret_cast<NullParser *>(&loopParser);
 
-  auto result = allStatement.do_parse(inputProgram, startCharacter);
+  ParseStatus result = allStatement.do_parse(inputProgram, startCharacter);
   if (!result.status) {
     result.errorType = "Issue parsing statement";
   }
