@@ -1,8 +1,8 @@
 #include "backend/control_flow_graph.h"
-#include "backend/lowerer_visitor.h"
 
 #include <vector>
 
+#include "backend/lowerer_visitor.h"
 #include "abstract_syntax/abstract_syntax.h"
 #include "gtest/gtest.h"
 #include "utility/memory.h"
@@ -38,7 +38,7 @@ using cs160::backend::ControlFlowGraphNode;
 using cs160::make_unique;
 
 class ControlFlowGraphTest : public ::testing::Test {
-  public:
+ public:
   std::unique_ptr<const FunctionDef> GenerateFuncDef() {
     // empty params
     auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
@@ -109,11 +109,10 @@ TEST_F(ControlFlowGraphTest, ConditionalWithNestedLogicalsWithVariables) {
     std::move(statements), std::move(arithexpr));
 
   expr->Visit(&lowerer_);
-  
   grapher_.CreateCFG(std::move(lowerer_.GetIR()));
   grapher_.Optimize();
 
-  EXPECT_EQ(grapher_.GetOutput(),"t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
+  EXPECT_EQ(grapher_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
     "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
     "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\nbob <- t_8\n"
     "t_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\nt_12 <- y VARLOAD \n"
@@ -189,17 +188,7 @@ TEST_F(ControlFlowGraphTest, LoopWithNestedLogicalsWithVariables) {
 
   expr->Visit(&lowerer_);
   grapher_.CreateCFG(std::move(lowerer_.GetIR()));
-  grapher_.Optimize();
-  //std::string poststring = grapher_.GetOutput();
-  // int compared = prestring.compare(poststring);
-  // std::cout << "--- SEE IF IT GOT REDUCED ---" << std::endl;
-  // std::cout << "--- FIRST STRING ---" << std::endl;
-  // std::cout << prestring << std::endl;
-  // std::cout << "--- SECOND STRING ---" << std::endl;
-  // std::cout << poststring << std::endl;
-  // std::cout << "--- STRINGCOMPARE INT VALUE ---" << std::endl;
-  // std::cout << ".compare() strings: " << compared << std::endl;
-  //grapher_.Optimize();
+  grapher_.Optimize();;
   // t_6 <- 5
   // t_7 <- 10
   // t_8 <- t_6 + t_7
@@ -208,22 +197,22 @@ TEST_F(ControlFlowGraphTest, LoopWithNestedLogicalsWithVariables) {
   // t_10 <- 10
   // t_11 <- t_9 - t_10
   // y <- t_11
-  // t_12 <- y VARLOAD 
-  // t_13 <- x VARLOAD 
+  // t_12 <- y VARLOAD
+  // t_13 <- x VARLOAD
   // t_14 <- t_12 + t_13
   // bob <- t_14
   // MkLabel loop0
-  // t_15 <- x VARLOAD 
+  // t_15 <- x VARLOAD
   // t_16 <- 100
   // t_17 <- t_15 < t_16
-  // t_18 <- y VARLOAD 
-  // t_19 <- x VARLOAD 
+  // t_18 <- y VARLOAD
+  // t_19 <- x VARLOAD
   // t_20 <- t_18 > t_19
   // t_21 <- t_17 && t_20
-  // t_22 <- bob VARLOAD 
+  // t_22 <- bob VARLOAD
   // t_23 <- 100
   // t_24 <- t_22 <= t_23
-  // t_25 <- bob VARLOAD 
+  // t_25 <- bob VARLOAD
   // t_26 <- 0
   // t_27 <- t_25 >= t_26
   // t_28 <- t_24 && t_27
@@ -232,25 +221,25 @@ TEST_F(ControlFlowGraphTest, LoopWithNestedLogicalsWithVariables) {
   // je continue0
   // jmp loop0
   // MkLabel continue0
-  // <-  PRINTARITH 
-  // <-  FUNCTIONDEF 
+  // <-  PRINTARITH
+  // <-  FUNCTIONDEF
   // MkLabel func
-  // <-  FUNPROLOGUE 
-  // <-  FUNEPILOGUE 
+  // <-  FUNPROLOGUE
+  // <-  FUNEPILOGUE
   EXPECT_EQ(grapher_.GetOutput(), "t_6 <- 5\nt_7 <- 10\nt_8 <- t_6 + t_7\n"
   "x <- t_8\nt_9 <- 5\nt_10 <- 10\nt_11 <- t_9 - t_10\ny <- t_11\nt_12 <- y "
-  "VARLOAD \nt_13 <- x VARLOAD \nt_14 <- t_12 + t_13\nbob <- t_14\nMkLabel " 
-  "loop0\nt_15 <- x VARLOAD \nt_16 <- 100\nt_17 <- t_15 < t_16\nt_18 <- y " 
+  "VARLOAD \nt_13 <- x VARLOAD \nt_14 <- t_12 + t_13\nbob <- t_14\nMkLabel "
+  "loop0\nt_15 <- x VARLOAD \nt_16 <- 100\nt_17 <- t_15 < t_16\nt_18 <- y "
   "VARLOAD \nt_19 <- x VARLOAD \nt_20 <- t_18 > t_19\nt_21 <- t_17 && t_20\n"
-  "t_22 <- bob VARLOAD \nt_23 <- 100\nt_24 <- t_22 <= t_23\nt_25 <- bob " 
+  "t_22 <- bob VARLOAD \nt_23 <- 100\nt_24 <- t_22 <= t_23\nt_25 <- bob "
   "VARLOAD \nt_26 <- 0\nt_27 <- t_25 >= t_26\nt_28 <- t_24 && t_27\n"
   "t_29 <- t_21 || t_28\nwhile t_29 == 0\nje continue0\njmp loop0\n"
   "MkLabel continue0\n <-  PRINTARITH \n <-  FUNCTIONDEF \n"
   "MkLabel func\n <-  FUNPROLOGUE \n <-  FUNEPILOGUE \n");
-
 }
 
-TEST_F(ControlFlowGraphTest, LoopWithNestedLogicalsWithVariablesMultiAssignment) {
+TEST_F(ControlFlowGraphTest
+, LoopWithNestedLogicalsWithVariablesMultiAssignment) {
   Statement::Block statements;
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
@@ -317,7 +306,6 @@ TEST_F(ControlFlowGraphTest, LoopWithNestedLogicalsWithVariablesMultiAssignment)
   expr->Visit(&lowerer_);
   grapher_.CreateCFG(std::move(lowerer_.GetIR()));
   grapher_.Optimize();
-  
   EXPECT_EQ(grapher_.GetOutput(),
             "t_12 <- 5\nt_13 <- 10\nt_14 <- t_12 + t_13\n"
             "x <- t_14\nt_15 <- 5\nt_16 <- 10\nt_17 <- t_15 - t_16\n"
@@ -326,9 +314,12 @@ TEST_F(ControlFlowGraphTest, LoopWithNestedLogicalsWithVariablesMultiAssignment)
             "t_21 <- x VARLOAD \nt_22 <- 100\nt_23 <- t_21 < t_22\n"
             "t_24 <- y VARLOAD \nt_25 <- x VARLOAD \nt_26 <- t_24 > t_25\n"
             "t_27 <- t_23 && t_26\nt_28 <- bob VARLOAD \nt_29 <- 100\n"
-            "t_30 <- t_28 <= t_29\nt_31 <- bob VARLOAD \nt_32 <- 0\nt_33 <- t_31 >= t_32\n"
-            "t_34 <- t_30 && t_33\nt_35 <- t_27 || t_34\nwhile t_35 == 0\nje continue0\njmp loop0\n"
-            "MkLabel continue0\n <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n"
+            "t_30 <- t_28 <= t_29\nt_31 <- bob VARLOAD \nt_32 <- 0\n"
+            "t_33 <- t_31 >= t_32\n"
+            "t_34 <- t_30 && t_33\nt_35 <- t_27 || t_34\nwhile t_35 == 0\n"
+            "je continue0\njmp loop0\n"
+            "MkLabel continue0\n <-  PRINTARITH \n <-  FUNCTIONDEF \n"
+            "MkLabel func\n"
             " <-  FUNPROLOGUE \n <-  FUNEPILOGUE \n");
 }
 
@@ -393,7 +384,6 @@ TEST_F(ControlFlowGraphTest, ConditionalsWithBothBranch) {
 
   grapher_.CreateCFG(std::move(lowerer_.GetIR()));
   grapher_.Optimize();
-  
   EXPECT_EQ(grapher_.GetOutput(),
       "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
       "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\n"
@@ -457,7 +447,8 @@ TEST_F(ControlFlowGraphTest, NestedLoop) {
   EXPECT_EQ(grapher_.GetOutput(), "t_0 <- 0\nx <- t_0\nMkLabel loop0\n"
   "t_2 <- x VARLOAD \nt_3 <- 5\nt_4 <- t_2 < t_3\nwhile t_4 == 0\n"
   "je continue0\nMkLabel loop1\nt_5 <- y VARLOAD \nt_6 <- 3\n"
-  "t_7 <- t_5 < t_6\nwhile t_7 == 0\nje continue1\nt_8 <- y VARLOAD \nt_9 <- 2\n"
+  "t_7 <- t_5 < t_6\nwhile t_7 == 0\nje continue1\n"
+  "t_8 <- y VARLOAD \nt_9 <- 2\n"
   "t_10 <- t_8 + t_9\ny <- t_10\njmp loop1\nMkLabel continue1\n"
   "jmp loop0\nMkLabel continue0\n");
 }
