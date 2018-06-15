@@ -508,7 +508,8 @@ TEST_F(CodeGenTestV4, AssignmentsWithDivisionWorksInFunctions) {
 // }
 //
 // foo_retval = foo()
-TEST_F(CodeGenTestV4, AssignmentWithDivisionByZeroErrorsOutCorrectlyInFunctions) {
+TEST_F(CodeGenTestV4,
+       AssignmentWithDivisionByZeroErrorsOutCorrectlyInFunctions) {
   Statement::Block foo_statements;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(

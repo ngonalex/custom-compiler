@@ -1697,7 +1697,8 @@ TEST_F(CodeGenTestV5, CanCreateTupleWithMixedTypesFunction) {
 //  bob = tuple(0)
 //  return bob
 // call foo()
-TEST_F(CodeGenTestV5, TupleCreationErrorsOutWhenArgumentSuppliedisZeroFunction) {
+TEST_F(CodeGenTestV5,
+       TupleCreationErrorsOutWhenArgumentSuppliedisZeroFunction) {
   Statement::Block foo_statements;
   Statement::Block statements;
 
@@ -1780,7 +1781,8 @@ TEST_F(CodeGenTestV5, TupleCreationErrorsOutWhenArgumentSuppliedisNegFunc) {
 //  bob->4 = 50
 //  return bob
 // call foo()
-TEST_F(CodeGenTestV5, DereferenceAccessErrorsOutWhenArgumentIsAboveMaxSizeFunc) {
+TEST_F(CodeGenTestV5,
+       DereferenceAccessErrorsOutWhenArgumentIsAboveMaxSizeFunc) {
   Statement::Block foo_statements;
   Statement::Block statements;
 
@@ -2018,7 +2020,8 @@ TEST_F(CodeGenTestV5, ArithAssignedCorrectlyWhenTheRHSIsATupleFunc) {
 //  bob->1 = rob
 //  return bob
 // call foo()
-TEST_F(CodeGenTestV5, NestedTupleCreationErrOutCorrectlyWhenTheRHSIsATupleFunc) {
+TEST_F(CodeGenTestV5,
+       NestedTupleCreationErrOutCorrectlyWhenTheRHSIsATupleFunc) {
   Statement::Block foo_statements;
   Statement::Block statements;
 
@@ -2318,7 +2321,8 @@ TEST_F(CodeGenTestV5, RHSDoubleNestedDereferencesCanBeAccessedCorrectlyFunc) {
 //  rob = bob->2->1
 //  return rob
 // call foo()
-TEST_F(CodeGenTestV5, NestedDereferencesErrorOutIfObjectAccessedIsNotTupleFunc) {
+TEST_F(CodeGenTestV5,
+       NestedDereferencesErrorOutIfObjectAccessedIsNotTupleFunc) {
   Statement::Block foo_statements;
   Statement::Block statements;
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
@@ -2537,7 +2541,8 @@ TEST_F(CodeGenTestV5, ArithmeticExprWorksOnTuplesIndicesIfTheyAreIntsFunc) {
 //    rob = 0
 //  return rob
 // call foo()
-TEST_F(CodeGenTestV5, GreaterThanLessThanWorksOnTuplesIndicesIfTheyAreIntsFunc) {
+TEST_F(CodeGenTestV5,
+       GreaterThanLessThanWorksOnTuplesIndicesIfTheyAreIntsFunc) {
   Statement::Block foo_statements;
   Statement::Block statements;
 
