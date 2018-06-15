@@ -111,7 +111,7 @@ If the variable "x" is never used again then our program will continue. However 
 5) Undeclared Functions
   If the function name that is being referred to in a function call does not exist in our map we throw an error.
 
-# Code Generation#
+# Code Generation #
 
 Files: code_gen.cc, code_gen.h
 Files it depends on: ir.h, helper_struct.h, lowerer_visitor.cc, lowerer_visitor.h
@@ -146,6 +146,7 @@ Also this is important to note that there are reserved keywords in our language.
 - Conditional -> Pop top two things off the stack and evaluate it. If it's == to 0 then we jump to the false branch, otherwise we continues (falls in the true branch), Eventually both branches converge and have a jump to main.
 
 **V4**
+
 -Function calls -> Loads all the arguments on the stack, then calls the corresponding function (it has a label)
                 -> when it returns, we have a variable in the static segment called "returnobj", unpack that object and load the flags + object into the corresponding variable defined by the function call return variable. Then 
                 -> clear the returnobj so it can be used in the next function call then restore the stack (misaligned because we loaded in arguments into the stack)
