@@ -29,7 +29,8 @@ class ParseStatus {  // Super class
   // Only for And Combinator
   std::unique_ptr<const AstNode> second_ast;
 
-  // Only for And Combinator (used for ast construction when grabbing relation operator)
+  // Only for And Combinator (used for ast construction when grabbing relation
+  // operator)
   std::string firstParsedCharacters;
   std::string secondParsedCharacters;
 

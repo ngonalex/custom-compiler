@@ -46,7 +46,8 @@ ParseStatus RelationBodyParser::do_parse(std::string inputProgram,
   AndCombinator firstAnd;
   firstAnd.firstParser = reinterpret_cast<NullParser *>(&aeAndRop);
   firstAnd.secondParser = reinterpret_cast<NullParser *>(&aeParser);
-  ParseStatus grabOperatorResult = aeAndRop.do_parse(inputProgram, endCharacter);
+  ParseStatus grabOperatorResult =
+      aeAndRop.do_parse(inputProgram, endCharacter);
   ParseStatus firstStatus = firstAnd.do_parse(inputProgram, endCharacter);
 
   // Cache the result for later
