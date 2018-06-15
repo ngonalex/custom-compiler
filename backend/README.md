@@ -1,19 +1,23 @@
 Backend Documentation
 
 Development:
-1) Mainly developed on a Ubuntu 17.04 machine, so the instructions used reflect. Our codegen tests will not work on mac/windows machines. If bazel is installed on a csil machine, our program should work.
+
+1) Mainly developed on a Ubuntu 17.04 machine. Our codegen tests will not work on mac/windows machines due to things like absolute addressing. If bazel is installed on a csil machine, our program should work.
 
 Testing:
-to run codegen tests: bazel test backend/backend_test
-to run lowerer_tests: bazel test backend/lowerer_test
+
+- to run all tests: bazel test backend/backend_test
+- to run codegen tests: bazel test backend/codegen_test
+- to run lowerer_tests: bazel test backend/lowerer_test
 
 Our project is split into 4 parts.
 1) Intermediate Representation
 2) Lowerer
 3) Code Generation
-4) Control Flow Graph + Optimizer (David fix this)
+4) Control Flow Graph + Optimizer
 
 INTERMEDIATE REPRESENTATION
+
 Files: ir.h
 Basically contains all of our useful enums and classes that are used to make up the ThreeAddressCode data structure.
 The way we broke down our ThreeAddressCode structure is  
@@ -26,6 +30,7 @@ The way we broke down our ThreeAddressCode structure is
 There's nothing too difficult here, but it may be somewhat confusing on why we decided to have Target/Operand hold two different classes rather than be a parent and have classes inherit from it. We based this structure off of the way Ben created his tokens in the example-code repository because we didn't want to deal with object slicing. If we had more time we definitely would revise our class structure as it can get very confusing to deal with though.
 
 LOWERER
+
 Files: lowerer_visitor.cc, lowerer_visitor.h
 Files it depends on: ir.h, helper_struct.h
 Tests: lowerer_visitor_test* 
@@ -35,17 +40,20 @@ The way our lowerer works is it takes in an AST and creates a vector of ThreeAdd
 We'll break our lowerer_visitor into what it does for each version.
 
 V1:
+
 V1 does two things
 1) Responsible for signaling instructions for Codegen to load an integer/dereference/variable into the stack
 2) Signal to codegen to pop two things off the stack and do the corresponding operation on them as provided by the opcode, then pushing the result onto the stack
 
 V2:
+
 V2 is an extension of V1 except now it needs to handle LeftHandSide variable/Dereferences present in ArithmeticExprs
 
 All V2 really is is differentiating between a LHS and a RHS variable. If it's a LHS variable signal to codegen that it needs to pop the address of the variable and load something into it.
 If it's a RHS variable signal to codegen to load from memory and use that value in resulting calculations.
 
 V3:
+
 Loops
 - Tell codegen how to evaluate the guard, create a label for the loop name, create instructions for the loop body, then jumpback to either the loop or to main.
 
@@ -56,6 +64,7 @@ Relational/Logical Exprs
 - Similar to how our lowerer handles Add/Sub/Mul/Div, all it does is signal to codegen to pop two things of the stack compare them based on the opcode and push the result on the stack.
 
 V4:
+
 Function calls
 - Iterate through the arguments vector which tells CodeGen to load in arguments into the stack, then tell Codegen to create a "call instruction", then which variable to load in the result of the function
 
@@ -63,6 +72,7 @@ Function definitions
 - Iterate through the function definition vector and tell codegen to create a label for the function as well as which instructions to put in each function
 
 V5:
+
 Dereference
 - Similar to how variables are handled, dereferences are handled by differentiating on if they are a RHS or a LHS and signaling to codegen to do a different action accordingly. You can look at our OpCode Enum in ir.h to see a RHS and a LHS dereference opcode instruction.
 - It does one key thing differently though which is it will signal to codegen where the dereference is in the chain.
@@ -71,6 +81,7 @@ x->1 vs x->1->1
 There are two types of different dereferences which are a "parent" dereference and a "child" dereference. We need to figure this stuff out here, because codegen handles the two cases differently. If it's a child dereference then codegen needs to know to push the address of where the child lies so the next dereference can access further into the tuple. If it's a parent dereference however this changes based on if it's a RHS or a LHS defererence. If it's a RHS dereference then access the value inside the dereference and push it on the stack otherwise push the address so it can write into the tuple.
 
 Some extra features our lowerer does:
+
 1) Catches unassigned variable errors
   e.g y = x where x has never been assigned yet, our lowerer will catch this error and exit the program by using a global set that is created as variables are assigned.
 
@@ -98,6 +109,7 @@ If the variable "x" is never used again then our program will continue. However 
   If the function name that is being referred to in a function call does not exist in our map we throw an error.
 
 CODE GENERATION
+
 Files: code_gen.cc, code_gen.h
 Files it depends on: ir.h, helper_struct.h, lowerer_visitor.cc, lowerer_visitor.h
 Tests: codegen_test.cc
@@ -157,7 +169,44 @@ Child/Parent + LHS Dereference and Child RHS Dereference are handled the same. T
 
 Parent Dereference + RHS Dereference takes an extra step of accessing the actual value of the tuple rather than just the address and then pushing that on the stack.
 
-CONTROL FLOW GRAPH && OPTIMIZER
-(David fill this in)
+CONTROL FLOW GRAPH && OPTIMIZER:
+Files: control_flow_graph.cc, control_flow_graph.h
+Files it depends on: ir.h, helper_struct.h, lowerer_visitor.cc, lowerer_visitor.h
+Tests: control_flow_graph.cc
+
+The Control Flow Graph takes an IR and attempts to optimizes it using Dead Code Elimination
+1) Takes the vector of IR and creates a vector of Control Flow Graph Nodes
+  1a) Each Control Flow Graph Node has a subset (in the form of a vector) of the vector of IR
+2) Takes the Control Flow Graph Nodes and recursively build a graph
+3) Apply the Optimize() function
+
+Each step is fairly complicated in its actual implementation however:
+In order to build the nodes, the Control Flow Graph iterates through the vector of unique_ptr ThreeAddressCodes.
+As the Graph iterates through each vector, it builds a new unique_ptr ThreeAddressCodes vector, creating a "local block" for each node.
+On each iteration, the operation type of the ThreeAddressCode is checked, and on certain operations, it then breaks off and creates a node. These operations include: CONDITIONAL, LOOP, JUMP.
+Also it checks if it has reached the end of the IR to make a node.
+It makes blocks at these points because these are points where the instructions can jump to another location. Creating these blocks allow for a local optimization.
+
+Since the nodes created are unique_ptr ControlFlowGraphNodes, it is impossible to directly point nodes at each other since  2 nodes can point at a single one. Thus I used a vector of "Edges", a self definied struct that contained a from -> to int pair using the creation order of each node as the numerical identifier, and an edge type (which is important in recursely traversing the graph in reverse).
+The recursion begins with the first node in the vector (which should be the node that contains the first few lines of IR), and then checks if it is a CONDITIONAL or a LOOP.
+Depending on what it sees, it'll make 3-4 recursive calls. These recursive calls allow the ControlFlowGraph to handle nested conditionals or nested loops regardless. Because of the nature of the graph, you have to connect 6 nodes if it is a CONDITIONAL or 5 if it is a LOOP, while there is a possibility that 2 of those nodes are the same as 2 of the other nodes. This is due to the fact that you have to connect the top and bottom part of another conditional/loop if it ends up being nested
+
+Labeling the Edge Type was important in creating the reverse traversal needed for Optimize().
+When Optimize is called, it calls a RecursiveFind by using a helper. The RecursiveFind is designed to pass the current live_set to the next neccessarily block. This allows it to handle a global optimization.
+For conditionals, it is important that both the true and false branch make their local optimizations, and then combine their local set, and then pass it onto the guard who can then make a local optimization. Because you have to merge the vector, the recursive call to the functions can't possibly figure out what to combine. Thus they prematurely return and give their vectors back to the original function that called them to merge their vectors. They also return the guard that they were supposed to give their merged vectors too, allowing the last recursive call to happen.
+Loops are much easier, as they only have to pass it off to the next node. They do require a visited vector so they don't infinitely pass their live_sets. Edge Types must be used determine what kind of operation must be done, because it is impossible to check node type since node type can only be used to determine direction going forward, not backward.
+Overall, this reverse recurse was incredibly difficult because it was impossible to figure out what operation has to be done unless more information was given (which is why I had to create a edge struct and label each edge)
+
+Finally now since it can figure out how to pass the local set between the nodes, it can apply the liveliness analysis in the local blocks.
+The function reverse iterates through the vector of ThreeAddressCode. It checks if the target (LHS) is in the liveset. If it isn't and also isn't being use by the args (RHS), then that means that the variable is dead and can be eliminated. It sets the unique_ptr to NULL (which code_gen knows to ignore). 
+Then it checks the args (RHS) to see if they're in the liveset. If they are then they're ignored, but if they aren't, then they're placed into the live_set, meaning they won't get optimized out the next time they're assigned.
+This operation is also done on virtual registers, allowing for the naive implementation that ThreeAddressCode use to be completely cleaned up.
+
+Finally it returns back to the user the IR by rebuilding a vector of ThreeAddressCode by iterating over the Nodes and reclaiming ownership of their IRs
+
+There are some additional functionality, including some debug functions and a GetOutput() function. 
+
+The Recursion for this part was only possible by using unique_ptr's .get(), returning a direct pointer back. Since the recursion didn't need the ownership, it made sense to use them. Also it would've been incredibly difficult to recursively pass unique_ptrs, because when the functions are popped out of the stack, then the original function call will no longer have ownership. 
+
 
 

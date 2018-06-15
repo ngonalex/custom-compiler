@@ -1,18 +1,20 @@
-#ifndef WORD_PARSER_H_
-#define WORD_PARSER_H_
+#ifndef FRONTEND_COMBINATORS_V2_COMBINATORS_MAIN_WORD_PARSER_H_
+#define FRONTEND_COMBINATORS_V2_COMBINATORS_MAIN_WORD_PARSER_H_
 
-#include "frontend/combinators/basic_combinators/null.h"
+#include <string>
+
 #include "abstract_syntax/abstract_syntax.h"
+#include "frontend/combinators/basic_combinators/null.h"
 
 namespace cs160 {
 namespace frontend {
 
-class WordParser : NullParser {
+class WordParser : public NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-} // namespace frontend
-} // namespace cs160
+}  // namespace frontend
+}  // namespace cs160
 
-#endif // WORD_PARSER_H_
+#endif  // FRONTEND_COMBINATORS_V2_COMBINATORS_MAIN_WORD_PARSER_H_

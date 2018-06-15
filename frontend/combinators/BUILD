@@ -1,7 +1,6 @@
 cc_library(
 	name = "preparser",
 	copts = ["-Wall -g"],
-	hdrs = ["preparser.h"],
 	srcs = ["preparser.cc"],
 	deps = [],
 	visibility = ["//visibility:public"],

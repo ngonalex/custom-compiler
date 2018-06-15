@@ -1,5 +1,8 @@
-#ifndef NULL_PARSER_H
-#define NULL_PARSER_H
+#ifndef FRONTEND_COMBINATORS_BASIC_COMBINATORS_NULL_H_
+#define FRONTEND_COMBINATORS_BASIC_COMBINATORS_NULL_H_
+
+#include <map>
+#include <string>
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/parsestatus.h"
@@ -9,10 +12,18 @@ namespace frontend {
 
 class NullParser {
  public:
-	virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
+  ParseStatus fail(std::string inputProgram, int startCharacter,
+                   std::string errorMessage = "");
+
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+  ParseStatus parse(std::string inputProgram, int startCharacter,
+                    std::string errorMessage = "");
+
+ private:
+  std::map<int, ParseStatus> cache;
 };
 
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // NULL_PARSER_H
+#endif  // FRONTEND_COMBINATORS_BASIC_COMBINATORS_NULL_H_

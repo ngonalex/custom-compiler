@@ -8,44 +8,44 @@ namespace cs160 {
 namespace backend {
 
 enum OpcodeType {
-  INTLOAD,
-  VARLOAD,
-  VARASSIGNLOAD,
-  FUNARGLOAD,
-  FUNRETLOAD,
+  INT_LOAD,
+  VAR_LOAD,
+  VAR_ASSIGN_LOAD,
+  FUN_ARG_LOAD,
+  FUN_RET_LOAD,
   ADD,
   SUB,
   MULT,
   DIV,
-  LESSTHAN,
-  LESSTHANEQ,
-  GREATERTHAN,
-  GREATERTHANEQ,
+  LESS_THAN,
+  LESS_THAN_EQ,
+  GREATER_THAN,
+  GREATER_THAN_EQ,
   EQUAL,
-  LOGAND,
-  LOGOR,
-  LOGNOT,
+  LOG_AND,
+  LOG_OR,
+  LOG_NOT,
   LOOP,
   CONDITIONAL,
   JUMP,
-  JEQUAL,
-  JNOTEQUAL,
-  JGREATER,
-  JGREATEREQ,
-  JLESS,
-  JLESSEQ,
+  JMP_EQUAL,
+  JMP_NOT_EQUAL,
+  JMP_GREATER_THAN,
+  JMP_GREATER_THAN_EQ,
+  JMP_LESS_THAN,
+  JMP_LESS_THAN_EQ,
   LABEL,
-  FUNCALL,
-  FUNRETEP,
-  FUNDEF,
-  FUNPROLOGUE,
-  FUNEPILOGUE,
-  PRINTARITH,
-  NOTYPE,
-  LHSDEREFERENCE,
-  RHSDEREFERENCE,
-  NEWTUPLE,
-  VARCHILDTUPLE  // change this later
+  FUN_CALL,
+  FUN_RET_EP,
+  FUN_DEF,
+  FUN_PROLOGUE,
+  FUN_EPILOGUE,
+  PRINT_ARITH,
+  NO_TYPE,
+  LHS_DEREFERENCE,
+  RHS_DEREFERENCE,
+  NEW_TUPLE,
+  VAR_CHILD_TUPLE
 };
 
 enum PrintFlag {
@@ -56,40 +56,36 @@ enum PrintFlag {
 };
 
 enum OperandType {
-  OPREGISTER,
-  INT
+  OP_REGISTER,
+  OP_INT
 };
 
 
 enum TargetType {
-  TARGETREGISTER,
-  TARGETLABEL
+  TARGET_REGISTER,
+  TARGET_LABEL
 };
 
 enum RegisterType {
-  VIRTUALREG,
-  VARIABLEREG,
-  DEREFREG,
-  NOREG
+  VIRTUAL_REG,
+  VARIABLE_REG,
+  DEREF_REG,
+  NO_REG
 };
 
-// Maybe unneeded
-enum Scope {
-  GLOBAL,
-  FUNCTION
-};
+enum Scope { GLOBAL, FUNCTION };
 
 enum FlagType {
-  TYPEFLAG,
-  EXISTENCEFLAG,
-  SIZEFLAG,
-  OBJECTFLAG,
-  NOFLAG
+  TYPE_FLAG,
+  EXISTENCE_FLAG,
+  SIZE_FLAG,
+  OBJECT_FLAG,
+  NO_FLAG
 };
 
 enum VariableType {
-  LEFTHANDVAR,
-  RIGHTHANDVAR
+  LEFT_HAND_VAR,
+  RIGHT_HAND_VAR
 };
 
 class Label {
@@ -104,7 +100,7 @@ class Label {
 class Register {
  public:
   Register(std::string name, RegisterType type) : name_(name), type_(type) {}
-  Register() : name_(""), type_(NOREG) {}
+  Register() : name_(""), type_(NO_REG) {}
   std::string name() const {return name_;}
   RegisterType type() const {return type_;}
   void ChangeRegisterName(std::string newname) {name_ = newname;}
@@ -118,10 +114,11 @@ class Register {
 // Look at this later, this probably can be designed much better
 class Operand {
  public:
-  explicit Operand(Register reg) : reg_(reg), value_(0), optype_(OPREGISTER) {
+  explicit Operand(Register reg) : reg_(reg), value_(0), optype_(OP_REGISTER) {
     // ASSERT (Registers can't have values )
   }
-  explicit Operand(int value) : reg_(Register()), value_(value), optype_(INT) {
+  explicit Operand(int value) : reg_(Register()), value_(value),
+    optype_(OP_INT) {
     // ASSERT (only ints can have values)
   }
   // explicit Operand(VariableOperand var) : reg_(Register("")),
@@ -159,9 +156,9 @@ class Opcode {
 class Target {
  public:
   explicit Target(Register reg)
-      : reg_(reg), label_(Label("")), type_(TARGETREGISTER) {}
+      : reg_(reg), label_(Label("")), type_(TARGET_REGISTER) {}
   explicit Target(Label label)
-      : reg_(Register()), label_(label), type_(TARGETLABEL) {}
+      : reg_(Register()), label_(label), type_(TARGET_LABEL) {}
 
   Register reg() const { return reg_; }
   Label label() const { return label_; }
@@ -182,7 +179,7 @@ struct ThreeAddressCode {
   Operand arg2;
 
   ThreeAddressCode()
-      : target(Register()), op(NOTYPE), arg1(Operand(0)), arg2(Operand(0)) {}
+      : target(Register()), op(NO_TYPE), arg1(Operand(0)), arg2(Operand(0)) {}
 };
 
 }  // namespace backend

@@ -1,5 +1,7 @@
-#ifndef VAR_HELPER_H_
-#define VAR_HELPER_H_
+#ifndef FRONTEND_COMBINATORS_V2_COMBINATORS_HELPERS_VAR_HELPER_H_
+#define FRONTEND_COMBINATORS_V2_COMBINATORS_HELPERS_VAR_HELPER_H_
+
+#include <string>
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
@@ -7,37 +9,37 @@
 namespace cs160 {
 namespace frontend {
 
-class VarKeywordParser : NullParser {
+class VarKeywordParser : public NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class ColonParser : NullParser {
+class ColonParser : public NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class TypeParser : NullParser {
+class TypeParser : public NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class EqualSignParser : NullParser {
+class EqualSignParser : public NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class HelperVariableParser : NullParser {
+class HelperVariableParser : public NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 /*
-class BOExpr : NullParser {
+class BOExpr : public NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
+   virtual ParseStatus do_parse(std::string inputProgram);
 };*/
 
-} // namespace frontend
-} // namespace cs160
+}  // namespace frontend
+}  // namespace cs160
 
-#endif // VAR_HELPER_H_
+#endif  // FRONTEND_COMBINATORS_V2_COMBINATORS_HELPERS_VAR_HELPER_H_

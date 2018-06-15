@@ -14,37 +14,37 @@ using cs160::abstract_syntax::backend::AddExpr;
 using cs160::abstract_syntax::backend::Statement;
 
 class LowererTestV2 : public ::testing::Test{
-   public:
+ public:
   std::unique_ptr<const FunctionDef> GenerateFuncDef() {
     // empty params
     auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
-  // empty fact_body
+    // empty fact_body
     Statement::Block fact_body;
 
-  // return value
+    // return value
     auto foo_retval = make_unique<const IntegerExpr>(0);
 
     auto foo_def = make_unique<const FunctionDef>("func", std::move(foo_params),
-                                                std::move(fact_body),
-                                                std::move(foo_retval));
+                                                  std::move(fact_body),
+                                                  std::move(foo_retval));
     return foo_def;
   }
 
   std::string GenerateFuncDefOutPut(int blocksize) {
-    return  " <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n <-"
-    "FUNPROLOGUE \nt_" + std::to_string(blocksize) + " <- 0\n <-"
-    "  FUNEPILOGUE \n";
+    return  " <-  PRINT_ARITH \n <-  FUNCTIONDEF \nMkLabel func\n <-"
+    "FUN_PROLOGUE \nt_" + std::to_string(blocksize) + " <- 0\n <-"
+    "  FUN_EPILOGUE \n";
   }
 
-  protected:
-   LowererVisitor lowerer_;
+ protected:
+  LowererVisitor lowerer_;
 };
 
 TEST_F(LowererTestV2, SimpleAssignmentTest) {
   auto expr = make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("x"),
-    make_unique<IntegerExpr>(5));
+      make_unique<VariableExpr>("x"),
+      make_unique<IntegerExpr>(5));
 
   expr->Visit(&lowerer_);
   // t_0 <- 5
@@ -55,10 +55,10 @@ TEST_F(LowererTestV2, SimpleAssignmentTest) {
 
 TEST_F(LowererTestV2, DoubleIntAssignmentTest) {
   auto expr = make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("x"),
-    make_unique<AddExpr>(
-      make_unique<IntegerExpr>(5),
-      make_unique<IntegerExpr>(10)));
+      make_unique<VariableExpr>("x"),
+      make_unique<AddExpr>(
+          make_unique<IntegerExpr>(5),
+          make_unique<IntegerExpr>(10)));
 
   expr->Visit(&lowerer_);
 
@@ -91,16 +91,16 @@ TEST_F(LowererTestV2, VariabletoVariableAssignmentTest) {
   Statement::Block statements;
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("x"),
-    make_unique<AddExpr>(
-      make_unique<IntegerExpr>(5),
-      make_unique<IntegerExpr>(10)))));
+      make_unique<VariableExpr>("x"),
+      make_unique<AddExpr>(
+          make_unique<IntegerExpr>(5),
+          make_unique<IntegerExpr>(10)))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("y"),
-    make_unique<SubtractExpr>(
-      make_unique<VariableExpr>("x"),
-      make_unique<IntegerExpr>(10)))));
+      make_unique<VariableExpr>("y"),
+      make_unique<SubtractExpr>(
+          make_unique<VariableExpr>("x"),
+          make_unique<IntegerExpr>(10)))));
 
   auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
                                              make_unique<IntegerExpr>(5));
@@ -110,7 +110,8 @@ TEST_F(LowererTestV2, VariabletoVariableAssignmentTest) {
   function_defs.push_back(std::move(func_def));
 
   auto expr = make_unique<Program>(std::move(function_defs),
-    std::move(statements), std::move(arithexpr));
+                                   std::move(statements),
+                                   std::move(arithexpr));
 
   expr->Visit(&lowerer_);
 
@@ -126,8 +127,8 @@ TEST_F(LowererTestV2, VariabletoVariableAssignmentTest) {
   // t_7 <- t_5 - t_6
 
   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
-    "x <- t_2\nt_3 <- x VARLOAD \nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
-    "t_6 <- 7\nt_7 <- 5\nt_8 <- t_6 - t_7\n <-  PRINTARITH \n"
-    " <-  FUNCTIONDEF \nMkLabel func\n <-  FUNPROLOGUE \nt_9 <- 0\n"
-    " <-  FUNEPILOGUE \n");
+            "x <- t_2\nt_3 <- x VAR_LOAD \nt_4 <- 10\nt_5 <- t_3 - t_4\n"
+            "y <- t_5\nt_6 <- 7\nt_7 <- 5\nt_8 <- t_6 - t_7\n"
+            " <-  PRINT_ARITH \n <-  FUNCTIONDEF \nMkLabel func\n"
+            " <-  FUN_PROLOGUE \nt_9 <- 0\n <-  FUN_EPILOGUE \n");
 }
