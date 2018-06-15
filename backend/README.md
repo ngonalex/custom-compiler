@@ -1,12 +1,12 @@
 Backend Documentation
 
 Development:
-1) Mainly developed on a Ubuntu 17.04 machine, so the instructions used reflect. Our codegen tests will not work on mac/windows machines. If bazel is installed on a csil machine, our program should work.
+1) Mainly developed on a Ubuntu 17.04 machine. Our codegen tests will not work on mac/windows machines due to things like absolute addressing. If bazel is installed on a csil machine, our program should work.
 
 Testing:
-to run all tests: bazel test backend/backend_test
-to run codegen tests: bazel test backend/codegen_test
-to run lowerer_tests: bazel test backend/lowerer_test
+- to run all tests: bazel test backend/backend_test
+- to run codegen tests: bazel test backend/codegen_test
+- to run lowerer_tests: bazel test backend/lowerer_test
 
 Our project is split into 4 parts.
 1) Intermediate Representation
