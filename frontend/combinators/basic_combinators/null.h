@@ -3,13 +3,24 @@
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/parsestatus.h"
+#include <map>
 
 namespace cs160 {
 namespace frontend {
 
 class NullParser {
  public:
-	virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
+  ParseStatus fail(std::string inputProgram,
+  				         int startCharacter,
+                   std::string errorMessage = "");
+
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+  ParseStatus parse(std::string inputProgram,
+                    int startCharacter,
+                    std::string errorMessage = "");
+ 
+ private:
+  std::map<int, ParseStatus> cache;
 };
 
 }  // namespace frontend

@@ -7,9 +7,9 @@
 namespace cs160 {
 namespace frontend {
 
-class VariableParser : NullParser {
+class VariableParser : public NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
+   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 } // namespace frontend
