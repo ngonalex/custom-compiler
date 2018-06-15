@@ -26,10 +26,28 @@ ParseStatus EqualToOpParser::do_parse(std::string inputProgram,
   auto equalParser_1 = AtomParser('=');
   auto equalParser_2 = AtomParser('=');
   AndCombinator equals_equals;
-  equals_equals.firstParser = reinterpret_cast<NullParser *>(&equalParser_1);
-  equals_equals.secondParser = reinterpret_cast<NullParser *>(&equalParser_2);
+  equals_equals.firstParser = &equalParser_1;
+  equals_equals.secondParser = &equalParser_2;
 
   return equals_equals.do_parse(inputProgram, endCharacter);
+}
+
+ParseStatus NotEqualToOpParser::do_parse(std::string inputProgram,
+                                      int startCharacter) {
+    int endCharacter = startCharacter;
+    endCharacter += trim(inputProgram);
+    
+    if (inputProgram.size() <= 1) {
+        return super::fail(inputProgram, endCharacter, errorMessage);
+    }
+    
+    auto equalParser_1 = AtomParser('!');
+    auto equalParser_2 = AtomParser('=');
+    AndCombinator equals_equals;
+    equals_equals.firstParser = &equalParser_1;
+    equals_equals.secondParser = &equalParser_2;
+    
+    return equals_equals.do_parse(inputProgram, endCharacter);
 }
 
 ParseStatus GreaterThanOpParser::do_parse(std::string inputProgram,
@@ -71,8 +89,8 @@ ParseStatus GreaterThanOrEqualToOpParser::do_parse(std::string inputProgram,
   auto equalsParser = AtomParser('=');
   AndCombinator greater_or_equal;
   greater_or_equal.firstParser =
-      reinterpret_cast<NullParser *>(&greaterThanParser);
-  greater_or_equal.secondParser = reinterpret_cast<NullParser *>(&equalsParser);
+      &greaterThanParser;
+  greater_or_equal.secondParser = &equalsParser;
 
   return greater_or_equal.do_parse(inputProgram, endCharacter);
 }
@@ -89,8 +107,8 @@ ParseStatus LessThanOrEqualToOpParser::do_parse(std::string inputProgram,
   auto lessThanParser = AtomParser('<');
   auto equalsParser = AtomParser('=');
   AndCombinator less_or_equal;
-  less_or_equal.firstParser = reinterpret_cast<NullParser *>(&lessThanParser);
-  less_or_equal.secondParser = reinterpret_cast<NullParser *>(&equalsParser);
+  less_or_equal.firstParser = &lessThanParser;
+  less_or_equal.secondParser = &equalsParser;
 
   return less_or_equal.do_parse(inputProgram, endCharacter);
 }
@@ -107,8 +125,8 @@ ParseStatus AndOpParser::do_parse(std::string inputProgram,
   auto andParser_1 = AtomParser('&');
   auto andParser_2 = AtomParser('&');
   AndCombinator and_and;
-  and_and.firstParser = reinterpret_cast<NullParser *>(&andParser_1);
-  and_and.secondParser = reinterpret_cast<NullParser *>(&andParser_2);
+  and_and.firstParser = &andParser_1;
+  and_and.secondParser = &andParser_2;
 
   return and_and.do_parse(inputProgram, endCharacter);
 }
@@ -124,8 +142,8 @@ ParseStatus OrOpParser::do_parse(std::string inputProgram, int startCharacter) {
   auto orParser_1 = AtomParser('|');
   auto orParser_2 = AtomParser('|');
   AndCombinator or_or;
-  or_or.firstParser = reinterpret_cast<NullParser *>(&orParser_1);
-  or_or.secondParser = reinterpret_cast<NullParser *>(&orParser_2);
+  or_or.firstParser = &orParser_1;
+  or_or.secondParser = &orParser_2;
 
   return or_or.do_parse(inputProgram, endCharacter);
 }
@@ -147,6 +165,7 @@ ParseStatus NotOpParser::do_parse(std::string inputProgram,
 ParseStatus RelationOperatorParser::do_parse(std::string inputProgram,
                                              int startCharacter) {
   EqualToOpParser equalTo;
+  NotEqualToOpParser notEqualTo;
 
   GreaterThanOrEqualToOpParser greaterOrEqual;
   LessThanOrEqualToOpParser lessOrEqual;
@@ -155,21 +174,26 @@ ParseStatus RelationOperatorParser::do_parse(std::string inputProgram,
   LessThanOpParser lessThan;
   // > or <
   OrCombinator greaterOrLess;
-  greaterOrLess.firstParser = reinterpret_cast<NullParser *>(&greaterThan);
-  greaterOrLess.secondParser = reinterpret_cast<NullParser *>(&lessThan);
+  greaterOrLess.firstParser = &greaterThan;
+  greaterOrLess.secondParser = &lessThan;
   // >= or <=
   OrCombinator orEqualTo;
-  orEqualTo.firstParser = reinterpret_cast<NullParser *>(&greaterOrEqual);
-  orEqualTo.secondParser = reinterpret_cast<NullParser *>(&lessOrEqual);
+  orEqualTo.firstParser = &greaterOrEqual;
+  orEqualTo.secondParser = &lessOrEqual;
   // > or < or >= or <=
   OrCombinator both;
-  both.firstParser = reinterpret_cast<NullParser *>(&orEqualTo);
-  both.secondParser = reinterpret_cast<NullParser *>(&greaterOrLess);
+  both.firstParser = &orEqualTo;
+  both.secondParser = &greaterOrLess;
   // == or > or < or >= or <=
   OrCombinator all;
-  all.firstParser = reinterpret_cast<NullParser *>(&equalTo);
-  all.secondParser = reinterpret_cast<NullParser *>(&both);
-  ParseStatus result = all.parse(inputProgram, startCharacter);
+  all.firstParser = &equalTo;
+  all.secondParser = &both;
+
+    OrCombinator includingNot;
+    includingNot.firstParser = &all;
+    includingNot.secondParser = &notEqualTo;
+    
+  ParseStatus result = includingNot.parse(inputProgram, startCharacter);
   return result;
 }
 
@@ -181,8 +205,8 @@ ParseStatus LogicOperatorParser::do_parse(std::string inputProgram,
 
   // && or ||
   OrCombinator and_or;
-  and_or.firstParser = reinterpret_cast<NullParser *>(&andOp);
-  and_or.secondParser = reinterpret_cast<NullParser *>(&orOp);
+  and_or.firstParser = &andOp;
+  and_or.secondParser = &orOp;
 
   return and_or.parse(inputProgram, startCharacter);
 }
@@ -227,8 +251,8 @@ ParseStatus IfKeyword::do_parse(std::string inputProgram, int startCharacter) {
   auto fParser = AtomParser('f');
 
   AndCombinator andOne;
-  andOne.firstParser = reinterpret_cast<NullParser *>(&iParser);
-  andOne.secondParser = reinterpret_cast<NullParser *>(&fParser);
+  andOne.firstParser = &iParser;
+  andOne.secondParser = &fParser;
 
   ParseStatus result = andOne.do_parse(inputProgram, endCharacter);
   if (!result.status) {
@@ -251,16 +275,16 @@ ParseStatus ElseKeyword::do_parse(std::string inputProgram,
   auto sParser = AtomParser('s');
   auto e2Parser = AtomParser('e');
   AndCombinator andOne;
-  andOne.firstParser = reinterpret_cast<NullParser *>(&e1Parser);
-  andOne.secondParser = reinterpret_cast<NullParser *>(&lParser);
+  andOne.firstParser = &e1Parser;
+  andOne.secondParser = &lParser;
 
   AndCombinator andTwo;
-  andTwo.firstParser = reinterpret_cast<NullParser *>(&sParser);
-  andTwo.secondParser = reinterpret_cast<NullParser *>(&e2Parser);
+  andTwo.firstParser = &sParser;
+  andTwo.secondParser = &e2Parser;
 
   AndCombinator andThree;
-  andThree.firstParser = reinterpret_cast<NullParser *>(&andOne);
-  andThree.secondParser = reinterpret_cast<NullParser *>(&andTwo);
+  andThree.firstParser = &andOne;
+  andThree.secondParser = &andTwo;
 
   ParseStatus result = andThree.do_parse(inputProgram, endCharacter);
   if (!result.status) {
@@ -284,20 +308,20 @@ ParseStatus RepeatKeyword::do_parse(std::string inputProgram,
   auto aParser = AtomParser('a');
   auto tParser = AtomParser('t');
   AndCombinator andOne;
-  andOne.firstParser = reinterpret_cast<NullParser *>(&rParser);
-  andOne.secondParser = reinterpret_cast<NullParser *>(&eParser);
+    andOne.firstParser = &rParser;
+  andOne.secondParser = &eParser;
   AndCombinator andTwo;
-  andTwo.firstParser = reinterpret_cast<NullParser *>(&andOne);
-  andTwo.secondParser = reinterpret_cast<NullParser *>(&pParser);
+  andTwo.firstParser = &andOne;
+  andTwo.secondParser = &pParser;
   AndCombinator andThree;
-  andThree.firstParser = reinterpret_cast<NullParser *>(&andTwo);
-  andThree.secondParser = reinterpret_cast<NullParser *>(&eParser);
+  andThree.firstParser = &andTwo;
+  andThree.secondParser = &eParser;
   AndCombinator andFour;
-  andFour.firstParser = reinterpret_cast<NullParser *>(&andThree);
-  andFour.secondParser = reinterpret_cast<NullParser *>(&aParser);
+  andFour.firstParser = &andThree;
+  andFour.secondParser = &aParser;
   AndCombinator andFive;
-  andFive.firstParser = reinterpret_cast<NullParser *>(&andFour);
-  andFive.secondParser = reinterpret_cast<NullParser *>(&tParser);
+  andFive.firstParser = &andFour;
+  andFive.secondParser = &tParser;
 
   ParseStatus result = andFive.do_parse(inputProgram, endCharacter);
   if (!result.status) {
@@ -321,17 +345,17 @@ ParseStatus WhileKeyword::do_parse(std::string inputProgram,
   auto lParser = AtomParser('l');
   auto eParser = AtomParser('e');
   AndCombinator andOne;
-  andOne.firstParser = reinterpret_cast<NullParser *>(&wParser);
-  andOne.secondParser = reinterpret_cast<NullParser *>(&hParser);
+  andOne.firstParser = &wParser;
+  andOne.secondParser = &hParser;
   AndCombinator andTwo;
-  andTwo.firstParser = reinterpret_cast<NullParser *>(&andOne);
-  andTwo.secondParser = reinterpret_cast<NullParser *>(&iParser);
+  andTwo.firstParser = &andOne;
+  andTwo.secondParser = &iParser;
   AndCombinator andThree;
-  andThree.firstParser = reinterpret_cast<NullParser *>(&andTwo);
-  andThree.secondParser = reinterpret_cast<NullParser *>(&lParser);
+  andThree.firstParser = &andTwo;
+  andThree.secondParser = &lParser;
   AndCombinator andFour;
-  andFour.firstParser = reinterpret_cast<NullParser *>(&andThree);
-  andFour.secondParser = reinterpret_cast<NullParser *>(&eParser);
+  andFour.firstParser = &andThree;
+  andFour.secondParser = &eParser;
 
   ParseStatus result = andFour.do_parse(inputProgram, endCharacter);
   if (!result.status) {
