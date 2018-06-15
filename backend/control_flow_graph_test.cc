@@ -203,7 +203,7 @@ TEST_F(ControlFlowGraphTest, LoopWithNestedLogicalsWithVariables) {
   //grapher_.DebugPrint();
   grapher_.DebugEdgeAndBlock();
   std::string prestring = grapher_.GetOutput();
-//   grapher_.Optimize();
+  grapher_.Optimize();
   std::string poststring = grapher_.GetOutput();
   int compared = prestring.compare(poststring);
   std::cout << "--- SEE IF IT GOT REDUCED ---" << std::endl;
@@ -213,7 +213,7 @@ TEST_F(ControlFlowGraphTest, LoopWithNestedLogicalsWithVariables) {
   std::cout << poststring << std::endl;
   std::cout << "--- STRINGCOMPARE INT VALUE ---" << std::endl;
   std::cout << ".compare() strings: " << compared << std::endl;
-  grapher_.Optimize();
+  //grapher_.Optimize();
   // t_0 <- 5
   // t_1 <- 10
   // t_2 <- t_0 + t_1

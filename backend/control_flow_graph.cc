@@ -163,12 +163,14 @@ ControlFlowGraphNode * MarkSweep(
     //Opcode is the RHS check
     bool deletionperformed = false;
     if (iter->get()->target.reg().type() == VARIABLEREG) {
-      //Check if the variable is in the liveset
-      if (std::find(live_set.begin(),live_set.end(), iter->get()->target.reg().name()) != live_set.end()) {
+      //Check if the variable is not in the liveset
+      if (std::find(live_set.begin(),live_set.end(), iter->get()->target.reg().name()) == live_set.end()) {
         //Check if variable isn't being used on the RHS
         if(iter->get()->target.reg().name() != iter->get()->arg1.reg().name() 
         || iter->get()->target.reg().name() != iter->get()->arg2.reg().name()) {
           //Delete if its not in the set
+          bool test = (std::find(live_set.begin(),live_set.end(), iter->get()->target.reg().name()) == live_set.end());
+          bool truehope = test;
           iter->reset();
           std::cout << "I'm actually deleting something" << std::endl;
           deletionperformed = true;
@@ -180,10 +182,15 @@ ControlFlowGraphNode * MarkSweep(
       }
     } 
     if (!deletionperformed && iter->get()->arg1.reg().type() == VARIABLEREG) {
-      live_set.push_back(iter->get()->arg1.reg().name());
+      //Check if the variable is not in the liveset
+      if (std::find(live_set.begin(),live_set.end(), iter->get()->target.reg().name()) == live_set.end()) {
+        live_set.push_back(iter->get()->arg1.reg().name());
+      }
     }
     if (!deletionperformed &&iter->get()->arg2.reg().type() == VARIABLEREG) {
-      live_set.push_back(iter->get()->arg2.reg().name());
+      if (std::find(live_set.begin(),live_set.end(), iter->get()->target.reg().name()) == live_set.end()) {
+        live_set.push_back(iter->get()->arg2.reg().name());
+      }
     }
     //deletionperformed = false;
   }
@@ -367,6 +374,9 @@ std::vector<std::unique_ptr<struct ThreeAddressCode>> ControlFlowGraph::MakeThre
   for (unsigned int i = 0; i < return_three_address.size(); ++i) {
     // If it's a just a int (Register without a name then access it's value)
     // Otherwise access its name
+    if(return_three_address[i] == NULL) {
+      continue;
+    }
     OpcodeType opcodetype = return_three_address[i]->op.opcode();
     switch (opcodetype) {
       case INTLOAD:
