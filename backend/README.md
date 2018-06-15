@@ -14,7 +14,7 @@ Our project is split into 4 parts.
 1) Intermediate Representation
 2) Lowerer
 3) Code Generation
-4) Control Flow Graph + Optimizer (David fix this)
+4) Control Flow Graph + Optimizer
 
 INTERMEDIATE REPRESENTATION
 
@@ -170,6 +170,43 @@ Child/Parent + LHS Dereference and Child RHS Dereference are handled the same. T
 Parent Dereference + RHS Dereference takes an extra step of accessing the actual value of the tuple rather than just the address and then pushing that on the stack.
 
 CONTROL FLOW GRAPH && OPTIMIZER:
-(David fill this in)
+Files: control_flow_graph.cc, control_flow_graph.h
+Files it depends on: ir.h, helper_struct.h, lowerer_visitor.cc, lowerer_visitor.h
+Tests: control_flow_graph.cc
+
+The Control Flow Graph takes an IR and attempts to optimizes it using Dead Code Elimination
+1) Takes the vector of IR and creates a vector of Control Flow Graph Nodes
+  1a) Each Control Flow Graph Node has a subset (in the form of a vector) of the vector of IR
+2) Takes the Control Flow Graph Nodes and recursively build a graph
+3) Apply the Optimize() function
+
+Each step is fairly complicated in its actual implementation however:
+In order to build the nodes, the Control Flow Graph iterates through the vector of unique_ptr ThreeAddressCodes.
+As the Graph iterates through each vector, it builds a new unique_ptr ThreeAddressCodes vector, creating a "local block" for each node.
+On each iteration, the operation type of the ThreeAddressCode is checked, and on certain operations, it then breaks off and creates a node. These operations include: CONDITIONAL, LOOP, JUMP.
+Also it checks if it has reached the end of the IR to make a node.
+It makes blocks at these points because these are points where the instructions can jump to another location. Creating these blocks allow for a local optimization.
+
+Since the nodes created are unique_ptr ControlFlowGraphNodes, it is impossible to directly point nodes at each other since  2 nodes can point at a single one. Thus I used a vector of "Edges", a self definied struct that contained a from -> to int pair using the creation order of each node as the numerical identifier, and an edge type (which is important in recursely traversing the graph in reverse).
+The recursion begins with the first node in the vector (which should be the node that contains the first few lines of IR), and then checks if it is a CONDITIONAL or a LOOP.
+Depending on what it sees, it'll make 3-4 recursive calls. These recursive calls allow the ControlFlowGraph to handle nested conditionals or nested loops regardless. Because of the nature of the graph, you have to connect 6 nodes if it is a CONDITIONAL or 5 if it is a LOOP, while there is a possibility that 2 of those nodes are the same as 2 of the other nodes. This is due to the fact that you have to connect the top and bottom part of another conditional/loop if it ends up being nested
+
+Labeling the Edge Type was important in creating the reverse traversal needed for Optimize().
+When Optimize is called, it calls a RecursiveFind by using a helper. The RecursiveFind is designed to pass the current live_set to the next neccessarily block. This allows it to handle a global optimization.
+For conditionals, it is important that both the true and false branch make their local optimizations, and then combine their local set, and then pass it onto the guard who can then make a local optimization. Because you have to merge the vector, the recursive call to the functions can't possibly figure out what to combine. Thus they prematurely return and give their vectors back to the original function that called them to merge their vectors. They also return the guard that they were supposed to give their merged vectors too, allowing the last recursive call to happen.
+Loops are much easier, as they only have to pass it off to the next node. They do require a visited vector so they don't infinitely pass their live_sets. Edge Types must be used determine what kind of operation must be done, because it is impossible to check node type since node type can only be used to determine direction going forward, not backward.
+Overall, this reverse recurse was incredibly difficult because it was impossible to figure out what operation has to be done unless more information was given (which is why I had to create a edge struct and label each edge)
+
+Finally now since it can figure out how to pass the local set between the nodes, it can apply the liveliness analysis in the local blocks.
+The function reverse iterates through the vector of ThreeAddressCode. It checks if the target (LHS) is in the liveset. If it isn't and also isn't being use by the args (RHS), then that means that the variable is dead and can be eliminated. It sets the unique_ptr to NULL (which code_gen knows to ignore). 
+Then it checks the args (RHS) to see if they're in the liveset. If they are then they're ignored, but if they aren't, then they're placed into the live_set, meaning they won't get optimized out the next time they're assigned.
+This operation is also done on virtual registers, allowing for the naive implementation that ThreeAddressCode use to be completely cleaned up.
+
+Finally it returns back to the user the IR by rebuilding a vector of ThreeAddressCode by iterating over the Nodes and reclaiming ownership of their IRs
+
+There are some additional functionality, including some debug functions and a GetOutput() function. 
+
+The Recursion for this part was only possible by using unique_ptr's .get(), returning a direct pointer back. Since the recursion didn't need the ownership, it made sense to use them. Also it would've been incredibly difficult to recursively pass unique_ptrs, because when the functions are popped out of the stack, then the original function call will no longer have ownership. 
+
 
 
