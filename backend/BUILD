@@ -65,3 +65,12 @@ cc_test(
 	size = "small",
 )
 
+cc_binary(
+    name = "backend_main",
+    copts = ["-Wall -g"],
+    deps = [
+        ":backend"
+    ],
+    srcs = ["backend_main.cc"],
+)
+

@@ -83,6 +83,7 @@ cc_test(
              "//utility",
              "@gtest//:main",
         ],
+        copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
         timeout = "short",
         size = "small",
 )
@@ -95,6 +96,7 @@ cc_test(
              "//utility",
              "@gtest//:main",
         ],
+        copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
         timeout = "short",
         size = "small",
 )
@@ -107,6 +109,7 @@ cc_test(
              "//utility",
              "@gtest//:main",
         ],
+        copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
         timeout = "short",
         size = "small",
 )
@@ -119,6 +122,7 @@ cc_test(
              "//utility",
              "@gtest//:main",
         ],
+        copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
         timeout = "short",
         size = "small",
 )
@@ -131,6 +135,7 @@ cc_test(
              "//utility",
              "@gtest//:main",
         ],
+        copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
         timeout = "short",
         size = "small",
 )
@@ -142,6 +147,7 @@ cc_test(
              ":print_visitor_v1",
              "@gtest//:main",
         ],
+  copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
 	timeout = "short",
 	size = "small",
 )
@@ -153,6 +159,7 @@ cc_test(
              ":print_visitor_v2",
              "@gtest//:main",
         ],
+  copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
 	timeout = "short",
 	size = "small",
 )
