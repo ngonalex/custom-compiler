@@ -3,8 +3,9 @@
 namespace cs160 {
 namespace backend {
 
+//This just exists for the control_flow_graph_test.cc
 ControlFlowGraph::ControlFlowGraph() {
-  
+
 }
 
 ControlFlowGraph::ControlFlowGraph
@@ -51,6 +52,9 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> &graph_
       int next_false = node1 + 1;
       int node2 = temp2->GetCreationOrder();
       int node3 = temp3->GetCreationOrder();
+      //Has to handle the possibility of 6 different nodes
+      //If next_true == node1 and next_false == node2
+      //Then that means there isn't a nested case
       Edge edge1(std::make_pair(node0,next_true), CONDITIONAL_TRUE);
       Edge edge2(std::make_pair(node0,next_false), CONDITIONAL_FALSE);
       Edge edge3(std::make_pair(node1,node3), CONDITIONAL_TRUE_RETURN);
@@ -79,6 +83,8 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> &graph_
       int next = next_node->GetCreationOrder();
       int node1 = temp1->GetCreationOrder();
       int node2 = temp2->GetCreationOrder();
+      //Next is there to handle nested cases
+      //If next == node1 then there isn't a nested case
       Edge edge1(std::make_pair(node0,next), LOOP_TRUE);
       Edge edge2(std::make_pair(node1,node0), LOOP_RETURN);
       Edge edge3(std::make_pair(node0,node2), LOOP_FALSE);
@@ -86,7 +92,8 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> &graph_
       edge_graph.push_back(edge2);
       edge_graph.push_back(edge3);
       return temp2;
-    } else { // It is a type that we don't need to branch on
+    } else { 
+      // It is a type that we don't need to branch on
       ControlFlowGraphNode * temp = graph_set[0];
       graph_set.erase(graph_set.begin());
       return temp; 
@@ -94,6 +101,8 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> &graph_
   }
 }
 
+//Iterates through the IR
+//Creates blocks depending on what kind of op type it sees
 void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddressCode>> input) {
   // Has to branch on:
   // IF/WHILE/FUNCTION
@@ -125,17 +134,19 @@ void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddress
     } else if (op_type == JUMP) {
       auto block = make_unique<class ControlFlowGraphNode>(std::move(new_block));
       block->SetCreationOrder(creation_order);
-      block->SetBlockType(NO_TYPE);
+      block->SetBlockType(NO_BLOCK_TYPE);
       std::vector<std::unique_ptr<struct ThreeAddressCode>> new_block;
       cfg_nodes_.push_back(std::move(block));
       ++creation_order;
     } else if (is_end) {
+      //Reached the end of the IR
+      //Make sure to create a block with the leftovers
       auto block = make_unique<class ControlFlowGraphNode>(std::move(new_block));
       block->SetCreationOrder(creation_order);
       block->SetBlockType(END_BLOCK);
       std::vector<std::unique_ptr<struct ThreeAddressCode>> new_block;
       cfg_nodes_.push_back(std::move(block));
-      ++creation_order;
+      ++creation_order; //Theres no reason to actually increment
     } else {
       //No need to make a block
     }
@@ -149,112 +160,115 @@ void ControlFlowGraph::CreateCFG(std::vector<std::unique_ptr<struct ThreeAddress
   std::vector<Edge> edge_vector;
   RecursiveCreate(cfg_pointers,edge_vector);
   edges_ = edge_vector;
-  //cfg_nodes_ = std::move(cfg_vector);
 }
 
 //Apply a local optimization
-ControlFlowGraphNode * MarkSweep(
-    std::vector<std::string> &live_set,
+ControlFlowGraphNode * MarkSweep(std::vector<std::string> &live_set,
     ControlFlowGraphNode * apply_sweep) {
-  std::vector<std::unique_ptr<struct ThreeAddressCode>> optimize_block = std::move(apply_sweep->GetLocalUniqueBlock());
+  std::vector<std::unique_ptr<struct ThreeAddressCode>> optimize_block
+   = std::move(apply_sweep->GetLocalUniqueBlock());
+  //Create a local virtual register list
+  //Does not need to be passed along because virtual registers are used immediately when they are made
   std::vector<std::string> virtual_register_list;
+  //Reverse iterate through the IR
   for (std::vector<std::unique_ptr<struct ThreeAddressCode>>::reverse_iterator iter = 
   optimize_block.rbegin(); iter != optimize_block.rend(); ++iter) {
     //Target is the LHS check
     //Opcode is the RHS check
+    //This variable is so we prevent segfaults via short circuiting
+    //I probably could've just checked if iter was NULL
+    //But admittedly I forgot
     bool deletionperformed = false;
-    if (iter->get()->target.reg().type() == VARIABLEREG) {
-      //Check if the variable is not in the liveset
+    //Check LHS for Variable         
+    if (iter->get()->target.reg().type() == VARIABLE_REG) {  
+      //Check if the variable is not in the liveset   
       if (std::find(live_set.begin(),live_set.end(), iter->get()->target.reg().name()) == live_set.end()) {
         //Check if variable isn't being used on the RHS
         if(iter->get()->target.reg().name() != iter->get()->arg1.reg().name() 
         || iter->get()->target.reg().name() != iter->get()->arg2.reg().name()) {
-          //Delete if its not in the set
-          //Check if the variable is not in the liveset
-          // if (iter->get()->arg1.reg().type() == VIRTUALREG) {
-          //   if (std::find(virtual_register_list.begin(),virtual_register_list.end(), iter->get()->target.reg().name()) == virtual_register_list.end()) {
-          //     virtual_register_list.push_back(iter->get()->arg1.reg().name());
-          //   }
-          // }
-          // if (iter->get()->arg2.reg().type() == VIRTUALREG) {
-          //   if (std::find(virtual_register_list.begin(),virtual_register_list.end(), iter->get()->target.reg().name()) == virtual_register_list.end()) {
-          //     virtual_register_list.push_back(iter->get()->arg2.reg().name());
-          //   }
-          // }
+          //Remove the IR because it is not alive
+          //Set the Unique_ptr to NULL
+          //Codegen will thus ignore it
           iter->reset();
-          //std::cout << "I'm actually deleting something" << std::endl;
           deletionperformed = true;
         }
       } else {
-        live_set.erase(std::remove(live_set.begin(),live_set.end(),iter->get()->target.reg().name()),live_set.end());
         //Remove it from the live set
-
+        live_set.erase(std::remove(live_set.begin(),live_set.end(),iter->get()->target.reg().name()),live_set.end());
       }
     } 
-    if (!deletionperformed && iter->get()->target.reg().type() == VIRTUALREG) {
+    //Check LHS for Virtual Register
+    if (!deletionperformed && iter->get()->target.reg().type() == VIRTUAL_REG) {
       //Check if the variable is not in the liveset
       if (std::find(virtual_register_list.begin(),virtual_register_list.end(), 
       iter->get()->target.reg().name()) == virtual_register_list.end()) {
         //Check if variable isn't being used on the RHS
         if(iter->get()->target.reg().name() != iter->get()->arg1.reg().name() 
         || iter->get()->target.reg().name() != iter->get()->arg2.reg().name()) {
-          //Delete if its not in the set
-          //Check if the variable is not in the liveset
-          // if (iter->get()->arg1.reg().type() == VIRTUALREG) {
-          //   if (std::find(virtual_register_list.begin(),virtual_register_list.end(), iter->get()->target.reg().name()) == virtual_register_list.end()) {
-          //     virtual_register_list.push_back(iter->get()->arg1.reg().name());
-          //   }
-          // }
-          // if (iter->get()->arg2.reg().type() == VIRTUALREG) {
-          //   if (std::find(virtual_register_list.begin(),virtual_register_list.end(), iter->get()->target.reg().name()) == virtual_register_list.end()) {
-          //     virtual_register_list.push_back(iter->get()->arg2.reg().name());
-          //   }
-          // }
+          //Remove the IR because it is not alive
+          //Set the Unique_ptr to NULL
+          //Codegen will thus ignore it
           iter->reset();
-          //std::cout << "I'm actually deleting something" << std::endl;
           deletionperformed = true;
         }
       } else {
-        virtual_register_list.erase(std::remove(virtual_register_list.begin(),virtual_register_list.end(),iter->get()->target.reg().name()),virtual_register_list.end());
         //Remove it from the live set
-
+        virtual_register_list.erase(std::remove(virtual_register_list.begin(),virtual_register_list.end(),iter->get()->target.reg().name()),virtual_register_list.end());    
       }
     } 
-    if (!deletionperformed && iter->get()->arg1.reg().type() == VARIABLEREG) {
+    //Check RHS for Variable
+    if (!deletionperformed && iter->get()->arg1.reg().type() == VARIABLE_REG) {
       //Check if the variable is not in the liveset
       if (std::find(live_set.begin(),live_set.end(), iter->get()->target.reg().name()) == live_set.end()) {
+        //If not it's ok to add to the list
         live_set.push_back(iter->get()->arg1.reg().name());
       }
     }
-    if (!deletionperformed && iter->get()->arg2.reg().type() == VARIABLEREG) {
+    //Check RHS for Variable
+    if (!deletionperformed && iter->get()->arg2.reg().type() == VARIABLE_REG) {
+      //Check if the variable is not in the liveset
       if (std::find(live_set.begin(),live_set.end(), iter->get()->target.reg().name()) == live_set.end()) {
+        //If not it's ok to add to the list
         live_set.push_back(iter->get()->arg2.reg().name());
       }
     }
-    if (!deletionperformed && iter->get()->arg1.reg().type() == VIRTUALREG) {
-      //Check if the variable is not in the liveset
+    //Check RHS for Virtual Register
+    if (!deletionperformed && iter->get()->arg1.reg().type() == VIRTUAL_REG) {
+      //Check if the variable is not in the registerset
       if (std::find(virtual_register_list.begin(),virtual_register_list.end(), 
       iter->get()->target.reg().name()) == virtual_register_list.end()) {
+        //If not it's ok to add to the list
         virtual_register_list.push_back(iter->get()->arg1.reg().name());
       }
     }
-    if (!deletionperformed && iter->get()->arg2.reg().type() == VIRTUALREG) {
+    //Check RHS for Virtual Register
+    if (!deletionperformed && iter->get()->arg2.reg().type() == VIRTUAL_REG) {
+      //Check if the variable is not in the registerset
       if (std::find(virtual_register_list.begin(),virtual_register_list.end(), 
       iter->get()->target.reg().name()) == virtual_register_list.end()) {
+        //If not it's ok to add to the list
         virtual_register_list.push_back(iter->get()->arg2.reg().name());
       }
     }
-    //deletionperformed = false;
+    //This looks sort of weird but because of how the IR is designed
+    //Function Definitions is always at the bottom of the code
+    //Because the optimization begins from the last node
+    //And the local operations reverse traverses the node
+    //Function Defs will always be seen before other CFG related blocks
+    //Their variables are local to the Function Def so we clear the set
+    //This prevents situations where things don't get optimized out
+    if (!deletionperformed && iter->get()->op.opcode() == FUN_DEF) {
+      live_set.clear();
+      virtual_register_list.clear();
+    }
   }
   apply_sweep->SetLocalBlock(std::move(optimize_block));
-  // std::cout << "Block Number: " << apply_sweep->GetCreationOrder() << " finished optimizing"
-  // << std::endl;
   return apply_sweep;
-  //return std::move(optimize_block); 
 
 
 }
 
+//String Vector Merge helper function
 std::vector<std::string> MergeVector(std::vector<std::string> vector1, std::vector<std::string> vector2) {
   std::vector<std::string> return_vector = vector1;
   for (auto iter: vector2) {
@@ -266,6 +280,9 @@ std::vector<std::string> MergeVector(std::vector<std::string> vector1, std::vect
   return return_vector;
 }
 
+//Starts at the End of the Graph and reverse traverse upwards 
+//This is to find how the live_set should be passed along
+//Very strange recursion is needed because of the difficulty of going backwards
 std::pair<std::vector<std::string>, ControlFlowGraphNode *> RecursiveFindPath(
   std::vector<ControlFlowGraphNode *> passed_cfgn_vec,
   std::vector<Edge> edges, std::vector<std::string> live_set,
@@ -278,6 +295,7 @@ std::pair<std::vector<std::string>, ControlFlowGraphNode *> RecursiveFindPath(
     EdgeType edge2 = TYPELESS_EDGE;
     int block1 = -1;
     int block2 = -1;
+    //Look for edges that lead to the node
     for (auto iter : edges) {
       if (iter.edge_pair.second == node_number) {
         if (edge1 == TYPELESS_EDGE) {
@@ -291,6 +309,7 @@ std::pair<std::vector<std::string>, ControlFlowGraphNode *> RecursiveFindPath(
         }
       }
     }
+    //Find the node itself
     ControlFlowGraphNode * node1;
     ControlFlowGraphNode * node2;
     for (auto tac_iter : passed_cfgn_vec) {
@@ -303,54 +322,47 @@ std::pair<std::vector<std::string>, ControlFlowGraphNode *> RecursiveFindPath(
     if (edge1 == CONDITIONAL_TRUE_RETURN || edge1 == CONDITIONAL_FALSE_RETURN) {
       std::vector<std::string> live_set_copy = live_set;
       std::vector<std::string> str_return1, str_return2, merged_return;
+      //Find the True + False Nodes
       std::pair<std::vector<std::string>,ControlFlowGraphNode * >  return1 = RecursiveFindPath(passed_cfgn_vec, edges, live_set, node1, visited);
       std::pair<std::vector<std::string>,ControlFlowGraphNode * >  return2 = RecursiveFindPath(passed_cfgn_vec, edges, live_set_copy, node2, visited);
       str_return1 = return1.first;
       str_return2 = return2.first;
+      //Has to be merged here
       merged_return = MergeVector(str_return1,str_return2);
-      // std::cout << "Printing out Vectors: " << std::endl << "Vector 1: " << std::endl;
-      // for ( auto vec1_iter: str_return1) {
-      //   std::cout << vec1_iter << std::endl;
-      // }
-      // std::cout << std::endl << "Vector 2: " << std::endl;
-      // for ( auto vec2_iter: str_return2) {
-      //   std::cout << vec2_iter << std::endl;
-      // }
-      // std::cout << std::endl << "Merged Vector: " << std::endl;
-      // for ( auto merge_iter: merged_return) {
-      //   std::cout << merge_iter << std::endl;
-      // }
+      //Using a merged string vector, find the guard
       std::pair<std::vector<std::string>,ControlFlowGraphNode * >  return3 = RecursiveFindPath(passed_cfgn_vec, edges, merged_return, return1.second, visited);
-      return return3; //Idunno actually
+      return return3; 
     } else if (edge1 == CONDITIONAL_TRUE || edge1 == CONDITIONAL_FALSE) {
+      //True + False branches returns their values so the original node can handle it
       return std::make_pair(live_set, node1);
     } else if (edge1 == LOOP_TRUE) {
-      //std::cout << "LOOP TRUE" << std::endl;
       if(!(std::find(visited.begin(),visited.end(), node1->GetCreationOrder())!=visited.end())) {
         RecursiveFindPath(passed_cfgn_vec, edges, live_set, node1, visited);
       }
-      if(block2 != -1) { //If there is something that branches off of this 
-        //Maybe I need a visited?
+      //If there is something that branches off of this 
+      if(block2 != -1) { 
+        //Check if the node hasn't been visited yet
+        //Prevents infinite recursive loops
         if(!(std::find(visited.begin(),visited.end(), node2->GetCreationOrder())!=visited.end())) {
          RecursiveFindPath(passed_cfgn_vec, edges, live_set, node2, visited);
         }
       }
-      return std::make_pair(live_set, node1); //Dunno if I need any of these
+      return std::make_pair(live_set, node1);
     } else if (edge1 == LOOP_FALSE) {
-      //std::cout << "LOOP FALSE" << std::endl;
       RecursiveFindPath(passed_cfgn_vec, edges, live_set, node1, visited);
       return std::make_pair(live_set, node1);
     } else if (edge1 == LOOP_RETURN) {
-      //std::cout << "LOOP RETURN" << std::endl;
       RecursiveFindPath(passed_cfgn_vec, edges, live_set, node1, visited);
       return std::make_pair(live_set, node1);
     } else {
-
+      //If there are no edges that go to the node then that means this is the first node
+      //Nothing really has to be done
     }
 
 
 }
 
+//Helper function to pass everything needed
 std::vector<std::unique_ptr<ControlFlowGraphNode>> OptimizeHelp(
   std::vector<std::unique_ptr<ControlFlowGraphNode>> cfg_node,
   std::vector<Edge> edges) {
@@ -361,14 +373,18 @@ std::vector<std::unique_ptr<ControlFlowGraphNode>> OptimizeHelp(
     std::vector<std::string> live_set;
     ControlFlowGraphNode * end = cfg_node.back().get();
     std::vector<int> visited_set;
+    //We don't need the return value of RecursiveFindPath
+    //Only thing that is important is modifying the local_block of each node
     RecursiveFindPath(cfg_pointer,edges,live_set, end,visited_set);
     return cfg_node;
  }
 
+//Calls on a bunch of other functions
 void ControlFlowGraph::Optimize() {
   cfg_nodes_ = std::move(OptimizeHelp(std::move(cfg_nodes_),edges_));
 }
 
+// Useful to see the IR within the nodes
 void ControlFlowGraph::DebugPrint() {
   for (auto &iter: cfg_nodes_) {
     std::cout << "--- NEW BLOCK ---" << std::endl;
@@ -383,6 +399,7 @@ void ControlFlowGraph::DebugPrint() {
   }
 }
 
+// Useful when you don't want to see the IR withing the nodes
 void ControlFlowGraph::DebugEdgeAndBlock() {
   for (auto &iter: cfg_nodes_) {
     std::cout << "--- NEW BLOCK ---" << std::endl;
@@ -396,6 +413,8 @@ void ControlFlowGraph::DebugEdgeAndBlock() {
   }
 }
 
+//Iterates through the Node vector
+//Slowly accumulates the IR and then returns it
 std::vector<std::unique_ptr<struct ThreeAddressCode>> ControlFlowGraph::MakeThreeAddressCode() {
   int creation_check = 0;
   std::vector<std::unique_ptr<struct ThreeAddressCode>> return_three_address;
@@ -413,9 +432,11 @@ std::vector<std::unique_ptr<struct ThreeAddressCode>> ControlFlowGraph::MakeThre
 }
 
   // Iterate through the vector and print out each basic block
+  // Shamelessly borrowed from lowerer_visitor.cc
+  // Slightly repurposed for the sake of CFGS
   std::string OutputHelper(std::vector<ThreeAddressCode*> return_three_address ){
   std::string output = "";
-  std::vector<std::string> printhelper = {"INTLOAD", "VARLOAD", "VARASSIGNLOAD",
+  std::vector<std::string> printhelper = {"INTLOAD", "VARLOAD", "VAR_ASSIGN_LOAD",
     "FUNARGLOAD", "FUNRETLOAD", "+", "-", "*", "/", "<", "<=", ">", ">=",
     "==", "&&", "||", "¬", "while", "if", "jmp", "je", "jne", "jg", "jge",
     "jl", "jle", "MkLabel", "FUNCTIONCALL", "FUNRETURNEPILOGUE",
@@ -431,37 +452,21 @@ std::vector<std::unique_ptr<struct ThreeAddressCode>> ControlFlowGraph::MakeThre
     }
     OpcodeType opcodetype = return_three_address[i]->op.opcode();
     switch (opcodetype) {
-      case INTLOAD:
-        output = output + return_three_address[i]->target.reg().name()
-          + " <- " + std::to_string(return_three_address[i]->arg1.value());
-        break;
-      case VARASSIGNLOAD:
-        output = output + return_three_address[i]->target.reg().name()
-              + " <- " + return_three_address[i]->arg1.reg().name();
-        break;
-      case FUNARGLOAD:
-        output = output + return_three_address[i]->target.reg().name()
-              + " <- " + std::to_string(return_three_address[i]->arg1.value());
-        break;
-      // case ADD:
-      //   GetOutputArithmeticHelper(output, i, printhelper);
-      //   break;
-      // case SUB:
-      //   GetOutputArithmeticHelper(output, i, printhelper);
-      //   break;
-      // case MULT:
-      //   GetOutputArithmeticHelper(output, i, printhelper);
-      //   break;
-      // case DIV:
-      //   GetOutputArithmeticHelper(output, i, printhelper);
-      //   break;
-      // case LESSTHAN:
-      //   GetOutputArithmeticHelper(output, i, printhelper);
-      //   break;
-      // case LESSTHANEQ:
-      case LOGNOT:
+     case INT_LOAD:
         output = output + return_three_address[i]->target.reg().name() + " <- " +
-                 printhelper[LOGNOT] + return_three_address[i]->arg1.reg().name();
+                 std::to_string(return_three_address[i]->arg1.value());
+        break;
+      case VAR_ASSIGN_LOAD:
+        output = output + return_three_address[i]->target.reg().name() + " <- " +
+                 return_three_address[i]->arg1.reg().name();
+        break;
+      case FUN_ARG_LOAD:
+        output = output + return_three_address[i]->target.reg().name() + " <- " +
+                 std::to_string(return_three_address[i]->arg1.value());
+        break;
+      case LOG_NOT:
+        output = output + return_three_address[i]->target.reg().name() + " <- " +
+                 printhelper[LOG_NOT] + return_three_address[i]->arg1.reg().name();
         break;
       case LOOP:
         output = output + printhelper[LOOP] + " " +
@@ -476,28 +481,28 @@ std::vector<std::unique_ptr<struct ThreeAddressCode>> ControlFlowGraph::MakeThre
         output = output + printhelper[JUMP] + " " +
                  return_three_address[i]->target.label().name();
         break;
-      case JEQUAL:
-        output = output + printhelper[JEQUAL] + " " +
+      case JMP_EQUAL:
+        output = output + printhelper[JMP_EQUAL] + " " +
                  return_three_address[i]->target.label().name();
         break;
-      case JNOTEQUAL:
-        output = output + printhelper[JNOTEQUAL] + " " +
+      case JMP_NOT_EQUAL:
+        output = output + printhelper[JMP_NOT_EQUAL] + " " +
                  return_three_address[i]->target.label().name();
         break;
-      case JGREATER:
-        output = output + printhelper[JGREATER] + " " +
+      case JMP_GREATER_THAN:
+        output = output + printhelper[JMP_GREATER_THAN] + " " +
                  return_three_address[i]->target.label().name();
         break;
-      case JGREATEREQ:
-        output = output + printhelper[JGREATEREQ] + " " +
+      case JMP_GREATER_THAN_EQ:
+        output = output + printhelper[JMP_GREATER_THAN_EQ] + " " +
                  return_three_address[i]->target.label().name();
         break;
-      case JLESS:
-        output = output + printhelper[JLESS] + " " +
+      case JMP_LESS_THAN:
+        output = output + printhelper[JMP_LESS_THAN] + " " +
                  return_three_address[i]->target.label().name();
         break;
-      case JLESSEQ:
-        output = output + printhelper[JLESSEQ] + " " +
+      case JMP_LESS_THAN_EQ:
+        output = output + printhelper[JMP_LESS_THAN_EQ] + " " +
                  return_three_address[i]->target.label().name();
         break;
       case LABEL:
@@ -518,33 +523,35 @@ std::vector<std::unique_ptr<struct ThreeAddressCode>> ControlFlowGraph::MakeThre
   return output;
 }
 
+//Once again iterates through all the nodes to create IR
+//Uses direct pointers because there is no need to transfer ownership
 std::string ControlFlowGraph::GetOutput() {
   int creation_check = 0;
   std::vector<ThreeAddressCode *> return_three_address;
   for(auto &iter: cfg_nodes_) {
-    //if(iter->GetCreationOrder() == creation_check) {
       for(auto &three_iter: iter->GetLocalBlock()) {
         return_three_address.push_back(three_iter);
       }
     }
-  //creation_check++;
-  //}
-    
-  //}
+
   return OutputHelper(return_three_address);
 }
 
+//Default Constructor
 ControlFlowGraphNode::ControlFlowGraphNode() {
   creation_order = 0;
-  blocktype_ = NO_TYPE;
+  blocktype_ = NO_BLOCK_TYPE;
 }
 
 ControlFlowGraphNode::ControlFlowGraphNode(std::vector<std::unique_ptr<struct ThreeAddressCode>> input) {
   localblock_ = std::move(input);
   creation_order = 0;
-  blocktype_ = NO_TYPE;
+  blocktype_ = NO_BLOCK_TYPE;
 }
 
+//Originally the idea was to use objects
+//Pointers turned out to be easier to manage
+//Not Used
 ControlFlowGraphNode::ControlFlowGraphNode( ControlFlowGraphNode &copy) {
   localblock_.clear();
   // Because it is a vector of unique pointers
@@ -562,6 +569,7 @@ ControlFlowGraphNode::ControlFlowGraphNode( ControlFlowGraphNode &copy) {
   blocktype_ = copy.GetBlockType();
 }
 
+//Not Used
 ControlFlowGraphNode& ControlFlowGraphNode::operator=(ControlFlowGraphNode &copy) {
   localblock_.clear();
   for (const auto& iter: copy.GetLocalBlock()) {
@@ -578,32 +586,21 @@ ControlFlowGraphNode& ControlFlowGraphNode::operator=(ControlFlowGraphNode &copy
   return *this;
 }
 
+//Not Used
 ControlFlowGraphNode ControlFlowGraphNode::operator=(ControlFlowGraphNode copy) {
   localblock_.clear();
-  // for (const auto& iter: copy.GetLocalBlock()) {
-  //   auto block = make_unique<struct ThreeAddressCode>();
-  //   block->target = iter->target;
-  //   block->op = iter->op;
-  //   block->arg1 = iter->arg1;
-  //   block->arg2 = iter->arg2;
-  //   localblock_.push_back(std::move(block));
-  // }
   localblock_ = std::move(copy.GetLocalUniqueBlock());
   creation_order = copy.GetCreationOrder();
   blocktype_ = copy.GetBlockType();
   return *this;
 }
 
+//Transfers ownership of the IR
 void ControlFlowGraphNode::SetLocalBlock(std::vector<std::unique_ptr<struct ThreeAddressCode>> input) {
-  // for (const auto& iter: input) {
-  //   auto block = make_unique<struct ThreeAddressCode>();
-  //   block->target = iter->target;
-  //   block->op = iter->op;
-  //   localblock_.push_back(std::move(block));
-  // }
   localblock_ = std::move(input);
 }
 
+//Debug function for the nodes
 void ControlFlowGraphNode::DebugNode() {
   for (auto &iter : localblock_) {
     std::cout << "Target name: " << iter->target.reg().name() << " Arg1 name: " << 
