@@ -19,7 +19,7 @@ Our project is split into 4 parts.
 3) Code Generation
 4) Control Flow Graph + Optimizer
 
-# INTERMEDIATE REPRESENTATION #
+# Intermediate Representation #
 
 Files: ir.h
 Basically contains all of our useful enums and classes that are used to make up the ThreeAddressCode data structure.
@@ -32,7 +32,7 @@ The way we broke down our ThreeAddressCode structure is
 
 There's nothing too difficult here, but it may be somewhat confusing on why we decided to have Target/Operand hold two different classes rather than be a parent and have classes inherit from it. We based this structure off of the way Ben created his tokens in the example-code repository because we didn't want to deal with object slicing. If we had more time we definitely would revise our class structure as it can get very confusing to deal with though.
 
-# LOWERER #
+# Lowerer #
 
 Files: lowerer_visitor.cc, lowerer_visitor.h
 Files it depends on: ir.h, helper_struct.h
@@ -111,7 +111,7 @@ If the variable "x" is never used again then our program will continue. However 
 5) Undeclared Functions
   If the function name that is being referred to in a function call does not exist in our map we throw an error.
 
-# CODE GENERATION #
+# Code Generation#
 
 Files: code_gen.cc, code_gen.h
 Files it depends on: ir.h, helper_struct.h, lowerer_visitor.cc, lowerer_visitor.h
@@ -174,7 +174,7 @@ Child/Parent + LHS Dereference and Child RHS Dereference are handled the same. T
 
 Parent Dereference + RHS Dereference takes an extra step of accessing the actual value of the tuple rather than just the address and then pushing that on the stack.
 
-# CONTROL FLOW GRAPH && OPTIMIZER #
+# Control Flow Graph && Optimizer #
 Files: control_flow_graph.cc, control_flow_graph.h
 Files it depends on: ir.h, helper_struct.h, lowerer_visitor.cc, lowerer_visitor.h
 Tests: control_flow_graph.cc
