@@ -436,10 +436,10 @@ TEST(LoopParser, regularWhileSuccess2) {
       "while(x>=3&&e<0){if(x==5){e=4;}else{x=x+5;}}");
   EXPECT_EQ(result.errorType, "");
 
-  // PrintVisitor *a = new PrintVisitor();
-  // result.ast->Visit(a);
-  // std::string output = a->GetOutput();
-  // EXPECT_EQ(output, //TODO: Check appropriate ast formation);
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
+  EXPECT_EQ(output, "while ((x >= 3) && (e < 0)) {if (x == 5) {e = 4} else {x = (x + 5)}}");
 }
 
 TEST(LoopParser, doWhileFailure1) {
