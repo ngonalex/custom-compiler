@@ -7,7 +7,6 @@
 #include <string>
 
 #include "utility/memory.h"
-//#include "backend/lowerer_visitor.h"
 #include "backend/ir.h"
 
 using cs160::make_unique;
@@ -26,14 +25,14 @@ enum EdgeType {
   CONDITIONAL_TRUE, CONDITIONAL_FALSE,
   CONDITIONAL_TRUE_RETURN, CONDITIONAL_FALSE_RETURN,
   LOOP_TRUE, LOOP_FALSE, LOOP_RETURN,
-  TYPELESS_EDGE  
+  TYPELESS_EDGE
 };
 struct Edge {
-  std::pair<int,int> edge_pair = std::make_pair(0,0);
+  std::pair<int, int> edge_pair = std::make_pair(0, 0);
   EdgeType edge_type;
-  Edge(std::pair<int,int> edge_input,
-    EdgeType edge_type_input) : 
-    edge_pair(edge_input) { edge_type = edge_type_input; }
+  Edge(std::pair<int, int> edge_input,
+    EdgeType edge_type_input) : edge_pair(edge_input)
+    { edge_type = edge_type_input; }
 };
 
 // Individual nodes in the CGF
@@ -42,10 +41,11 @@ struct Edge {
 class ControlFlowGraphNode {
  public:
   ControlFlowGraphNode();
-  ControlFlowGraphNode(std::vector<std::unique_ptr<struct ThreeAddressCode>>);
+  explicit ControlFlowGraphNode(std::vector
+  <std::unique_ptr<struct ThreeAddressCode>>);
   std::vector<ThreeAddressCode *> GetLocalBlock() {
     std::vector<ThreeAddressCode *> return_tac;
-    for (auto &iter: localblock_) {
+    for (auto &iter : localblock_) {
       return_tac.push_back(iter.get());
     }
     return return_tac;
@@ -54,7 +54,7 @@ class ControlFlowGraphNode {
     return std::move(localblock_);
   }
   void CreateCFG(std::vector<std::unique_ptr<struct ThreeAddressCode>>);
-  ControlFlowGraphNode( ControlFlowGraphNode &copy);
+  ControlFlowGraphNode(ControlFlowGraphNode &copy);
   int GetCreationOrder() {
     return creation_order;
   }
@@ -81,9 +81,10 @@ class ControlFlowGraphNode {
 class ControlFlowGraph {
  public:
   ControlFlowGraph();
-  ControlFlowGraph(std::vector<std::unique_ptr<struct ThreeAddressCode>>);
+  explicit ControlFlowGraph(std::vector
+  <std::unique_ptr<struct ThreeAddressCode>>);
   std::vector<std::unique_ptr<ControlFlowGraphNode>> GetRoot() {
-   return std::move(cfg_nodes_);
+    return std::move(cfg_nodes_);
   }
   void CreateCFG(std::vector<std::unique_ptr<struct ThreeAddressCode>>);
   void Optimize();
@@ -93,12 +94,11 @@ class ControlFlowGraph {
   std::vector<std::unique_ptr<struct ThreeAddressCode>> MakeThreeAddressCode();
 
  private:
-  //std::unique_ptr<ControlFlowGraphNode> root_;
-  std::vector<std::unique_ptr<ControlFlowGraphNode>> cfg_nodes_; 
+  std::vector<std::unique_ptr<ControlFlowGraphNode>> cfg_nodes_;
   std::vector<Edge> edges_;
 };
 
-} // namespace backend
-} // namespace cs160
+}  // namespace backend
+}  // namespace cs160
 
-#endif // CONTROL_FLOW_GRAPH_H_
+#endif  // BACKEND_CONTROL_FLOW_GRAPH_H_
