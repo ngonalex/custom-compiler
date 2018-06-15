@@ -16,8 +16,8 @@ using cs160::abstract_syntax::backend::MultiplyExpr;
 using cs160::backend::LowererVisitor;
 
 class LowererTestV1 : public ::testing::Test{
-  protected:
-   LowererVisitor lowerer_;
+ protected:
+  LowererVisitor lowerer_;
 };
 
 TEST_F(LowererTestV1, IntegerExprIsVisited) {
@@ -35,7 +35,7 @@ TEST_F(LowererTestV1, IntegerExprIsVisited_0) {
 }
 
 TEST_F(LowererTestV1, AddExprIsVisited) {
-  auto expr = make_unique<AddExpr>((make_unique<IntegerExpr>(7)),
+  auto expr = make_unique<AddExpr>(make_unique<IntegerExpr>(7),
                                    make_unique<IntegerExpr>(5));
   expr->Visit(&lowerer_);
 
