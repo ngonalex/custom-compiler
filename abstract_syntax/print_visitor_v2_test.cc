@@ -26,8 +26,9 @@ class PrinterTest : public ::testing::Test {
 };
 
 TEST_F(PrinterTest, AssignmentIsVisited) {
-  auto expr = make_unique<const Assignment>(make_unique<const VariableExpr>(a),
-                                            make_unique<const IntegerExpr>(9));
+  auto expr = make_unique<const Assignment>(
+      make_unique<const VariableExpr>("a"),
+      make_unique<const IntegerExpr>(9));
   expr->Visit(&printer_);
 
   EXPECT_EQ(printer_.GetOutput(), "(= a 9)");
