@@ -449,15 +449,12 @@ std::vector<std::unique_ptr<struct ThreeAddressCode>>
 ControlFlowGraph::MakeThreeAddressCode() {
   int creation_check = 0;
   std::vector<std::unique_ptr<struct ThreeAddressCode>> return_three_address;
-  while (!cfg_nodes_.empty()) {
-    for (auto &iter : cfg_nodes_) {
-      if (iter->GetCreationOrder() == creation_check) {
-        for (auto &three_iter : iter->GetLocalUniqueBlock()) {
-          return_three_address.push_back(std::move(three_iter));
-        }
+  for (auto &iter : cfg_nodes_) {
+    if (iter->GetCreationOrder() == creation_check) {
+      for (auto &three_iter : iter->GetLocalUniqueBlock()) {
+        return_three_address.push_back(std::move(three_iter));
       }
     }
-    creation_check++;
   }
   return std::move(return_three_address);
 }
