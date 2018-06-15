@@ -25,23 +25,29 @@ std::unique_ptr<R> unique_cast(std::unique_ptr<T> &&p) {
 }
 
 // trim from start (in place)
-static inline void ltrim(std::string &s) {
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
-        return !std::isspace(ch);
-    }));
+static inline int ltrim(std::string &s) {
+  int origCount = s.length();
+  s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
+      return !std::isspace(ch);
+  }));
+  return origCount - s.length();
 }
 
 // trim from end (in place)
-static inline void rtrim(std::string &s) {
-    s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
-        return !std::isspace(ch);
-    }).base(), s.end());
+static inline int rtrim(std::string &s) {
+  int origCount = s.length();
+  s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
+      return !std::isspace(ch);
+  }).base(), s.end());
+  return origCount - s.length();
 }
 
 // trim from both ends (in place)
-static inline void trim(std::string &s) {
-    ltrim(s);
-    rtrim(s);
+static inline int trim(std::string &s) {
+  int count = 0;
+  count += ltrim(s);
+  //count += rtrim(s);
+  return count;
 }
 
 }  // cs160
