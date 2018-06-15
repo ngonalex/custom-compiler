@@ -4,6 +4,7 @@
 #include <vector>
 #include <utility>
 #include <algorithm>
+#include <string>
 
 #include "utility/memory.h"
 //#include "backend/lowerer_visitor.h"
