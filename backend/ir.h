@@ -57,7 +57,10 @@ enum TargetType { TARGETREGISTER, TARGETLABEL };
 enum RegisterType { VIRTUALREG, VARIABLEREG, NOREG };
 
 // Maybe unneeded
-enum Scope { GLOBAL, FUNCTION };
+enum Scope {
+  GLOBAL,
+  FUNCTION
+};
 
 enum VariableType {
   LEFTHAND,

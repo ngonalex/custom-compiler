@@ -7,10 +7,10 @@
 namespace cs160 {
 namespace frontend {
 
-class OneOrMoreCombinator : public NullParser {
+class OneOrMoreCombinator : NullParser {
  public:
-  NullParser *parser;
-  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+	NullParser *parser;
+	virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
 };
 
 }  // namespace frontend

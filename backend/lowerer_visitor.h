@@ -1,12 +1,12 @@
 #ifndef BACKEND_LOWERER_VISITOR_H_
 #define BACKEND_LOWERER_VISITOR_H_
 
-#include <algorithm>
 #include <iostream>
 #include <set>
 #include <stack>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "backend/helper_struct.h"
@@ -20,9 +20,10 @@ using cs160::abstract_syntax::backend::Assignment;
 using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::Conditional;
 using cs160::abstract_syntax::backend::DivideExpr;
+using cs160::abstract_syntax::backend::SubtractExpr;
+using cs160::abstract_syntax::backend::MultiplyExpr;
+using cs160::abstract_syntax::backend::VariableExpr;
 using cs160::abstract_syntax::backend::EqualToExpr;
-using cs160::abstract_syntax::backend::FunctionCall;
-using cs160::abstract_syntax::backend::FunctionDef;
 using cs160::abstract_syntax::backend::GreaterThanEqualToExpr;
 using cs160::abstract_syntax::backend::GreaterThanExpr;
 using cs160::abstract_syntax::backend::IntegerExpr;
@@ -33,10 +34,11 @@ using cs160::abstract_syntax::backend::LogicalBinaryOperator;
 using cs160::abstract_syntax::backend::LogicalNotExpr;
 using cs160::abstract_syntax::backend::LogicalOrExpr;
 using cs160::abstract_syntax::backend::Loop;
-using cs160::abstract_syntax::backend::MultiplyExpr;
+using cs160::abstract_syntax::backend::Conditional;
+using cs160::abstract_syntax::backend::FunctionCall;
+using cs160::abstract_syntax::backend::FunctionDef;
 using cs160::abstract_syntax::backend::Program;
-using cs160::abstract_syntax::backend::SubtractExpr;
-using cs160::abstract_syntax::backend::VariableExpr;
+using cs160::make_unique;
 
 namespace cs160 {
 namespace backend {
@@ -97,9 +99,9 @@ class LowererVisitor : public AstVisitor {
   std::string LoopLabelHelper();
   Register GetArgument(ChildType type);
   std::set<std::string> SetDifferenceHelper(std::set<std::string> set1,
-                                            std::set<std::string> set2);
+    std::set<std::string> set2);
   std::set<std::string> SetIntersectionHelper(std::set<std::string> set1,
-                                              std::set<std::string> set2);
+    std::set<std::string> set2);
 
   std::vector<std::unique_ptr<ThreeAddressCode>> GetIR() {
     return std::move(blocks_);
