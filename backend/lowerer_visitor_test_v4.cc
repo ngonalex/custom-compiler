@@ -179,7 +179,7 @@ TEST_F(LowererTestV4, UndefinedFunctionCallTest) {
   function_defs.push_back(std::move(foo_def));
 
   auto ast = make_unique<const Program>(std::move(function_defs),
-    std::move(statements), std::move(ae));
+                                        std::move(statements), std::move(ae));
 
   EXPECT_EXIT(ast->Visit(&lowerer_), ::testing::ExitedWithCode(1),
               "called undefined function");

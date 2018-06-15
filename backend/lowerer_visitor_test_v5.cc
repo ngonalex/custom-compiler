@@ -62,7 +62,9 @@ TEST_F(LowererTestV5, AccessTupleTest) {
   ast->Visit(&lowerer_);
   access->Visit(&lowerer_);
 
-  EXPECT_EQ(lowerer_.GetOutput(), "bob <-  VARCHILDTUPLE \nt_0 <- 3\nbob <- t_0 NEWTUPLE \nt_1 <- 1\nbob->t_1 <- bob LHSDEREFERENCE Parent\nt_2 <- 2\nbob->t_1 <- t_2\n");
+  EXPECT_EQ(lowerer_.GetOutput(), "bob <-  VARCHILDTUPLE \nt_0 <- 3\n"
+            "bob <- t_0 NEWTUPLE \nt_1 <- 1\nbob->t_1 <- bob LHSDEREFERENCE Parent\n"
+            "t_2 <- 2\nbob->t_1 <- t_2\n");
 }
 
 TEST_F(LowererTestV5, TupleRHSDERTest) {
