@@ -14,19 +14,34 @@ cc_library(
 cc_test(
 	name = "backend_test",
 	deps = ["@gtest//:main", ":backend"],
-	srcs = [
-		"lowerer_visitor_test.cc", "codegen_test.cc"
+  srcs = [
+		"lowerer_visitor_test_v1.cc", "lowerer_visitor_test_v2.cc", "lowerer_visitor_test_v3.cc", "lowerer_visitor_test_v4.cc", "lowerer_visitor_test_v5.cc",
+    "codegen_test_v1.cc", "codegen_test_v2.cc", "codegen_test_v3.cc", "codegen_test_v4.cc", "codegen_test_v5.cc"
 	],
 	copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
 	timeout = "short",
 	size = "small",
 )
 
-cc_binary(
-    name = "backend_main",
-    copts = ["-Wall -g"],
-    deps = [
-        ":backend"
-    ],
-    srcs = ["backend_main.cc"],
+cc_test(
+  name = "lowerer_test",
+  deps = ["@gtest//:main", ":backend"],
+	srcs = [
+		"lowerer_visitor_test_v1.cc", "lowerer_visitor_test_v2.cc", "lowerer_visitor_test_v3.cc", "lowerer_visitor_test_v4.cc", "lowerer_visitor_test_v5.cc"
+	],
+	copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
+	timeout = "short",
+	size = "small",
 )
+
+cc_test(
+  name = "codegen_test",
+  deps = ["@gtest//:main", ":backend"],
+	srcs = [
+		"codegen_test_v1.cc", "codegen_test_v2.cc", "codegen_test_v3.cc", "codegen_test_v4.cc", "codegen_test_v5.cc"
+	],
+	copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
+	timeout = "short",
+	size = "small",
+)
+

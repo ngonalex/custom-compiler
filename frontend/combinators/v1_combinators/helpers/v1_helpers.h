@@ -1,11 +1,12 @@
-#ifndef V1_HELPERS_H_
-#define V1_HELPERS_H_
-
-#include "abstract_syntax/abstract_syntax.h"
-#include "frontend/combinators/basic_combinators/null.h"
+#ifndef FRONTEND_COMBINATORS_V1_COMBINATORS_HELPERS_V1_HELPERS_H_
+#define FRONTEND_COMBINATORS_V1_COMBINATORS_HELPERS_V1_HELPERS_H_
 
 #include <iostream>
 #include <map>
+#include <string>
+
+#include "abstract_syntax/abstract_syntax.h"
+#include "frontend/combinators/basic_combinators/null.h"
 
 namespace cs160 {
 namespace frontend {
@@ -43,4 +44,4 @@ class SemiColonParser : public NullParser {
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // V1_HELPERS_H_
+#endif  // FRONTEND_COMBINATORS_V1_COMBINATORS_HELPERS_V1_HELPERS_H_

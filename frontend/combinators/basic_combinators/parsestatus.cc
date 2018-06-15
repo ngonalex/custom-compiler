@@ -64,3 +64,4 @@ ParseStatus ParseStatus::operator=(ParseStatus &g)  {
     this->endCharacter = g.endCharacter;
     return *this;
   }*/
+  

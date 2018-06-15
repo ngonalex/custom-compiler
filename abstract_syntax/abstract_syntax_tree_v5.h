@@ -67,6 +67,22 @@ namespace cs160 {
 namespace abstract_syntax {
 namespace version_5 {
 
+// int a = 5
+// int b = 5 + a * 2
+// tuple t = tuple(a + b)
+
+// struct Int {
+//   enum type = INT;
+//   int value;
+// }
+
+// struct Tuple {
+//   enum type = TUPLE;
+//   int size;
+//   void *p1;
+//   void *p2;
+// }
+
 // Forward declarations of abstract syntax tree node types for use in the
 // abstract syntax tree visitor.
 class IntegerExpr;
