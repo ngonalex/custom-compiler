@@ -468,7 +468,7 @@ TEST(LoopParser, regularWhileFalure1) {
   EXPECT_EQ(result.parsedCharacters, "");
   EXPECT_EQ(result.errorType, "");
 }
-/*
+
 // CONDITIONALS
 TEST(ConditionalParser, conditionalSuccess1) {
   ConditionalParser parser;
@@ -636,41 +636,41 @@ TEST(StatementParser, sucessDoWhileLoop) {
 TEST(StatementParser, sucessWhileLoop1) {
   StatementParser parser;
   ParseStatus result = parser.do_parse(
-      "while (3 != 3) {if(a = 2) {e = 4;} else {e = 5;} e = 4+5;", 0);
+      "while (3 != 3) {if(a == 2) {e = 4;} else {e = 5;} e = 4+5;}", 0);
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 58);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters,
-            "while (3 != 3) {if(a = 2) {e = 4;} else {e = 5;} e = 4+5;}");
+            "while(3!=3){if(a==2){e=4;}else{e=5;}e=4+5;}");
   EXPECT_EQ(result.errorType, "");
 
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
-  EXPECT_EQ(output, "");
+  EXPECT_EQ(output, "while ! ((3 == 3)) {if (a == 2) {e = 4} else {e = 5}e = (4 + 5)}");
 }
 
 TEST(StatementParser, sucessWhileLoop2) {
   StatementParser parser;
   ParseStatus result = parser.do_parse(
-      "while (x >= 3 && e < 0) { if (x == 5) { e = 4; } else { x = x + 5; }",
+      "while (x >= 3 && e < 0) { if (x == 5) { e = 4; } else { x = x + 5; }}",
       0);
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
-  EXPECT_EQ(result.endCharacter, 68);
+  EXPECT_EQ(result.endCharacter, 66);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(
       result.parsedCharacters,
-      "while (x >= 3 && e < 0) { if (x == 5) { e = 4; } else { x = x + 5; }");
+      "while(x>=3&&e<0){if(x==5){e=4;}else{x=x+5;}}");
   EXPECT_EQ(result.errorType, "");
 
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
-  EXPECT_EQ(output, "");
+  EXPECT_EQ(output, "while ((x >= 3) && (e < 0)) {if (x == 5) {e = 4} else {x = (x + 5)}}");
 }
 
 // BLOCKS
