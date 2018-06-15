@@ -219,28 +219,30 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
   switch (loadtype) {
     case INTLOAD:
       outfile_ << "\t# Loading in an integer" << std::endl;
-      outfile_ << "\tmov $" + std::to_string(tac->arg1.value())
-        + ", %rcx" << std::endl;
+      outfile_ << "\tmov $" + std::to_string(tac->arg1.value()) + ", %rcx"
+               << std::endl;
       outfile_ << "\tpush %rcx\n" << std::endl;
       break;
     case VARLOAD:
       outfile_ << "\t# Loading a variable" << std::endl;
-      outfile_ << "\tmov " + VariableNameHelper(tac->arg1.reg().name())
-        + ", %rcx" << std::endl;
+      outfile_ << "\tmov " + VariableNameHelper(tac->arg1.reg().name()) +
+                      ", %rcx"
+               << std::endl;
       outfile_ << "\tpush %rcx\n" << std::endl;
       break;
     case VARASSIGNLOAD:
       if (symboltable_.count(tac->target.reg().name()) == 0) {
         // Add it to the map if its new
         symboltable_.insert(std::pair<std::string, int>(
-        tac->target.reg().name(), -8+-8*(symboltable_.size()+1)));
+            tac->target.reg().name(), -8 + -8 * (symboltable_.size() + 1)));
       }
-      outfile_ << "\t# Loading a value into variable "
-        + tac->target.reg().name() << std::endl;
+      outfile_ << "\t# Loading a value into variable " +
+                      tac->target.reg().name()
+               << std::endl;
       ClearRegister("rbx");
       outfile_ << "\tpop %rbx" << std::endl;
-      outfile_ << "\tmov %rbx, "
-        << VariableNameHelper(tac->target.reg().name()) << "" << std::endl;
+      outfile_ << "\tmov %rbx, " << VariableNameHelper(tac->target.reg().name())
+               << "" << std::endl;
 
       // This currently makes it work. IT SHOuLD NOT WORK
       // outfile_ << "\tpush %rbx" << std::endl;
@@ -251,28 +253,29 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
         outfile_ << "\tmov %rbx, %rax\n" << std::endl;
         // Call on correct print function
         outfile_ << "\t# Going to print " << tac->target.reg().name()
-          << std::endl;
+                 << std::endl;
         outfile_ << "\tcall print" + tac->target.reg().name() << std::endl;
-        outfile_ << "\t# Returning from printing "
-          << tac->target.reg().name() << std::endl;
+        outfile_ << "\t# Returning from printing " << tac->target.reg().name()
+                 << std::endl;
       }
       outfile_ << std::endl;
       break;
     case FUNARGLOAD:
       // Here we're moving arguments loaded into the stack before the
       // function call and moving it to the local stack
-      argumentnum = tac->arg1.value()+1;
+      argumentnum = tac->arg1.value() + 1;
       varname = tac->target.reg().name();
       outfile_ << "\t# Moving argument " << std::to_string(argumentnum)
-        << " into the stack" << std::endl;
-      outfile_ << "\tmov " << std::to_string(8+argumentnum*8) << "(%rbp), %rax"
-        << std::endl;
-      outfile_ << "\tmov %rax, -" << std::to_string(8+argumentnum*8)
-        << "(%rbp)\n" << std::endl;
+               << " into the stack" << std::endl;
+      outfile_ << "\tmov " << std::to_string(8 + argumentnum * 8)
+               << "(%rbp), %rax" << std::endl;
+      outfile_ << "\tmov %rax, -" << std::to_string(8 + argumentnum * 8)
+               << "(%rbp)\n"
+               << std::endl;
       // Include it in the symbol table
       if (symboltable_.count(varname) == 0) {
-        symboltable_.insert(std::pair<std::string, int>(varname,
-          -8+-8*argumentnum));
+        symboltable_.insert(
+            std::pair<std::string, int>(varname, -8 + -8 * argumentnum));
       } else {
         std::cerr << "FUNARGLOAD VARIABLE ASSIGNMENT PROBLEM\n";
         exit(1);
@@ -284,7 +287,7 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
       if (symboltable_.count(tac->target.reg().name()) == 0) {
         // Add it to the map then create a spot for it (if its a function)
         symboltable_.insert(std::pair<std::string, int>(
-        tac->target.reg().name(), -8+-8*(symboltable_.size()+1)));
+            tac->target.reg().name(), -8 + -8 * (symboltable_.size() + 1)));
 
         // Shouldn't need this anymore
         // if (currscope_ == FUNCTION) {
@@ -296,8 +299,9 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
         // }
       }
       outfile_ << "\t# Returning from function and loading value" << std::endl;
-      outfile_ << "\tmov %rax, " <<
-        VariableNameHelper(tac->target.reg().name()) << "\n" << std::endl;
+      outfile_ << "\tmov %rax, " << VariableNameHelper(tac->target.reg().name())
+               << "\n"
+               << std::endl;
       break;
     default:
       break;
@@ -449,10 +453,10 @@ void CodeGen::GenerateBinaryExprHelper(std::unique_ptr<ThreeAddressCode> tac) {
   //       << ", %rbx" << std::endl;
   //     outfile_ << "\tpop %rax" << std::endl;
   // } else {
-      // double pop from stack
-      outfile_ << " btwn int, int\n";
-      outfile_ << "\tpop %rbx" << std::endl;  // rbx = right
-      outfile_ << "\tpop %rax" << std::endl;  // rax = left
+  // double pop from stack
+  outfile_ << " btwn int, int\n";
+  outfile_ << "\tpop %rbx" << std::endl;  // rbx = right
+  outfile_ << "\tpop %rax" << std::endl;  // rax = left
   // }
 }
 
@@ -462,13 +466,13 @@ std::string CodeGen::VariableNameHelper(std::string variablename) {
   } else {
     // We're inside a function so consult the map
     if (symboltable_.count(variablename) == 1) {
-      std::string mappedname = std::to_string(
-        symboltable_.find(variablename)->second) + "(%rbp)";
+      std::string mappedname =
+          std::to_string(symboltable_.find(variablename)->second) + "(%rbp)";
       return mappedname;
     } else {
       // something bad happened
       std::cerr << "Variable name helper could not find the mapping for "
-        << variablename <<" \n";
+                << variablename << " \n";
       exit(1);
     }
   }
@@ -553,8 +557,8 @@ void CodeGen::Generate(
       // Note to self abstract jumps out later
       case JUMP:
         outfile_ << "\t# JUMP\n";
-        outfile_ << "\tjmp " << code->target.label().name()
-          << "\n" << std::endl;
+        outfile_ << "\tjmp " << code->target.label().name() << "\n"
+                 << std::endl;
         break;
       case JEQUAL:
         outfile_ << "\t# Jump on Equal\n";
@@ -562,27 +566,25 @@ void CodeGen::Generate(
         break;
       case JNOTEQUAL:
         outfile_ << "\t# Jump on Not Equal\n";
-        outfile_ << "\tjne " << code->target.label().name()
-          << "\n" << std::endl;
+        outfile_ << "\tjne " << code->target.label().name() << "\n"
+                 << std::endl;
         break;
       case JGREATER:
         outfile_ << "\t# Jump on greater than\n";
-        outfile_ << "\tjg " << code->target.label().name()
-          << "\n" << std::endl;
+        outfile_ << "\tjg " << code->target.label().name() << "\n" << std::endl;
         break;
       case JGREATEREQ:
         outfile_ << "\t# Jump on greater or equal\n";
-        outfile_ << "\tjge " << code->target.label().name()
-          << "\n" << std::endl;
+        outfile_ << "\tjge " << code->target.label().name() << "\n"
+                 << std::endl;
         break;
       case JLESS:
         outfile_ << "\t# Jump on less than\n";
-        outfile_ << "\tjl " << code->target.label().name()
-          << "\n" << std::endl;
+        outfile_ << "\tjl " << code->target.label().name() << "\n" << std::endl;
       case JLESSEQ:
         outfile_ << "\t# Jump on less or equal\n";
-        outfile_ << "\tjle " << code->target.label().name()
-          << "\n" << std::endl;
+        outfile_ << "\tjle " << code->target.label().name() << "\n"
+                 << std::endl;
         break;
       case LABEL:
         outfile_ << code->target.label().name() << ":" << std::endl;
@@ -590,12 +592,12 @@ void CodeGen::Generate(
       case FUNCALL:
         outfile_ << "\t# Calling Function" << std::endl;
         outfile_ << "\tcall " << code->target.label().name() << "\n"
-          << std::endl;
+                 << std::endl;
         break;
       case FUNRETEP:
         outfile_ << "\t# FunctionRetEpilogue (Restore Stack)" << std::endl;
-        outfile_ << "\tadd $" << code->arg1.value() * 8 <<
-          ", %rsp" << std::endl;
+        outfile_ << "\tadd $" << code->arg1.value() * 8 << ", %rsp"
+                 << std::endl;
         outfile_ << "\tcall printfunctionret\n" << std::endl;
         break;
       case FUNDEF:
@@ -611,8 +613,8 @@ void CodeGen::Generate(
         // May be unneeded
         outfile_ << "\tpush %rbx" << std::endl;
 
-        outfile_ << "\tsub $" << code->arg1.value()*8 << ", %rsp\n"
-          << std::endl;
+        outfile_ << "\tsub $" << code->arg1.value() * 8 << ", %rsp\n"
+                 << std::endl;
         break;
       case FUNEPILOGUE:
 
