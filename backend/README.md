@@ -1,9 +1,11 @@
 Backend Documentation
 
 Development:
+
 1) Mainly developed on a Ubuntu 17.04 machine. Our codegen tests will not work on mac/windows machines due to things like absolute addressing. If bazel is installed on a csil machine, our program should work.
 
 Testing:
+
 - to run all tests: bazel test backend/backend_test
 - to run codegen tests: bazel test backend/codegen_test
 - to run lowerer_tests: bazel test backend/lowerer_test
@@ -14,7 +16,8 @@ Our project is split into 4 parts.
 3) Code Generation
 4) Control Flow Graph + Optimizer (David fix this)
 
-INTERMEDIATE REPRESENTATION:
+INTERMEDIATE REPRESENTATION
+
 Files: ir.h
 Basically contains all of our useful enums and classes that are used to make up the ThreeAddressCode data structure.
 The way we broke down our ThreeAddressCode structure is  
@@ -26,7 +29,8 @@ The way we broke down our ThreeAddressCode structure is
 
 There's nothing too difficult here, but it may be somewhat confusing on why we decided to have Target/Operand hold two different classes rather than be a parent and have classes inherit from it. We based this structure off of the way Ben created his tokens in the example-code repository because we didn't want to deal with object slicing. If we had more time we definitely would revise our class structure as it can get very confusing to deal with though.
 
-LOWERER:
+LOWERER
+
 Files: lowerer_visitor.cc, lowerer_visitor.h
 Files it depends on: ir.h, helper_struct.h
 Tests: lowerer_visitor_test* 
@@ -36,17 +40,20 @@ The way our lowerer works is it takes in an AST and creates a vector of ThreeAdd
 We'll break our lowerer_visitor into what it does for each version.
 
 V1:
+
 V1 does two things
 1) Responsible for signaling instructions for Codegen to load an integer/dereference/variable into the stack
 2) Signal to codegen to pop two things off the stack and do the corresponding operation on them as provided by the opcode, then pushing the result onto the stack
 
 V2:
+
 V2 is an extension of V1 except now it needs to handle LeftHandSide variable/Dereferences present in ArithmeticExprs
 
 All V2 really is is differentiating between a LHS and a RHS variable. If it's a LHS variable signal to codegen that it needs to pop the address of the variable and load something into it.
 If it's a RHS variable signal to codegen to load from memory and use that value in resulting calculations.
 
 V3:
+
 Loops
 - Tell codegen how to evaluate the guard, create a label for the loop name, create instructions for the loop body, then jumpback to either the loop or to main.
 
@@ -57,6 +64,7 @@ Relational/Logical Exprs
 - Similar to how our lowerer handles Add/Sub/Mul/Div, all it does is signal to codegen to pop two things of the stack compare them based on the opcode and push the result on the stack.
 
 V4:
+
 Function calls
 - Iterate through the arguments vector which tells CodeGen to load in arguments into the stack, then tell Codegen to create a "call instruction", then which variable to load in the result of the function
 
@@ -64,6 +72,7 @@ Function definitions
 - Iterate through the function definition vector and tell codegen to create a label for the function as well as which instructions to put in each function
 
 V5:
+
 Dereference
 - Similar to how variables are handled, dereferences are handled by differentiating on if they are a RHS or a LHS and signaling to codegen to do a different action accordingly. You can look at our OpCode Enum in ir.h to see a RHS and a LHS dereference opcode instruction.
 - It does one key thing differently though which is it will signal to codegen where the dereference is in the chain.
@@ -72,6 +81,7 @@ x->1 vs x->1->1
 There are two types of different dereferences which are a "parent" dereference and a "child" dereference. We need to figure this stuff out here, because codegen handles the two cases differently. If it's a child dereference then codegen needs to know to push the address of where the child lies so the next dereference can access further into the tuple. If it's a parent dereference however this changes based on if it's a RHS or a LHS defererence. If it's a RHS dereference then access the value inside the dereference and push it on the stack otherwise push the address so it can write into the tuple.
 
 Some extra features our lowerer does:
+
 1) Catches unassigned variable errors
   e.g y = x where x has never been assigned yet, our lowerer will catch this error and exit the program by using a global set that is created as variables are assigned.
 
@@ -98,7 +108,8 @@ If the variable "x" is never used again then our program will continue. However 
 5) Undeclared Functions
   If the function name that is being referred to in a function call does not exist in our map we throw an error.
 
-CODE GENERATION:
+CODE GENERATION
+
 Files: code_gen.cc, code_gen.h
 Files it depends on: ir.h, helper_struct.h, lowerer_visitor.cc, lowerer_visitor.h
 Tests: codegen_test.cc
