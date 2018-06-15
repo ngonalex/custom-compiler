@@ -1,4 +1,5 @@
 #include <string>  // std::string, std::stoi
+#include <vector>
 
 #include "frontend/combinators/v2_combinators/main/program_parser.h"
 #include "frontend/combinators/basic_combinators/and_combinator.h"

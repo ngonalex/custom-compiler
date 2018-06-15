@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <map>
+#include <string>
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"

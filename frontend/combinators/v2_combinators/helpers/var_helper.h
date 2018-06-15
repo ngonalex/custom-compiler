@@ -1,6 +1,8 @@
 #ifndef FRONTEND_COMBINATORS_V2_COMBINATORS_HELPERS_VAR_HELPER_H_
 #define FRONTEND_COMBINATORS_V2_COMBINATORS_HELPERS_VAR_HELPER_H_
 
+#include <string>
+
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
 
