@@ -43,22 +43,6 @@ std::string LowererVisitor::GetOutput() {
         output = output + blocks_[i]->target.reg().name()
               + " <- " + std::to_string(blocks_[i]->arg1.value());
         break;
-      // case ADD:
-      //   GetOutputArithmeticHelper(output, i, printhelper);
-      //   break;
-      // case SUB:
-      //   GetOutputArithmeticHelper(output, i, printhelper);
-      //   break;
-      // case MULT:
-      //   GetOutputArithmeticHelper(output, i, printhelper);
-      //   break;
-      // case DIV:
-      //   GetOutputArithmeticHelper(output, i, printhelper);
-      //   break;
-      // case LESSTHAN:
-      //   GetOutputArithmeticHelper(output, i, printhelper);
-      //   break;
-      // case LESSTHANEQ:
       case LOGNOT:
         output = output + blocks_[i]->target.reg().name() + " <- " +
                  printhelper[LOGNOT] + blocks_[i]->arg1.reg().name();
@@ -259,7 +243,15 @@ void LowererVisitor::VisitVariableExpr(const VariableExpr& exp) {
 void LowererVisitor::VisitFunctionCall(const FunctionCall& call) {
   // - This DOES NOT Signal to code gen
   // CreateFunctionCallSignal(call.callee_name()));
+  
+  // Check if this functions is defined
+  if (functioncheck_.find(call.callee_name()) == functioncheck_.end() 
+      || functioncheck_.find(call.callee_name())->second != call.arguments().size()){
+    std::cerr<<"called undefined function"<<std::endl;
+    exit(1);
+  }
 
+  
   // Evaluate the arguments to a single value
   // Do it backwards to make loading into the stack easier
   for (int i = call.arguments().size() - 1 ; i >= 0 ; --i) {
@@ -539,6 +531,17 @@ void LowererVisitor::VisitLoop(const Loop& loop) {
 
 void LowererVisitor::VisitProgram(const Program& program) {
   // Do all the Assignments, then the AE, then the functions
+
+  for (auto& def : program.function_defs()) {
+    if(functioncheck_.find(def->function_name()) == functioncheck_.end() ) {
+      functioncheck_.insert( std:: pair<std::string, int> ( def->function_name(), def->parameters().size() ) );
+    } else{
+      if(functioncheck_.find(def->function_name())->second == def -> parameters().size()){
+        std::cerr<<"function redefined"<<std::endl;
+        exit(1);
+      }
+    }
+  }
 
   for (auto& statement : program.statements()) {
     statement->Visit(this);

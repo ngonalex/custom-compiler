@@ -35,6 +35,10 @@ class CodeGen {
     void GeneratePrintResult();
     void GenerateData(std::set<std::string>);
     void TestPrint(std::string label);
+    void GeneratePrintTuple();
+    void GeneratePrintIntTuple();
+    void GeneratePrintNestedTuple();
+    void GeneratePrintUnassignedTuple();
     // Different nodes + helpers
     void GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac);
     void GenerateArithmeticExpr(std::unique_ptr<ThreeAddressCode> tac,
@@ -44,17 +48,6 @@ class CodeGen {
                                 OpcodeType type);
     void GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
                              OpcodeType type);
-
-    void GeneratePrintTuple();
-    void GeneratePrintIntTuple();
-    void GeneratePrintNestedTuple();
-    void GeneratePrintUnassignedTuple();
-    void GenerateDivisionByZeroCheck();
-    void GenerateTupleFlagCheck();
-    void GenerateIntegerFlagCheck();
-    void GenerateExistenceCheck();
-    void GenerateTupleSizeCheck();
-    void GenerateTupleCreationSizeCheck();
     void GenerateCreateNewTuple();
     void GenerateNestedDeref();
     void GenerateBaseDeref(std::string variablename);
@@ -67,7 +60,16 @@ class CodeGen {
     // offset inside the stacks
     std::string VariableNameHelper(std::string variablename, FlagType flag);
 
+    // Splits a string of form X->Y->...->... into a vector
     std::vector<std::string> DereferenceParserHelper(std::string variablename);
+
+    // Error + Type checking
+    void GenerateDivisionByZeroCheck();
+    void GenerateTupleFlagCheck();
+    void GenerateIntegerFlagCheck();
+    void GenerateExistenceCheck();
+    void GenerateTupleSizeCheck();
+    void GenerateTupleCreationSizeCheck();
 
  private:
   std::ofstream& outfile_;

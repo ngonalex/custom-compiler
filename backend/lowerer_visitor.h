@@ -42,7 +42,6 @@ using cs160::abstract_syntax::backend::FunctionDef;
 using cs160::abstract_syntax::backend::Dereference;
 using cs160::abstract_syntax::backend::AssignmentFromArithExp;
 using cs160::abstract_syntax::backend::AssignmentFromNewTuple;
-using cs160::make_unique;
 
 namespace cs160 {
 namespace backend {
@@ -138,6 +137,7 @@ class LowererVisitor : public AstVisitor {
   std::vector<std::set<std::string>> localsets_;
   std::set<std::string> totalset_;
   std::set<std::string> globalset_;
+  std::map<std::string, int> functioncheck_;
   ChildType lastchildtype_;
   struct Counter counter_;
   VariableType currvariabletype_;

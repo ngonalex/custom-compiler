@@ -27,7 +27,7 @@ cc_test(
   name = "lowerer_test",
   deps = ["@gtest//:main", ":backend"],
 	srcs = [
-		"lowerer_visitor_test.cc"
+		"lowerer_visitor_test_v1.cc", "lowerer_visitor_test_v2.cc", "lowerer_visitor_test_v3.cc", "lowerer_visitor_test_v4.cc", "lowerer_visitor_test_v5.cc"
 	],
 	copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
 	timeout = "short",
@@ -53,3 +53,4 @@ cc_binary(
     ],
     srcs = ["backend_main.cc"],
 )
+

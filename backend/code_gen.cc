@@ -901,6 +901,9 @@ void CodeGen::Generate(
   // IR to assembly inst
   for (unsigned int i = 0; i < blocks.size(); ++i) {
     auto code = std::move(blocks[i]);
+    if (code.get() == NULL) {
+      continue;
+    }
     OpcodeType opcode = code->op.opcode();
 
     switch (opcode) {
@@ -959,8 +962,7 @@ void CodeGen::Generate(
         outfile_ << "\t# LOOP\n";
         outfile_ << "\tpop %rax" << std::endl;
         outfile_ << "\tcmp $" << std::to_string(code->arg1.value())
-          << ", %rax\n"
-          << std::endl;
+          << ", %rax\n" << std::endl;
         break;
       case CONDITIONAL:
         outfile_ << "\t# CONDITIONAL\n";
@@ -969,52 +971,43 @@ void CodeGen::Generate(
           << ", %rax\n"
           << std::endl;
         break;
-      // Note to self abstract jumps out later
       case JUMP:
         outfile_ << "\t# JUMP\n";
-        outfile_ << "\tjmp " << code->target.label().name()
-          << "\n" << std::endl;
+        outfile_ << "\tjmp " << code->target.label().name() << "\n\n";
         break;
       case JEQUAL:
         outfile_ << "\t# Jump on Equal\n";
-        outfile_ << "\tje " << code->target.label().name() << "\n" << std::endl;
+        outfile_ << "\tje " << code->target.label().name() << "\n\n";
         break;
       case JNOTEQUAL:
         outfile_ << "\t# Jump on Not Equal\n";
-        outfile_ << "\tjne " << code->target.label().name()
-          << "\n" << std::endl;
+        outfile_ << "\tjne " << code->target.label().name() << "\n\n";
         break;
       case JGREATER:
         outfile_ << "\t# Jump on greater than\n";
-        outfile_ << "\tjg " << code->target.label().name()
-          << "\n" << std::endl;
+        outfile_ << "\tjg " << code->target.label().name() << "\n\n";
         break;
       case JGREATEREQ:
         outfile_ << "\t# Jump on greater or equal\n";
-        outfile_ << "\tjge " << code->target.label().name()
-          << "\n" << std::endl;
+        outfile_ << "\tjge " << code->target.label().name() << "\n\n";
         break;
       case JLESS:
         outfile_ << "\t# Jump on less than\n";
-        outfile_ << "\tjl " << code->target.label().name()
-          << "\n" << std::endl;
+        outfile_ << "\tjl " << code->target.label().name() << "\n\n";
       case JLESSEQ:
         outfile_ << "\t# Jump on less or equal\n";
-        outfile_ << "\tjle " << code->target.label().name()
-          << "\n" << std::endl;
+        outfile_ << "\tjle " << code->target.label().name() << "\n\n";
         break;
       case LABEL:
         outfile_ << code->target.label().name() << ":" << std::endl;
         break;
       case FUNCALL:
         outfile_ << "\t# Calling Function" << std::endl;
-        outfile_ << "\tcall " << code->target.label().name() << "\n"
-          << std::endl;
+        outfile_ << "\tcall " << code->target.label().name() << "\n\n";
         break;
       case FUNRETEP:
         outfile_ << "\t# FunctionRetEpilogue (Restore Stack)" << std::endl;
-        outfile_ << "\tadd $" << code->arg1.value() * 16 <<
-          ", %rsp" << std::endl;
+        outfile_ << "\tadd $" << code->arg1.value() * 16 << ", %rsp\n";
         if (flag_ == PRINT_DEBUG || flag_ == PRINT_PROGRAM) {
           GeneratePrintCall("printfunctionresult");
         }
@@ -1030,8 +1023,7 @@ void CodeGen::Generate(
         outfile_ << "\tpush %rbp" << std::endl;
         outfile_ << "\tmov %rsp, %rbp" << std::endl;
         outfile_ << "\tpush %rbx" << std::endl;
-        outfile_ << "\tsub $" << 16+code->arg1.value()*16 << ", %rsp\n"
-          << std::endl;
+        outfile_ << "\tsub $" << 16+code->arg1.value()*16 << ", %rsp\n\n";
         break;
       case FUNEPILOGUE:
         outfile_ << "\t# Function Epilogue " << std::endl;
@@ -1143,8 +1135,7 @@ void CodeGen::Generate(
             << std::endl;
           outfile_ << "\tmovq %rax, "
             << VariableNameHelper(code->target.reg().name(), OBJECTFLAG)
-            << std::endl;
-          outfile_ << "\n";
+            << "\n" << std::endl;
         } else {
           // Rewrite flags
           outfile_ << "\tmovb $1, (%rbx)" << std::endl;
@@ -1162,16 +1153,13 @@ void CodeGen::Generate(
                   code->target.reg().name(),
                   -16+-16*(symbollocations_.size()+1)));
         }
-        outfile_ << "\t# Getting value of " << code->target.reg().name()
-          << std::endl;
+        outfile_ <<"\t#Getting value of "<< code->target.reg().name() << "\n";
         outfile_ << "\tmov " <<
-          VariableNameHelper(code->target.reg().name(), NOFLAG) << ", %rbx"
-          << std::endl;
+          VariableNameHelper(code->target.reg().name(), NOFLAG) << ", %rbx\n";
         outfile_ << "\tpush %rbx\n" << std::endl;
         break;
       default:
         std::cerr << "Unknown opcode " << std::to_string(opcode) << std::endl;
-        exit(1);
     }
   }
 
