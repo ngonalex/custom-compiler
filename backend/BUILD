@@ -38,8 +38,8 @@ cc_test(
 cc_test(
   name = "control_flow_graph_test",
   deps = ["@gtest//:main", ":backend"],
-  srcs = ["code_gen.cc","lowerer_visitor.cc",
-    "control_flow_graph.cc", "control_flow_graph_test.cc"],
+  srcs = ["control_flow_graph_test.cc"],
+  copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
     timeout = "short",
 	size = "small",
 )
