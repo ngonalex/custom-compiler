@@ -221,6 +221,8 @@ For conditionals, it is important that both the true and false branch make their
 Loops are much easier, as they only have to pass it off to the next node. They do require a visited vector so they don't infinitely pass their live_sets. Edge Types must be used determine what kind of operation must be done, because it is impossible to check node type since node type can only be used to determine direction going forward, not backward.
 Overall, this reverse recurse was incredibly difficult because it was impossible to figure out what operation has to be done unless more information was given (which is why I had to create a edge struct and label each edge)
 
+Both recursion required usage of a pass by reference vector even though it is against the style guide. I needed it so that each recursive call would continue to build the vectors. The MarkSweep operation in particular applied local optimizatioms under the assumptiom that the proper live set would be given to it. Because of the possibility of nested conditionals and loops, it couldn't be done iteratively.
+
 Finally now since it can figure out how to pass the local set between the nodes, it can apply the liveliness analysis in the local blocks.
 The function reverse iterates through the vector of ThreeAddressCode. It checks if the target (LHS) is in the liveset. If it isn't and also isn't being use by the args (RHS), then that means that the variable is dead and can be eliminated. It sets the unique_ptr to NULL (which code_gen knows to ignore). 
 Then it checks the args (RHS) to see if they're in the liveset. If they are then they're ignored, but if they aren't, then they're placed into the live_set, meaning they won't get optimized out the next time they're assigned.
