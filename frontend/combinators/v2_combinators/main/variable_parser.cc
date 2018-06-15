@@ -1,11 +1,11 @@
+#include <string>  // std::string, std::stoi
+
 #include "frontend/combinators/v2_combinators/main/variable_parser.h"
 #include "frontend/combinators/basic_combinators/and_combinator.h"
 #include "frontend/combinators/v1_combinators/helpers/v1_helpers.h"
 #include "frontend/combinators/v1_combinators/term_expr.h"
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
 #include "frontend/combinators/v2_combinators/main/word_parser.h"
-
-#include <string>  // std::string, std::stoi
 
 #define super NullParser
 
