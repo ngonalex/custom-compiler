@@ -11,10 +11,10 @@ class EqualToOpParser : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
-    
+
 class NotEqualToOpParser : public NullParser {
-public:
-    virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+ public:
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class GreaterThanOpParser : public NullParser {

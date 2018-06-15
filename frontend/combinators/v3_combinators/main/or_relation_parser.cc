@@ -39,7 +39,8 @@ ParseStatus OrRelationParser::do_parse(std::string inputProgram,
   orRelationParserFinal.firstParser = &orRelationParser;
   orRelationParserFinal.secondParser = &rhs;
 
-  ParseStatus result = orRelationParserFinal.do_parse(inputProgram, endCharacter);
+  ParseStatus result =
+      orRelationParserFinal.do_parse(inputProgram, endCharacter);
 
   // AST Formation
   int strIndex = 0;
@@ -47,8 +48,9 @@ ParseStatus OrRelationParser::do_parse(std::string inputProgram,
     if (i == 0) {
       result.ast = std::move(result.astNodes[i]);
     } else {
-      result.ast = make_node(unique_cast<const RelationalExpr>(std::move(result.ast)),
-        unique_cast<const RelationalExpr>(std::move(result.astNodes[i])));
+      result.ast = make_node(
+          unique_cast<const RelationalExpr>(std::move(result.ast)),
+          unique_cast<const RelationalExpr>(std::move(result.astNodes[i])));
     }
   }
 
@@ -62,8 +64,7 @@ ParseStatus OrRelationParser::do_parse(std::string inputProgram,
 // Creating the AST Node
 std::unique_ptr<const LogicalOrExpr> OrRelationParser::make_node(
     std::unique_ptr<const RelationalExpr> first_leaf,
-    std::unique_ptr<const RelationalExpr> second_leaf){
+    std::unique_ptr<const RelationalExpr> second_leaf) {
   return make_unique<LogicalOrExpr>(std::move(first_leaf),
-                                     std::move(second_leaf));
-
+                                    std::move(second_leaf));
 }

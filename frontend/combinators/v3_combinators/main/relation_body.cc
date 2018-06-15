@@ -81,9 +81,9 @@ std::unique_ptr<const RelationalExpr> RelationBodyParser::make_node(
   } else if (rop == "==") {
     return make_unique<const EqualToExpr>(std::move(first_ae),
                                           std::move(second_ae));
-  } else if (rop == "!="){
-    return make_unique<const LogicalNotExpr>(make_unique<const EqualToExpr>(std::move(first_ae),
-                                            std::move(second_ae)));
+  } else if (rop == "!=") {
+    return make_unique<const LogicalNotExpr>(make_unique<const EqualToExpr>(
+        std::move(first_ae), std::move(second_ae)));
   } else {
     return nullptr;
   }

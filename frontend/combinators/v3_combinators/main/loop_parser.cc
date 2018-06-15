@@ -5,8 +5,8 @@
 #include "frontend/combinators/v1_combinators/helpers/v1_helpers.h"
 #include "frontend/combinators/v3_combinators/helpers/relational_helper.h"
 #include "frontend/combinators/v3_combinators/main/block_parser.h"
-#include "frontend/combinators/v3_combinators/main/relation_body.h"
 #include "frontend/combinators/v3_combinators/main/or_relation_parser.h"
+#include "frontend/combinators/v3_combinators/main/relation_body.h"
 
 #include <iostream>
 #include <string>  // std::string, std::stoi
@@ -100,24 +100,32 @@ ParseStatus LoopParser::do_parse(std::string inputProgram, int startCharacter) {
 
   ParseStatus result = loops.do_parse(inputProgram, endCharacter);
   if (result.status) {
-      Statement::Block block;
-      if (result.firstOrSecond){
-          for (int i = 0; i < result.astNodes.size()-1; i++){
-              block.push_back(unique_cast<const Statement>(std::move(result.astNodes[i])));
-          }
-          std::unique_ptr<const RelationalExpr> guard = unique_cast<const RelationalExpr>(std::move(result.astNodes[result.astNodes.size()-1]));
-          
-          result.ast = std::move(make_unique<const Loop>(std::move(guard), std::move(block)));
-      } else {
-          for (int i = 1; i < result.astNodes.size(); i++){
-              block.push_back(unique_cast<const Statement>(std::move(result.astNodes[i])));
-          }
-          std::unique_ptr<const RelationalExpr> guard = unique_cast<const RelationalExpr>(std::move(result.astNodes[0]));
-          result.ast = std::move(make_unique<const Loop>(std::move(guard), std::move(block)));
+    Statement::Block block;
+    if (result.firstOrSecond) {
+      for (int i = 0; i < result.astNodes.size() - 1; i++) {
+        block.push_back(
+            unique_cast<const Statement>(std::move(result.astNodes[i])));
       }
-      
-      result.astNodes.erase(std::begin(result.astNodes), std::end(result.astNodes));
-      
+      std::unique_ptr<const RelationalExpr> guard =
+          unique_cast<const RelationalExpr>(
+              std::move(result.astNodes[result.astNodes.size() - 1]));
+
+      result.ast = std::move(
+          make_unique<const Loop>(std::move(guard), std::move(block)));
+    } else {
+      for (int i = 1; i < result.astNodes.size(); i++) {
+        block.push_back(
+            unique_cast<const Statement>(std::move(result.astNodes[i])));
+      }
+      std::unique_ptr<const RelationalExpr> guard =
+          unique_cast<const RelationalExpr>(std::move(result.astNodes[0]));
+      result.ast = std::move(
+          make_unique<const Loop>(std::move(guard), std::move(block)));
+    }
+
+    result.astNodes.erase(std::begin(result.astNodes),
+                          std::end(result.astNodes));
+
     /*
      std::unique_ptr<const RelationalExpr> relationAst;
       std::vector<std::unique_ptr<const AstNode>> blockAsts;
