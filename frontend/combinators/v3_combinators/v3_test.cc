@@ -323,7 +323,7 @@ TEST(LogicParser, simpleLogicParser1) {
   EXPECT_EQ(result.endCharacter, 16);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "!x>y&&x>=z");
-  EXPECT_EQ(output, "! ((x > y) && (x >= z))");
+  EXPECT_EQ(output, "(! ((x > y)) && (x >= z))");
 }
 
 TEST(LogicParser, simpleLogicParser2) {
