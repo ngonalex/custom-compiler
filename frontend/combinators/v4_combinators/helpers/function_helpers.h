@@ -27,6 +27,11 @@ class FunctionVariableParsers : public NullParser {
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
+class FunctionArgumentParsers : public NullParser {
+ public:
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+};
+
 }  // namespace frontend
 }  // namespace cs160
 #endif

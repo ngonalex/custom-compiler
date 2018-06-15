@@ -4,6 +4,7 @@
 #include "frontend/combinators/basic_combinators/atom_parser.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 #include "frontend/combinators/basic_combinators/zero_or_more_combinator.h"
+#include "frontend/combinators/v1_combinators/ae.h"
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
 #include "frontend/combinators/v2_combinators/main/word_parser.h"
 
@@ -113,4 +114,39 @@ ParseStatus FunctionVariableParsers::do_parse(std::string inputProgram, int star
                                     std::end(intermediateValue.parsedCharactersArray));
     
 	return intermediateValue;
+}
+
+ParseStatus FunctionArgumentParsers::do_parse(std::string inputProgram, int startCharacter){
+    int endCharacter = startCharacter;
+    endCharacter += trim(inputProgram);
+
+    if (inputProgram.size() == 0) {
+        return super::fail(inputProgram, endCharacter, "Expected function variable declaration");
+    }
+
+    ArithExprParser arithExpr;
+    CommaOp commaOp;
+
+    AndCombinator argumentParser;
+    argumentParser.firstParser = &arithExpr;
+    argumentParser.secondParser = &commaOp; 
+
+    ZeroOrMoreCombinator intermediateParser;
+    intermediateParser.parser = &argumentParser;
+
+    ParseStatus intermediateValue = intermediateParser.do_parse(inputProgram, endCharacter);
+
+    ParseStatus lastValue = arithExpr.do_parse(intermediateValue.remainingCharacters, intermediateValue.endCharacter);
+    
+    intermediateValue.status = true;
+    intermediateValue.remainingCharacters = lastValue.remainingCharacters;
+    intermediateValue.parsedCharacters += lastValue.parsedCharacters;
+    intermediateValue.endCharacter = lastValue.endCharacter;
+    intermediateValue.astNodes.push_back(std::move(lastValue.ast));
+    
+    intermediateValue.parsedCharactersArray.erase(
+                                    std::begin(intermediateValue.parsedCharactersArray),
+                                    std::end(intermediateValue.parsedCharactersArray));
+    
+    return intermediateValue;
 }
