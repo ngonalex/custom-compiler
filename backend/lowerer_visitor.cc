@@ -536,9 +536,9 @@ void LowererVisitor::VisitProgram(const Program& program) {
       functioncheck_.insert(std::pair<std::string, int>(
           def->function_name(), def->parameters().size()));
     } else {
-      if (functioncheck_.find (def->function_name())->second
-      == def -> parameters().size()) {
-        std::cerr<<"function redefined"<<std::endl;
+      if (functioncheck_.find (def->function_name())->second ==
+          def -> parameters().size()) {
+        std::cerr<< "function redefined" <<std::endl;
         exit(1);
       }
     }

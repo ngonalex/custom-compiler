@@ -86,22 +86,22 @@ TEST_F(LowererTestV3, ConditionalWithNestedLogicalsWithVariables) {
   Statement::Block statements;
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("x"),
-    make_unique<AddExpr>(
-        make_unique<IntegerExpr>(5),
-        make_unique<IntegerExpr>(10)))));
+      make_unique<VariableExpr>("x"),
+      make_unique<AddExpr>(
+          make_unique<IntegerExpr>(5),
+          make_unique<IntegerExpr>(10)))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("y"),
-    make_unique<SubtractExpr>(
-        make_unique<IntegerExpr>(5),
-        make_unique<IntegerExpr>(10)))));
+      make_unique<VariableExpr>("y"),
+      make_unique<SubtractExpr>(
+          make_unique<IntegerExpr>(5),
+          make_unique<IntegerExpr>(10)))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("bob"),
-    make_unique<AddExpr>(
-        make_unique<VariableExpr>("y"),
-        make_unique<VariableExpr>("x")))));
+      make_unique<VariableExpr>("bob"),
+      make_unique<AddExpr>(
+          make_unique<VariableExpr>("y"),
+          make_unique<VariableExpr>("x")))));
 
   statements.push_back(std::move(make_unique<const Conditional>(
       make_unique<LogicalOrExpr>(
@@ -183,22 +183,22 @@ TEST_F(LowererTestV3, LoopWithNestedLogicalsWithVariables) {
   Statement::Block statements;
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("x"),
-    make_unique<AddExpr>(
-        make_unique<IntegerExpr>(5),
-        make_unique<IntegerExpr>(10)))));
+      make_unique<VariableExpr>("x"),
+      make_unique<AddExpr>(
+          make_unique<IntegerExpr>(5),
+          make_unique<IntegerExpr>(10)))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("y"),
-    make_unique<SubtractExpr>(
-        make_unique<IntegerExpr>(5),
-        make_unique<IntegerExpr>(10)))));
+      make_unique<VariableExpr>("y"),
+      make_unique<SubtractExpr>(
+          make_unique<IntegerExpr>(5),
+          make_unique<IntegerExpr>(10)))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("bob"),
-    make_unique<AddExpr>(
-        make_unique<VariableExpr>("y"),
-        make_unique<VariableExpr>("x")))));
+      make_unique<VariableExpr>("bob"),
+      make_unique<AddExpr>(
+          make_unique<VariableExpr>("y"),
+          make_unique<VariableExpr>("x")))));
 
   statements.push_back(std::move(make_unique<const Loop>(
       make_unique<LogicalOrExpr>(
@@ -279,25 +279,25 @@ TEST_F(LowererTestV3, ConditionalsWithTrueBranch) {
   Statement::Block trueblock;
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("x"),
-    make_unique<AddExpr>(
-        make_unique<IntegerExpr>(5),
-        make_unique<IntegerExpr>(10)))));
+      make_unique<VariableExpr>("x"),
+      make_unique<AddExpr>(
+          make_unique<IntegerExpr>(5),
+          make_unique<IntegerExpr>(10)))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("y"),
-    make_unique<SubtractExpr>(
-        make_unique<IntegerExpr>(5),
-        make_unique<IntegerExpr>(10)))));
+      make_unique<VariableExpr>("y"),
+      make_unique<SubtractExpr>(
+          make_unique<IntegerExpr>(5),
+          make_unique<IntegerExpr>(10)))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("bob"),
-    make_unique<AddExpr>(
-        make_unique<VariableExpr>("y"),
-        make_unique<VariableExpr>("x")))));
+      make_unique<VariableExpr>("bob"),
+      make_unique<AddExpr>(
+          make_unique<VariableExpr>("y"),
+          make_unique<VariableExpr>("x")))));
 
   trueblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("bob"),
+      make_unique<VariableExpr>("bob"),
       make_unique<AddExpr>(
           make_unique<VariableExpr>("y"),
           make_unique<VariableExpr>("x")))));
@@ -386,44 +386,45 @@ TEST_F(LowererTestV3, ConditionalsWithFalseBranch) {
   Statement::Block falseblock;
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("x"),
-    make_unique<AddExpr>(
-        make_unique<IntegerExpr>(5),
-        make_unique<IntegerExpr>(10)))));
+      make_unique<VariableExpr>("x"),
+      make_unique<AddExpr>(
+          make_unique<IntegerExpr>(5),
+          make_unique<IntegerExpr>(10)))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("y"),
-    make_unique<SubtractExpr>(
-        make_unique<IntegerExpr>(5),
-        make_unique<IntegerExpr>(10)))));
+      make_unique<VariableExpr>("y"),
+      make_unique<SubtractExpr>(
+          make_unique<IntegerExpr>(5),
+          make_unique<IntegerExpr>(10)))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("bob"),
-    make_unique<AddExpr>(
-        make_unique<VariableExpr>("y"),
-        make_unique<VariableExpr>("x")))));
+      make_unique<VariableExpr>("bob"),
+      make_unique<AddExpr>(
+          make_unique<VariableExpr>("y"),
+          make_unique<VariableExpr>("x")))));
 
   falseblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("bob"),
-    make_unique<AddExpr>(
-        make_unique<VariableExpr>("y"),
-        make_unique<VariableExpr>("x")))));
+      make_unique<VariableExpr>("bob"),
+      make_unique<AddExpr>(
+          make_unique<VariableExpr>("y"),
+          make_unique<VariableExpr>("x")))));
 
   statements.push_back(std::move(make_unique<const Conditional>(
-      make_unique<LogicalOrExpr>(make_unique<const LogicalAndExpr>(
-                                     make_unique<const LessThanExpr>(
-                                         make_unique<const VariableExpr>("x"),
-                                         make_unique<const IntegerExpr>(100)),
-                                     make_unique<const GreaterThanExpr>(
-                                         make_unique<const VariableExpr>("y"),
-                                         make_unique<const VariableExpr>("x"))),
-                                 make_unique<const LogicalAndExpr>(
-                                     make_unique<const LessThanEqualToExpr>(
-                                         make_unique<const VariableExpr>("bob"),
-                                         make_unique<const IntegerExpr>(100)),
-                                     make_unique<const GreaterThanEqualToExpr>(
-                                         make_unique<const VariableExpr>("bob"),
-                                         make_unique<const IntegerExpr>(0)))),
+      make_unique<LogicalOrExpr>(
+          make_unique<const LogicalAndExpr>(
+              make_unique<const LessThanExpr>(
+                  make_unique<const VariableExpr>("x"),
+                  make_unique<const IntegerExpr>(100)),
+              make_unique<const GreaterThanExpr>(
+                  make_unique<const VariableExpr>("y"),
+                  make_unique<const VariableExpr>("x"))),
+          make_unique<const LogicalAndExpr>(
+              make_unique<const LessThanEqualToExpr>(
+                  make_unique<const VariableExpr>("bob"),
+                  make_unique<const IntegerExpr>(100)),
+              make_unique<const GreaterThanEqualToExpr>(
+                  make_unique<const VariableExpr>("bob"),
+                  make_unique<const IntegerExpr>(0)))),
       Statement::Block(), std::move(falseblock))));
 
   auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
@@ -492,50 +493,51 @@ TEST_F(LowererTestV3, ConditionalsWithBothBranch) {
   Statement::Block falseblock;
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("x"),
-    make_unique<AddExpr>(
-      make_unique<IntegerExpr>(5),
-      make_unique<IntegerExpr>(10)))));
+      make_unique<VariableExpr>("x"),
+      make_unique<AddExpr>(
+          make_unique<IntegerExpr>(5),
+          make_unique<IntegerExpr>(10)))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("y"),
-    make_unique<SubtractExpr>(
-      make_unique<IntegerExpr>(5),
-      make_unique<IntegerExpr>(10)))));
-
-  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("bob"),
-    make_unique<AddExpr>(
       make_unique<VariableExpr>("y"),
-      make_unique<VariableExpr>("x")))));
+      make_unique<SubtractExpr>(
+          make_unique<IntegerExpr>(5),
+          make_unique<IntegerExpr>(10)))));
+
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
+      make_unique<VariableExpr>("bob"),
+      make_unique<AddExpr>(
+          make_unique<VariableExpr>("y"),
+          make_unique<VariableExpr>("x")))));
 
   trueblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("bob"),
+      make_unique<VariableExpr>("bob"),
       make_unique<AddExpr>(
-      make_unique<VariableExpr>("y"),
-      make_unique<VariableExpr>("x")))));
+          make_unique<VariableExpr>("y"),
+          make_unique<VariableExpr>("x")))));
 
   falseblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("bob"),
+      make_unique<VariableExpr>("bob"),
       make_unique<SubtractExpr>(
-      make_unique<VariableExpr>("y"),
-      make_unique<VariableExpr>("x")))));
+          make_unique<VariableExpr>("y"),
+          make_unique<VariableExpr>("x")))));
 
   statements.push_back(std::move(make_unique<const Conditional>(
-      make_unique<LogicalOrExpr>(make_unique<const LogicalAndExpr>(
-                                     make_unique<const LessThanExpr>(
-                                         make_unique<const VariableExpr>("x"),
-                                         make_unique<const IntegerExpr>(100)),
-                                     make_unique<const GreaterThanExpr>(
-                                         make_unique<const VariableExpr>("y"),
-                                         make_unique<const VariableExpr>("x"))),
-                                 make_unique<const LogicalAndExpr>(
-                                     make_unique<const LessThanEqualToExpr>(
-                                         make_unique<const VariableExpr>("bob"),
-                                         make_unique<const IntegerExpr>(100)),
-                                     make_unique<const GreaterThanEqualToExpr>(
-                                         make_unique<const VariableExpr>("bob"),
-                                         make_unique<const IntegerExpr>(0)))),
+      make_unique<LogicalOrExpr>(
+          make_unique<const LogicalAndExpr>(
+              make_unique<const LessThanExpr>(
+                  make_unique<const VariableExpr>("x"),
+                  make_unique<const IntegerExpr>(100)),
+              make_unique<const GreaterThanExpr>(
+                  make_unique<const VariableExpr>("y"),
+                  make_unique<const VariableExpr>("x"))),
+          make_unique<const LogicalAndExpr>(
+              make_unique<const LessThanEqualToExpr>(
+                  make_unique<const VariableExpr>("bob"),
+                  make_unique<const IntegerExpr>(100)),
+              make_unique<const GreaterThanEqualToExpr>(
+                  make_unique<const VariableExpr>("bob"),
+                  make_unique<const IntegerExpr>(0)))),
       std::move(trueblock), std::move(falseblock))));
 
   auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
@@ -546,7 +548,8 @@ TEST_F(LowererTestV3, ConditionalsWithBothBranch) {
   function_defs.push_back(std::move(func_def));
 
   auto expr = make_unique<Program>(std::move(function_defs),
-    std::move(statements), std::move(arithexpr));
+                                   std::move(statements),
+                                   std::move(arithexpr));
 
   expr->Visit(&lowerer_);
 
@@ -585,8 +588,8 @@ TEST_F(LowererTestV3, ConditionalsWithBothBranch) {
   // t_21 <- t_19 - t_20
   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
             "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
-            "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\nbob <- t_8\n"
-            "t_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\n"
+            "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\n"
+            "bob <- t_8\nt_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\n"
             "t_12 <- y VARLOAD \nt_13 <- x VARLOAD \nt_14 <- t_12 > t_13\n"
             "t_15 <- t_11 && t_14\nt_16 <- bob VARLOAD \nt_17 <- 100\n"
             "t_18 <- t_16 <= t_17\nt_19 <- bob VARLOAD \nt_20 <- 0\n"
@@ -606,36 +609,39 @@ TEST_F(LowererTestV3, SimpleLoop) {
   Statement::Block loop_body;
 
   auto assign = make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("x"),
-    make_unique<IntegerExpr>(0));
+      make_unique<VariableExpr>("x"),
+      make_unique<IntegerExpr>(0));
   auto loopbody = make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("x"),
-    make_unique<AddExpr>(make_unique<VariableExpr>("x"),
-                        make_unique<IntegerExpr>(1)));
+      make_unique<VariableExpr>("x"),
+      make_unique<AddExpr>(
+          make_unique<VariableExpr>("x"),
+          make_unique<IntegerExpr>(1)));
   loop_body.push_back(std::move(loopbody));
   auto ast = make_unique<const Loop>(
-      make_unique<LessThanExpr>(make_unique<VariableExpr>("x"),
-      make_unique<IntegerExpr>(5)),
+      make_unique<LessThanExpr>(
+          make_unique<VariableExpr>("x"),
+          make_unique<IntegerExpr>(5)),
       std::move(loop_body));
 
   assign->Visit(&lowerer_);
   ast->Visit(&lowerer_);
   EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 0\nx <- t_0\nMkLabel loop0\n"
-    "t_1 <- x VARLOAD \nt_2 <- 5\nt_3 <- t_1 < t_2\n"
-    "while t_3 == 0\nje continue0\nt_4 <- x VARLOAD \n"
-    "t_5 <- 1\nt_6 <- t_4 + t_5\nx <- t_6\njmp loop0\n"
-    "MkLabel continue0\n");
+            "t_1 <- x VARLOAD \nt_2 <- 5\nt_3 <- t_1 < t_2\n"
+            "while t_3 == 0\nje continue0\nt_4 <- x VARLOAD \n"
+            "t_5 <- 1\nt_6 <- t_4 + t_5\nx <- t_6\njmp loop0\n"
+            "MkLabel continue0\n");
 }
 
 TEST_F(LowererTestV3, EmptyLoop) {
   Statement::Block loop_body;
 
   auto assign = make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("x"),
-    make_unique<IntegerExpr>(0));
+      make_unique<VariableExpr>("x"),
+      make_unique<IntegerExpr>(0));
   auto ast = make_unique<const Loop>(
-      make_unique<LessThanExpr>(make_unique<VariableExpr>("x"),
-      make_unique<IntegerExpr>(5)),
+      make_unique<LessThanExpr>(
+          make_unique<VariableExpr>("x"),
+          make_unique<IntegerExpr>(5)),
       std::move(loop_body));
 
   assign->Visit(&lowerer_);
@@ -649,16 +655,16 @@ TEST_F(LowererTestV3, InfinityLoop) {
   Statement::Block loop_body;
 
   auto assign = make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("x"),
-    make_unique<IntegerExpr>(0));
+      make_unique<VariableExpr>("x"),
+      make_unique<IntegerExpr>(0));
   auto loopbody = make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("x"),
-    make_unique<IntegerExpr>(0));
+      make_unique<VariableExpr>("x"),
+      make_unique<IntegerExpr>(0));
   loop_body.push_back(std::move(loopbody));
   auto ast = make_unique<const Loop>(
       make_unique<LessThanExpr>(
-        make_unique<VariableExpr>("x"),
-        make_unique<IntegerExpr>(5)),
+          make_unique<VariableExpr>("x"),
+          make_unique<IntegerExpr>(5)),
       std::move(loop_body));
 
   assign->Visit(&lowerer_);
@@ -674,36 +680,37 @@ TEST_F(LowererTestV3, NestedLoop) {
   Statement::Block nested_loop_body;
 
   auto assign = make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("x"),
-    make_unique<IntegerExpr>(0));
+      make_unique<VariableExpr>("x"),
+      make_unique<IntegerExpr>(0));
   auto assign1 = make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("y"),
-    make_unique<IntegerExpr>(0));
+      make_unique<VariableExpr>("y"),
+      make_unique<IntegerExpr>(0));
 
   auto nestedloopbody = make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("y"),
-    make_unique<AddExpr>(
       make_unique<VariableExpr>("y"),
-      make_unique<IntegerExpr>(2)));
+      make_unique<AddExpr>(
+          make_unique<VariableExpr>("y"),
+          make_unique<IntegerExpr>(2)));
   nested_loop_body.push_back(std::move(nestedloopbody));
 
   auto loop = make_unique<const Loop>(
     make_unique<LessThanExpr>(
-      make_unique<VariableExpr>("y"),
-      make_unique<IntegerExpr>(3)),
+        make_unique<VariableExpr>("y"),
+        make_unique<IntegerExpr>(3)),
     std::move(nested_loop_body));
 
   auto loopbody = make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("x"),
-    make_unique<AddExpr>(make_unique<VariableExpr>("x"),
-    make_unique<IntegerExpr>(1)));
+      make_unique<VariableExpr>("x"),
+      make_unique<AddExpr>(
+          make_unique<VariableExpr>("x"),
+          make_unique<IntegerExpr>(1)));
   loop_body.push_back(std::move(loop));
   loop_body.push_back(std::move(loopbody));
 
   auto ast = make_unique<const Loop>(
       make_unique<LessThanExpr>(
-        make_unique<VariableExpr>("x"),
-        make_unique<IntegerExpr>(5)),
+          make_unique<VariableExpr>("x"),
+          make_unique<IntegerExpr>(5)),
       std::move(loop_body));
 
   assign->Visit(&lowerer_);
@@ -724,44 +731,45 @@ TEST_F(LowererTestV3, LoopWithBody) {
   Statement::Block loopbody;
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("x"),
-    make_unique<AddExpr>(
-      make_unique<IntegerExpr>(5),
-      make_unique<IntegerExpr>(10)))));
+      make_unique<VariableExpr>("x"),
+      make_unique<AddExpr>(
+          make_unique<IntegerExpr>(5),
+          make_unique<IntegerExpr>(10)))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("y"),
-    make_unique<SubtractExpr>(
-      make_unique<IntegerExpr>(5),
-      make_unique<IntegerExpr>(10)))));
-
-  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("bob"),
-    make_unique<AddExpr>(
       make_unique<VariableExpr>("y"),
-      make_unique<VariableExpr>("x")))));
+      make_unique<SubtractExpr>(
+          make_unique<IntegerExpr>(5),
+          make_unique<IntegerExpr>(10)))));
+
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
+      make_unique<VariableExpr>("bob"),
+      make_unique<AddExpr>(
+          make_unique<VariableExpr>("y"),
+          make_unique<VariableExpr>("x")))));
 
   loopbody.push_back(std::move(make_unique<AssignmentFromArithExp>(
-    make_unique<VariableExpr>("bob"),
+      make_unique<VariableExpr>("bob"),
       make_unique<SubtractExpr>(
-      make_unique<VariableExpr>("y"),
-      make_unique<VariableExpr>("x")))));
+          make_unique<VariableExpr>("y"),
+          make_unique<VariableExpr>("x")))));
 
   statements.push_back(std::move(make_unique<const Loop>(
-      make_unique<LogicalOrExpr>(make_unique<const LogicalAndExpr>(
-                                     make_unique<const LessThanExpr>(
-                                         make_unique<const VariableExpr>("x"),
-                                         make_unique<const IntegerExpr>(100)),
-                                     make_unique<const GreaterThanExpr>(
-                                         make_unique<const VariableExpr>("y"),
-                                         make_unique<const VariableExpr>("x"))),
-                                 make_unique<const LogicalAndExpr>(
-                                     make_unique<const LessThanEqualToExpr>(
-                                         make_unique<const VariableExpr>("bob"),
-                                         make_unique<const IntegerExpr>(100)),
-                                     make_unique<const GreaterThanEqualToExpr>(
-                                         make_unique<const VariableExpr>("bob"),
-                                         make_unique<const IntegerExpr>(0)))),
+      make_unique<LogicalOrExpr>(
+          make_unique<const LogicalAndExpr>(
+              make_unique<const LessThanExpr>(
+                  make_unique<const VariableExpr>("x"),
+                  make_unique<const IntegerExpr>(100)),
+              make_unique<const GreaterThanExpr>(
+                  make_unique<const VariableExpr>("y"),
+                  make_unique<const VariableExpr>("x"))),
+          make_unique<const LogicalAndExpr>(
+              make_unique<const LessThanEqualToExpr>(
+                  make_unique<const VariableExpr>("bob"),
+                  make_unique<const IntegerExpr>(100)),
+              make_unique<const GreaterThanEqualToExpr>(
+                  make_unique<const VariableExpr>("bob"),
+                  make_unique<const IntegerExpr>(0)))),
       std::move(loopbody))));
 
   auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
@@ -772,7 +780,8 @@ TEST_F(LowererTestV3, LoopWithBody) {
   function_defs.push_back(std::move(func_def));
 
   auto expr = make_unique<Program>(std::move(function_defs),
-    std::move(statements), std::move(arithexpr));
+                                   std::move(statements),
+                                   std::move(arithexpr));
 
   expr->Visit(&lowerer_);
 
