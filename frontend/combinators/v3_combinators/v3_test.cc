@@ -2,8 +2,8 @@
 #include "abstract_syntax/print_visitor_v3.h"
 // #include "frontend/combinators/v1_combinators/ae.h"
 #include "frontend/combinators/v3_combinators/helpers/relational_helper.h"
-#include "frontend/combinators/v3_combinators/main/relation_body.h"
 #include "frontend/combinators/v3_combinators/main/or_relation_parser.h"
+#include "frontend/combinators/v3_combinators/main/relation_body.h"
 
 #include "frontend/combinators/v3_combinators/main/block_parser.h"
 #include "frontend/combinators/v3_combinators/main/conditional_parser.h"
@@ -294,7 +294,7 @@ TEST(OrRelationParser, simpleRelationParser1) {
   EXPECT_EQ(result.endCharacter, 5);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "x>y");
-  //EXPECT_EQ(output, "(x > y)");
+  // EXPECT_EQ(output, "(x > y)");
 }
 
 TEST(OrRelationParser, simpleRelationParser2) {
@@ -419,7 +419,8 @@ TEST(LoopParser, regularWhileSuccess1) {
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
-  EXPECT_EQ(output, "while ! ((3 == 3)) {if (a == 2) {e = 4} else {e = 5}e = (4 + 5)}");
+  EXPECT_EQ(output,
+            "while ! ((3 == 3)) {if (a == 2) {e = 4} else {e = 5}e = (4 + 5)}");
 }
 
 TEST(LoopParser, regularWhileSuccess2) {
@@ -432,15 +433,16 @@ TEST(LoopParser, regularWhileSuccess2) {
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 66);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(
-      result.parsedCharacters,
-      "while(x>=3&&e<0){if(x==5){e=4;}else{x=x+5;}}");
+  EXPECT_EQ(result.parsedCharacters,
+            "while(x>=3&&e<0){if(x==5){e=4;}else{x=x+5;}}");
   EXPECT_EQ(result.errorType, "");
 
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
-  EXPECT_EQ(output, "while ((x >= 3) && (e < 0)) {if (x == 5) {e = 4} else {x = (x + 5)}}");
+  EXPECT_EQ(
+      output,
+      "while ((x >= 3) && (e < 0)) {if (x == 5) {e = 4} else {x = (x + 5)}}");
 }
 
 TEST(LoopParser, doWhileFailure1) {
@@ -480,8 +482,7 @@ TEST(ConditionalParser, conditionalSuccess1) {
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 40);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(result.parsedCharacters,
-            "if(x==5){e=4;}else{x=x+5;}");
+  EXPECT_EQ(result.parsedCharacters, "if(x==5){e=4;}else{x=x+5;}");
   EXPECT_EQ(result.errorType, "");
 
   PrintVisitor *a = new PrintVisitor();
@@ -499,14 +500,14 @@ TEST(ConditionalParser, conditionalSuccess2) {
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 54);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(result.parsedCharacters,
-            "if(x==5&&y+3==5){e=4;}else{x=x+5;}");
+  EXPECT_EQ(result.parsedCharacters, "if(x==5&&y+3==5){e=4;}else{x=x+5;}");
   EXPECT_EQ(result.errorType, "");
 
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
-  EXPECT_EQ(output, "if ((x == 5) && ((y + 3) == 5)) {e = 4} else {x = (x + 5)}");
+  EXPECT_EQ(output,
+            "if ((x == 5) && ((y + 3) == 5)) {e = 4} else {x = (x + 5)}");
 }
 
 TEST(ConditionalParser, conditionalSuccess3) {
@@ -525,7 +526,9 @@ TEST(ConditionalParser, conditionalSuccess3) {
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
-  EXPECT_EQ(output, "if (((x == 5) && ((y + 3) == 5)) || (x == y)) {e = 4} else {x = (x + 5)}");
+  EXPECT_EQ(output,
+            "if (((x == 5) && ((y + 3) == 5)) || (x == y)) {e = 4} else {x = "
+            "(x + 5)}");
 }
 
 TEST(ConditionalParser, conditionalFailure1) {
@@ -596,7 +599,8 @@ TEST(StatementParser, sucessWhileLoop1) {
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
-  EXPECT_EQ(output, "while ! ((3 == 3)) {if (a == 2) {e = 4} else {e = 5}e = (4 + 5)}");
+  EXPECT_EQ(output,
+            "while ! ((3 == 3)) {if (a == 2) {e = 4} else {e = 5}e = (4 + 5)}");
 }
 
 TEST(StatementParser, sucessWhileLoop2) {
@@ -609,15 +613,16 @@ TEST(StatementParser, sucessWhileLoop2) {
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 66);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(
-      result.parsedCharacters,
-      "while(x>=3&&e<0){if(x==5){e=4;}else{x=x+5;}}");
+  EXPECT_EQ(result.parsedCharacters,
+            "while(x>=3&&e<0){if(x==5){e=4;}else{x=x+5;}}");
   EXPECT_EQ(result.errorType, "");
 
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
-  EXPECT_EQ(output, "while ((x >= 3) && (e < 0)) {if (x == 5) {e = 4} else {x = (x + 5)}}");
+  EXPECT_EQ(
+      output,
+      "while ((x >= 3) && (e < 0)) {if (x == 5) {e = 4} else {x = (x + 5)}}");
 }
 
 // PROGRAMS

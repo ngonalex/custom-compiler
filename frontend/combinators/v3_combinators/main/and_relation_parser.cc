@@ -11,7 +11,7 @@ using namespace cs160::frontend;
 using namespace std;
 
 ParseStatus AndRelationParser::do_parse(std::string inputProgram,
-                                       int startCharacter) {
+                                        int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
@@ -39,7 +39,8 @@ ParseStatus AndRelationParser::do_parse(std::string inputProgram,
   andRelationParserFinal.firstParser = &andRelationParser;
   andRelationParserFinal.secondParser = &rhs;
 
-  ParseStatus result = andRelationParserFinal.do_parse(inputProgram, endCharacter);
+  ParseStatus result =
+      andRelationParserFinal.do_parse(inputProgram, endCharacter);
 
   // AST Formation
   int strIndex = 0;
@@ -47,8 +48,9 @@ ParseStatus AndRelationParser::do_parse(std::string inputProgram,
     if (i == 0) {
       result.ast = std::move(result.astNodes[i]);
     } else {
-      result.ast = make_node(unique_cast<const RelationalExpr>(std::move(result.ast)),
-        unique_cast<const RelationalExpr>(std::move(result.astNodes[i])));
+      result.ast = make_node(
+          unique_cast<const RelationalExpr>(std::move(result.ast)),
+          unique_cast<const RelationalExpr>(std::move(result.astNodes[i])));
     }
   }
 
@@ -65,5 +67,4 @@ std::unique_ptr<const LogicalAndExpr> AndRelationParser::make_node(
     std::unique_ptr<const RelationalExpr> second_leaf) {
   return make_unique<LogicalAndExpr>(std::move(first_leaf),
                                      std::move(second_leaf));
-
 }

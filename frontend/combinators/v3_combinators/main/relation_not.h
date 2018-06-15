@@ -10,7 +10,8 @@ namespace frontend {
 class NotRelationParser : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
-    std::unique_ptr<const LogicalNotExpr> make_node(std::unique_ptr<const RelationalExpr> first_ae);
+  std::unique_ptr<const LogicalNotExpr> make_node(
+      std::unique_ptr<const RelationalExpr> first_ae);
 };
 
 }  // namespace frontend

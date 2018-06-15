@@ -33,21 +33,21 @@ ParseStatus EqualToOpParser::do_parse(std::string inputProgram,
 }
 
 ParseStatus NotEqualToOpParser::do_parse(std::string inputProgram,
-                                      int startCharacter) {
-    int endCharacter = startCharacter;
-    endCharacter += trim(inputProgram);
-    
-    if (inputProgram.size() <= 1) {
-        return super::fail(inputProgram, endCharacter, errorMessage);
-    }
-    
-    auto equalParser_1 = AtomParser('!');
-    auto equalParser_2 = AtomParser('=');
-    AndCombinator equals_equals;
-    equals_equals.firstParser = &equalParser_1;
-    equals_equals.secondParser = &equalParser_2;
-    
-    return equals_equals.do_parse(inputProgram, endCharacter);
+                                         int startCharacter) {
+  int endCharacter = startCharacter;
+  endCharacter += trim(inputProgram);
+
+  if (inputProgram.size() <= 1) {
+    return super::fail(inputProgram, endCharacter, errorMessage);
+  }
+
+  auto equalParser_1 = AtomParser('!');
+  auto equalParser_2 = AtomParser('=');
+  AndCombinator equals_equals;
+  equals_equals.firstParser = &equalParser_1;
+  equals_equals.secondParser = &equalParser_2;
+
+  return equals_equals.do_parse(inputProgram, endCharacter);
 }
 
 ParseStatus GreaterThanOpParser::do_parse(std::string inputProgram,
@@ -88,8 +88,7 @@ ParseStatus GreaterThanOrEqualToOpParser::do_parse(std::string inputProgram,
   auto greaterThanParser = AtomParser('>');
   auto equalsParser = AtomParser('=');
   AndCombinator greater_or_equal;
-  greater_or_equal.firstParser =
-      &greaterThanParser;
+  greater_or_equal.firstParser = &greaterThanParser;
   greater_or_equal.secondParser = &equalsParser;
 
   return greater_or_equal.do_parse(inputProgram, endCharacter);
@@ -189,10 +188,10 @@ ParseStatus RelationOperatorParser::do_parse(std::string inputProgram,
   all.firstParser = &equalTo;
   all.secondParser = &both;
 
-    OrCombinator includingNot;
-    includingNot.firstParser = &all;
-    includingNot.secondParser = &notEqualTo;
-    
+  OrCombinator includingNot;
+  includingNot.firstParser = &all;
+  includingNot.secondParser = &notEqualTo;
+
   ParseStatus result = includingNot.parse(inputProgram, startCharacter);
   return result;
 }
@@ -308,7 +307,7 @@ ParseStatus RepeatKeyword::do_parse(std::string inputProgram,
   auto aParser = AtomParser('a');
   auto tParser = AtomParser('t');
   AndCombinator andOne;
-    andOne.firstParser = &rParser;
+  andOne.firstParser = &rParser;
   andOne.secondParser = &eParser;
   AndCombinator andTwo;
   andTwo.firstParser = &andOne;

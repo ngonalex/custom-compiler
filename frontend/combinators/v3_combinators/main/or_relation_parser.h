@@ -11,8 +11,8 @@ class OrRelationParser : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
   std::unique_ptr<const LogicalOrExpr> make_node(
-    std::unique_ptr<const RelationalExpr> first_leaf,
-    std::unique_ptr<const RelationalExpr> second_leaf);
+      std::unique_ptr<const RelationalExpr> first_leaf,
+      std::unique_ptr<const RelationalExpr> second_leaf);
 };
 
 }  // namespace frontend
