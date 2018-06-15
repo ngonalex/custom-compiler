@@ -69,7 +69,33 @@ ParseStatus FunctionDeclParser::do_parse(std::string inputProgram, int startChar
     func9.firstParser = &func8;
     func9.secondParser = &closeBracketP;
     
-    //TODO: Add AST Generation
+    ParseStatus funcHeaderResult = func4.do_parse(inputProgram, endCharacter);
     
-    return func9.do_parse(inputProgram, endCharacter);
+    ParseStatus result = func9.do_parse(inputProgram, endCharacter);
+    
+    if (result.status){
+        VariableExpr *funcNameExpr = (VariableExpr *)funcHeaderResult.astNodes[0].get();
+        
+        std::vector<std::unique_ptr<const VariableExpr>> parameters;
+        std::vector<std::unique_ptr<const Statement>> block;
+        
+        const std::string funcNameStr = funcNameExpr->name();
+        
+        for (int i = 1; i < funcHeaderResult.astNodes.size(); i++){
+            parameters.push_back(unique_cast<const VariableExpr>(std::move(result.astNodes[i])));
+        }
+        
+        for (int i = funcHeaderResult.astNodes.size(); i < result.astNodes.size() - 1; i++){
+            block.push_back(unique_cast<const Statement>(std::move(result.astNodes[i])));
+        }
+        
+        result.ast = make_unique<const FunctionDef>(
+                                                    funcNameStr,
+                                                    std::move(parameters),
+                                                    std::move(block),
+                                                    unique_cast<const ArithmeticExpr>(std::move(result.astNodes[result.astNodes.size() - 1])));
+        result.astNodes.erase(std::begin(result.astNodes),
+                              std::end(result.astNodes));
+    }
+    return result;
 }
