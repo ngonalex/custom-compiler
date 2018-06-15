@@ -52,7 +52,22 @@ ParseStatus FunctionCallParser::do_parse(std::string inputProgram, int startChar
     func5.secondParser = &closeParenP;
     func5.noBackwardsCompat = true;
     
-    //TODO: Add AST Generation
+    ParseStatus result = func5.do_parse(inputProgram, endCharacter);
     
-    return func5.do_parse(inputProgram, endCharacter);
+    if (result.status){
+        VariableExpr *funcNameExpr = (VariableExpr *)result.astNodes[1].get();
+        
+        const std::string funcNameStr = funcNameExpr->name();
+        std::vector<std::unique_ptr<const ArithmeticExpr>> arguments;
+        for (int i = 2; i < result.astNodes.size(); i++){
+            arguments.push_back(unique_cast<const ArithmeticExpr>(std::move(result.astNodes[i])));
+        }
+        result.ast = make_unique<const FunctionCall>(unique_cast<const VariableExpr>(std::move(result.astNodes[0])),
+                                                     funcNameStr,
+                                                     std::move(arguments));
+        result.astNodes.erase(std::begin(result.astNodes),
+                              std::end(result.astNodes));
+    }
+    
+    return result;
 }

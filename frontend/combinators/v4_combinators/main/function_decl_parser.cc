@@ -81,11 +81,11 @@ ParseStatus FunctionDeclParser::do_parse(std::string inputProgram, int startChar
         
         const std::string funcNameStr = funcNameExpr->name();
         
-        for (int i = 1; i < funcHeaderResult.astNodes.size(); i++){
+        for (long i = 1; i < funcHeaderResult.astNodes.size(); i++){
             parameters.push_back(unique_cast<const VariableExpr>(std::move(result.astNodes[i])));
         }
         
-        for (int i = funcHeaderResult.astNodes.size(); i < result.astNodes.size() - 1; i++){
+        for (long i = funcHeaderResult.astNodes.size(); i < result.astNodes.size() - 1; i++){
             block.push_back(unique_cast<const Statement>(std::move(result.astNodes[i])));
         }
         
