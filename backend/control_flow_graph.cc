@@ -373,9 +373,14 @@ std::vector<std::unique_ptr<ControlFlowGraphNode>> OptimizeHelp(
     std::vector<std::string> live_set;
     ControlFlowGraphNode * end = cfg_node.back().get();
     std::vector<int> visited_set;
+    // if(edges.empty()){
+    //   edges.push_back(Edge(std::make_pair(0,0),TYPELESS_EDGE));
+    // }
     //We don't need the return value of RecursiveFindPath
     //Only thing that is important is modifying the local_block of each node
-    RecursiveFindPath(cfg_pointer,edges,live_set, end,visited_set);
+    //std::pair<std::vector<std::string>, ControlFlowGraphNode *> ignored = 
+    RecursiveFindPath(cfg_pointer,edges,live_set,end,visited_set);
+    cfg_pointer.clear();
     return cfg_node;
  }
 
