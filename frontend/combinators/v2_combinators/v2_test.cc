@@ -466,7 +466,7 @@ TEST(AssignmentParserCombinator, successProgramParser1) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 1);
-  EXPECT_EQ(result.endCharacter, 48);
+  EXPECT_EQ(result.endCharacter, 47);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "victor=(123*1+3901-2);j=4;j+victor;");
   EXPECT_EQ(output, "victor = (((123 * 1) + 3901) - 2); j = 4; (j + victor)");

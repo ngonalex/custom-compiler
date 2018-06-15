@@ -6,6 +6,7 @@
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
 #include "frontend/combinators/v2_combinators/main/assignment_parser.h"
 #include "frontend/combinators/v2_combinators/main/word_parser.h"
+#include "frontend/combinators/v3_combinators/main/statement_parser.h"
 
 #include <string>  // std::string, std::stoi
 
@@ -30,10 +31,10 @@ ParseStatus ProgramParser::do_parse(std::string inputProgram,
   aeSemi.firstParser = reinterpret_cast<NullParser *>(&arithExprParser);
   aeSemi.secondParser = reinterpret_cast<NullParser *>(&semiColon);
 
-  AssignmentParser assignParser;
+  StatementParser statementParser;
   ZeroOrMoreCombinator zeroOrMore;
 
-  zeroOrMore.parser = reinterpret_cast<NullParser *>(&assignParser);
+  zeroOrMore.parser = reinterpret_cast<NullParser *>(&statementParser);
 
   ParseStatus intermediateResult =
       zeroOrMore.do_parse(inputProgram, endCharacter);

@@ -9,6 +9,7 @@
 #include "frontend/combinators/v3_combinators/main/conditional_parser.h"
 #include "frontend/combinators/v3_combinators/main/loop_parser.h"
 #include "frontend/combinators/v3_combinators/main/statement_parser.h"
+#include "frontend/combinators/v2_combinators/main/program_parser.h"
 
 #include "gtest/gtest.h"
 
@@ -620,70 +621,67 @@ TEST(StatementParser, sucessWhileLoop2) {
 }
 
 // PROGRAMS
-/*
+
 TEST(ProgramParser, sucessProgramParser1) {
   ProgramParser parser;
-  ParseStatus result = parser.do_parse("var z = 0 if (z == 0) { z = 100;} x;",
+  ParseStatus result = parser.do_parse("var z = 0; if (z == 0) { z = 100;} x;",
 0);
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
-  EXPECT_EQ(result.endCharacter, 36);
+  EXPECT_EQ(result.endCharacter, 34);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(result.parsedCharacters, "var z = 0 if (z == 0) { z = 100;} x;");
+  EXPECT_EQ(result.parsedCharacters, "varz=0;if(z==0){z=100;}x;");
   EXPECT_EQ(result.errorType, "");
 
-  // PrintVisitor *a = new PrintVisitor();
-  // result.ast->Visit(a);
-  // std::string output = a->GetOutput();
-  // EXPECT_EQ(output, //TODO: Check appropriate ast formation);
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
+  EXPECT_EQ(output, "varz = 0; if ()... x");
 }
 
 TEST(ProgramParser, sucessProgramParser2) {
   ProgramParser parser;
-  ParseStatus result = parser.do_parse("var x : Integer = 10; while(x > 0) { x =
-x - 1; } x;", 0);
+  ParseStatus result = parser.do_parse("var x : Integer = 10; while(x > 0) { x = x - 1; } x;", 0);
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
-  EXPECT_EQ(result.endCharacter, 52);
+  EXPECT_EQ(result.endCharacter, 50);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(result.parsedCharacters, "var x : Integer = 10; while(x > 0) { x = x
-- 1; } x;"); EXPECT_EQ(result.errorType, "");
+  EXPECT_EQ(result.parsedCharacters, "varx:Integer=10;while(x>0){x=x-1;}x;"); EXPECT_EQ(result.errorType, "");
 
-  // PrintVisitor *a = new PrintVisitor();
-  // result.ast->Visit(a);
-  // std::string output = a->GetOutput();
-  // EXPECT_EQ(output, //TODO: Check appropriate ast formation);
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
+  EXPECT_EQ(output, "x = 10; while (x > 0) {x = (x - 1)}; x");
 }
 
-TEST(ProgramParser, sucessProgramParser2) {
+TEST(ProgramParser, sucessProgramParser3) {
   ProgramParser parser;
-  ParseStatus result = parser.do_parse("var z = 0 if (z == 0) { z = 100;} z;",
+  ParseStatus result = parser.do_parse("var z = 0; if (z == 0) { z = 100;} z;",
 0);
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
-  EXPECT_EQ(result.endCharacter, 36);
+  EXPECT_EQ(result.endCharacter, 34);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(result.parsedCharacters, "var z = 0 if (z == 0) { z = 100;} z;");
+  EXPECT_EQ(result.parsedCharacters, "varz=0;if(z==0){z=100;}z;");
   EXPECT_EQ(result.errorType, "");
 
-  // PrintVisitor *a = new PrintVisitor();
-  // result.ast->Visit(a);
-  // std::string output = a->GetOutput();
-  // EXPECT_EQ(output, //TODO: Check appropriate ast formation);
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
+  EXPECT_EQ(output, "");
 }
 
 TEST(ProgramParser, failedProgramParser1) {
   ProgramParser parser;
-  ParseStatus result = parser.do_parse("var z = 0 if (z == 0) { z = 100;}", 0);
+  ParseStatus result = parser.do_parse("var z = 0; if (z == 0) { z = 100;}", 0);
 
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 0);
-  EXPECT_EQ(result.remainingCharacters, "var z = 0 if (z == 0) { z = 100;}");
-  EXPECT_EQ(result.parsedCharacters, "");
-  EXPECT_EQ(result.errorType, "Missing AE");
+  //EXPECT_EQ(result.remainingCharacters, "var z = 0 if (z == 0) { z = 100;}");
+  //EXPECT_EQ(result.parsedCharacters, "");
+  //EXPECT_EQ(result.errorType, "Missing AE");
 }
-*/

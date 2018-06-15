@@ -56,6 +56,15 @@ cc_library(
 )
 
 cc_library(
+	name = "ae",
+	copts = ["-Wall -g"],
+	hdrs = ["ae.h"],
+	srcs = ["ae.cc"],
+	deps = ["//utility", "//frontend/combinators/basic_combinators"],
+	visibility = ["//visibility:public"],
+)
+
+cc_library(
 	name = "v1_helpers",
 	copts = ["-Wall -g"],
 	hdrs = ["helpers/v1_helpers.h"],
