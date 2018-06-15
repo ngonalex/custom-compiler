@@ -1,14 +1,17 @@
-Backend Documentation
+# Backend Documentation #
 
-Development:
+**Development:**
 
 1) Mainly developed on a Ubuntu 17.04 machine. Our codegen tests will not work on mac/windows machines due to things like absolute addressing. If bazel is installed on a csil machine, our program should work.
 
-Testing:
-
+**Testing:**
 - to run all tests: bazel test backend/backend_test
 - to run codegen tests: bazel test backend/codegen_test
 - to run lowerer_tests: bazel test backend/lowerer_test
+- to run control_graph tests: bazel test backend/control_flow_graph_test
+- to run optimizer tests: bazel test backend/optimizer_test
+
+Additional notes about tests. Optimizer uses EXPECT_LE to compare the file size of the non optimized file from codegen and the optimized file from codegen. Because it's a LE (LessThanEqualTo) that means that it will always "pass" as if the optimizer did not do anything, the two files will be identical. Run bazel build backend/optimizer_test && bazel-bin/backend/optimizer_test instead to see output that shows the file size of both the optimized file and the non optimized file.
 
 Our project is split into 4 parts.
 1) Intermediate Representation
@@ -16,7 +19,7 @@ Our project is split into 4 parts.
 3) Code Generation
 4) Control Flow Graph + Optimizer
 
-INTERMEDIATE REPRESENTATION
+# INTERMEDIATE REPRESENTATION #
 
 Files: ir.h
 Basically contains all of our useful enums and classes that are used to make up the ThreeAddressCode data structure.
@@ -29,7 +32,7 @@ The way we broke down our ThreeAddressCode structure is
 
 There's nothing too difficult here, but it may be somewhat confusing on why we decided to have Target/Operand hold two different classes rather than be a parent and have classes inherit from it. We based this structure off of the way Ben created his tokens in the example-code repository because we didn't want to deal with object slicing. If we had more time we definitely would revise our class structure as it can get very confusing to deal with though.
 
-LOWERER
+# LOWERER #
 
 Files: lowerer_visitor.cc, lowerer_visitor.h
 Files it depends on: ir.h, helper_struct.h
@@ -39,20 +42,20 @@ The way our lowerer works is it takes in an AST and creates a vector of ThreeAdd
 
 We'll break our lowerer_visitor into what it does for each version.
 
-V1:
+**V1**
 
 V1 does two things
 1) Responsible for signaling instructions for Codegen to load an integer/dereference/variable into the stack
 2) Signal to codegen to pop two things off the stack and do the corresponding operation on them as provided by the opcode, then pushing the result onto the stack
 
-V2:
+**V2**
 
 V2 is an extension of V1 except now it needs to handle LeftHandSide variable/Dereferences present in ArithmeticExprs
 
 All V2 really is is differentiating between a LHS and a RHS variable. If it's a LHS variable signal to codegen that it needs to pop the address of the variable and load something into it.
 If it's a RHS variable signal to codegen to load from memory and use that value in resulting calculations.
 
-V3:
+**V3**
 
 Loops
 - Tell codegen how to evaluate the guard, create a label for the loop name, create instructions for the loop body, then jumpback to either the loop or to main.
@@ -63,7 +66,7 @@ Conditionals
 Relational/Logical Exprs
 - Similar to how our lowerer handles Add/Sub/Mul/Div, all it does is signal to codegen to pop two things of the stack compare them based on the opcode and push the result on the stack.
 
-V4:
+**V4**
 
 Function calls
 - Iterate through the arguments vector which tells CodeGen to load in arguments into the stack, then tell Codegen to create a "call instruction", then which variable to load in the result of the function
@@ -71,7 +74,7 @@ Function calls
 Function definitions
 - Iterate through the function definition vector and tell codegen to create a label for the function as well as which instructions to put in each function
 
-V5:
+**V5**
 
 Dereference
 - Similar to how variables are handled, dereferences are handled by differentiating on if they are a RHS or a LHS and signaling to codegen to do a different action accordingly. You can look at our OpCode Enum in ir.h to see a RHS and a LHS dereference opcode instruction.
@@ -108,7 +111,7 @@ If the variable "x" is never used again then our program will continue. However 
 5) Undeclared Functions
   If the function name that is being referred to in a function call does not exist in our map we throw an error.
 
-CODE GENERATION
+# CODE GENERATION #
 
 Files: code_gen.cc, code_gen.h
 Files it depends on: ir.h, helper_struct.h, lowerer_visitor.cc, lowerer_visitor.h
@@ -120,17 +123,19 @@ Some other things to note:
 Our language will type check meaning that things like x->1 + 1 (if x->1 is a tuple) are not valid. In any Arithmetic/Relational/Logical Expr, if any of the arguments are not integers we throw a type error and exit. Our language will protect against tuple of out of bounds errors. Anytime a dereference is accessed we check if the argument provided is within range of 1 -> size (stored as metadata in the first 8 bytes of the object). Also we catch things like accessing a tuple that doesn't exist, so if x->1->1 has not been assigned or x->1 is actually an integer, we throw an error by checking first if it exists (existence flag) then if it's a tuple (if type flag is 1 for tuple).
 We also guard against using tuple creation with bogus arguments (cannot create a tuple of size 0 or less). Because we never garbare collect our program doesn't have dangling pointers, so things like x = tuple (2), y = x, x = 5 is totally valid as y will just point to the origin tuple that x contained after x is reassigned to the variable 5.
 
-V1
+Also this is important to note that there are reserved keywords in our language. There's an issue up on github that details this, but it's not handled in backend. So if a user were to use any of the reserved keywords like heap, bumpptr, returnobj, their program would crash or have undefined behavior.
+
+**V1**
 - loading in integers -> creates flags to indicate it exists and it's an integer (sets type flag to 0, and existence flag to 1) and then pushes it on the stack, then pushes the actual value to the stack
 - Add/Mult/Div/Sub -> pops 4 things off the stack (Each object is split into two 64 bit spaces on the stack, one for the flags, one for the object itself)
                    -> checks the existence + type flag of the two objects on the stack (Both must exist and both must be integers as we don't suppose tuple addition otherwise throw an error), then perform the corresponding operator on it and push flags + object back on the stack
 
-V2
+**V2**
 - Variables -> stored in the static segment, where each variable is given a 16 bytes of space in it (global). If it belongs to a function, then it's stored in the stack (more on this in the v4 section)
 - LHS variables -> get the address of the variable using a map. If it's a global then it just returns it's name (e.g. variable "x" is $x). If it's in a function then it returns the offset in the stack where it is, then pop the                      top thing off the stack (should be the result of the variable ArithmeticExprs, and write into memory/stack)
 - RHS variables -> get the address of the variable using a map, then push the flags + value of the variable onto the stack
 
-V3
+**V3**
 - Relational Exprs -> We use the instruction cmp to compare two values, then use an instruction setcc which will set a byte register to either 0 or 1 depending on what "cc" was. e.g if we want LessThan we would do setl. Then we                        sign-extend the byte register to a 8 byte register (64 bits) and push that and an integer flag register to the stack. Basically this allows us to emulate booleans using "0s" and "1s" rather than having to                         create a "boolean type" in our language.
 
 - Logical Exprs -> Use corresponding provided instruction in x86 (and, or). For LogicalNot, we use xor to flip the byte provided to us because we know that the thing at the top of the stack is either a 0 or a 1.
@@ -140,7 +145,7 @@ V3
 
 - Conditional -> Pop top two things off the stack and evaluate it. If it's == to 0 then we jump to the false branch, otherwise we continues (falls in the true branch), Eventually both branches converge and have a jump to main.
 
-V4
+**V4**
 -Function calls -> Loads all the arguments on the stack, then calls the corresponding function (it has a label)
                 -> when it returns, we have a variable in the static segment called "returnobj", unpack that object and load the flags + object into the corresponding variable defined by the function call return variable. Then 
                 -> clear the returnobj so it can be used in the next function call then restore the stack (misaligned because we loaded in arguments into the stack)
@@ -152,7 +157,7 @@ V4
 
 - Variable/Dereference, The way this works is codegen has a map of where each variable is mapped to. So it knows where to access each variable in the stack. Anytime it sees a variable instead of accessing it from the static now it uses the stack. Once it's on the stack there's no difference in how Arith/Logical/Relational Exprs interact with them. The only thing that changes here in loading from and into variables.
 
-V5
+**V5**
 - AssignmentFromNewTuple -> We have a heap allocator subroutine called "newtuple" defined in GenerateCreateNewTuple(). The way it works is we have a static segment variable called "heap" and a 8 byte variable called "bumpptr" 
                          -> which is reserved memory acting as our heap and our head of freelist. One thing we did not implement is garbage collection, so objects are never reclaimed. In addition there is no error handling when
                          -> bumpptr > size of heap. Our program will just enter into the realm of undefined behavior. Everytime newtuple is called it takes in an argument of how much space to allocate. It takes that argument 
@@ -169,7 +174,7 @@ Child/Parent + LHS Dereference and Child RHS Dereference are handled the same. T
 
 Parent Dereference + RHS Dereference takes an extra step of accessing the actual value of the tuple rather than just the address and then pushing that on the stack.
 
-CONTROL FLOW GRAPH && OPTIMIZER:
+# CONTROL FLOW GRAPH && OPTIMIZER #
 Files: control_flow_graph.cc, control_flow_graph.h
 Files it depends on: ir.h, helper_struct.h, lowerer_visitor.cc, lowerer_visitor.h
 Tests: control_flow_graph.cc
@@ -207,6 +212,4 @@ Finally it returns back to the user the IR by rebuilding a vector of ThreeAddres
 There are some additional functionality, including some debug functions and a GetOutput() function. 
 
 The Recursion for this part was only possible by using unique_ptr's .get(), returning a direct pointer back. Since the recursion didn't need the ownership, it made sense to use them. Also it would've been incredibly difficult to recursively pass unique_ptrs, because when the functions are popped out of the stack, then the original function call will no longer have ownership. 
-
-
 
