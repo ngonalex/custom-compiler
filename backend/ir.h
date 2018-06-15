@@ -74,10 +74,7 @@ enum RegisterType {
 };
 
 // Maybe unneeded
-enum Scope {
-  GLOBAL,
-  FUNCTION
-};
+enum Scope { GLOBAL, FUNCTION };
 
 enum FlagType {
   TYPEFLAG,

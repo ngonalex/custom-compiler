@@ -1,24 +1,20 @@
-#ifndef TERM_EXPR_H_
-#define TERM_EXPR_H_
+#ifndef FRONTEND_COMBINATORS_V1_COMBINATORS_TERM_EXPR_H_
+#define FRONTEND_COMBINATORS_V1_COMBINATORS_TERM_EXPR_H_
+
+#include <string>
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
-#include "frontend/combinators/v1_combinators/add_sub_expr.h"
-#include "frontend/combinators/v1_combinators/add_sub_op.h"
-#include "frontend/combinators/v1_combinators/close_paren.h"
-#include "frontend/combinators/v1_combinators/negative_sign.h"
-#include "frontend/combinators/v1_combinators/num_parser.h"
-#include "frontend/combinators/v1_combinators/open_paren.h"
 
 namespace cs160 {
 namespace frontend {
 
-class TermExprParser : NullParser {
+class TermExprParser : public NullParser {
  public:
-   virtual ParseStatus parse(std::string inputProgram, std::string errorType = "");
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // TERM_EXPR_H
+#endif  // FRONTEND_COMBINATORS_V1_COMBINATORS_TERM_EXPR_H_

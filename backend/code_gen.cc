@@ -304,7 +304,7 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
     case FUNARGLOAD:
       // Here we're moving arguments loaded into the stack before the
       // function call and moving it to the local stack
-      argumentnum = tac->arg1.value()+1;
+      argumentnum = tac->arg1.value() + 1;
       varname = tac->target.reg().name();
       outfile_ << "\t# Moving argument " << std::to_string(argumentnum)
         << " into the stack" << std::endl;
@@ -549,7 +549,7 @@ std::string CodeGen::VariableNameHelper(std::string variablename,
     if (symbollocations_.count(variablename) != 1) {
       // something bad happened
       std::cerr << "Variable name helper could not find the mapping for "
-        << variablename <<" \n";
+                << variablename << " \n";
       exit(1);
     }
     int index = symbollocations_.find(variablename)->second;

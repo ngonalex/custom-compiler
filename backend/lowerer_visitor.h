@@ -1,6 +1,7 @@
 #ifndef BACKEND_LOWERER_VISITOR_H_
 #define BACKEND_LOWERER_VISITOR_H_
 
+#include <algorithm>
 #include <iostream>
 #include <set>
 #include <stack>
@@ -18,15 +19,17 @@
 
 using cs160::make_unique;
 using cs160::abstract_syntax::backend::AddExpr;
+using cs160::abstract_syntax::backend::SubtractExpr;
 using cs160::abstract_syntax::backend::Assignment;
 using cs160::abstract_syntax::backend::Program;
 using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::Conditional;
-using cs160::abstract_syntax::backend::DivideExpr;
-using cs160::abstract_syntax::backend::SubtractExpr;
 using cs160::abstract_syntax::backend::MultiplyExpr;
 using cs160::abstract_syntax::backend::VariableExpr;
+using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::EqualToExpr;
+using cs160::abstract_syntax::backend::FunctionCall;
+using cs160::abstract_syntax::backend::FunctionDef;
 using cs160::abstract_syntax::backend::GreaterThanEqualToExpr;
 using cs160::abstract_syntax::backend::GreaterThanExpr;
 using cs160::abstract_syntax::backend::IntegerExpr;

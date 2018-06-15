@@ -32,16 +32,16 @@ std::string LowererVisitor::GetOutput() {
     OpcodeType opcodetype = blocks_[i]->op.opcode();
     switch (opcodetype) {
       case INTLOAD:
-        output = output + blocks_[i]->target.reg().name()
-          + " <- " + std::to_string(blocks_[i]->arg1.value());
+        output = output + blocks_[i]->target.reg().name() + " <- " +
+                 std::to_string(blocks_[i]->arg1.value());
         break;
       case VARASSIGNLOAD:
-        output = output + blocks_[i]->target.reg().name()
-              + " <- " + blocks_[i]->arg1.reg().name();
+        output = output + blocks_[i]->target.reg().name() + " <- " +
+                 blocks_[i]->arg1.reg().name();
         break;
       case FUNARGLOAD:
-        output = output + blocks_[i]->target.reg().name()
-              + " <- " + std::to_string(blocks_[i]->arg1.value());
+        output = output + blocks_[i]->target.reg().name() + " <- " +
+                 std::to_string(blocks_[i]->arg1.value());
         break;
       case LOGNOT:
         output = output + blocks_[i]->target.reg().name() + " <- " +
@@ -253,7 +253,7 @@ void LowererVisitor::VisitFunctionCall(const FunctionCall& call) {
 
   // Evaluate the arguments to a single value
   // Do it backwards to make loading into the stack easier
-  for (int i = call.arguments().size() - 1 ; i >= 0 ; --i) {
+  for (int i = call.arguments().size() - 1; i >= 0; --i) {
     call.arguments()[i]->Visit(this);
   }
 
@@ -289,7 +289,7 @@ void LowererVisitor::VisitFunctionDef(const FunctionDef& def) {
   // mov %rsp, %rbp
   // Potentially push rbx?
   CreateFunctionDefPrologue(def.function_name());
-  int prologueindex = blocks_.size()-1;
+  int prologueindex = blocks_.size() - 1;
 
   // Use a function specific stack here to keep track of variables
   std::set<std::string> originalglobalset(globalset_);
@@ -459,7 +459,7 @@ void LowererVisitor::VisitConditional(const Conditional& conditional) {
   if (differenceset.size() == 0) {
     // we can now safely copy one of the local sets
     // as a globalset
-    globalset_ = localsets_[localsets_.size()-1];
+    globalset_ = localsets_[localsets_.size() - 1];
   } else {
     // otherwise use only the intersection set
     // std::cerr << "A variable assignment in only one branch has been detected"
@@ -555,7 +555,7 @@ void LowererVisitor::VisitProgram(const Program& program) {
   blocks_.push_back(std::move(newblock));
 
   for (auto& def : program.function_defs()) {
-      def->Visit(this);
+    def->Visit(this);
   }
 }
 
@@ -618,13 +618,13 @@ void LowererVisitor::CreateLoadBlock(OpcodeType type, Operand arg1) {
       varname = variablestack_.top();
       variablestack_.pop();
 
-      if ( globalset_.count(varname) == 0 ) {
-        std::cerr << "Variable "+ varname +" not assigned\n";
+      if (globalset_.count(varname) == 0) {
+        std::cerr << "Variable " + varname + " not assigned\n";
         exit(1);
       }
 
-      newblock->target = Target(Register("t_" +
-        std::to_string(counter_.variablecount), VIRTUALREG));
+      newblock->target = Target(
+          Register("t_" + std::to_string(counter_.variablecount), VIRTUALREG));
       newblock->op = Opcode(VARLOAD);
       // Not consistent rework later
       newblock->arg1 = Operand(Register(varname, VARIABLEREG));
@@ -636,8 +636,8 @@ void LowererVisitor::CreateLoadBlock(OpcodeType type, Operand arg1) {
       newblock->op = Opcode(INTLOAD);
 
       // look at this later,just going to do this now to test some things
-      newblock->target = Target(Register("t_" +
-        std::to_string(counter_.variablecount), VIRTUALREG));
+      newblock->target = Target(
+          Register("t_" + std::to_string(counter_.variablecount), VIRTUALREG));
 
       // Push into vector
       blocks_.push_back(std::move(newblock));
@@ -835,8 +835,8 @@ std::set<std::string> LowererVisitor::GetSetDifference(
   std::set<std::string> set1, std::set<std::string> set2) {
   std::set<std::string> differenceset;
   set_symmetric_difference(set1.begin(), set1.end(), set2.begin(), set2.end(),
-    std::inserter(differenceset, differenceset.begin()));
-    return differenceset;
+                           std::inserter(differenceset, differenceset.begin()));
+  return differenceset;
 }
 
 std::set<std::string> LowererVisitor::GetSetIntersection(

@@ -127,7 +127,7 @@ TEST_F(LowererTestV5, NestedTupleTest) {
             "bob <- t_0 NEWTUPLE \nt_1 <- 1\n"
             "bob->t_1 <- bob LHSDEREFERENCE Parent\n"
             "t_2 <- 2\nbob->t_1 <- t_2 NEWTUPLE \nt_3 <- 1\n"
-            "ob->t_3 <- bob LHSDEREFERENCE Child\nt_4 <- 2\n"
+            "bob->t_3 <- bob LHSDEREFERENCE Child\nt_4 <- 2\n"
             "bob->t_3->t_4 <- bob LHSDEREFERENCE Parent\nt_5 <- 2\n"
             "t_6 <- 3\nt_7 <- t_5 + t_6\nbob->t_3->t_4 <- t_7\n");
 }
