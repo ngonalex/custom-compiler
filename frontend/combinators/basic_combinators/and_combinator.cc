@@ -31,7 +31,7 @@ ParseStatus AndCombinator::do_parse(std::string inputProgram,
   both.parsedCharacters =
       firstStatus.parsedCharacters + secondStatus.parsedCharacters;
   size_t parsedCharacterCount = firstStatus.parsedCharactersArray.size() +
-                             secondStatus.parsedCharactersArray.size();
+                                secondStatus.parsedCharactersArray.size();
   if (parsedCharacterCount > 0) {
     if (firstStatus.parsedCharactersArray.size() > 0)
       both.parsedCharactersArray.insert(
@@ -48,8 +48,8 @@ ParseStatus AndCombinator::do_parse(std::string inputProgram,
     else if (secondStatus.parsedCharacters.size() > 0)
       both.parsedCharactersArray.push_back(secondStatus.parsedCharacters);
   } else {
-      both.firstParsedCharacters = firstStatus.parsedCharacters;
-      both.secondParsedCharacters = secondStatus.parsedCharacters;
+    both.firstParsedCharacters = firstStatus.parsedCharacters;
+    both.secondParsedCharacters = secondStatus.parsedCharacters;
   }
   both.remainingCharacters = secondStatus.remainingCharacters;
   both.startCharacter = startCharacter;
