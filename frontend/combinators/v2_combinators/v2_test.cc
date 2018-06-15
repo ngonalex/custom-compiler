@@ -10,7 +10,6 @@
 
 using namespace cs160::frontend;
 
-
 // Fail Case WordParser
 TEST(WordParserCombinator, failWordParser1) {
   WordParser wordParser;
@@ -19,29 +18,35 @@ TEST(WordParserCombinator, failWordParser1) {
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 0);
-  EXPECT_EQ(result.errorType, "Declare variable names with 'var variable_name : type = expression'");
+  EXPECT_EQ(
+      result.errorType,
+      "Declare variable names with 'var variable_name : type = expression'");
 }
 
 // Fail Case WordParser
 TEST(WordParserCombinator, failWordParser2) {
- WordParser wordParser;
+  WordParser wordParser;
   ParseStatus result = wordParser.parse("()qam", 0);
 
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 0);
-  EXPECT_EQ(result.errorType, "Declare variable names with 'var variable_name : type = expression'");
+  EXPECT_EQ(
+      result.errorType,
+      "Declare variable names with 'var variable_name : type = expression'");
 }
 
 // Fail Case WordParser
 TEST(WordParserCombinator, failWordParser4) {
-   WordParser wordParser;
+  WordParser wordParser;
   ParseStatus result = wordParser.parse("&&qam", 0);
 
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 0);
-  EXPECT_EQ(result.errorType, "Declare variable names with 'var variable_name : type = expression'");
+  EXPECT_EQ(
+      result.errorType,
+      "Declare variable names with 'var variable_name : type = expression'");
 }
 
 // Fail Case WordParser
@@ -52,7 +57,9 @@ TEST(WordParserCombinator, failWordParser5) {
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 0);
-  EXPECT_EQ(result.errorType, "Declare variable names with 'var variable_name : type = expression'");
+  EXPECT_EQ(
+      result.errorType,
+      "Declare variable names with 'var variable_name : type = expression'");
 }
 
 // Fail Case WordParser
@@ -63,7 +70,9 @@ TEST(WordParserCombinator, failWordParser6) {
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 0);
-  EXPECT_EQ(result.errorType, "Declare variable names with 'var variable_name : type = expression'");
+  EXPECT_EQ(
+      result.errorType,
+      "Declare variable names with 'var variable_name : type = expression'");
 }
 
 // Success Case WordParser
@@ -71,7 +80,7 @@ TEST(WordParserCombinator, successWordParser1) {
   WordParser wordParser;
   ParseStatus result = wordParser.parse("var", 0);
 
-    // Traversing the AST created from the variable name
+  // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
@@ -82,7 +91,6 @@ TEST(WordParserCombinator, successWordParser1) {
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "var");
   EXPECT_EQ(output, "var");
-
 }
 
 // Success Case WordParser
@@ -100,7 +108,7 @@ TEST(WordParserCombinator, successWordParser2) {
   EXPECT_EQ(result.endCharacter, 3);
   EXPECT_EQ(result.remainingCharacters, ";35345345");
   EXPECT_EQ(result.parsedCharacters, "var");
-    EXPECT_EQ(output, "var");
+  EXPECT_EQ(output, "var");
 }
 
 // Success Case WordParser
@@ -108,7 +116,7 @@ TEST(WordParserCombinator, successWordParser3) {
   WordParser wordParser;
   ParseStatus result = wordParser.parse("_victor", 0);
 
-    // Traversing the AST created from the variable name
+  // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
@@ -127,7 +135,6 @@ TEST(WordParserCombinator, trimTest) {
   cs160::trim(result);
   EXPECT_EQ(result, "var ");
 }
-
 
 // Success Case var_keyword_parser
 TEST(WordParserCombinator, successVarKeywordParser1) {
@@ -152,7 +159,6 @@ TEST(WordParserCombinator, failVarKeywordParser1) {
   EXPECT_EQ(result.errorType, "Start variable declaration with var");
 }
 
-
 // Success Case ColonParser
 TEST(WordParserCombinator, sucessColonParser1) {
   ColonParser test;
@@ -175,7 +181,6 @@ TEST(WordParserCombinator, failColonParser1) {
   EXPECT_EQ(result.endCharacter, 0);
   EXPECT_EQ(result.errorType, "Missing colon");
 }
-
 
 // Success Case TypeParser
 TEST(WordParserCombinator, successTypeParser1) {
@@ -241,7 +246,6 @@ TEST(VariableParserCombinator, successVariableParser1) {
   EXPECT_EQ(output, "_victor");
 }
 
-
 // Success Case VariableParser
 TEST(VariableParserCombinator, successVariableParser2) {
   VariableParser test;
@@ -260,7 +264,6 @@ TEST(VariableParserCombinator, successVariableParser2) {
   EXPECT_EQ(output, "_victor");
 }
 
-
 // Fail Case VariableParser
 TEST(VariableParserCombinator, failVariableParser1) {
   VariableParser test;
@@ -274,7 +277,7 @@ TEST(VariableParserCombinator, failVariableParser1) {
 
 // Fail Case VariableParser
 TEST(VariableParserCombinator, failVariableParser2) {
-   VariableParser test;
+  VariableParser test;
   ParseStatus result = test.parse("var _victor : ;", 10);
 
   EXPECT_EQ(result.status, false);
@@ -391,19 +394,21 @@ TEST(AssignmentParserCombinator, failAssignmentParser1) {
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.startCharacter, 10);
   EXPECT_EQ(result.endCharacter, 10);
-  EXPECT_EQ(result.errorType, "Missing arithmetic expression"); // Start of arithmetic expression
+  EXPECT_EQ(result.errorType,
+            "Missing arithmetic expression");  // Start of arithmetic expression
 }
 
 // Fail Case VariableParser
 TEST(AssignmentParserCombinator, failAssignmentParser2) {
-    AssignmentParser test;
+  AssignmentParser test;
   ParseStatus result = test.parse("1victor = (123 * 1 + 3901 - 2);", 10);
 
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.startCharacter, 10);
   EXPECT_EQ(result.endCharacter, 10);
- EXPECT_EQ(result.errorType,
-      "Declare variable names with 'var variable_name : type = expression' or Start variable declaration with var");
+  EXPECT_EQ(result.errorType,
+            "Declare variable names with 'var variable_name : type = "
+            "expression' or Start variable declaration with var");
 }
 
 // Fail Case VariableParser : missing equal sign
@@ -426,9 +431,9 @@ TEST(AssignmentParserCombinator, failAssignmentParser4) {
   EXPECT_EQ(result.startCharacter, 10);
   EXPECT_EQ(result.endCharacter, 10);
   EXPECT_EQ(result.errorType,
-      "Declare variable names with 'var variable_name : type = expression' or Start variable declaration with var");
+            "Declare variable names with 'var variable_name : type = "
+            "expression' or Start variable declaration with var");
 }
-
 
 TEST(BinaryOperatorExpr, successBinaryOperatorExpr1) {
   ArithExprParser parser;
@@ -446,13 +451,13 @@ TEST(BinaryOperatorExpr, successBinaryOperatorExpr1) {
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "(victor+490)-_foo+3;");
   EXPECT_EQ(output, "(((victor + 490) - _foo) + 3)");
-
 }
 
 // Success Case ProgramParser
 TEST(AssignmentParserCombinator, successProgramParser1) {
   ProgramParser test;
-  ParseStatus result = test.parse(" victor = (123 * 1 + 3901 - 2); j = 4; j+victor;", 0);
+  ParseStatus result =
+      test.parse(" victor = (123 * 1 + 3901 - 2); j = 4; j+victor;", 0);
 
   // Traversing the AST created from the variable name
   PrintVisitor *a = new PrintVisitor();
@@ -488,5 +493,3 @@ TEST(AssignmentParserCombinator, failProgramParser2) {
   EXPECT_EQ(result.endCharacter, 10);
   EXPECT_EQ(result.errorType, "Missing arithmetic expression");
 }
-
-

@@ -6,16 +6,16 @@
 using namespace cs160::frontend;
 
 ParseStatus OrCombinator::do_parse(std::string inputProgram,
-				int startCharacter) {
+                                   int startCharacter) {
   ParseStatus firstStatus = firstParser->do_parse(inputProgram, startCharacter);
   if (firstStatus.status) {
     return firstStatus;
   }
 
-  ParseStatus secondStatus = secondParser->do_parse(inputProgram, startCharacter);
-  if(!secondStatus.status) {
-  	secondStatus.errorType += " or " + firstStatus.errorType;
+  ParseStatus secondStatus =
+      secondParser->do_parse(inputProgram, startCharacter);
+  if (!secondStatus.status) {
+    secondStatus.errorType += " or " + firstStatus.errorType;
   }
   return secondStatus;
 }
-

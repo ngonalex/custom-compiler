@@ -9,27 +9,27 @@ namespace frontend {
 
 class VarKeywordParser : public NullParser {
  public:
-   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class ColonParser : public NullParser {
  public:
-   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class TypeParser : public NullParser {
  public:
-   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class EqualSignParser : public NullParser {
  public:
-   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 class HelperVariableParser : public NullParser {
  public:
-   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 /*
 class BOExpr : public NullParser {
@@ -37,7 +37,7 @@ class BOExpr : public NullParser {
    virtual ParseStatus do_parse(std::string inputProgram);
 };*/
 
-} // namespace frontend
-} // namespace cs160
+}  // namespace frontend
+}  // namespace cs160
 
-#endif // VAR_HELPER_H_
+#endif  // VAR_HELPER_H_

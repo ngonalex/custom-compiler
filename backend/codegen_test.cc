@@ -29,7 +29,8 @@
 // };
 
 // // this piece of code is from stackoverflow
-// // link: https://stackoverflow.com/questions/478898/how-to-execute-a-command-and-get-output-of-command-within-c-using-posix
+// // link:
+// https://stackoverflow.com/questions/478898/how-to-execute-a-command-and-get-output-of-command-within-c-using-posix
 // std::string exec(const char* cmd) {
 //     std::array<char, 128> buffer;
 //     std::string result;

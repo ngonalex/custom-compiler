@@ -16,10 +16,9 @@ namespace frontend {
 
 class AtomParser : public NullParser {
  public:
-  virtual ParseStatus do_parse(std::string inputProgram,
-  				int startCharacter);
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 
-  explicit AtomParser(char char_to_parse) { 
+  explicit AtomParser(char char_to_parse) {
     this->char_to_parse = char_to_parse;
   }
 

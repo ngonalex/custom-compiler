@@ -1,6 +1,6 @@
 #include "abstract_syntax/abstract_syntax.h"
-#include "frontend/combinators/basic_combinators/parsestatus.h"
 #include "frontend/combinators/basic_combinators/atom_parser.h"
+#include "frontend/combinators/basic_combinators/parsestatus.h"
 
 #include "gtest/gtest.h"
 

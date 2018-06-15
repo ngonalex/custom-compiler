@@ -12,8 +12,7 @@ class OrCombinator : public NullParser {
   NullParser *firstParser;
   NullParser *secondParser;
 
-  virtual ParseStatus do_parse(std::string inputProgram,
-  				int startCharacter);
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
 }  // namespace frontend
