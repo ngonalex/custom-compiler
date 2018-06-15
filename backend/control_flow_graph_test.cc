@@ -59,8 +59,99 @@ class ControlFlowGraphTest : public ::testing::Test {
   ControlFlowGraph grapher_;
 };
 
-TEST_F(ControlFlowGraphTest, ConditionalWithNestedLogicalsWithVariables) {
+// TEST_F(ControlFlowGraphTest, ConditionalWithNestedLogicalsWithVariables) {
+//   Statement::Block statements;
+
+//   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
+//     make_unique<VariableExpr>("x"),
+//     make_unique<AddExpr>(
+//       make_unique<IntegerExpr>(5),
+//       make_unique<IntegerExpr>(10)))));
+
+//   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
+//     make_unique<VariableExpr>("y"),
+//     make_unique<SubtractExpr>(
+//       make_unique<IntegerExpr>(5),
+//       make_unique<IntegerExpr>(10)))));
+
+//   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
+//     make_unique<VariableExpr>("bob"),
+//     make_unique<AddExpr>(
+//       make_unique<VariableExpr>("y"),
+//       make_unique<VariableExpr>("x")))));
+
+//   statements.push_back(std::move(make_unique<const Conditional>(
+//     make_unique<LogicalOrExpr>(
+//     make_unique<const LogicalAndExpr>(
+//       make_unique<const LessThanExpr>(
+//         make_unique<const VariableExpr>("x"),
+//         make_unique<const IntegerExpr>(100)),
+//       make_unique<const GreaterThanExpr>(
+//         make_unique<const VariableExpr>("y"),
+//         make_unique<const VariableExpr>("x"))),
+//     make_unique<const LogicalAndExpr>(
+//       make_unique<const LessThanEqualToExpr>(
+//         make_unique<const VariableExpr>("bob"),
+//         make_unique<const IntegerExpr>(100)),
+//       make_unique<const GreaterThanEqualToExpr>(
+//         make_unique<const VariableExpr>("bob"),
+//         make_unique<const IntegerExpr>(0)))),
+//         Statement::Block(), Statement::Block())));
+
+//   auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
+//     make_unique<IntegerExpr>(5));
+
+//   FunctionDef::Block function_defs;
+//   auto func_def = GenerateFuncDef();
+//   function_defs.push_back(std::move(func_def));
+
+//   auto expr = make_unique<Program>(std::move(function_defs),
+//     std::move(statements), std::move(arithexpr));
+
+//   expr->Visit(&lowerer_);
+  
+//   grapher_.CreateCFG(std::move(lowerer_.GetIR()));
+//   //grapher_.DebugPrint();
+//   //std::string prestring = grapher_.GetOutput();
+//   grapher_.Optimize();
+//   //std::string poststring = grapher_.GetOutput();
+//   //int compared = prestring.compare(poststring);
+//   // std::cout << "--- SEE IF IT GOT REDUCED ---" << std::endl;
+//   // std::cout << "--- FIRST STRING ---" << std::endl;
+//   // std::cout << prestring << std::endl;
+//   // std::cout << "--- SECOND STRING ---" << std::endl;
+//   // std::cout << poststring << std::endl;
+//   // std::cout << "--- STRINGCOMPARE INT VALUE ---" << std::endl;
+//   // std::cout << ".compare() strings: " << compared << std::endl;
+
+//   EXPECT_EQ(grapher_.GetOutput(),"t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
+//     "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
+//     "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\nbob <- t_8\n"
+//     "t_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\nt_12 <- y VARLOAD \n"
+//     "t_13 <- x VARLOAD \nt_14 <- t_12 > t_13\nt_15 <- t_11 && t_14\n"
+//     "t_16 <- bob VARLOAD \nt_17 <- 100\nt_18 <- t_16 <= t_17\n"
+//     "t_19 <- bob VARLOAD \nt_20 <- 0\nt_21 <- t_19 >= t_20\n"
+//     "t_22 <- t_18 && t_21\nt_23 <- t_15 || t_22\nif t_23 == 0\n"
+//     "je falsebranch0\njmp continue0\nMkLabel falsebranch0\njmp continue0\n"
+//     "MkLabel continue0\nt_24 <- 7\nt_25 <- 5\nt_26 <- t_24 - t_25\n"
+//     " <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n <-  FUNPROLOGUE \n"
+//     "t_27 <- 0\n <-  FUNEPILOGUE \n");
+// }
+
+TEST_F(ControlFlowGraphTest, LoopWithNestedLogicalsWithVariables) {
   Statement::Block statements;
+
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
+    make_unique<VariableExpr>("x"),
+    make_unique<AddExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
+
+  statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
+    make_unique<VariableExpr>("x"),
+    make_unique<AddExpr>(
+      make_unique<IntegerExpr>(5),
+      make_unique<IntegerExpr>(10)))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
     make_unique<VariableExpr>("x"),
@@ -80,40 +171,39 @@ TEST_F(ControlFlowGraphTest, ConditionalWithNestedLogicalsWithVariables) {
       make_unique<VariableExpr>("y"),
       make_unique<VariableExpr>("x")))));
 
-  statements.push_back(std::move(make_unique<const Conditional>(
-    make_unique<LogicalOrExpr>(
-    make_unique<const LogicalAndExpr>(
-      make_unique<const LessThanExpr>(
-        make_unique<const VariableExpr>("x"),
-        make_unique<const IntegerExpr>(100)),
-      make_unique<const GreaterThanExpr>(
-        make_unique<const VariableExpr>("y"),
-        make_unique<const VariableExpr>("x"))),
-    make_unique<const LogicalAndExpr>(
-      make_unique<const LessThanEqualToExpr>(
-        make_unique<const VariableExpr>("bob"),
-        make_unique<const IntegerExpr>(100)),
-      make_unique<const GreaterThanEqualToExpr>(
-        make_unique<const VariableExpr>("bob"),
-        make_unique<const IntegerExpr>(0)))),
-        Statement::Block(), Statement::Block())));
+  statements.push_back(std::move(make_unique<const Loop>(
+      make_unique<LogicalOrExpr>(make_unique<const LogicalAndExpr>(
+                                     make_unique<const LessThanExpr>(
+                                         make_unique<const VariableExpr>("x"),
+                                         make_unique<const IntegerExpr>(100)),
+                                     make_unique<const GreaterThanExpr>(
+                                         make_unique<const VariableExpr>("y"),
+                                         make_unique<const VariableExpr>("x"))),
+                                 make_unique<const LogicalAndExpr>(
+                                     make_unique<const LessThanEqualToExpr>(
+                                         make_unique<const VariableExpr>("bob"),
+                                         make_unique<const IntegerExpr>(100)),
+                                     make_unique<const GreaterThanEqualToExpr>(
+                                         make_unique<const VariableExpr>("bob"),
+                                         make_unique<const IntegerExpr>(0)))),
+      Statement::Block())));
 
   auto arithexpr = make_unique<SubtractExpr>(make_unique<IntegerExpr>(7),
-    make_unique<IntegerExpr>(5));
-
+                                             make_unique<IntegerExpr>(5));
   FunctionDef::Block function_defs;
   auto func_def = GenerateFuncDef();
   function_defs.push_back(std::move(func_def));
+
 
   auto expr = make_unique<Program>(std::move(function_defs),
     std::move(statements), std::move(arithexpr));
 
   expr->Visit(&lowerer_);
-  
   grapher_.CreateCFG(std::move(lowerer_.GetIR()));
-  grapher_.DebugPrint();
+  //grapher_.DebugPrint();
+  grapher_.DebugEdgeAndBlock();
   std::string prestring = grapher_.GetOutput();
-  grapher_.Optimize();
+//   grapher_.Optimize();
   std::string poststring = grapher_.GetOutput();
   int compared = prestring.compare(poststring);
   std::cout << "--- SEE IF IT GOT REDUCED ---" << std::endl;
@@ -123,17 +213,44 @@ TEST_F(ControlFlowGraphTest, ConditionalWithNestedLogicalsWithVariables) {
   std::cout << poststring << std::endl;
   std::cout << "--- STRINGCOMPARE INT VALUE ---" << std::endl;
   std::cout << ".compare() strings: " << compared << std::endl;
-
-  EXPECT_EQ(grapher_.GetOutput(),"t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
+  grapher_.Optimize();
+  // t_0 <- 5
+  // t_1 <- 10
+  // t_2 <- t_0 + t_1
+  // x <- t_2
+  // t_3 <- 5
+  // t_4 <- 10
+  // t_5 <- t_3 - t_4
+  // y <- t_5
+  // t_6 <- y + x
+  // bob <- t_6
+  // MkLabel loop0
+  // t_7 <- 100
+  // t_8 <- x < t_7
+  // t_9 <- y > x
+  // t_10 <- t_8 && t_9
+  // t_11 <- 100
+  // t_12 <- bob <= t_11
+  // t_13 <- 0
+  // t_14 <- bob >= t_13
+  // t_15 <- t_12 && t_14
+  // t_16 <- t_10 || t_15
+  // while t_16 == 0
+  // je continue0
+  // jmp loop0
+  // MkLabel continue0
+  // t_17 <- 7
+  // t_18 <- 5
+  // t_19 <- t_17 - t_18
+  EXPECT_EQ(grapher_.GetOutput(), "t_0 <- 5\nt_1 <- 10\nt_2 <- t_0 + t_1\n"
     "x <- t_2\nt_3 <- 5\nt_4 <- 10\nt_5 <- t_3 - t_4\ny <- t_5\n"
     "t_6 <- y VARLOAD \nt_7 <- x VARLOAD \nt_8 <- t_6 + t_7\nbob <- t_8\n"
-    "t_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\nt_12 <- y VARLOAD \n"
-    "t_13 <- x VARLOAD \nt_14 <- t_12 > t_13\nt_15 <- t_11 && t_14\n"
-    "t_16 <- bob VARLOAD \nt_17 <- 100\nt_18 <- t_16 <= t_17\n"
-    "t_19 <- bob VARLOAD \nt_20 <- 0\nt_21 <- t_19 >= t_20\n"
-    "t_22 <- t_18 && t_21\nt_23 <- t_15 || t_22\nif t_23 == 0\n"
-    "je falsebranch0\njmp continue0\nMkLabel falsebranch0\njmp continue0\n"
-    "MkLabel continue0\nt_24 <- 7\nt_25 <- 5\nt_26 <- t_24 - t_25\n"
-    " <-  PRINTARITH \n <-  FUNCTIONDEF \nMkLabel func\n <-  FUNPROLOGUE \n"
-    "t_27 <- 0\n <-  FUNEPILOGUE \n");
+    "MkLabel loop0\nt_9 <- x VARLOAD \nt_10 <- 100\nt_11 <- t_9 < t_10\n"
+    "t_12 <- y VARLOAD \nt_13 <- x VARLOAD \nt_14 <- t_12 > t_13\n"
+    "t_15 <- t_11 && t_14\nt_16 <- bob VARLOAD \nt_17 <- 100\n"
+    "t_18 <- t_16 <= t_17\nt_19 <- bob VARLOAD \nt_20 <- 0\n"
+    "t_21 <- t_19 >= t_20\nt_22 <- t_18 && t_21\nt_23 <- t_15 || t_22\n"
+    "while t_23 == 0\nje continue0\njmp loop0\nMkLabel continue0\nt_24 <- 7\n"
+    "t_25 <- 5\nt_26 <- t_24 - t_25\n <-  PRINTARITH \n <-  FUNCTIONDEF \n"
+    "MkLabel func\n <-  FUNPROLOGUE \nt_27 <- 0\n <-  FUNEPILOGUE \n");
 }

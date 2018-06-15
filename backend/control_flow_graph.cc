@@ -80,8 +80,8 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*> &graph_
       int node1 = temp1->GetCreationOrder();
       int node2 = temp2->GetCreationOrder();
       Edge edge1(std::make_pair(node0,next), LOOP_TRUE);
-      Edge edge2(std::make_pair(node1,node0), LOOP_FALSE);
-      Edge edge3(std::make_pair(node0,node2), LOOP_RETURN);
+      Edge edge2(std::make_pair(node1,node0), LOOP_RETURN);
+      Edge edge3(std::make_pair(node0,node2), LOOP_FALSE);
       edge_graph.push_back(edge1);
       edge_graph.push_back(edge2);
       edge_graph.push_back(edge3);
@@ -157,32 +157,39 @@ ControlFlowGraphNode * MarkSweep(
     std::vector<std::string> &live_set,
     ControlFlowGraphNode * apply_sweep) {
   std::vector<std::unique_ptr<struct ThreeAddressCode>> optimize_block = std::move(apply_sweep->GetLocalUniqueBlock());
-  for (auto &iter: optimize_block) {
+  for (std::vector<std::unique_ptr<struct ThreeAddressCode>>::reverse_iterator iter = 
+  optimize_block.rbegin(); iter != optimize_block.rend(); ++iter) {
     //Target is the LHS check
     //Opcode is the RHS check
-    if (iter->target.reg().type() == VARIABLEREG) {
+    bool deletionperformed = false;
+    if (iter->get()->target.reg().type() == VARIABLEREG) {
       //Check if the variable is in the liveset
-      if (std::find(live_set.begin(),live_set.end(), iter->target.reg().name()) != live_set.end()) {
+      if (std::find(live_set.begin(),live_set.end(), iter->get()->target.reg().name()) != live_set.end()) {
         //Check if variable isn't being used on the RHS
-        if(iter->target.reg().name() != iter->arg1.reg().name() || iter->target.reg().name() != iter->arg2.reg().name()) {
+        if(iter->get()->target.reg().name() != iter->get()->arg1.reg().name() 
+        || iter->get()->target.reg().name() != iter->get()->arg2.reg().name()) {
           //Delete if its not in the set
-          iter.reset();
+          iter->reset();
           std::cout << "I'm actually deleting something" << std::endl;
+          deletionperformed = true;
         }
       } else {
-        live_set.erase(std::remove(live_set.begin(),live_set.end(),iter->target.reg().name()),live_set.end());
+        live_set.erase(std::remove(live_set.begin(),live_set.end(),iter->get()->target.reg().name()),live_set.end());
         //Remove it from the live set
 
       }
     } 
-    if (iter->arg1.reg().type() == VARIABLEREG) {
-      live_set.push_back(iter->arg1.reg().name());
+    if (!deletionperformed && iter->get()->arg1.reg().type() == VARIABLEREG) {
+      live_set.push_back(iter->get()->arg1.reg().name());
     }
-    if (iter->arg2.reg().type() == VARIABLEREG) {
-      live_set.push_back(iter->arg2.reg().name());
+    if (!deletionperformed &&iter->get()->arg2.reg().type() == VARIABLEREG) {
+      live_set.push_back(iter->get()->arg2.reg().name());
     }
+    //deletionperformed = false;
   }
   apply_sweep->SetLocalBlock(std::move(optimize_block));
+  std::cout << "Block Number: " << apply_sweep->GetCreationOrder() << " finished optimizing"
+  << std::endl;
   return apply_sweep;
   //return std::move(optimize_block); 
 
@@ -203,10 +210,11 @@ std::vector<std::string> MergeVector(std::vector<std::string> vector1, std::vect
 std::pair<std::vector<std::string>, ControlFlowGraphNode *> RecursiveFindPath(
   std::vector<ControlFlowGraphNode *> passed_cfgn_vec,
   std::vector<Edge> edges, std::vector<std::string> live_set,
-  ControlFlowGraphNode * optimize_node) {
+  ControlFlowGraphNode * optimize_node, std::vector<int> &visited) {
     //Optimize the local block
     int node_number = optimize_node->GetCreationOrder();
     optimize_node = MarkSweep(live_set, optimize_node);
+    visited.push_back(optimize_node->GetCreationOrder());
     EdgeType edge1 = TYPELESS_EDGE;
     EdgeType edge2 = TYPELESS_EDGE;
     int block1 = -1;
@@ -236,8 +244,8 @@ std::pair<std::vector<std::string>, ControlFlowGraphNode *> RecursiveFindPath(
     if (edge1 == CONDITIONAL_TRUE_RETURN || edge1 == CONDITIONAL_FALSE_RETURN) {
       std::vector<std::string> live_set_copy = live_set;
       std::vector<std::string> str_return1, str_return2, merged_return;
-      std::pair<std::vector<std::string>,ControlFlowGraphNode * >  return1 = RecursiveFindPath(passed_cfgn_vec, edges, live_set, node1);
-      std::pair<std::vector<std::string>,ControlFlowGraphNode * >  return2 = RecursiveFindPath(passed_cfgn_vec, edges, live_set_copy, node2);
+      std::pair<std::vector<std::string>,ControlFlowGraphNode * >  return1 = RecursiveFindPath(passed_cfgn_vec, edges, live_set, node1, visited);
+      std::pair<std::vector<std::string>,ControlFlowGraphNode * >  return2 = RecursiveFindPath(passed_cfgn_vec, edges, live_set_copy, node2, visited);
       str_return1 = return1.first;
       str_return2 = return2.first;
       merged_return = MergeVector(str_return1,str_return2);
@@ -253,22 +261,29 @@ std::pair<std::vector<std::string>, ControlFlowGraphNode *> RecursiveFindPath(
       for ( auto merge_iter: merged_return) {
         std::cout << merge_iter << std::endl;
       }
-      std::pair<std::vector<std::string>,ControlFlowGraphNode * >  return3 = RecursiveFindPath(passed_cfgn_vec, edges, merged_return, return1.second);
+      std::pair<std::vector<std::string>,ControlFlowGraphNode * >  return3 = RecursiveFindPath(passed_cfgn_vec, edges, merged_return, return1.second, visited);
       return return3; //Idunno actually
     } else if (edge1 == CONDITIONAL_TRUE || edge1 == CONDITIONAL_FALSE) {
       return std::make_pair(live_set, node1);
     } else if (edge1 == LOOP_TRUE) {
-      RecursiveFindPath(passed_cfgn_vec, edges, live_set, node1);
+      std::cout << "LOOP TRUE" << std::endl;
+      if(!(std::find(visited.begin(),visited.end(), node1->GetCreationOrder())!=visited.end())) {
+        RecursiveFindPath(passed_cfgn_vec, edges, live_set, node1, visited);
+      }
       if(block2 != -1) { //If there is something that branches off of this 
         //Maybe I need a visited?
-        RecursiveFindPath(passed_cfgn_vec, edges, live_set, node2);
+        if(!(std::find(visited.begin(),visited.end(), node2->GetCreationOrder())!=visited.end())) {
+         RecursiveFindPath(passed_cfgn_vec, edges, live_set, node2, visited);
+        }
       }
       return std::make_pair(live_set, node1); //Dunno if I need any of these
     } else if (edge1 == LOOP_FALSE) {
-      RecursiveFindPath(passed_cfgn_vec, edges, live_set, node1);
+      std::cout << "LOOP FALSE" << std::endl;
+      RecursiveFindPath(passed_cfgn_vec, edges, live_set, node1, visited);
       return std::make_pair(live_set, node1);
     } else if (edge1 == LOOP_RETURN) {
-      RecursiveFindPath(passed_cfgn_vec, edges, live_set, node1);
+      std::cout << "LOOP RETURN" << std::endl;
+      RecursiveFindPath(passed_cfgn_vec, edges, live_set, node1, visited);
       return std::make_pair(live_set, node1);
     } else {
 
@@ -286,7 +301,8 @@ std::vector<std::unique_ptr<ControlFlowGraphNode>> OptimizeHelp(
     }
     std::vector<std::string> live_set;
     ControlFlowGraphNode * end = cfg_node.back().get();
-    RecursiveFindPath(cfg_pointer,edges,live_set, end);
+    std::vector<int> visited_set;
+    RecursiveFindPath(cfg_pointer,edges,live_set, end,visited_set);
     return cfg_node;
  }
 
@@ -300,6 +316,19 @@ void ControlFlowGraph::DebugPrint() {
     std::cout << "Creation Order: "<< iter->GetCreationOrder() << 
     " Block Type: "<< iter->GetBlockType() << std::endl;
     iter->DebugNode();
+  }
+  std::cout << "EDGES: " << std::endl;
+  for (auto iter1: edges_) {
+    std::cout << "From: " << iter1.edge_pair.first << " To: " << iter1.edge_pair.second
+    << " Edge Type: " << iter1.edge_type << std::endl;
+  }
+}
+
+void ControlFlowGraph::DebugEdgeAndBlock() {
+  for (auto &iter: cfg_nodes_) {
+    std::cout << "--- NEW BLOCK ---" << std::endl;
+    std::cout << "Creation Order: "<< iter->GetCreationOrder() << 
+    " Block Type: "<< iter->GetBlockType() << std::endl;
   }
   std::cout << "EDGES: " << std::endl;
   for (auto iter1: edges_) {
