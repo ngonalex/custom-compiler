@@ -22,7 +22,8 @@ class CodeGen {
     CodeGen(std::ofstream &filename, PrintFlag flag) : outfile_(filename),
       currscope_(GLOBAL), flag_(flag) {}
 
-    // Iterates through the whole vector of TACs and creates assembly based on the opcode
+    // Iterates through the whole vector of TACs and
+    // creates assembly based on the opcode
     void Generate(std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks);
     // Generates an exit call
     void GenerateEpilogue();
