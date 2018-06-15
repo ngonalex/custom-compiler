@@ -19,7 +19,8 @@
 
 Additional notes about tests. Optimizer uses EXPECT_LE to compare the file size of the non optimized file from codegen and the optimized file from codegen. Because it's a LE (LessThanEqualTo) that means that it will always "pass" as if the optimizer did not do anything, the two files will be identical. Run bazel build backend/optimizer_test && bazel-bin/backend/optimizer_test instead to see output that shows the file size of both the optimized file and the non optimized file.
 
-**Contract**
+**Contract:**
+
 Our group contract was v5 + ir optimizations. V5 is fully complete and IR optimizations is complete with a CFG and dead code elimination.
 
 Our project is split into 4 parts.
