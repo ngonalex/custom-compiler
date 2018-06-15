@@ -3,7 +3,7 @@
 #include "frontend/combinators/basic_combinators/one_or_more_combinator.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 #include "frontend/combinators/v3_combinators/helpers/relational_helper.h"
-#include "frontend/combinators/v3_combinators/main/relation_body.h"
+#include "frontend/combinators/v3_combinators/main/relation_not.h"
 
 #define super NullParser
 
@@ -19,7 +19,7 @@ ParseStatus AndRelationParser::do_parse(std::string inputProgram,
     return super::fail(inputProgram, endCharacter);
   }
 
-  RelationBodyParser lhs;
+  NotRelationParser lhs;
   AndOpParser op;
 
   AndCombinator andExpr;
@@ -29,7 +29,7 @@ ParseStatus AndRelationParser::do_parse(std::string inputProgram,
   OneOrMoreCombinator oneOrMore;
   oneOrMore.parser = &andExpr;
 
-  RelationBodyParser rhs;
+  NotRelationParser rhs;
 
   AndCombinator andRelationParser;
   andRelationParser.firstParser = &oneOrMore;
