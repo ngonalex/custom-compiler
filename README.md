@@ -18,7 +18,9 @@ To run a certain subproject, you can use `bazel run` with the path and name of t
 =======================================
 Documentation
 
-We've proud to have completed and tested up to v5. We've also added additional error handling (character number and error messages that tell you where you've failed and how to fix it sometimes).
+We've proud to have completed and tested up to v5. We've also added additional error handling (character number and error messages that tell you where you've failed and how to fix it sometimes) and got cacheing to work for basic_combinators and v1_combinators (don't require storing AST nodes).
+
+Missing: Getting cache to work for v2 to v5. Cache works for basic combinators and v1 because they don't return ASTs. One solution would be to duplicate the AST nodes as they're being created in the combinator/parser, but we felt this would be too hacky of a solution.
 
 Here is a link to our language specification
 https://github.ucsb.edu/CS160-S18/team-influx/issues/21
@@ -43,7 +45,7 @@ In /v3_tests, we mainly implemented loops, boolean operations, blocks, and if st
 
 In /v4_tests, we implemented function calls
 
-In /v5_tests
+In /v5_tests, we implemented 
 
 
 
@@ -66,12 +68,11 @@ parse status (results to all our combinators/parser) = parsestatus.h
 **Non-trivial (recursive) handling of arithmetic expression and relations**
 
 
-With more time, we'd like to clean up our code such that we can handle longer sequences instead of our hacky solution of having multiple "and combinators", build our parsestatus out such that every combinator/parser would get its own parse status subclass whenever there is a need for it instead of putting everything into one ParseStatus class, and we would also like to do a more efficient version of Packrat parsing that isn't memory intensive (our workaround with unique pointers). Additionally, we'd would've loved to include some non trivial error handling, and added templating in our ParseStatus.
+With more time, we'd like to clean up our code such that we can handle longer sequences instead of our hacky solution of having multiple "and combinators", build our parsestatus out such that every combinator/parser would get its own parse status subclass whenever there is a need for it instead of putting everything into one ParseStatus class, and we would also like to do a more efficient version of Packrat parsing that isn't memory intensive (our workaround with unique pointers). Additionally, we'd would've loved to include some non trivial error handling, and added templating in our ParseStatus. 
 
 
-Technical problems: Getting acquainted to Bazel, learning functional programming + combinators and figuring out how to split up the work such that we maximize efficiency.
+Technical problems: Getting acquainted to Bazel, learning functional programming + combinators and figuring out how to split up the work such that we maximize efficiency. Also figuring out a solution for cacheing with Unique pointers
 
-Missing: Getting cache to work for v2 to v5. Cache works for basic combinators and v1 because they don't return ASTs. One solution would be to duplicate the AST nodes as they're being created in the combinator/parser, but we felt this would be too hacky of a solution.
 
 Responsibilities:
 Victor helped with basic combinators, v1, finished v2, v3, and v4.
