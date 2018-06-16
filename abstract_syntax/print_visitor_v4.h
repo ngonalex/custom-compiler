@@ -153,7 +153,7 @@ class PrintVisitor : public AstVisitor {
 
   void VisitFunctionDef(const FunctionDef& def) override {
     output_ << "func";
-    output_ << def.function_name;
+    output_ << def.function_name();
     output_ << "(";
     for (auto& params : def.parameters()) {
       params->Visit(this);
@@ -168,10 +168,10 @@ class PrintVisitor : public AstVisitor {
   }
 
   void VisitFunctionCall(const FunctionCall& call) override {
-    call.lhs.Visit(this);
+    call.lhs().Visit(this);
     output_ << " = ";
-    call.callee_name.Visit(this);
-    for (auto& args : call.arguments) {
+    call.callee_name().Visit(this);
+    for (auto& args : call.arguments()) {
       args->Visit(this);
     }
   }
