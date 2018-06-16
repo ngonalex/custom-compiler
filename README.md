@@ -45,8 +45,19 @@ In /v4_combinators, we mainly implemented function calls.
 
 
 
-
 1) /basic_combinators: 
+
+
+2) /v1_combinators:
+...
+
+
+
+
+**Combinator Library**
+
+**Basic Combinators**
+
 and_parser (sequence parser) = and_combinator.cc (sequence parser)
 atom_parser (parses individual characters) = atom_parser.cc
 null (super class that handles packrat parsing and fail cases) = null.cc
@@ -55,19 +66,10 @@ zero or more parser = zero_or_more_combinator.cc
 or combinator = or_combinator.cc
 parse status (results to all our combinators/parser) = parsestatus.h 
 
-2) /v1_combinators:
-...
 
+**Cacheing**
 
-
-
-Combinator Library
-
-Basic Combinators
-
-Cacheing
-
-Non-trivial handling of arithmetic expression and relations
+**Non-trivial (recursive) handling of arithmetic expression and relations**
 
 
 With more time, we'd like to clean up our code such that we can handle longer sequences instead of our hacky solution of having multiple "and combinators", build our parsestatus out such that every combinator/parser would get its own parse status subclass whenever there is a need for it instead of putting everything into one ParseStatus class, and we would also like to do a more efficient version of Packrat parsing that isn't memory intensive (our workaround with unique pointers). Additionally, we'd would've loved to include some non trivial error handling, and added templating in our ParseStatus.
@@ -75,6 +77,7 @@ With more time, we'd like to clean up our code such that we can handle longer se
 
 Technical problems: Getting acquainted to Bazel, learning functional programming + combinators and figuring out how to split up the work such that we maximize efficiency.
 
+Missing: Getting cache to work for v2 to v5. Cache works for basic combinators and v1 because they don't return ASTs. One solution would be to duplicate the AST nodes as they're being created in the combinator/parser, but we felt this would be too hacky of a solution.
 
 Responsibilities:
 Victor helped with basic combinators, v1, finished v2, v3, and v4.
