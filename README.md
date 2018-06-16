@@ -39,11 +39,12 @@ In /v1_combinators, we implemented arithmetic expressions with ae.cc as our high
 
 In /v2_combinators, we mainly implemented variable assignments. program_parser.cc is our highest order function which allows for multiple assignments and then an arithmetic expression from v1.
 
-In /v3_combinators, we mainly implemented loops, boolean operations, blocks, and if statements. In here our higher order functions include conditional_parser.cc, loop_parser.cc, block_parser.cc, and relation_parser.cc. 
+In /v3_combinators, we mainly implemented loops, boolean operations, blocks, and if statements. In here our higher order functions include conditional_parser, loop_parser block_parser, and and_relation_parser and or_relation parser.
+    and_relation_parser and  or_relation_parser use a recursive manner that allow all sorts of complicated logical expressions (similar to v1)
 
 In /v4_combinators, we mainly implemented function calls. 
 
-
+In /v5_combinators, we implemented arrays (known as tuples in the AST) and support boht creating the array and dereferencing indexes of it to read and modify the array.
 
 
 1) /basic_combinators: 
