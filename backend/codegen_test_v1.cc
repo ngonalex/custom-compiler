@@ -44,7 +44,7 @@ class CodeGenTestV1 : public ::testing::Test {
         result += buffer.data();
       }
     return result;
-}
+  }
  protected:
   LowererVisitor lowerer_;
 };

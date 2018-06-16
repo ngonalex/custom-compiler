@@ -968,7 +968,8 @@ void CodeGen::Generate(
         outfile_ << "\t# CONDITIONAL\n";
         outfile_ << "\tpop %rax" << std::endl;
         outfile_ << "\tcmp $" << std::to_string(code->arg1.value())
-          << ", %rax\n" << std::endl;
+          << ", %rax\n"
+          << std::endl;
         break;
       case JUMP:
         outfile_ << "\t# JUMP\n";
