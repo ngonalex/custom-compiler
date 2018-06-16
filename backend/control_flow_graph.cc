@@ -12,19 +12,20 @@ ControlFlowGraph::ControlFlowGraph
 }
 
 // Use Recursion to find all the edges in the graph
-ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*>
-  &graph_set, std::vector<Edge> &edge_graph) {
+ControlFlowGraphNode* RecursiveCreate(
+    std::vector<ControlFlowGraphNode*> &graph_set,
+    std::vector<Edge> &edge_graph) {
   if (graph_set.empty()) {
     // If this occurs then there's a bigger problem
     std::vector<std::unique_ptr<struct ThreeAddressCode>> empty;
     auto error_node = make_unique<class ControlFlowGraphNode>(std::move(empty));
     error_node->SetBlockType(ERROR_TYPE);
     std::cerr <<
-    "Error block created, edge creation failed. Creating Error Node"
-    << std::endl;
+      "Error block created, edge creation failed. Creating Error Node"
+      << std::endl;
     return error_node.get();
   } else if (graph_set.size() == 1) {
-    ControlFlowGraphNode * temp = graph_set[0];
+    ControlFlowGraphNode* temp = graph_set[0];
     graph_set.erase(graph_set.begin());
     return temp;
   } else {
@@ -39,13 +40,13 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*>
       // temp1 = True
       // temp2 = False
       // temp3 = END
-      // ControlFlowGraphNode * temp0 = RecursiveCreate(graph_set,edge_graph);
-      ControlFlowGraphNode * temp0 = graph_set.front();
+      // ControlFlowGraphNode* temp0 = RecursiveCreate(graph_set,edge_graph);
+      ControlFlowGraphNode* temp0 = graph_set.front();
       graph_set.erase(graph_set.begin());
-      ControlFlowGraphNode * next_true_node = graph_set.front();
-      ControlFlowGraphNode * temp1 = RecursiveCreate(graph_set, edge_graph);
-      ControlFlowGraphNode * temp2 = RecursiveCreate(graph_set, edge_graph);
-      ControlFlowGraphNode * temp3 = RecursiveCreate(graph_set, edge_graph);
+      ControlFlowGraphNode* next_true_node = graph_set.front();
+      ControlFlowGraphNode* temp1 = RecursiveCreate(graph_set, edge_graph);
+      ControlFlowGraphNode* temp2 = RecursiveCreate(graph_set, edge_graph);
+      ControlFlowGraphNode* temp3 = RecursiveCreate(graph_set, edge_graph);
       int node0 = temp0->GetCreationOrder();
       int next_true = next_true_node->GetCreationOrder();
       int node1 = temp1->GetCreationOrder();
@@ -73,13 +74,13 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*>
       // temp0 = Loop
       // temp1 = True
       // temp2 = False
-      // ControlFlowGraphNode * temp0 = RecursiveCreate(graph_set,edge_graph);
-      ControlFlowGraphNode * temp0 = graph_set.front();
+      // ControlFlowGraphNode* temp0 = RecursiveCreate(graph_set,edge_graph);
+      ControlFlowGraphNode* temp0 = graph_set.front();
       graph_set.erase(graph_set.begin());
       // Needed for nested statements
-      ControlFlowGraphNode * next_node = graph_set.front();
-      ControlFlowGraphNode * temp1 = RecursiveCreate(graph_set, edge_graph);
-      ControlFlowGraphNode * temp2 = RecursiveCreate(graph_set, edge_graph);
+      ControlFlowGraphNode* next_node = graph_set.front();
+      ControlFlowGraphNode* temp1 = RecursiveCreate(graph_set, edge_graph);
+      ControlFlowGraphNode* temp2 = RecursiveCreate(graph_set, edge_graph);
       int node0 = temp0->GetCreationOrder();
       int next = next_node->GetCreationOrder();
       int node1 = temp1->GetCreationOrder();
@@ -95,7 +96,7 @@ ControlFlowGraphNode* RecursiveCreate(std::vector<ControlFlowGraphNode*>
       return temp2;
     } else {
       // It is a type that we don't need to branch on
-      ControlFlowGraphNode * temp = graph_set[0];
+      ControlFlowGraphNode* temp = graph_set[0];
       graph_set.erase(graph_set.begin());
       return temp;
     }
@@ -159,7 +160,7 @@ struct ThreeAddressCode>> input) {
     }
   }
   // Use CFGN to recursively create edge vector
-  std::vector<ControlFlowGraphNode *> cfg_pointers;
+  std::vector<ControlFlowGraphNode*> cfg_pointers;
   for (auto &iter : cfg_nodes_) {
     cfg_pointers.push_back(iter.get());
   }
@@ -169,8 +170,8 @@ struct ThreeAddressCode>> input) {
 }
 
 // Apply a local optimization
-ControlFlowGraphNode * MarkSweep(std::vector<std::string> &live_set,
-    ControlFlowGraphNode * apply_sweep) {
+ControlFlowGraphNode* MarkSweep(std::vector<std::string> &live_set,
+    ControlFlowGraphNode* apply_sweep) {
   std::vector<std::unique_ptr<struct ThreeAddressCode>> optimize_block =
   std::move(apply_sweep->GetLocalUniqueBlock());
   // Create a local virtual register list
@@ -300,112 +301,115 @@ std::vector<std::string> MergeVector(std::vector<std::string> vector1
 // Starts at the End of the Graph and reverse traverse upwards
 // This is to find how the live_set should be passed along
 // Very strange recursion is needed because of the difficulty of going backwards
-std::pair<std::vector<std::string>, ControlFlowGraphNode *> RecursiveFindPath(
-  std::vector<ControlFlowGraphNode *> passed_cfgn_vec,
-  std::vector<Edge> edges, std::vector<std::string> live_set,
-  ControlFlowGraphNode * optimize_node, std::vector<int> &visited) {
-    // Optimize the local block
-    int node_number = optimize_node->GetCreationOrder();
-    optimize_node = MarkSweep(live_set, optimize_node);
-    visited.push_back(optimize_node->GetCreationOrder());
-    EdgeType edge1 = TYPELESS_EDGE;
-    EdgeType edge2 = TYPELESS_EDGE;
-    int block1 = -1;
-    int block2 = -1;
-    // Look for edges that lead to the node
-    for (auto iter : edges) {
-      if (iter.edge_pair.second == node_number) {
-        if (edge1 == TYPELESS_EDGE) {
-          edge1 = iter.edge_type;
-          block1 = iter.edge_pair.first;
-        } else if (edge2 == TYPELESS_EDGE) {
-          edge2 = iter.edge_type;
-          block2 = iter.edge_pair.first;
-        } else {
-          std::cerr << "More than 2 edges detected" << std::endl;
-        }
+std::pair<std::vector<std::string>, ControlFlowGraphNode*> RecursiveFindPath(
+    std::vector<ControlFlowGraphNode*> passed_cfgn_vec,
+    std::vector<Edge> edges, std::vector<std::string> live_set,
+    ControlFlowGraphNode* optimize_node, std::vector<int> &visited) {
+  // Optimize the local block
+  int node_number = optimize_node->GetCreationOrder();
+  optimize_node = MarkSweep(live_set, optimize_node);
+  visited.push_back(optimize_node->GetCreationOrder());
+  EdgeType edge1 = TYPELESS_EDGE;
+  EdgeType edge2 = TYPELESS_EDGE;
+  int block1 = -1;
+  int block2 = -1;
+  // Look for edges that lead to the node
+  for (auto iter : edges) {
+    if (iter.edge_pair.second == node_number) {
+      if (edge1 == TYPELESS_EDGE) {
+        edge1 = iter.edge_type;
+        block1 = iter.edge_pair.first;
+      } else if (edge2 == TYPELESS_EDGE) {
+        edge2 = iter.edge_type;
+        block2 = iter.edge_pair.first;
+      } else {
+        std::cerr << "More than 2 edges detected" << std::endl;
       }
     }
-    // Find the node itself
-    ControlFlowGraphNode * node1;
-    ControlFlowGraphNode * node2;
-    for (auto tac_iter : passed_cfgn_vec) {
-      if (tac_iter->GetCreationOrder() == block1) {
-        node1 = tac_iter;
-      } else if (tac_iter->GetCreationOrder() == block2) {
-        node2 = tac_iter;
-      }
+  }
+  // Find the node itself
+  ControlFlowGraphNode* node1;
+  ControlFlowGraphNode* node2;
+  for (auto tac_iter : passed_cfgn_vec) {
+    if (tac_iter->GetCreationOrder() == block1) {
+      node1 = tac_iter;
+    } else if (tac_iter->GetCreationOrder() == block2) {
+      node2 = tac_iter;
     }
-    if (edge1 == CONDITIONAL_TRUE_RETURN || edge1 == CONDITIONAL_FALSE_RETURN) {
-      std::vector<std::string> live_set_copy = live_set;
-      std::vector<std::string> str_return1, str_return2, merged_return;
-      // Find the True + False Nodes
-      std::pair<std::vector<std::string>, ControlFlowGraphNode * >  return1
-      = RecursiveFindPath(passed_cfgn_vec, edges, live_set, node1, visited);
-      std::pair<std::vector<std::string>, ControlFlowGraphNode * >  return2
-      = RecursiveFindPath(passed_cfgn_vec
-      , edges, live_set_copy, node2, visited);
-      str_return1 = return1.first;
-      str_return2 = return2.first;
-      // Has to be merged here
-      merged_return = MergeVector(str_return1, str_return2);
-      // Using a merged string vector, find the guard
-      std::pair<std::vector<std::string>, ControlFlowGraphNode * >  return3
-      = RecursiveFindPath(passed_cfgn_vec, edges
-      , merged_return, return1.second, visited);
-      return return3;
-    } else if (edge1 == CONDITIONAL_TRUE || edge1 == CONDITIONAL_FALSE) {
-      // True + False branches returns their
-      // values so the original node can handle it
-      return std::make_pair(live_set, node1);
-    } else if (edge1 == LOOP_TRUE) {
+  }
+  if (edge1 == CONDITIONAL_TRUE_RETURN || edge1 == CONDITIONAL_FALSE_RETURN) {
+    std::vector<std::string> live_set_copy = live_set;
+    std::vector<std::string> str_return1, str_return2, merged_return;
+    // Find the True + False Nodes
+    std::pair<std::vector<std::string>, ControlFlowGraphNode*>  return1
+    = RecursiveFindPath(passed_cfgn_vec, edges, live_set, node1, visited);
+    std::pair<std::vector<std::string>, ControlFlowGraphNode*>  return2
+    = RecursiveFindPath(passed_cfgn_vec
+    , edges, live_set_copy, node2, visited);
+    str_return1 = return1.first;
+    str_return2 = return2.first;
+    // Has to be merged here
+    merged_return = MergeVector(str_return1, str_return2);
+    // Using a merged string vector, find the guard
+    std::pair<std::vector<std::string>, ControlFlowGraphNode*>  return3
+    = RecursiveFindPath(passed_cfgn_vec, edges
+    , merged_return, return1.second, visited);
+    return return3;
+  } else if (edge1 == CONDITIONAL_TRUE || edge1 == CONDITIONAL_FALSE) {
+    // True + False branches returns their
+    // values so the original node can handle it
+    return std::make_pair(live_set, node1);
+  } else if (edge1 == LOOP_TRUE) {
+    if (!(std::find(visited.begin(), visited.end()
+    , node1->GetCreationOrder()) != visited.end())) {
+      RecursiveFindPath(passed_cfgn_vec, edges, live_set, node1, visited);
+    }
+    // If there is something that branches off of this
+    if (block2 != -1) {
+      // Check if the node hasn't been visited yet
+      // Prevents infinite recursive loops
       if (!(std::find(visited.begin(), visited.end()
-      , node1->GetCreationOrder()) != visited.end())) {
-        RecursiveFindPath(passed_cfgn_vec, edges, live_set, node1, visited);
+      , node2->GetCreationOrder()) != visited.end())) {
+        RecursiveFindPath(passed_cfgn_vec, edges, live_set, node2, visited);
       }
-      // If there is something that branches off of this
-      if (block2 != -1) {
-        // Check if the node hasn't been visited yet
-        // Prevents infinite recursive loops
-        if (!(std::find(visited.begin(), visited.end()
-        , node2->GetCreationOrder()) != visited.end())) {
-         RecursiveFindPath(passed_cfgn_vec, edges, live_set, node2, visited);
-        }
-      }
-      return std::make_pair(live_set, node1);
-    } else if (edge1 == LOOP_FALSE) {
-      RecursiveFindPath(passed_cfgn_vec, edges, live_set, node1, visited);
-      return std::make_pair(live_set, node1);
-    } else if (edge1 == LOOP_RETURN) {
-      RecursiveFindPath(passed_cfgn_vec, edges, live_set, node1, visited);
-      return std::make_pair(live_set, node1);
-    } else {
-      // If there are no edges that go to the node
-      // then that means this is the first node
-      // Nothing really has to be done
     }
+    return std::make_pair(live_set, node1);
+  } else if (edge1 == LOOP_FALSE) {
+    RecursiveFindPath(passed_cfgn_vec, edges, live_set, node1, visited);
+    return std::make_pair(live_set, node1);
+  } else if (edge1 == LOOP_RETURN) {
+    RecursiveFindPath(passed_cfgn_vec, edges, live_set, node1, visited);
+    return std::make_pair(live_set, node1);
+  } else {
+    // If there are no edges that go to the node
+    // then that means this is the first node
+    // Nothing really has to be done
+    std::vector<std::string> empty;
+    ControlFlowGraphNode* null;
+    return std::make_pair(empty, null);
+  }
 }
 
 // Helper function to pass everything needed
 std::vector<std::unique_ptr<ControlFlowGraphNode>> OptimizeHelp(
-  std::vector<std::unique_ptr<ControlFlowGraphNode>> cfg_node,
-  std::vector<Edge> edges) {
-    std::vector<ControlFlowGraphNode *> cfg_pointer;
-    for (auto &iter : cfg_node) {
-      cfg_pointer.push_back(iter.get());
-    }
-    std::vector<std::string> live_set;
-    ControlFlowGraphNode * end = cfg_node.back().get();
-    std::vector<int> visited_set;
-    // if (edges.empty()){
-    //   edges.push_back(Edge(std::make_pair(0,0),TYPELESS_EDGE));
-    // }
-    // We don't need the return value of RecursiveFindPath
-    // Only thing that is important is modifying the local_block of each node
-    RecursiveFindPath(cfg_pointer, edges, live_set, end, visited_set);
-    cfg_pointer.clear();
-    return cfg_node;
+    std::vector<std::unique_ptr<ControlFlowGraphNode>> cfg_node,
+    std::vector<Edge> edges) {
+  std::vector<ControlFlowGraphNode*> cfg_pointer;
+  for (auto &iter : cfg_node) {
+    cfg_pointer.push_back(iter.get());
   }
+  std::vector<std::string> live_set;
+  ControlFlowGraphNode* end = cfg_node.back().get();
+  std::vector<int> visited_set;
+  // if (edges.empty()){
+  //   edges.push_back(Edge(std::make_pair(0,0),TYPELESS_EDGE));
+  // }
+  // We don't need the return value of RecursiveFindPath
+  // Only thing that is important is modifying the local_block of each node
+  RecursiveFindPath(cfg_pointer, edges, live_set, end, visited_set);
+  cfg_pointer.clear();
+  return cfg_node;
+}
 
 // Calls on a bunch of other functions
 void ControlFlowGraph::Optimize() {
@@ -417,7 +421,7 @@ void ControlFlowGraph::DebugPrint() {
   for (auto &iter : cfg_nodes_) {
     std::cout << "--- NEW BLOCK ---" << std::endl;
     std::cout << "Creation Order: "<< iter->GetCreationOrder() <<
-    " Block Type: "<< iter->GetBlockType() << std::endl;
+      " Block Type: "<< iter->GetBlockType() << std::endl;
     iter->DebugNode();
   }
   std::cout << "EDGES: " << std::endl;
@@ -433,13 +437,13 @@ void ControlFlowGraph::DebugEdgeAndBlock() {
   for (auto &iter : cfg_nodes_) {
     std::cout << "--- NEW BLOCK ---" << std::endl;
     std::cout << "Creation Order: "<< iter->GetCreationOrder() <<
-    " Block Type: "<< iter->GetBlockType() << std::endl;
+      " Block Type: "<< iter->GetBlockType() << std::endl;
   }
   std::cout << "EDGES: " << std::endl;
   for (auto iter1 : edges_) {
     std::cout << "From: " << iter1.edge_pair.first << " To: "
-    << iter1.edge_pair.second << " Edge Type: "
-    << iter1.edge_type << std::endl;
+      << iter1.edge_pair.second << " Edge Type: "
+      << iter1.edge_type << std::endl;
   }
 }
 
@@ -459,11 +463,11 @@ ControlFlowGraph::MakeThreeAddressCode() {
   return std::move(return_three_address);
 }
 
-  // Iterate through the vector and print out each basic block
-  // Shamelessly borrowed from lowerer_visitor.cc
-  // Slightly repurposed for the sake of CFGS
-  std::string OutputHelper(std::vector<ThreeAddressCode*>
-  return_three_address ) {
+// Iterate through the vector and print out each basic block
+// Shamelessly borrowed from lowerer_visitor.cc
+// Slightly repurposed for the sake of CFGS
+std::string OutputHelper(
+    std::vector<ThreeAddressCode*> return_three_address ) {
   std::string output = "";
   std::vector<std::string> printhelper = {"INTLOAD", "VARLOAD"
     , "VAR_ASSIGN_LOAD", "FUNARGLOAD", "FUNRETLOAD", "+", "-"
@@ -559,7 +563,7 @@ ControlFlowGraph::MakeThreeAddressCode() {
 // Uses direct pointers because there is no need to transfer ownership
 std::string ControlFlowGraph::GetOutput() {
   int creation_check = 0;
-  std::vector<ThreeAddressCode *> return_three_address;
+  std::vector<ThreeAddressCode*> return_three_address;
   for (auto &iter : cfg_nodes_) {
       for (auto &three_iter : iter->GetLocalBlock()) {
         return_three_address.push_back(three_iter);
@@ -575,8 +579,8 @@ ControlFlowGraphNode::ControlFlowGraphNode() {
   blocktype_ = NO_BLOCK_TYPE;
 }
 
-ControlFlowGraphNode::ControlFlowGraphNode(std::vector<std::unique_ptr<struct
-ThreeAddressCode>> input) {
+ControlFlowGraphNode::ControlFlowGraphNode(
+    std::vector<std::unique_ptr<struct ThreeAddressCode>> input) {
   localblock_ = std::move(input);
   creation_order = 0;
   blocktype_ = NO_BLOCK_TYPE;
@@ -602,37 +606,9 @@ ControlFlowGraphNode::ControlFlowGraphNode(ControlFlowGraphNode &copy) {
   blocktype_ = copy.GetBlockType();
 }
 
-// Not Used
-ControlFlowGraphNode& ControlFlowGraphNode::operator=
-(ControlFlowGraphNode &copy) {
-  localblock_.clear();
-  for (const auto& iter : copy.GetLocalBlock()) {
-    auto block = make_unique<struct ThreeAddressCode>();
-    block->target = iter->target;
-    block->op = iter->op;
-    block->arg1 = iter->arg1;
-    block->arg2 = iter->arg2;
-    localblock_.push_back(std::move(block));
-  }
-  // localblock_ = std::move(copy.GetLocalBlock());
-  creation_order = copy.GetCreationOrder();
-  blocktype_ = copy.GetBlockType();
-  return *this;
-}
-
-// Not Used
-ControlFlowGraphNode ControlFlowGraphNode::operator=
-(ControlFlowGraphNode copy) {
-  localblock_.clear();
-  localblock_ = std::move(copy.GetLocalUniqueBlock());
-  creation_order = copy.GetCreationOrder();
-  blocktype_ = copy.GetBlockType();
-  return *this;
-}
-
 // Transfers ownership of the IR
-void ControlFlowGraphNode::SetLocalBlock(std::vector<std::unique_ptr<struct
-ThreeAddressCode>> input) {
+void ControlFlowGraphNode::SetLocalBlock(
+    std::vector<std::unique_ptr<struct ThreeAddressCode>> input) {
   localblock_ = std::move(input);
 }
 
@@ -640,15 +616,14 @@ ThreeAddressCode>> input) {
 void ControlFlowGraphNode::DebugNode() {
   for (auto &iter : localblock_) {
     std::cout << "Target name: " << iter->target.reg().name()
-    << " Arg1 name: " << iter->arg1.reg().name() <<
-    " Arg2 name: " << iter->arg2.reg().name() << std::endl;
+      << " Arg1 name: " << iter->arg1.reg().name() <<
+      " Arg2 name: " << iter->arg2.reg().name() << std::endl;
     std::cout << "Target type: " << iter->target.type()
-    << " Arg1 value: " << iter->arg1.value() << " Arg2 value: "
-    << iter->arg2.value() << std::endl;
+      << " Arg1 value: " << iter->arg1.value() << " Arg2 value: "
+      << iter->arg2.value() << std::endl;
     std::cout << "Op code type: " << iter->op.opcode() << std::endl;
   }
 }
-
 
 }  // namespace backend
 }  // namespace cs160

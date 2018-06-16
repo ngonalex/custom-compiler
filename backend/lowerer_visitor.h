@@ -97,6 +97,7 @@ class LowererVisitor : public AstVisitor {
   void VisitMultiplyExpr(const MultiplyExpr& exp);
   void VisitDivideExpr(const DivideExpr& exp);
 
+  // Abstracted out opcode creators
   void CreateFunctionDefPrologue(std::string name);
   void CreateFunctionDefEpilogue(std::string name);
   void CreateFunctionDefReturnBlock();
@@ -120,6 +121,8 @@ class LowererVisitor : public AstVisitor {
   std::string ContinueLabelHelper();
   std::string LoopLabelHelper();
   Register GetArgument(ChildType type);
+
+  // Two functions that help us identify unassigned variables
   std::set<std::string> GetSetDifference(std::set<std::string> set1,
     std::set<std::string> set2);
   std::set<std::string> GetSetIntersection(std::set<std::string> set1,

@@ -22,9 +22,14 @@ class CodeGen {
     CodeGen(std::ofstream &filename, PrintFlag flag) : outfile_(filename),
       currscope_(GLOBAL), flag_(flag) {}
 
+    // Iterates through the whole vector of TACs and
+    // creates assembly based on the opcode
     void Generate(std::vector<std::unique_ptr<struct ThreeAddressCode>> blocks);
+    // Generates an exit call
     void GenerateEpilogue();
+    // Clears a register by xoring with itself
     void ClearRegister(std::string reg);
+    // Creates beginning code to enter into main
     void GenerateBoiler();
 
     // Printing functions
@@ -39,6 +44,7 @@ class CodeGen {
     void GeneratePrintIntTuple();
     void GeneratePrintNestedTuple();
     void GeneratePrintUnassignedTuple();
+
     // Different nodes + helpers
     void GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac);
     void GenerateArithmeticExpr(std::unique_ptr<ThreeAddressCode> tac,
@@ -52,6 +58,8 @@ class CodeGen {
     void GenerateNestedDeref();
     void GenerateBaseDeref(std::string variablename);
     void GenerateRHSDerefEpilogue(std::string arg2);
+    // Checks the scope and will change if it accesses a memory address or
+    // a register
     std::string FlagHelper();
 
     // This function checks if the current scope is function or global
