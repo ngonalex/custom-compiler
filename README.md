@@ -27,29 +27,23 @@ https://github.ucsb.edu/CS160-S18/team-influx/issues/21
 Frontend: (TACK ON team-influx/frontend/combinators BEFORE EACH folder /)
 
 High level Overview:
-Everything in a helper folder does not return an ast node and we've separated our files such that those classes return just one ast.
+Everything in a helper folder does not return an ast node and we've modularized our files such that every file only return one ast.
 
-basic_combinators/null.cc is our base class for all our parsers/combinators. This handles fail case handling (error messages) and is where our packrat parsing is called.
+basic_combinators/null.cc is our base class for all our parsers/combinators. This handles fail error handling with error messages and is where our packrat parsing is called.
 
 basic_combinators/parseStatus.h is the class that is returned from all our parsers/combinators with things like status (success/fail), parsed characters, remaining characters, optional asts, etc. 
 
 Everything else in basic combinator classes serves as building blocks for our later versions (and or sequence parser, or parser, atom parser, null parser, one or more parser, zero or more parser). 
 
-In /v1_combinators, we implemented arithmetic expressions with ae.cc as our highest order function. ae.cc calls mul_div_expr, term_expr, and add_sub_expr in a recursive manner that allows for all sorts of complicated arithmetic expressions (i.e. look at the last 2-3 tests in v1_test.cc)
+In /v1_tests, we implemented arithmetic expressions with ae.cc as our highest order function. ae.cc calls mul_div_expr, term_expr, and add_sub_expr in a recursive manner that allows for all sorts of complicated arithmetic expressions (i.e. look at the last 2-3 tests in v1_test.cc)
 
-In /v2_combinators, we mainly implemented variable assignments. program_parser.cc is our highest order function which allows for multiple assignments and then an arithmetic expression from v1.
+In /v2_tests, we mainly implemented variable assignments. program_parser.cc is our highest order function which allows for multiple assignments and then an arithmetic expression from v1.
 
-In /v3_combinators, we mainly implemented loops, boolean operations, blocks, and if statements. In here our higher order functions include conditional_parser.cc, loop_parser.cc, block_parser.cc, and relation_parser.cc. 
+In /v3_tests, we mainly implemented loops, boolean operations, blocks, and if statements. In here our higher order functions include conditional_parser.cc, loop_parser.cc, block_parser.cc, and relation_parser.cc. 
 
-In /v4_combinators, we mainly implemented function calls. 
+In /v4_tests, we implemented function calls
 
-
-
-1) /basic_combinators: 
-
-
-2) /v1_combinators:
-...
+In /v5_tests
 
 
 
