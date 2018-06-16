@@ -84,6 +84,7 @@ Technical problems: Getting acquainted to Bazel, learning functional programming
 Responsibilities:
 Victor helped with basic combinators, v1, finished v2, v3, and v4.
 Prabal rewrote v1 and v3 to get them working using a recursive manner, and implemented v4 and v5.
+Chandler wrote many of the tests for v4 and v5
 
 **Backend** 
 See the readme in the backend folder
