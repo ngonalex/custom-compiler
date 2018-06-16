@@ -61,12 +61,14 @@ parse status (results to all our combinators/parser) = parsestatus.h
 
 
 
-With more time, we'd like to clean up our code such that we can handle longer sequences instead of our hacky solution of having multiple "and combinators" and build our parsestatus out such that every combinator/parser would get its own parse status subclass whenever there is a need for it instead of putting everything into one class. Additionally, we'd would've loved to finish v5, included some non trivial error handling, and added more complexity in our ast tree.
+With more time, we'd like to clean up our code such that we can handle longer sequences instead of our hacky solution of having multiple "and combinators", build our parsestatus out such that every combinator/parser would get its own parse status subclass whenever there is a need for it instead of putting everything into one ParseStatus class, and we would also like to do a more efficient version of Packrat parsing that isn't memory intensive (our workaround with unique pointers). Additionally, we'd would've loved to include some non trivial error handling, and added templating in our ParseStatus.
+
 
 Technical problems: Getting acquainted to Bazel, learning functional programming + combinators and figuring out how to split up the work such that we maximize efficiency.
 
+
 Responsibilities:
-Victor finished v2, helped with basic combinators, v1, v3, and v4.
+Victor helped with basic combinators, v1, finished v2, v3, and v4.
 
 **Backend** 
 See the readme in the backend folder
