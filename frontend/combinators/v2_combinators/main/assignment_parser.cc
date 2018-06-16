@@ -4,6 +4,7 @@
 #include "frontend/combinators/v1_combinators/ae.h"
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
 #include "frontend/combinators/v2_combinators/main/word_parser.h"
+#include "frontend/combinators/v5_combinators/main/dereference_parser.h"
 
 #include <stdio.h>
 #include <string>  // std::string, std::stoi
@@ -24,11 +25,16 @@ ParseStatus AssignmentParser::do_parse(std::string inputProgram,
 
   // Parsers used
   HelperVariableParser varParser;
+  DereferenceParser dereferenceParser;
   WordParser wordParser;
-  OrCombinator varOrWord;  // Left of equal can be variable instantiation or
+  OrCombinator varOrTuple;  // Left of equal can be variable instantiation or
                            // variable_name
-  varOrWord.firstParser = reinterpret_cast<NullParser *>(&varParser);
-  varOrWord.secondParser = reinterpret_cast<NullParser *>(&wordParser);
+  varOrTuple.firstParser = reinterpret_cast<NullParser *>(&varParser);
+  varOrTuple.secondParser = reinterpret_cast<NullParser *>(&dereferenceParser);
+    
+    OrCombinator varOrTupleOrWord;
+    varOrTupleOrWord.firstParser = &varOrTuple;
+    varOrTupleOrWord.secondParser = &wordParser;
 
   EqualSignParser equalSignParser;
 
@@ -41,7 +47,7 @@ ParseStatus AssignmentParser::do_parse(std::string inputProgram,
 
   // Grammar declaration
   AndCombinator firstAnd;
-  firstAnd.firstParser = reinterpret_cast<NullParser *>(&varOrWord);
+  firstAnd.firstParser = reinterpret_cast<NullParser *>(&varOrTupleOrWord);
   firstAnd.secondParser = reinterpret_cast<NullParser *>(&equalSignParser);
 
   ParseStatus firstResult = firstAnd.do_parse(
