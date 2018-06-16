@@ -16,11 +16,12 @@ Test in the same way, by using `bazel test`. Make sure to include the library/bi
 
 To run a certain subproject, you can use `bazel run` with the path and name of the task.
 =======================================
-Documentation
 
-We've proud to have completed and tested up to v5. We've also added additional error handling (character number and error messages that tell you where you've failed and how to fix it sometimes) and got cacheing to work for basic_combinators and v1_combinators (don't require storing AST nodes).
+Frontend Documentation
 
-Missing: Getting cache to work for v2 to v5. Cache works for basic combinators and v1 because they don't return ASTs. One solution would be to duplicate the AST nodes as they're being created in the combinator/parser, but we felt this would be too hacky of a solution.
+We've proud to have completed and tested up to v5. We've also added additional error handling (character number and error messages that tell you where you've failed and how to fix it sometimes) and got cacheing to work for basic_combinators and v1_combinators.
+
+Missing: Getting cache to work for v2 to v5. Cache works for basic combinators and v1 because they don't return ASTs. One solution would be to duplicate the AST nodes as they're being created, but we felt this would be too hacky of a solution and inefficient.
 
 Here is a link to our language specification
 https://github.ucsb.edu/CS160-S18/team-influx/issues/21
