@@ -6,8 +6,8 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus NotRelationParser::do_parse(std::string inputProgram,
                                         int startCharacter) {
@@ -41,3 +41,6 @@ std::unique_ptr<const LogicalNotExpr> NotRelationParser::make_node(
     std::unique_ptr<const RelationalExpr> first_ae) {
   return make_unique<const LogicalNotExpr>(std::move(first_ae));
 }
+
+}  // namespace frontend
+}  // namespace cs160

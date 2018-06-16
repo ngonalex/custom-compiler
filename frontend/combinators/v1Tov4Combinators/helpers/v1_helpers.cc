@@ -7,9 +7,8 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
-
+namespace cs160 {
+namespace frontend {
 // )
 ParseStatus CloseParenParser::do_parse(std::string inputProgram,
                                        int startCharacter) {
@@ -105,3 +104,6 @@ ParseStatus MulDivOpParser::do_parse(std::string inputProgram,
   auto result = mulOrDiv.do_parse(inputProgram, endCharacter);
   return result;
 }
+
+}  // namespace frontend
+}  // namespace cs160

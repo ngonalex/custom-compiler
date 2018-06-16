@@ -2,12 +2,12 @@
 #include "frontend/combinators/basic_combinators/and_combinator.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 #include "frontend/combinators/basic_combinators/zero_or_more_combinator.h"
-#include "frontend/combinators/v1Tov4Combinators/main/ae.h"
 #include "frontend/combinators/v1Tov4Combinators/helpers/var_helper.h"
+#include "frontend/combinators/v1Tov4Combinators/main/ae.h"
 #include "frontend/combinators/v1Tov4Combinators/main/assignment_parser.h"
-#include "frontend/combinators/v1Tov4Combinators/main/word_parser.h"
-#include "frontend/combinators/v1Tov4Combinators/main/statement_parser.h"
 #include "frontend/combinators/v1Tov4Combinators/main/function_decl_parser.h"
+#include "frontend/combinators/v1Tov4Combinators/main/statement_parser.h"
+#include "frontend/combinators/v1Tov4Combinators/main/word_parser.h"
 
 #include <string>  // std::string, std::stoi
 
@@ -32,24 +32,25 @@ ParseStatus ProgramParser::do_parse(std::string inputProgram,
   aeSemi.firstParser = &arithExprParser;
   aeSemi.secondParser = &semiColon;
 
-    FunctionDeclParser functionDeclParser;
-    ZeroOrMoreCombinator zeroOrMoreFunctionDecls;
-    zeroOrMoreFunctionDecls.parser = &functionDeclParser;
-    
-    ParseStatus functionsResult = zeroOrMoreFunctionDecls.do_parse(inputProgram, endCharacter);
-    
+  FunctionDeclParser functionDeclParser;
+  ZeroOrMoreCombinator zeroOrMoreFunctionDecls;
+  zeroOrMoreFunctionDecls.parser = &functionDeclParser;
+
+  ParseStatus functionsResult =
+      zeroOrMoreFunctionDecls.do_parse(inputProgram, endCharacter);
+
   StatementParser statementParser;
   ZeroOrMoreCombinator zeroOrMoreStatements;
 
   zeroOrMoreStatements.parser = &statementParser;
 
-  ParseStatus statementsResult =
-      zeroOrMoreStatements.do_parse(functionsResult.remainingCharacters, functionsResult.endCharacter);
+  ParseStatus statementsResult = zeroOrMoreStatements.do_parse(
+      functionsResult.remainingCharacters, functionsResult.endCharacter);
 
-    AndCombinator firstAnd;
-    firstAnd.firstParser = &zeroOrMoreFunctionDecls;
-    firstAnd.secondParser = &zeroOrMoreStatements;
-    
+  AndCombinator firstAnd;
+  firstAnd.firstParser = &zeroOrMoreFunctionDecls;
+  firstAnd.secondParser = &zeroOrMoreStatements;
+
   AndCombinator secondAnd;
   secondAnd.firstParser = &firstAnd;
   secondAnd.secondParser = &aeSemi;
@@ -57,22 +58,23 @@ ParseStatus ProgramParser::do_parse(std::string inputProgram,
   ParseStatus result = secondAnd.do_parse(inputProgram, endCharacter);
 
   if (result.status) {
-      std::vector<std::unique_ptr<const FunctionDef>> temporaryFunctions;
+    std::vector<std::unique_ptr<const FunctionDef>> temporaryFunctions;
     std::vector<std::unique_ptr<const Statement>> temporaryStatements;
 
-      for (auto i = functionsResult.astNodes.begin();
-           i != functionsResult.astNodes.end(); ++i) {
-          temporaryFunctions.push_back(unique_cast<const FunctionDef>(std::move(*i)));
-      }
-      
+    for (auto i = functionsResult.astNodes.begin();
+         i != functionsResult.astNodes.end(); ++i) {
+      temporaryFunctions.push_back(
+          unique_cast<const FunctionDef>(std::move(*i)));
+    }
+
     for (auto i = statementsResult.astNodes.begin();
          i != statementsResult.astNodes.end(); ++i) {
-      temporaryStatements.push_back(unique_cast<const Statement>(std::move(*i)));
+      temporaryStatements.push_back(
+          unique_cast<const Statement>(std::move(*i)));
     }
 
     result.ast = make_unique<const Program>(
-        std::move(temporaryFunctions),
-        std::move(temporaryStatements),
+        std::move(temporaryFunctions), std::move(temporaryStatements),
         unique_cast<const ArithmeticExpr>(
             std::move(result.astNodes[statementsResult.astNodes.size()])));
   }

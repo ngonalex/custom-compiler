@@ -6,9 +6,8 @@
 #include "frontend/combinators/v1Tov4Combinators/main/conditional_parser.h"  // cs160::frontend::ConditionalParser
 #include "frontend/combinators/v1Tov4Combinators/main/loop_parser.h"  // cs160::frontend::LoopParser
 
-#include "frontend/combinators/v1Tov4Combinators/main/function_call_parser.h" // cs160::frontend::FunctionCallParser
+#include "frontend/combinators/v1Tov4Combinators/main/function_call_parser.h"  // cs160::frontend::FunctionCallParser
 
-#include <iostream>
 #include <string>  // std::string, std::stoi
 
 /*
@@ -24,8 +23,8 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus StatementParser::do_parse(std::string inputProgram,
                                       int startCharacter) {
@@ -36,22 +35,22 @@ ParseStatus StatementParser::do_parse(std::string inputProgram,
     return super::fail(inputProgram, endCharacter, "");
   }
 
-    FunctionCallParser functionCallParser;
+  FunctionCallParser functionCallParser;
   AssignmentParser assignParser;
   ConditionalParser conditionalParser;
   LoopParser loopParser;
 
   // func call | assign | cond | loop
-    OrCombinator funcCallOrAssign;
+  OrCombinator funcCallOrAssign;
   OrCombinator assignOrConditional;
   OrCombinator allStatement;
 
-    funcCallOrAssign.firstParser = &functionCallParser;
-    funcCallOrAssign.secondParser = &assignParser;
-    
-    assignOrConditional.firstParser = &funcCallOrAssign;
-    assignOrConditional.secondParser = &conditionalParser;
-    
+  funcCallOrAssign.firstParser = &functionCallParser;
+  funcCallOrAssign.secondParser = &assignParser;
+
+  assignOrConditional.firstParser = &funcCallOrAssign;
+  assignOrConditional.secondParser = &conditionalParser;
+
   allStatement.firstParser = &assignOrConditional;
   allStatement.secondParser = &loopParser;
 
@@ -64,3 +63,6 @@ ParseStatus StatementParser::do_parse(std::string inputProgram,
 
   return result;
 }
+
+}  // namespace frontend
+}  // namespace cs160

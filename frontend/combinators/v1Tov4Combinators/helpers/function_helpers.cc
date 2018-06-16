@@ -4,8 +4,8 @@
 #include "frontend/combinators/basic_combinators/atom_parser.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 #include "frontend/combinators/basic_combinators/zero_or_more_combinator.h"
-#include "frontend/combinators/v1Tov4Combinators/main/ae.h"
 #include "frontend/combinators/v1Tov4Combinators/helpers/var_helper.h"
+#include "frontend/combinators/v1Tov4Combinators/main/ae.h"
 #include "frontend/combinators/v1Tov4Combinators/main/word_parser.h"
 
 #define super NullParser
@@ -107,12 +107,12 @@ ParseStatus FunctionVariableParsers::do_parse(std::string inputProgram,
       intermediateValue.remainingCharacters, intermediateValue.endCharacter);
 
   intermediateValue.status = true;
-    if (lastValue.status){
-        intermediateValue.remainingCharacters = lastValue.remainingCharacters;
-        intermediateValue.parsedCharacters += lastValue.parsedCharacters;
-        intermediateValue.endCharacter = lastValue.endCharacter;
-        intermediateValue.astNodes.push_back(std::move(lastValue.ast));
-    }
+  if (lastValue.status) {
+    intermediateValue.remainingCharacters = lastValue.remainingCharacters;
+    intermediateValue.parsedCharacters += lastValue.parsedCharacters;
+    intermediateValue.endCharacter = lastValue.endCharacter;
+    intermediateValue.astNodes.push_back(std::move(lastValue.ast));
+  }
 
   intermediateValue.parsedCharactersArray.erase(
       std::begin(intermediateValue.parsedCharactersArray),

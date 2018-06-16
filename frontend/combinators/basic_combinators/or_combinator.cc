@@ -1,9 +1,9 @@
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 
-#include <iostream>
 #define super NullParser
 
-using namespace cs160::frontend;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus OrCombinator::do_parse(std::string inputProgram,
                                    int startCharacter) {
@@ -21,3 +21,6 @@ ParseStatus OrCombinator::do_parse(std::string inputProgram,
   }
   return secondStatus;
 }
+
+}  // namespace frontend
+}  // namespace cs160

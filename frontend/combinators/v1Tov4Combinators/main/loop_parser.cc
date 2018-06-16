@@ -1,14 +1,13 @@
 #include "frontend/combinators/v1Tov4Combinators/main/loop_parser.h"
 #include "frontend/combinators/basic_combinators/and_combinator.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
-#include "frontend/combinators/v1Tov4Combinators/main/ae.h"
-#include "frontend/combinators/v1Tov4Combinators/helpers/v1_helpers.h"
 #include "frontend/combinators/v1Tov4Combinators/helpers/relational_helper.h"
+#include "frontend/combinators/v1Tov4Combinators/helpers/v1_helpers.h"
+#include "frontend/combinators/v1Tov4Combinators/main/ae.h"
 #include "frontend/combinators/v1Tov4Combinators/main/block_parser.h"
 #include "frontend/combinators/v1Tov4Combinators/main/or_relation_parser.h"
 #include "frontend/combinators/v1Tov4Combinators/main/relation_body.h"
 
-#include <iostream>
 #include <string>  // std::string, std::stoi
 
 /*
@@ -26,8 +25,8 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus LoopParser::do_parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
@@ -145,3 +144,6 @@ ParseStatus LoopParser::do_parse(std::string inputProgram, int startCharacter) {
     return super::fail(inputProgram, endCharacter);
   }
 }
+
+}  // namespace frontend
+}  // namespace cs160

@@ -178,7 +178,6 @@ class PrintVisitor : public AstVisitor {
     output_ << " ); ";
   }
 
-
   // Might be incorrect
   void VisitProgram(const Program& program) override {
     for (auto& functions : program.function_defs()) {

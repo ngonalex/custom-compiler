@@ -1,5 +1,5 @@
 #include "abstract_syntax/abstract_syntax.h"
-#include "abstract_syntax/print_visitor_v3.h"
+#include "abstract_syntax/print_visitor_v4.h"
 #include "frontend/combinators/v1Tov4Combinators/main/single_char.h"
 #include "frontend/combinators/v1Tov4Combinators/main/single_digit.h"
 
@@ -408,11 +408,7 @@ TEST(Combinators, AeWithMinusMinus) {
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 4);
   EXPECT_EQ(result.remainingCharacters, "");
-<<<<<<< HEAD:frontend/combinators/v1Tov4Combinators/main/v1_test.cc
   EXPECT_EQ(result.parsedCharacters, "7--1");
-=======
-  EXPECT_EQ(result.parsedCharacters, "7--1;");
->>>>>>> master:frontend/combinators/v1_combinators/v1_test.cc
   EXPECT_EQ(output, "(7 - (0 - 1))");
 }
 
@@ -429,11 +425,7 @@ TEST(Combinators, AeWithPlusPlus) {
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 5);
   EXPECT_EQ(result.remainingCharacters, "");
-<<<<<<< HEAD:frontend/combinators/v1Tov4Combinators/main/v1_test.cc
   EXPECT_EQ(result.parsedCharacters, "3+4+5");
-=======
-  EXPECT_EQ(result.parsedCharacters, "3+4+5;");
->>>>>>> master:frontend/combinators/v1_combinators/v1_test.cc
   EXPECT_EQ(output, "((3 + 4) + 5)");
 }
 
@@ -450,11 +442,7 @@ TEST(Combinators, ComplicatedAe) {
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 25);
   EXPECT_EQ(result.remainingCharacters, "");
-<<<<<<< HEAD:frontend/combinators/v1Tov4Combinators/main/v1_test.cc
   EXPECT_EQ(result.parsedCharacters, "7*10+9/3+16-8*2*3-77+12*1");
-=======
-  EXPECT_EQ(result.parsedCharacters, "7*10+9/3+16-8*2*3-77+12*1;");
->>>>>>> master:frontend/combinators/v1_combinators/v1_test.cc
   EXPECT_EQ(
       output,
       "((((((7 * 10) + (9 / 3)) + 16) - ((8 * 2) * 3)) - 77) + (12 * 1))");
@@ -472,16 +460,8 @@ TEST(Combinators, NegComplicatedAe) {
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.startCharacter, 0);
-<<<<<<< HEAD:frontend/combinators/v1Tov4Combinators/main/v1_test.cc
   EXPECT_EQ(result.endCharacter, 28);
   EXPECT_EQ(output,
             "(0 - ((((((7 * 10) + (9 / 3)) + 16) - ((8 * 2) * 3)) - 77) + (12 "
             "* 1)))");
 }
-=======
-  EXPECT_EQ(result.endCharacter, 29);
-  EXPECT_EQ(output,
-            "(0 - ((((((7 * 10) + (9 / 3)) + 16) - ((8 * 2) * 3)) - 77) + (12 "
-            "* 1)))");
-}
->>>>>>> master:frontend/combinators/v1_combinators/v1_test.cc

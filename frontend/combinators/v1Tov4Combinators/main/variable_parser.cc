@@ -1,16 +1,16 @@
 #include "frontend/combinators/v1Tov4Combinators/main/variable_parser.h"
 #include "frontend/combinators/basic_combinators/and_combinator.h"
 #include "frontend/combinators/v1Tov4Combinators/helpers/v1_helpers.h"
-#include "frontend/combinators/v1Tov4Combinators/main/term_expr.h"
 #include "frontend/combinators/v1Tov4Combinators/helpers/var_helper.h"
+#include "frontend/combinators/v1Tov4Combinators/main/term_expr.h"
 #include "frontend/combinators/v1Tov4Combinators/main/word_parser.h"
 
 #include <string>  // std::string, std::stoi
 
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus VariableParser::do_parse(std::string inputProgram,
                                      int startCharacter) {
@@ -49,3 +49,6 @@ ParseStatus VariableParser::do_parse(std::string inputProgram,
 
   return result;
 }
+
+}  // namespace frontend
+}  // namespace cs160

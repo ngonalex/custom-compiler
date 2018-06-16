@@ -1,13 +1,12 @@
 #include "frontend/combinators/v1Tov4Combinators/main/relation_body.h"
 #include "frontend/combinators/basic_combinators/and_combinator.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
-#include "frontend/combinators/v1Tov4Combinators/main/ae.h"
 #include "frontend/combinators/v1Tov4Combinators/helpers/relational_helper.h"
+#include "frontend/combinators/v1Tov4Combinators/main/ae.h"
 #include "frontend/combinators/v1Tov4Combinators/main/or_relation_parser.h"
 
 #include "abstract_syntax/print_visitor_v3.h"
 
-#include <iostream>
 #include <string>  // std::string, std::stoi
 
 /*
@@ -22,8 +21,8 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus RelationBodyParser::do_parse(std::string inputProgram,
                                          int startCharacter) {
@@ -88,3 +87,6 @@ std::unique_ptr<const RelationalExpr> RelationBodyParser::make_node(
     return nullptr;
   }
 }
+
+}  // namespace frontend
+}  // namespace cs160

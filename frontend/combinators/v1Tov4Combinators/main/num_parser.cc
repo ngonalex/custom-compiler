@@ -2,12 +2,12 @@
 #include "frontend/combinators/basic_combinators/one_or_more_combinator.h"
 #include "frontend/combinators/v1Tov4Combinators/main/single_digit.h"
 
-#include <string>
+#include <string>  // std::string
 
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus NumParser::do_parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
@@ -37,3 +37,6 @@ ParseStatus NumParser::do_parse(std::string inputProgram, int startCharacter) {
                                      std::end(result.parsedCharactersArray));
   return result;
 }
+
+}  // namespace frontend
+}  // namespace cs160

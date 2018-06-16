@@ -3,15 +3,14 @@
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 #include "frontend/combinators/v1Tov4Combinators/main/word_parser.h"
 
-#include "frontend/combinators/v1Tov4Combinators/main/add_sub_expr.h"
 #include "frontend/combinators/v1Tov4Combinators/helpers/v1_helpers.h"
+#include "frontend/combinators/v1Tov4Combinators/main/add_sub_expr.h"
 #include "frontend/combinators/v1Tov4Combinators/main/num_parser.h"
-
 
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus TermExprParser::do_parse(std::string inputProgram,
                                      int startCharacter) {
@@ -82,3 +81,5 @@ ParseStatus TermExprParser::do_parse(std::string inputProgram,
   return final_result;
 }
 
+}  // namespace frontend
+}  // namespace cs160

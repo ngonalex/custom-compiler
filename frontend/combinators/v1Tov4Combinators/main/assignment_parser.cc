@@ -1,8 +1,8 @@
 #include "frontend/combinators/v1Tov4Combinators/main/assignment_parser.h"
 #include "frontend/combinators/basic_combinators/and_combinator.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
-#include "frontend/combinators/v1Tov4Combinators/main/ae.h"
 #include "frontend/combinators/v1Tov4Combinators/helpers/var_helper.h"
+#include "frontend/combinators/v1Tov4Combinators/main/ae.h"
 #include "frontend/combinators/v1Tov4Combinators/main/word_parser.h"
 
 #include <stdio.h>
@@ -10,8 +10,8 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus AssignmentParser::do_parse(std::string inputProgram,
                                        int startCharacter) {
@@ -73,3 +73,6 @@ ParseStatus AssignmentParser::do_parse(std::string inputProgram,
 
   return result;
 }
+
+}  // namespace frontend
+}  // namespace cs160

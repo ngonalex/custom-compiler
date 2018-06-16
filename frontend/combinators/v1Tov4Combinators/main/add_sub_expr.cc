@@ -8,8 +8,8 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus AddSubExprParser::do_parse(std::string inputProgram,
                                        int startCharacter) {
@@ -43,7 +43,6 @@ ParseStatus AddSubExprParser::do_parse(std::string inputProgram,
   ParseStatus result = addSubExprFinal.do_parse(inputProgram, endCharacter);
 
   // AST Formation
-  int strIndex = 0;
   for (int i = 0; i < result.astNodes.size(); i++) {
     if (i == 0) {
       result.ast = std::move(result.astNodes[i]);
@@ -77,3 +76,6 @@ std::unique_ptr<const ArithmeticExpr> AddSubExprParser::make_node(
     return nullptr;
   }
 }
+
+}  // namespace frontend
+}  // namespace cs160
