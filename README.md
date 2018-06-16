@@ -27,9 +27,33 @@ Here is a link to our language specification
 https://github.ucsb.edu/CS160-S18/team-influx/issues/21
 
 
-Frontend: (TACK ON team-influx/frontend/combinators BEFORE EACH folder /)
+(TACK ON team-influx/frontend/combinators BEFORE EACH folder /)
 
-High level Overview:
+**Basic Combinators (/basic_combinators)**
+
+and_parser (sequence parser) = and_combinator.cc (sequence parser)
+atom_parser (parses individual characters) = atom_parser.cc
+null (super class that handles packrat parsing and fail cases) = null.cc
+one or more parser = one_or_more_combinator.cc
+zero or more parser = zero_or_more_combinator.cc
+or combinator = or_combinator.cc
+parse status (results to all our combinators/parser) = parsestatus.h 
+
+
+**Combinator Library(v1_to_v5_combinators)**
+
+Inside of frontend/combinators/v1_to_v5_combinators
+ae.cc
+
+
+**Cacheing (/basic_combinators/null.cc)**
+
+Refer to "missing" section.
+
+**Non-trivial (recursive) handling of arithmetic expression and relations (inside of v1_to_v5_combinators/main folder: mul_div_expr.cc, add_sub_expr.cc, or_relation_parser.cc, and_relation_parser.cc)**
+
+
+Notes:
 Everything in a helper folder does not return an ast node and we've modularized our files such that every file only return one ast.
 
 basic_combinators/null.cc is our base class for all our parsers/combinators. This handles fail error handling with error messages and is where our packrat parsing is called.
@@ -47,30 +71,6 @@ In /v3_tests, we mainly implemented loops, boolean operations, blocks, and if st
 In /v4_tests, we implemented function definitions and calls with optional arguments
 
 In /v5_tests, we implemented tests to ensure the arrays (called tuples in the AST) are created correctly and that dereferencing works correctly.
-
-
-
-**Combinator Library**
-
-
-
-**Basic Combinators**
-
-and_parser (sequence parser) = and_combinator.cc (sequence parser)
-atom_parser (parses individual characters) = atom_parser.cc
-null (super class that handles packrat parsing and fail cases) = null.cc
-one or more parser = one_or_more_combinator.cc
-zero or more parser = zero_or_more_combinator.cc
-or combinator = or_combinator.cc
-parse status (results to all our combinators/parser) = parsestatus.h 
-
-
-
-**Cacheing**
-
-Refer to "missing" section.
-
-**Non-trivial (recursive) handling of arithmetic expression and relations**
 
 
 With more time, we'd like to clean up our code such that we can handle longer sequences instead of our hacky solution of having multiple "and combinators", build our parsestatus out such that every combinator/parser would get its own parse status subclass whenever there is a need for it instead of putting everything into one ParseStatus class, and we would also like to do a more efficient version of Packrat parsing that isn't memory intensive (our workaround with unique pointers). Additionally, we'd would've loved to include some non trivial error handling, and added templating in our ParseStatus. 
