@@ -60,7 +60,8 @@ ParseStatus FunctionCallParser::do_parse(std::string inputProgram, int startChar
         const std::string funcNameStr = funcNameExpr->name();
         std::vector<std::unique_ptr<const ArithmeticExpr>> arguments;
         for (int i = 2; i < result.astNodes.size(); i++){
-            arguments.push_back(unique_cast<const ArithmeticExpr>(std::move(result.astNodes[i])));
+            if (result.astNodes[i] != NULL)
+                arguments.push_back(unique_cast<const ArithmeticExpr>(std::move(result.astNodes[i])));
         }
         result.ast = make_unique<const FunctionCall>(unique_cast<const VariableExpr>(std::move(result.astNodes[0])),
                                                      funcNameStr,

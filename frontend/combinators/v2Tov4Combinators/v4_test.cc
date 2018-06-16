@@ -138,11 +138,11 @@ TEST(FunctionDeclParser, successFunctionDec1) {
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "funcvictor(prabal:Integer,Jason:String)->String{if(x==2){e=2;}else{f=3;}}");
   EXPECT_EQ(result.errorType, "");
-/*
+
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
-  EXPECT_EQ(output, "z = 0; if (z == 0) {z = 100} else {}; z");*/
+  EXPECT_EQ(output, "funcvictor(prabal Jason ){}");
 }
 
 TEST(FunctionDeclParser, successFunctionDec2) {
@@ -195,11 +195,11 @@ TEST(FunctionDeclParser, successFunctionCall1) {
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "return_val=victor(2+3*(2)+victor,jason)");
   EXPECT_EQ(result.errorType, "");
-/*
+
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
-  EXPECT_EQ(output, "z = 0; if (z == 0) {z = 100} else {}; z");*/
+  EXPECT_EQ(output, "return_val = victor ( ((2 + (3 * 2)) + victor)jason ); ");
 }
 
 TEST(FunctionDeclParser, successFunctionCall2) {
@@ -212,11 +212,11 @@ TEST(FunctionDeclParser, successFunctionCall2) {
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "test=victor()");
   EXPECT_EQ(result.errorType, "");
-/*
+
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
-  EXPECT_EQ(output, "z = 0; if (z == 0) {z = 100} else {}; z");*/
+  EXPECT_EQ(output, "test = victor (  ); ");
 }
 
 
