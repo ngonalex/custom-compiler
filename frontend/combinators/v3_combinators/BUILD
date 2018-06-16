@@ -32,7 +32,9 @@ cc_library(
 	"//frontend/combinators/v1_combinators:v1_combinators",
 	"//frontend/combinators/v2_combinators:v2_combinators",
 	"//abstract_syntax:abstract_syntax",
-	"//abstract_syntax:print_visitor_v3"
+	"//abstract_syntax:print_visitor_v3",
+	"//frontend/combinators/v4_combinators:super_function_decl",
+
 	],
 
 	visibility = ["//visibility:public"],
@@ -70,7 +72,7 @@ cc_library(
 	"//frontend/combinators/v1_combinators:v1_combinators",
 	"//frontend/combinators/v2_combinators:assignment_parser",
 	"//abstract_syntax:abstract_syntax",
-	"//abstract_syntax:print_visitor_v3"
+	"//abstract_syntax:print_visitor_v3",	
 	],
 
 	visibility = ["//visibility:public"],

@@ -26,7 +26,7 @@ cc_library(
 	"//abstract_syntax:abstract_syntax",
 	"//abstract_syntax:print_visitor_v3",
 	"//frontend/combinators/v3_combinators:statement_parser",
-	"//frontend/combinators/v4_combinators:function_decl",
+	"//frontend/combinators/v4_combinators:super_function_decl",
 	],
 
 	visibility = ["//visibility:public"],

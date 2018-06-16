@@ -170,10 +170,12 @@ class PrintVisitor : public AstVisitor {
   void VisitFunctionCall(const FunctionCall& call) override {
     call.lhs().Visit(this);
     output_ << " = ";
-    call.callee_name().Visit(this);
+    output_ << call.callee_name();
+    output_ << " ( ";
     for (auto& args : call.arguments()) {
       args->Visit(this);
     }
+    output_ << " ); ";
   }
 
 

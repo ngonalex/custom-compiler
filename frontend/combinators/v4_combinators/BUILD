@@ -27,17 +27,19 @@ cc_library(
 )
 
 cc_library(
-	name = "function_decl",
+	name = "super_function_decl",
 	copts = ["-Wall -g"],
 
 	hdrs = [
 	"helpers/function_helpers.h",
 	"main/function_decl_parser.h",
+	"main/function_call_parser.h"
 	],
 
 	srcs = [
 	"helpers/function_helpers.cc",
 	"main/function_decl_parser.cc",
+	"main/function_call_parser.cc"
 	],
 
 	deps = [
