@@ -6,8 +6,6 @@
 
 #include "gtest/gtest.h"
 
-#include <iostream>
-
 using namespace cs160::frontend;
 
 TEST(FunctionHelpers, successComma) {

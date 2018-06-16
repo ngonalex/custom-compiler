@@ -4,7 +4,6 @@
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
 
-#include <iostream>
 #include <map>
 
 namespace cs160 {
