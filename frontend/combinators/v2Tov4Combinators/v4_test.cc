@@ -95,8 +95,7 @@ TEST(FunctionHelpers, failFunctionVariable) {
 
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.startCharacter, 0);
-  EXPECT_EQ(result.endCharacter, 0);
-  EXPECT_EQ(result.errorType, "Expected function variable declaration");
+  EXPECT_EQ(result.errorType, "");
 }
 
 TEST(FunctionHelpers, successFunctionArguments) {
@@ -105,7 +104,7 @@ TEST(FunctionHelpers, successFunctionArguments) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
-  EXPECT_EQ(result.endCharacter, 20);
+  EXPECT_EQ(result.endCharacter, 14);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "33+2,victor");
 }
@@ -117,8 +116,7 @@ TEST(FunctionHelpers, failFunctionArguments) {
 
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.startCharacter, 0);
-  EXPECT_EQ(result.endCharacter, 0);
-  EXPECT_EQ(result.errorType, "Expected function variable declaration");
+  EXPECT_EQ(result.errorType, "");
 }
 
 
@@ -130,7 +128,7 @@ TEST(FunctionDeclParser, successFunctionDec1) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
-  EXPECT_EQ(result.endCharacter, 45);
+  EXPECT_EQ(result.endCharacter, 89);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "funcvictor(prabal:Integer,Jason:String)->String{if(x==2){e=2;}else{f=3;}}");
   EXPECT_EQ(result.errorType, "");
@@ -147,7 +145,7 @@ TEST(FunctionDeclParser, successFunctionDec2) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
-  EXPECT_EQ(result.endCharacter, 45);
+  EXPECT_EQ(result.endCharacter, 58);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "funcvictor()->String{if(x==2){e=2;}else{f=3;}}");
   EXPECT_EQ(result.errorType, "");
@@ -166,7 +164,7 @@ TEST(FunctionDeclParser, failFunctionDec1) {
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 0);
-  EXPECT_EQ(result.errorType, "");
+  EXPECT_EQ(result.errorType, "Expecting character: -");
 }
 
 TEST(FunctionDeclParser, failFunctionDec2) {
@@ -176,20 +174,20 @@ TEST(FunctionDeclParser, failFunctionDec2) {
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 0);
-  EXPECT_EQ(result.errorType, "");
+  EXPECT_EQ(result.errorType, "Expecting character: -");
 }
 
 
 
 TEST(FunctionDeclParser, successFunctionCall1) {
   FunctionCallParser parser;
-  ParseStatus result = parser.do_parse("victor(2+3*(2)+victor, jason)", 0);
+  ParseStatus result = parser.do_parse("return_val = victor(2+3*(2)+victor, jason)", 0);
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
-  EXPECT_EQ(result.endCharacter, 45);
+  EXPECT_EQ(result.endCharacter, 42);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(result.parsedCharacters, "victor(2+3*(2)+victor,jason)");
+  EXPECT_EQ(result.parsedCharacters, "return_val=victor(2+3*(2)+victor,jason)");
   EXPECT_EQ(result.errorType, "");
 /*
   PrintVisitor *a = new PrintVisitor();
@@ -200,13 +198,13 @@ TEST(FunctionDeclParser, successFunctionCall1) {
 
 TEST(FunctionDeclParser, successFunctionCall2) {
   FunctionCallParser parser;
-  ParseStatus result = parser.do_parse("victor()", 0);
+  ParseStatus result = parser.do_parse("test = victor()", 0);
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
-  EXPECT_EQ(result.endCharacter, 45);
+  EXPECT_EQ(result.endCharacter, 15);
   EXPECT_EQ(result.remainingCharacters, "");
-  EXPECT_EQ(result.parsedCharacters, "victor");
+  EXPECT_EQ(result.parsedCharacters, "test=victor()");
   EXPECT_EQ(result.errorType, "");
 /*
   PrintVisitor *a = new PrintVisitor();
@@ -218,12 +216,12 @@ TEST(FunctionDeclParser, successFunctionCall2) {
 
 TEST(FunctionDeclParser, failFunctionCall1) {
   FunctionCallParser parser;
-  ParseStatus result = parser.do_parse("jason(if victor)", 0);
+  ParseStatus result = parser.do_parse("test = jason(if victor)", 0);
 
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 0);
-  EXPECT_EQ(result.errorType, "");
+  EXPECT_EQ(result.errorType, "Expecting character: )");
 }
 
 TEST(FunctionDeclParser, failFunctionCall2) {
@@ -233,7 +231,7 @@ TEST(FunctionDeclParser, failFunctionCall2) {
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 0);
-  EXPECT_EQ(result.errorType, "");
+  EXPECT_EQ(result.errorType, "Missing equal sign");
 }
 
 
