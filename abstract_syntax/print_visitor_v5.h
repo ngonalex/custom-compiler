@@ -1,14 +1,14 @@
-#ifndef ABSTRACT_SYNTAX_PRINT_VISITOR_V4_H_
-#define ABSTRACT_SYNTAX_PRINT_VISITOR_V4_H_
+#ifndef ABSTRACT_SYNTAX_PRINT_VISITOR_V5_H_
+#define ABSTRACT_SYNTAX_PRINT_VISITOR_V5_H_
 
 #include <sstream>
 #include <string>
 
-#include "abstract_syntax/abstract_syntax_tree_v4.h"
+#include "abstract_syntax/abstract_syntax_tree_v5.h"
 
 namespace cs160 {
 namespace abstract_syntax {
-namespace version_4 {
+namespace version_5 {
 
 class PrintVisitor : public AstVisitor {
  public:
@@ -187,10 +187,10 @@ class PrintVisitor : public AstVisitor {
     output_ << " ); ";
   }
 
-  void VisitDereference(const VisitDereference& deref) override {
-    call.lhs().Visit(this);
+  void VisitDereference(const Dereference& deref) override {
+    deref.lhs().Visit(this);
     output_ << "[";
-    call.rhs().Visit(this);
+    deref.rhs().Visit(this);
     output_ << "]";
   }
 
@@ -215,4 +215,4 @@ class PrintVisitor : public AstVisitor {
 }  // namespace abstract_syntax
 }  // namespace cs160
 
-#endif  // ABSTRACT_SYNTAX_PRINT_VISITOR_V4_H_
+#endif  // ABSTRACT_SYNTAX_PRINT_VISITOR_V5_H_

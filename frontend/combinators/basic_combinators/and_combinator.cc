@@ -2,7 +2,8 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus AndCombinator::do_parse(std::string inputProgram,
                                     int startCharacter) {
@@ -21,11 +22,6 @@ ParseStatus AndCombinator::do_parse(std::string inputProgram,
     return secondStatus;
   }
 
-  /*
-    ParseStatus both::success(secondStatus.remainingCharacters,
-      firstStatus.parsedCharacters + secondStatus.parsedCharacters,
-    std::move(firstStatus.ast), std::move(secondStatus.ast),
-    firstStatus.characterStart + secondStatus.characterStart);*/
   ParseStatus both;
   both.status = true;
   both.parsedCharacters =
@@ -73,6 +69,7 @@ ParseStatus AndCombinator::do_parse(std::string inputProgram,
     if (secondStatus.second_ast != NULL) nodeCount_noArr++;
     if (nodeCount_noArr > 2 && nodeCount == 0) nodeCount = nodeCount_noArr;
   }
+
   if (nodeCount > 0) {
     if (firstStatus.astNodes.size() > 0) {
       for (int i = 0; i < firstStatus.astNodes.size(); i++) {
@@ -124,5 +121,5 @@ ParseStatus AndCombinator::do_parse(std::string inputProgram,
   return both;
 }
 
-// NUM and Operator
-//
+}  // namespace frontend
+}  // namespace cs160

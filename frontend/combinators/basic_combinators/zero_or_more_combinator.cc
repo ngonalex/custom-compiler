@@ -2,7 +2,8 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus ZeroOrMoreCombinator::do_parse(std::string inputProgram,
                                            int startCharacter) {
@@ -34,3 +35,6 @@ ParseStatus ZeroOrMoreCombinator::do_parse(std::string inputProgram,
 
   return pStatus;
 }
+
+}  // namespace frontend
+}  // namespace cs160
