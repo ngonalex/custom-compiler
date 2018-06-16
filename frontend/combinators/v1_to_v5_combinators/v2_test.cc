@@ -407,7 +407,9 @@ TEST(AssignmentParserCombinator, failAssignmentParser2) {
   EXPECT_EQ(result.startCharacter, 10);
   EXPECT_EQ(result.endCharacter, 10);
   EXPECT_EQ(result.errorType,
-            "Declare variable names with 'var variable_name : type = expression' or Declare variable names with 'var variable_name : type = expression' or Start variable declaration with var");
+            "Declare variable names with 'var variable_name : type = "
+            "expression' or Declare variable names with 'var variable_name : "
+            "type = expression' or Start variable declaration with var");
 }
 
 // Fail Case VariableParser : missing equal sign
@@ -430,7 +432,9 @@ TEST(AssignmentParserCombinator, failAssignmentParser4) {
   EXPECT_EQ(result.startCharacter, 10);
   EXPECT_EQ(result.endCharacter, 10);
   EXPECT_EQ(result.errorType,
-            "Declare variable names with 'var variable_name : type = expression' or Declare variable names with 'var variable_name : type = expression' or Start variable declaration with var");
+            "Declare variable names with 'var variable_name : type = "
+            "expression' or Declare variable names with 'var variable_name : "
+            "type = expression' or Start variable declaration with var");
 }
 
 TEST(BinaryOperatorExpr, successBinaryOperatorExpr1) {

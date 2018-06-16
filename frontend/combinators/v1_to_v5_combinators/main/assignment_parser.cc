@@ -3,8 +3,8 @@
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 #include "frontend/combinators/v1_to_v5_combinators/helpers/var_helper.h"
 #include "frontend/combinators/v1_to_v5_combinators/main/ae.h"
-#include "frontend/combinators/v1_to_v5_combinators/main/word_parser.h"
 #include "frontend/combinators/v1_to_v5_combinators/main/dereference_parser.h"
+#include "frontend/combinators/v1_to_v5_combinators/main/word_parser.h"
 
 #include <stdio.h>
 #include <string>  // std::string, std::stoi

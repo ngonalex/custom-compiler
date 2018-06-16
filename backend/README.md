@@ -2,7 +2,7 @@
 
 **Team Members**
 1) Alexander Ngo
-2) Yao Yuan
+2) Yuan Yao
 3) David Sun
 4) Areg Nersisyan
 
@@ -44,9 +44,9 @@ There's nothing too difficult here, but it may be somewhat confusing on why we d
 
 # Lowerer #
 
-Files: lowerer_visitor.cc, lowerer_visitor.h
-Files it depends on: ir.h, helper_struct.h
-Tests: lowerer_visitor_test* 
+Files: lowerer_visitor.cc, lowerer_visitor.h  
+Files it depends on: ir.h, helper_struct.h  
+Tests: lowerer_visitor_test  
 
 The way our lowerer works is it takes in an AST and creates a vector of ThreeAddressCodes by using the visitor design provided by abstract_syntax_tree.
 
@@ -62,7 +62,7 @@ V1 does two things
 
 V2 is an extension of V1 except now it needs to handle LeftHandSide variable/Dereferences present in ArithmeticExprs
 
-All V2 really is is differentiating between a LHS and a RHS variable. If it's a LHS variable signal to codegen that it needs to pop the address of the variable and load something into it.
+All V2 really is, is differentiating between a LHS and a RHS variable. If it's a LHS variable signal to codegen that it needs to pop the address of the variable and load something into it.
 If it's a RHS variable signal to codegen to load from memory and use that value in resulting calculations.
 
 **V3**
@@ -93,50 +93,47 @@ e.g.
 x->1 vs x->1->1
 There are two types of different dereferences which are a "parent" dereference and a "child" dereference. We need to figure this stuff out here, because codegen handles the two cases differently. If it's a child dereference then codegen needs to know to push the address of where the child lies so the next dereference can access further into the tuple. If it's a parent dereference however this changes based on if it's a RHS or a LHS defererence. If it's a RHS dereference then access the value inside the dereference and push it on the stack otherwise push the address so it can write into the tuple.
 
-Some extra features our lowerer does:
+Some extra features our lowerer does:  
+1) Catches unassigned variable errors  
+e.g y = x where x has never been assigned yet, our lowerer will catch this error and exit the program by using a global set that is created as variables are assigned.
 
-1) Catches unassigned variable errors
-  e.g y = x where x has never been assigned yet, our lowerer will catch this error and exit the program by using a global set that is created as variables are assigned.
-
-2) Catches unassigned variables in branches/conditionals
-If you have a program where there's a new variable created in one branch and is not created in the other branch, our lowerer will note it, but will not throw an error. It will only throw an error when it detects that variable being used outside of the branch.
-It does this by retaining a globalset and a totalset. Totalset is the set of ALL variables seen in the program in the current scope while globalset is variables that exist in EVERY branch. The only place that creates differences in the two are in conditionals or in loops. We use functions called GetSetDifference and GetSetIntersection to do this.
-
-e.g.
-if (...) {
-  x = 5 <- x is assigned here, but not in the false branch
-  y = x
-} else {
-  y = 5
-}
-
+2) Catches unassigned variables in branches/conditionals  
+If you have a program where there's a new variable created in one branch and is not created in the other branch, our lowerer will note it, but will not throw an error. It will only throw an error when it detects that variable being used outside of the branch.  
+It does this by retaining a globalset and a totalset. Totalset is the set of ALL variables seen in the program in the current scope while globalset is variables that exist in EVERY branch. The only place that creates differences in the two are in conditionals or in loops. We use functions called GetSetDifference and GetSetIntersection to do this.  
+e.g.   
+if (...) {  
+  x = 5 <- x is assigned here, but not in the false branch  
+  y = x  
+} else {  
+  y = 5  
+}  
 If the variable "x" is never used again then our program will continue. However in the case that "x" is used without being assigned to first, our program will throw an error.
 
-3) Incorrect number of function arguments
-  If the number of arguments supplied into a function call != to the number of arguments a function call expects, we throw an error. This is done by counting the number of arguments for a function call and storing it in a map of function_name -> # of arguments. Then when we see a function call anywhere in the program we consult the map if the number of arguments provided in the function call is equal to the number of arguments that the map tells us.
+3) Incorrect number of function arguments  
+If the number of arguments supplied into a function call != to the number of arguments a function call expects, we throw an error. This is done by counting the number of arguments for a function call and storing it in a map of function_name -> # of arguments. Then when we see a function call anywhere in the program we consult the map if the number of arguments provided in the function call is equal to the number of arguments that the map tells us.
 
-4) Redefining Functions
-  Using the map we created as described in number 3) when we're creating the function definitions for Codegen, we check if the function already exists in the map as our language has no notion of overloading functions. The AAST notes that function names should be unique, but it's not enforced in anyway, so this is our way of doing it.
+4) Redefining Functions  
+Using the map we created as described in number 3) when we're creating the function definitions for Codegen, we check if the function already exists in the map as our language has no notion of overloading functions. The AAST notes that function names should be unique, but it's not enforced in anyway, so this is our way of doing it.
 
-5) Undeclared Functions
-  If the function name that is being referred to in a function call does not exist in our map we throw an error.
+5) Undeclared Functions  
+If the function name that is being referred to in a function call does not exist in our map we throw an error.
 
 # Code Generation #
 
-Files: code_gen.cc, code_gen.h
-Files it depends on: ir.h, helper_struct.h, lowerer_visitor.cc, lowerer_visitor.h
-Tests: codegen_test.cc
+Files: code_gen.cc, code_gen.h  
+Files it depends on: ir.h, helper_struct.h, lowerer_visitor.cc, lowerer_visitor.h  
+Tests: codegen_test.cc  
 
 The way our codegen works is it's dynamically typed so it figures out the types at runtime. The way objects are stored in our language is each object is that each object is 16 bytes where byte 0 is the type flag (0 for int, 1 for tuple/pointer), byte 1 is the existence flag (0 if there is no object, 1 if there is one), byte 2-5 is the size flag (0 for ints, 1 -> 2^4-1 for tuples depending on the size asked for by AssignmentFromNewTuple), and bytes 8-15 being either the valued of the integer (64 bit signed integer) or the address of the tuple in the heap (64 bit address).
 
 Some other things to note:
-Our language will type check meaning that things like x->1 + 1 (if x->1 is a tuple) are not valid. In any Arithmetic/Relational/Logical Expr, if any of the arguments are not integers we throw a type error and exit. Our language will protect against tuple of out of bounds errors. Anytime a dereference is accessed we check if the argument provided is within range of 1 -> size (stored as metadata in the first 8 bytes of the object). Also we catch things like accessing a tuple that doesn't exist, so if x->1->1 has not been assigned or x->1 is actually an integer, we throw an error by checking first if it exists (existence flag) then if it's a tuple (if type flag is 1 for tuple).
-We also guard against using tuple creation with bogus arguments (cannot create a tuple of size 0 or less). Because we never garbare collect our program doesn't have dangling pointers, so things like x = tuple (2), y = x, x = 5 is totally valid as y will just point to the origin tuple that x contained after x is reassigned to the variable 5.
+Our language will type check meaning that things like x->1 + 1 (if x->1 is a tuple) are not valid. In any Arithmetic/Relational/Logical Expr, if any of the arguments are not integers we throw a type error and exit. Our language will protect against tuple of out of bounds errors. Anytime a dereference is accessed we check if the argument provided is within range of 1 -> size (stored as metadata in the first 8 bytes of the object). Also we catch things like accessing a tuple that doesn't exist, so if x->1->1 has not been assigned or x->1 is actually an integer, we throw an error by checking first if it exists (existence flag) then if it's a tuple (if type flag is 1 for tuple).  
+We also guard against using tuple creation with bogus arguments (cannot create a tuple of size 0 or less). Because we never garbare collect our program doesn't have dangling pointers, so things like x = tuple (2), y = x, x = 5 is totally valid as y will just point to the origin tuple that x contained after x is reassigned to the variable 5.  
 
-Also this is important to note that there are reserved keywords in our language. There's an issue up on github that details this, but it's not handled in backend. So if a user were to use any of the reserved keywords like heap, bumpptr, returnobj, their program would crash or have undefined behavior.
+Also this is important to note that there are reserved keywords in our language. There's an issue up on github that details this, but it's not handled in backend. So if a user were to use any of the reserved keywords like heap, bumpptr, returnobj, their program would crash or have undefined behavior.  
 
 **V1**
-- loading in integers 
+- loading in integers
   * creates flags to indicate it exists and it's an integer (sets type flag to 0, and existence flag to 1) and then pushes it on the stack, then pushes the actual value to the stack
 - Add/Mult/Div/Sub
   * pops 4 things off the stack (Each object is split into two 64 bit spaces on the stack, one for the flags, one for the object itself)
@@ -194,13 +191,13 @@ Child/Parent + LHS Dereference and Child RHS Dereference are handled the same. T
 Parent Dereference + RHS Dereference takes an extra step of accessing the actual value of the tuple rather than just the address and then pushing that on the stack.
 
 # Control Flow Graph && Optimizer #
-Files: control_flow_graph.cc, control_flow_graph.h
-Files it depends on: ir.h, helper_struct.h, lowerer_visitor.cc, lowerer_visitor.h
-Tests: control_flow_graph.cc
+Files: control_flow_graph.cc, control_flow_graph.h  
+Files it depends on: ir.h, helper_struct.h, lowerer_visitor.cc, lowerer_visitor.h  
+Tests: control_flow_graph.cc  
 
 The Control Flow Graph takes an IR and attempts to optimizes it using Dead Code Elimination
-1) Takes the vector of IR and creates a vector of Control Flow Graph Nodes
-  1a) Each Control Flow Graph Node has a subset (in the form of a vector) of the vector of IR
+1) Takes the vector of IR and creates a vector of Control Flow Graph Nodes  
+  1a) Each Control Flow Graph Node has a subset (in the form of a vector) of the vector of IR  
 2) Takes the Control Flow Graph Nodes and recursively build a graph
 3) Apply the Optimize() function
 

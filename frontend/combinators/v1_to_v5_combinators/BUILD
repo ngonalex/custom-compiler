@@ -143,3 +143,19 @@ cc_test(
 	timeout = "short",
 	size = "small",
 )
+
+cc_test(
+	name = "v5_tests",
+
+	deps = [
+	"@gtest//:main", 
+	":v1_to_v5_combinators", 
+	"//abstract_syntax:abstract_syntax",
+	"//abstract_syntax:print_visitor_v5"
+	],
+	
+	srcs = ["v5_test.cc"],
+	copts = ["-Iexternal/gtest/googletest-release-1.8.0/googletest/include"],
+	timeout = "short",
+	size = "small",
+)

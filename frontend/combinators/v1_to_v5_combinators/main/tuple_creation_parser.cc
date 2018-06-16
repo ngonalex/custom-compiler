@@ -1,9 +1,9 @@
 #include "frontend/combinators/v1_to_v5_combinators/main/tuple_creation_parser.h"
 #include "frontend/combinators/basic_combinators/and_combinator.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
-#include "frontend/combinators/v1_to_v5_combinators/main/ae.h"
-#include "frontend/combinators/v1_to_v5_combinators/helpers/var_helper.h"
 #include "frontend/combinators/v1_to_v5_combinators/helpers/tuple_helpers.h"
+#include "frontend/combinators/v1_to_v5_combinators/helpers/var_helper.h"
+#include "frontend/combinators/v1_to_v5_combinators/main/ae.h"
 
 #include <stdio.h>
 #include <string>  // std::string, std::stoi
