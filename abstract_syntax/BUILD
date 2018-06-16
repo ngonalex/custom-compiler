@@ -156,14 +156,3 @@ cc_test(
 	timeout = "short",
 	size = "small",
 )
-
-cc_test(
-	name = "print_visitor_v2_test",
-	srcs = ["print_visitor_v2_test.cc"],
-	deps = [
-             ":print_visitor_v2",
-             "@gtest//:main",
-        ],
-	timeout = "short",
-	size = "small",
-)

@@ -43,7 +43,6 @@ ParseStatus AddSubExprParser::do_parse(std::string inputProgram,
   ParseStatus result = addSubExprFinal.do_parse(inputProgram, endCharacter);
 
   // AST Formation
-  int strIndex = 0;
   for (int i = 0; i < result.astNodes.size(); i++) {
     if (i == 0) {
       result.ast = std::move(result.astNodes[i]);
