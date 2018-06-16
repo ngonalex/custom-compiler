@@ -65,7 +65,7 @@ ParseStatus AssignmentParser::do_parse(std::string inputProgram,
         unique_cast<const ArithmeticExpr>(std::move(result.second_ast))));
     }
     else {*/
-    result.ast = std::move(make_unique<const Assignment>(
+    result.ast = std::move(make_unique<const AssignmentFromArithExp>(
         unique_cast<const VariableExpr>(std::move(firstResult.ast)),
         unique_cast<const ArithmeticExpr>(std::move(result.second_ast))));
     //}
