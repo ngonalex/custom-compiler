@@ -1,10 +1,9 @@
 #include "abstract_syntax/abstract_syntax.h"
 #include "abstract_syntax/print_visitor_v5.h"
 #include "frontend/combinators/v1_to_v5_combinators/helpers/tuple_helpers.h"
-#include "frontend/combinators/v1_to_v5_combinators/main/tuple_creation_parser.h"
 #include "frontend/combinators/v1_to_v5_combinators/main/dereference_parser.h"
 #include "frontend/combinators/v1_to_v5_combinators/main/assignment_parser.h"
-
+#include "frontend/combinators/v1_to_v5_combinators/main/tuple_creation_parser.h"
 #include "gtest/gtest.h"
 
 #include <iostream>
