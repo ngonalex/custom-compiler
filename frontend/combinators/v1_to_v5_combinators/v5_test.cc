@@ -56,53 +56,78 @@ TEST(AssignmentParser, assignToArray) {
   AssignmentParser parser;
   ParseStatus result = parser.do_parse("z[5] = x;", 0);
 
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
+
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 9);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "z[5]=x;");
+  EXPECT_EQ(output, "z[5] = x");
 }
 
 TEST(AssignmentParser, assignToArray2) {
   AssignmentParser parser;
   ParseStatus result = parser.do_parse("a[ z + 6 + ( 4 + 5 ) ] = x;", 0);
 
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
+
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 27);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "a[z+6+(4+5)]=x;");
+  EXPECT_EQ(output, "a[((z + 6) + (4 + 5))] = x");
 }
 
 TEST(TupleCreationParser, createTuple) {
   TupleAssignmentParser parser;
   ParseStatus result = parser.do_parse("var z : int[5];", 0);
 
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
+
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 15);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "varz:int[5];");
+  EXPECT_EQ(output, "z[5]");
 }
 
 TEST(TupleCreationParser, createTuple2) {
   TupleAssignmentParser parser;
   ParseStatus result = parser.do_parse("var z : int[5 + 7 + z];", 0);
 
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
+
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 23);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "varz:int[5+7+z];");
+  EXPECT_EQ(output, "z[((5 + 7) + z)]");
 }
 
 TEST(TupleCreationParser, createTuple3) {
   TupleAssignmentParser parser;
   ParseStatus result = parser.do_parse("var z : int[5 * 2 + z];", 0);
 
+  PrintVisitor *a = new PrintVisitor();
+  result.ast->Visit(a);
+  std::string output = a->GetOutput();
+
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 23);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "varz:int[5*2+z];");
+  EXPECT_EQ(output, "z[((5 * 2) + z)]");
 }
