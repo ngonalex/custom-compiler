@@ -44,10 +44,9 @@ In /v2_tests, we mainly implemented variable assignments. program_parser.cc is o
 
 In /v3_tests, we mainly implemented loops, boolean operations, blocks, and if statements. In here our higher order functions include conditional_parser.cc, loop_parser.cc, block_parser.cc, and relation_parser.cc. 
 
-In /v4_tests, we implemented function calls
+In /v4_tests, we implemented function definitions and calls with optional arguments
 
-In /v5_tests, we implemented 
-
+In /v5_tests, we implemented tests to ensure the arrays (called tuples in the AST) are created correctly and that dereferencing works correctly.
 
 
 
