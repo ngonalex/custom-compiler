@@ -23,7 +23,7 @@ We've proud to have completed and tested up to v5. We've also added additional e
 
 Missing: Getting cache to work for v2 to v5. Cache works for basic combinators and v1 because they don't return ASTs. One solution would be to duplicate the AST nodes as they're being created, but we felt this would be too hacky of a solution and inefficient.
 
-Here is a link to our language specification
+Here is a link to our language specification (syntax based on Swift)
 https://github.ucsb.edu/CS160-S18/team-influx/issues/21
 
 
@@ -72,6 +72,8 @@ In /v4_tests, we implemented function definitions and calls with optional argume
 
 In /v5_tests, we implemented tests to ensure the arrays (called tuples in the AST) are created correctly and that dereferencing works correctly.
 
+Arithmetic expressions and relations are both handled non-trivially using a recursive descent algorithm implemented using combinators. Add/Multiply and Or/And operations are implemented recursively such that the order of operations is preserved while also allowing the AST to be generated fairly easily with data passed through the And, Or and One-or-more combinators.
+
 
 With more time, we'd like to clean up our code such that we can handle longer sequences instead of our hacky solution of having multiple "and combinators", build our parsestatus out such that every combinator/parser would get its own parse status subclass whenever there is a need for it instead of putting everything into one ParseStatus class, and we would also like to do a more efficient version of Packrat parsing that isn't memory intensive (our workaround with unique pointers). Additionally, we'd would've loved to include some non trivial error handling, and added templating in our ParseStatus. 
 
@@ -82,6 +84,7 @@ Technical problems: Getting acquainted to Bazel, learning functional programming
 Responsibilities:
 Victor helped with basic combinators, v1, finished v2, v3, and v4.
 Prabal rewrote v1 and v3 to get them working using a recursive manner, and implemented v4 and v5.
+Chandler wrote many of the tests for v4 and v5
 
 **Backend** 
 See the readme in the backend folder
