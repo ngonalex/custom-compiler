@@ -74,7 +74,7 @@ TEST(FunctionHelpers, failReturnType) {
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 0);
-  EXPECT_EQ(result.errorType, "Expecting '->'");
+  EXPECT_EQ(result.errorType, "Expecting character: -");
 }
 
 TEST(FunctionHelpers, successFunctionVariable) {
