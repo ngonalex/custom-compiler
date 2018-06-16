@@ -107,10 +107,12 @@ ParseStatus FunctionVariableParsers::do_parse(std::string inputProgram,
       intermediateValue.remainingCharacters, intermediateValue.endCharacter);
 
   intermediateValue.status = true;
-  intermediateValue.remainingCharacters = lastValue.remainingCharacters;
-  intermediateValue.parsedCharacters += lastValue.parsedCharacters;
-  intermediateValue.endCharacter = lastValue.endCharacter;
-  intermediateValue.astNodes.push_back(std::move(lastValue.ast));
+    if (lastValue.status){
+        intermediateValue.remainingCharacters = lastValue.remainingCharacters;
+        intermediateValue.parsedCharacters += lastValue.parsedCharacters;
+        intermediateValue.endCharacter = lastValue.endCharacter;
+        intermediateValue.astNodes.push_back(std::move(lastValue.ast));
+    }
 
   intermediateValue.parsedCharactersArray.erase(
       std::begin(intermediateValue.parsedCharactersArray),

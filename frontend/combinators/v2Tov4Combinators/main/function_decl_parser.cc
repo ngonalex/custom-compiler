@@ -74,18 +74,25 @@ ParseStatus FunctionDeclParser::do_parse(std::string inputProgram, int startChar
     ParseStatus result = func9.do_parse(inputProgram, endCharacter);
     
     if (result.status){
-        VariableExpr *funcNameExpr = (VariableExpr *)funcHeaderResult.astNodes[0].get();
+        VariableExpr *funcNameExpr;
+        int index = 1;
+        if (funcHeaderResult.astNodes.size() > 0){
+            funcNameExpr = (VariableExpr *)funcHeaderResult.astNodes[0].get();
+        } else {
+            funcNameExpr = (VariableExpr *)funcHeaderResult.ast.get();
+            index = 0;
+        }
         
         std::vector<std::unique_ptr<const VariableExpr>> parameters;
         std::vector<std::unique_ptr<const Statement>> block;
         
         const std::string funcNameStr = funcNameExpr->name();
         
-        for (long i = 1; i < funcHeaderResult.astNodes.size(); i++){
+        for (long i = index; i < funcHeaderResult.astNodes.size(); i++){
             parameters.push_back(unique_cast<const VariableExpr>(std::move(result.astNodes[i])));
         }
         
-        for (long i = funcHeaderResult.astNodes.size(); i < result.astNodes.size() - 1; i++){
+        for (long i = funcHeaderResult.astNodes.size(); i < result.astNodes.size() - index; i++){
             block.push_back(unique_cast<const Statement>(std::move(result.astNodes[i])));
         }
         

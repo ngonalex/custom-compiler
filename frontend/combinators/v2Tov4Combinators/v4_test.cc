@@ -89,13 +89,16 @@ TEST(FunctionHelpers, successFunctionVariable) {
 }
 
 
-TEST(FunctionHelpers, failFunctionVariable) {
+TEST(FunctionHelpers, incompleteFunctionVariable) {
   FunctionVariableParsers parser;
   ParseStatus result = parser.do_parse("victor : Integer, prabal ", 0);
 
-  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter,17);
   EXPECT_EQ(result.errorType, "");
+  EXPECT_EQ(result.remainingCharacters," prabal ");
+  EXPECT_EQ(result.parsedCharacters, "victor:Integer,");
 }
 
 TEST(FunctionHelpers, successFunctionArguments) {
@@ -110,13 +113,16 @@ TEST(FunctionHelpers, successFunctionArguments) {
 }
 
 
-TEST(FunctionHelpers, failFunctionArguments) {
+TEST(FunctionHelpers, successFunctionArguments2) {
   FunctionArgumentParsers parser;
   ParseStatus result = parser.do_parse("joj, victor,", 0);
 
-  EXPECT_EQ(result.status, false);
+  EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
+  EXPECT_EQ(result.endCharacter, 12);
   EXPECT_EQ(result.errorType, "");
+  EXPECT_EQ(result.remainingCharacters, "");
+  EXPECT_EQ(result.parsedCharacters, "joj,victor,");
 }
 
 
@@ -149,11 +155,11 @@ TEST(FunctionDeclParser, successFunctionDec2) {
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "funcvictor()->String{if(x==2){e=2;}else{f=3;}}");
   EXPECT_EQ(result.errorType, "");
-/*
+
   PrintVisitor *a = new PrintVisitor();
   result.ast->Visit(a);
   std::string output = a->GetOutput();
-  EXPECT_EQ(output, "z = 0; if (z == 0) {z = 100} else {}; z");*/
+  EXPECT_EQ(output, "funcvictor(){victorif (x == 2) {e = 2} else {f = 3}}");
 }
 
 
@@ -174,7 +180,7 @@ TEST(FunctionDeclParser, failFunctionDec2) {
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 0);
-  EXPECT_EQ(result.errorType, "Expecting character: -");
+  EXPECT_EQ(result.errorType, "Expecting character: )");
 }
 
 
