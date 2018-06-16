@@ -3,7 +3,8 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus LeftBracketOp::do_parse(std::string inputProgram,
                                     int startCharacter) {
@@ -32,3 +33,6 @@ ParseStatus RightBracketOp::do_parse(std::string inputProgram,
 
   return opParser.do_parse(inputProgram, endCharacter);
 }
+
+}  // namespace frontend
+}  // namespace cs160

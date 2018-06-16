@@ -13,8 +13,6 @@
 
 #include "gtest/gtest.h"
 
-#include <iostream>
-
 using namespace cs160::frontend;
 
 // Success Case >=

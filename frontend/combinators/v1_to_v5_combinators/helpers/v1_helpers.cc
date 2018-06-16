@@ -2,7 +2,6 @@
 #include "frontend/combinators/basic_combinators/atom_parser.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 
-#include <iostream>
 #include <string>  // std::string, std::stoi
 
 #define super NullParser

@@ -9,8 +9,8 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus FunctionCallParser::do_parse(std::string inputProgram,
                                          int startCharacter) {
@@ -74,3 +74,6 @@ ParseStatus FunctionCallParser::do_parse(std::string inputProgram,
 
   return result;
 }
+
+}  // namespace frontend
+}  // namespace cs160

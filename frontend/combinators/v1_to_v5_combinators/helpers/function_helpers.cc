@@ -10,7 +10,8 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus CommaOp::do_parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
@@ -159,3 +160,6 @@ ParseStatus FunctionArgumentParsers::do_parse(std::string inputProgram,
 
   return intermediateValue;
 }
+
+}  // namespace frontend
+}  // namespace cs160
