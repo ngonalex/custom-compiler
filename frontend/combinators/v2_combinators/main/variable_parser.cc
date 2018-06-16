@@ -9,9 +9,9 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
-
+namespace cs160 {
+namespace frontend {
+  
 ParseStatus VariableParser::do_parse(std::string inputProgram,
                                      int startCharacter) {
   int endCharacter = startCharacter;
@@ -49,3 +49,6 @@ ParseStatus VariableParser::do_parse(std::string inputProgram,
 
   return result;
 }
+
+}  // namespace frontend
+}  // namespace cs160

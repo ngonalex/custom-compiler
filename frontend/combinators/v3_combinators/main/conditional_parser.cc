@@ -7,7 +7,6 @@
 #include "frontend/combinators/v3_combinators/main/conditional_parser.h"  // cs160::frontend::ConditionalParser
 #include "frontend/combinators/v3_combinators/main/or_relation_parser.h"  // cs160::frontend::RelationParser
 
-#include <iostream>
 #include <string>  // std::string, std::stoi
 
 /*
@@ -23,8 +22,8 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus ConditionalParser::do_parse(std::string inputProgram,
                                         int startCharacter) {
@@ -124,3 +123,6 @@ ParseStatus ConditionalParser::do_parse(std::string inputProgram,
 
   return result;
 }
+
+}  // namespace frontend
+}  // namespace cs160

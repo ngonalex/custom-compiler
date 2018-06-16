@@ -2,7 +2,8 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus SingleDigitParser::do_parse(std::string inputProgram,
                                         int startCharacter) {
@@ -25,3 +26,8 @@ ParseStatus SingleDigitParser::do_parse(std::string inputProgram,
   }
   return status;
 }
+
+
+
+}  // namespace frontend
+}  // namespace cs160

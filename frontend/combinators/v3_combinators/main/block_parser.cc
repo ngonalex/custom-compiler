@@ -2,7 +2,6 @@
 #include "frontend/combinators/basic_combinators/one_or_more_combinator.h"
 #include "frontend/combinators/v3_combinators/main/statement_parser.h"  // cs160::frontend::StatementParser
 
-#include <iostream>
 #include <string>  // std::string, std::stoi
 
 /*
@@ -18,8 +17,8 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus BlockParser::do_parse(std::string inputProgram,
                                   int startCharacter) {
@@ -41,3 +40,6 @@ ParseStatus BlockParser::do_parse(std::string inputProgram,
 
   return result;
 }
+
+}  // namespace frontend
+}  // namespace cs160

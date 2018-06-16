@@ -8,8 +8,9 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
+
+namespace cs160 {
+namespace frontend {
 
 ParseStatus MulDivExprParser::do_parse(std::string inputProgram,
                                        int startCharacter) {
@@ -77,3 +78,6 @@ std::unique_ptr<const ArithmeticExpr> MulDivExprParser::make_node(
     return nullptr;
   }
 }
+
+}  // namespace frontend
+}  // namespace cs160

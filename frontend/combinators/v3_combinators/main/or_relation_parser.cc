@@ -7,8 +7,8 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus OrRelationParser::do_parse(std::string inputProgram,
                                        int startCharacter) {
@@ -68,3 +68,6 @@ std::unique_ptr<const LogicalOrExpr> OrRelationParser::make_node(
   return make_unique<LogicalOrExpr>(std::move(first_leaf),
                                     std::move(second_leaf));
 }
+
+}  // namespace frontend
+}  // namespace cs160

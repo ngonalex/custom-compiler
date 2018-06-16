@@ -5,14 +5,9 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
 
-/*
-        ae -> num_parser  ||  ae add_sub_op ae  || open_paren ae add_sub_op ae
-   close_paren
-                    ||  ae mul_div_op ae  || open_paren ae mul_div_op ae
-   close_paren
-*/
+namespace cs160 {
+namespace frontend {
 
 ParseStatus ArithExprParser::do_parse(std::string inputProgram,
                                       int startCharacter) {
@@ -32,3 +27,6 @@ ParseStatus ArithExprParser::do_parse(std::string inputProgram,
 
   return aeParseResult;
 }
+
+}  // namespace frontend
+}  // namespace cs160

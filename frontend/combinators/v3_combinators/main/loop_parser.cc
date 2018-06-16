@@ -8,7 +8,6 @@
 #include "frontend/combinators/v3_combinators/main/or_relation_parser.h"
 #include "frontend/combinators/v3_combinators/main/relation_body.h"
 
-#include <iostream>
 #include <string>  // std::string, std::stoi
 
 /*
@@ -26,8 +25,8 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus LoopParser::do_parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
@@ -145,3 +144,6 @@ ParseStatus LoopParser::do_parse(std::string inputProgram, int startCharacter) {
     return super::fail(inputProgram, endCharacter);
   }
 }
+
+}  // namespace frontend
+}  // namespace cs160

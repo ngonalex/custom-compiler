@@ -4,13 +4,12 @@
 #include "frontend/combinators/basic_combinators/atom_parser.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 
-#include <iostream>
-
 #include <string>  // std::string, std::stoi
 
 #define super NullParser
 
-using namespace cs160::frontend;
+namespace cs160 {
+namespace frontend {
 
 std::string errorMessage = "Expected relational operator";
 
@@ -362,3 +361,6 @@ ParseStatus WhileKeyword::do_parse(std::string inputProgram,
   }
   return result;
 }
+
+}  // namespace frontend
+}  // namespace cs160

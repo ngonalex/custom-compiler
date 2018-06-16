@@ -6,7 +6,6 @@
 #include "frontend/combinators/v3_combinators/main/conditional_parser.h"  // cs160::frontend::ConditionalParser
 #include "frontend/combinators/v3_combinators/main/loop_parser.h"  // cs160::frontend::LoopParser
 
-#include <iostream>
 #include <string>  // std::string, std::stoi
 
 /*
@@ -22,8 +21,8 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus StatementParser::do_parse(std::string inputProgram,
                                       int startCharacter) {
@@ -59,3 +58,6 @@ ParseStatus StatementParser::do_parse(std::string inputProgram,
 
   return result;
 }
+
+}  // namespace frontend
+}  // namespace cs160

@@ -8,8 +8,8 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus WordParser::do_parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
@@ -58,3 +58,6 @@ ParseStatus WordParser::do_parse(std::string inputProgram, int startCharacter) {
 
   return result;
 }
+
+}  // namespace frontend
+}  // namespace cs160

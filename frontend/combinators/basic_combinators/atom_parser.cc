@@ -1,6 +1,8 @@
 #include "frontend/combinators/basic_combinators/atom_parser.h"
-#include <iostream>
-using namespace cs160::frontend;
+
+namespace cs160 {
+namespace frontend {
+
 
 ParseStatus AtomParser::do_parse(std::string inputProgram, int startCharacter) {
   std::string errorMessage = "Expecting character: ";
@@ -30,5 +32,5 @@ ParseStatus AtomParser::do_parse(std::string inputProgram, int startCharacter) {
   return result;
 }
 
-// NUM and Operator
-//
+}  // namespace frontend
+}  // namespace cs160

@@ -8,8 +8,8 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus AddSubExprParser::do_parse(std::string inputProgram,
                                        int startCharacter) {
@@ -77,3 +77,7 @@ std::unique_ptr<const ArithmeticExpr> AddSubExprParser::make_node(
     return nullptr;
   }
 }
+
+
+}  // namespace frontend
+}  // namespace cs160
