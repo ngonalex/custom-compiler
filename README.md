@@ -53,6 +53,8 @@ In /v5_tests, we implemented
 
 **Combinator Library**
 
+
+
 **Basic Combinators**
 
 and_parser (sequence parser) = and_combinator.cc (sequence parser)
@@ -64,7 +66,10 @@ or combinator = or_combinator.cc
 parse status (results to all our combinators/parser) = parsestatus.h 
 
 
+
 **Cacheing**
+
+Refer to "missing" section.
 
 **Non-trivial (recursive) handling of arithmetic expression and relations**
 
