@@ -6,16 +6,16 @@
 #include "gtest/gtest.h"
 #include "utility/memory.h"
 
-using cs160::abstract_syntax::backend::AstVisitor;
-using cs160::abstract_syntax::backend::ArithmeticExpr;
-using cs160::abstract_syntax::backend::IntegerExpr;
 using cs160::abstract_syntax::backend::AddExpr;
-using cs160::abstract_syntax::backend::SubtractExpr;
+using cs160::abstract_syntax::backend::ArithmeticExpr;
+using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::DivideExpr;
+using cs160::abstract_syntax::backend::IntegerExpr;
 using cs160::abstract_syntax::backend::MultiplyExpr;
+using cs160::abstract_syntax::backend::SubtractExpr;
 using cs160::backend::LowererVisitor;
 
-class LowererTestV1 : public ::testing::Test{
+class LowererTestV1 : public ::testing::Test {
  protected:
   LowererVisitor lowerer_;
 };

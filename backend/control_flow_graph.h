@@ -1,13 +1,13 @@
 #ifndef BACKEND_CONTROL_FLOW_GRAPH_H_
 #define BACKEND_CONTROL_FLOW_GRAPH_H_
 
-#include <vector>
-#include <utility>
 #include <algorithm>
 #include <string>
+#include <utility>
+#include <vector>
 
-#include "utility/memory.h"
 #include "backend/ir.h"
+#include "utility/memory.h"
 
 using cs160::make_unique;
 
@@ -16,23 +16,33 @@ namespace backend {
 
 // A CFG can be composed of different block types
 enum BlockType {
-  CONDITIONAL_BLOCK, LOOP_BLOCK,
-  FUNCTION_BLOCK, TRUE_BLOCK,
-  FALSE_BLOCK, END_BLOCK, NO_BLOCK_TYPE, ERROR_TYPE
+  CONDITIONAL_BLOCK,
+  LOOP_BLOCK,
+  FUNCTION_BLOCK,
+  TRUE_BLOCK,
+  FALSE_BLOCK,
+  END_BLOCK,
+  NO_BLOCK_TYPE,
+  ERROR_TYPE
 };
 
 enum EdgeType {
-  CONDITIONAL_TRUE, CONDITIONAL_FALSE,
-  CONDITIONAL_TRUE_RETURN, CONDITIONAL_FALSE_RETURN,
-  LOOP_TRUE, LOOP_FALSE, LOOP_RETURN,
+  CONDITIONAL_TRUE,
+  CONDITIONAL_FALSE,
+  CONDITIONAL_TRUE_RETURN,
+  CONDITIONAL_FALSE_RETURN,
+  LOOP_TRUE,
+  LOOP_FALSE,
+  LOOP_RETURN,
   TYPELESS_EDGE
 };
 struct Edge {
   std::pair<int, int> edge_pair = std::make_pair(0, 0);
   EdgeType edge_type;
-  Edge(std::pair<int, int> edge_input,
-    EdgeType edge_type_input) : edge_pair(edge_input)
-    { edge_type = edge_type_input; }
+  Edge(std::pair<int, int> edge_input, EdgeType edge_type_input)
+      : edge_pair(edge_input) {
+    edge_type = edge_type_input;
+  }
 };
 
 // Individual nodes in the CGF
@@ -41,8 +51,8 @@ struct Edge {
 class ControlFlowGraphNode {
  public:
   ControlFlowGraphNode();
-  explicit ControlFlowGraphNode(std::vector
-  <std::unique_ptr<struct ThreeAddressCode>>);
+  explicit ControlFlowGraphNode(
+      std::vector<std::unique_ptr<struct ThreeAddressCode>>);
   std::vector<ThreeAddressCode *> GetLocalBlock() {
     std::vector<ThreeAddressCode *> return_tac;
     for (auto &iter : localblock_) {
@@ -55,21 +65,13 @@ class ControlFlowGraphNode {
   }
   void CreateCFG(std::vector<std::unique_ptr<struct ThreeAddressCode>>);
   ControlFlowGraphNode(ControlFlowGraphNode &copy);
-  int GetCreationOrder() {
-    return creation_order;
-  }
-  BlockType GetBlockType() {
-    return blocktype_;
-  }
-  ControlFlowGraphNode& operator=(ControlFlowGraphNode &copy);
+  int GetCreationOrder() { return creation_order; }
+  BlockType GetBlockType() { return blocktype_; }
+  ControlFlowGraphNode &operator=(ControlFlowGraphNode &copy);
   ControlFlowGraphNode operator=(ControlFlowGraphNode copy);
   void SetLocalBlock(std::vector<std::unique_ptr<struct ThreeAddressCode>>);
-  void SetCreationOrder(int order) {
-    creation_order = order;
-  }
-  void SetBlockType(BlockType settype) {
-    blocktype_ = settype;
-  }
+  void SetCreationOrder(int order) { creation_order = order; }
+  void SetBlockType(BlockType settype) { blocktype_ = settype; }
   void DebugNode();
 
  private:
@@ -81,8 +83,8 @@ class ControlFlowGraphNode {
 class ControlFlowGraph {
  public:
   ControlFlowGraph();
-  explicit ControlFlowGraph(std::vector
-  <std::unique_ptr<struct ThreeAddressCode>>);
+  explicit ControlFlowGraph(
+      std::vector<std::unique_ptr<struct ThreeAddressCode>>);
   std::vector<std::unique_ptr<ControlFlowGraphNode>> GetRoot() {
     return std::move(cfg_nodes_);
   }

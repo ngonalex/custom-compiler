@@ -68,3 +68,5 @@ Technical problems: Getting acquainted to Bazel, learning functional programming
 Responsibilities:
 Victor finished v2, helped with basic combinators, v1, v3, and v4.
 
+**Backend** 
+See the readme in the backend folder

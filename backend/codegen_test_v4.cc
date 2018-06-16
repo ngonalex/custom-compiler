@@ -1,34 +1,34 @@
 #include <stdio.h>
 
+#include <array>
 #include <cstdio>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
 #include <string>
-#include <array>
 
-#include "backend/code_gen.h"
 #include "abstract_syntax/abstract_syntax.h"
-#include "backend/lowerer_visitor.h"
+#include "backend/code_gen.h"
 #include "backend/ir.h"
-#include "utility/memory.h"
+#include "backend/lowerer_visitor.h"
 #include "gtest/gtest.h"
+#include "utility/memory.h"
 
-using cs160::abstract_syntax::backend::AstVisitor;
-using cs160::abstract_syntax::backend::IntegerExpr;
+using cs160::make_unique;
 using cs160::abstract_syntax::backend::AddExpr;
-using cs160::abstract_syntax::backend::SubtractExpr;
-using cs160::abstract_syntax::backend::MultiplyExpr;
-using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::ArithmeticExpr;
+using cs160::abstract_syntax::backend::AstVisitor;
+using cs160::abstract_syntax::backend::DivideExpr;
+using cs160::abstract_syntax::backend::IntegerExpr;
+using cs160::abstract_syntax::backend::MultiplyExpr;
+using cs160::abstract_syntax::backend::SubtractExpr;
+using cs160::abstract_syntax::version_5::Statement;
+using cs160::backend::CodeGen;
 using cs160::backend::LowererVisitor;
 using cs160::backend::ThreeAddressCode;
-using cs160::backend::CodeGen;
 using cs160::backend::PrintFlag::PRINT_DEBUG;
 using cs160::backend::PrintFlag::PRINT_LAST_ARITHMETIC_EXPR;
 using cs160::backend::PrintFlag::PRINT_ONLY_RESULT;
-using cs160::abstract_syntax::version_5::Statement;
-using cs160::make_unique;
 
 class CodeGenTestV4 : public ::testing::Test {
  public:
@@ -42,9 +42,10 @@ class CodeGenTestV4 : public ::testing::Test {
     while (!feof(pipe.get())) {
       if (fgets(buffer.data(), 128, pipe.get()) != nullptr)
         result += buffer.data();
-      }
+    }
     return result;
   }
+
  protected:
   LowererVisitor lowerer_;
 };
@@ -60,8 +61,7 @@ TEST_F(CodeGenTestV4, BasicFunctionCallWithNoArguments) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(5),
-      make_unique<const IntegerExpr>(10));
+      make_unique<const IntegerExpr>(5), make_unique<const IntegerExpr>(10));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -92,7 +92,8 @@ TEST_F(CodeGenTestV4, BasicFunctionCallWithNoArguments) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The function returned: 15\n"
+  EXPECT_EQ(result,
+            "The function returned: 15\n"
             "The program returned: 15\n");
 }
 
@@ -109,23 +110,18 @@ TEST_F(CodeGenTestV4, BasicFunctionCallWithManyArguments) {
       make_unique<VariableExpr>("x"),
       make_unique<AddExpr>(
           make_unique<AddExpr>(
-              make_unique<AddExpr>(
-                  make_unique<VariableExpr>("a"),
-                  make_unique<VariableExpr>("b")),
-              make_unique<AddExpr>(
-                  make_unique<VariableExpr>("c"),
-                  make_unique<VariableExpr>("d"))),
+              make_unique<AddExpr>(make_unique<VariableExpr>("a"),
+                                   make_unique<VariableExpr>("b")),
+              make_unique<AddExpr>(make_unique<VariableExpr>("c"),
+                                   make_unique<VariableExpr>("d"))),
           make_unique<AddExpr>(
+              make_unique<AddExpr>(make_unique<VariableExpr>("e"),
+                                   make_unique<VariableExpr>("f")),
               make_unique<AddExpr>(
-                  make_unique<VariableExpr>("e"),
-                  make_unique<VariableExpr>("f")),
-              make_unique<AddExpr>(
-                  make_unique<AddExpr>(
-                      make_unique<VariableExpr>("g"),
-                      make_unique<VariableExpr>("h")),
-                  make_unique<AddExpr>(
-                      make_unique<VariableExpr>("j"),
-                      make_unique<VariableExpr>("k"))))))));
+                  make_unique<AddExpr>(make_unique<VariableExpr>("g"),
+                                       make_unique<VariableExpr>("h")),
+                  make_unique<AddExpr>(make_unique<VariableExpr>("j"),
+                                       make_unique<VariableExpr>("k"))))))));
   auto foo_retval = make_unique<const VariableExpr>("x");
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
@@ -161,10 +157,8 @@ TEST_F(CodeGenTestV4, BasicFunctionCallWithManyArguments) {
 
   Statement::Block statements;
 
-  statements.push_back(std::move(
-      make_unique<const AssignmentFromArithExp>(
-          make_unique<VariableExpr>("x"),
-          make_unique<IntegerExpr>(10))));
+  statements.push_back(std::move(make_unique<const AssignmentFromArithExp>(
+      make_unique<VariableExpr>("x"), make_unique<IntegerExpr>(10))));
   statements.push_back(std::move(make_unique<const FunctionCall>(
       make_unique<const VariableExpr>("foo_retval"), "foo",
       std::move(arguments))));
@@ -182,7 +176,8 @@ TEST_F(CodeGenTestV4, BasicFunctionCallWithManyArguments) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "Variable x is equal to: 10\n"
+  EXPECT_EQ(result,
+            "Variable x is equal to: 10\n"
             "The function returned: 55\n"
             "The program returned: 55\n");
 }
@@ -200,23 +195,18 @@ TEST_F(CodeGenTestV4, BasicFunctionCallWithMoreComplexArithExprAsArguments) {
       make_unique<VariableExpr>("x"),
       make_unique<AddExpr>(
           make_unique<AddExpr>(
-              make_unique<AddExpr>(
-                  make_unique<VariableExpr>("a"),
-                  make_unique<VariableExpr>("b")),
-              make_unique<AddExpr>(
-                  make_unique<VariableExpr>("c"),
-                  make_unique<VariableExpr>("d"))),
+              make_unique<AddExpr>(make_unique<VariableExpr>("a"),
+                                   make_unique<VariableExpr>("b")),
+              make_unique<AddExpr>(make_unique<VariableExpr>("c"),
+                                   make_unique<VariableExpr>("d"))),
           make_unique<AddExpr>(
+              make_unique<AddExpr>(make_unique<VariableExpr>("e"),
+                                   make_unique<VariableExpr>("f")),
               make_unique<AddExpr>(
-                  make_unique<VariableExpr>("e"),
-                  make_unique<VariableExpr>("f")),
-              make_unique<AddExpr>(
-                  make_unique<AddExpr>(
-                      make_unique<VariableExpr>("g"),
-                      make_unique<VariableExpr>("h")),
-                  make_unique<AddExpr>(
-                      make_unique<VariableExpr>("j"),
-                      make_unique<VariableExpr>("k"))))))));
+                  make_unique<AddExpr>(make_unique<VariableExpr>("g"),
+                                       make_unique<VariableExpr>("h")),
+                  make_unique<AddExpr>(make_unique<VariableExpr>("j"),
+                                       make_unique<VariableExpr>("k"))))))));
   auto foo_retval = make_unique<const VariableExpr>("x");
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
@@ -240,28 +230,22 @@ TEST_F(CodeGenTestV4, BasicFunctionCallWithMoreComplexArithExprAsArguments) {
 
   auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
   arguments.push_back(std::move(make_unique<const AddExpr>(
-      make_unique<IntegerExpr>(-10),
-      make_unique<IntegerExpr>(11))));
+      make_unique<IntegerExpr>(-10), make_unique<IntegerExpr>(11))));
   arguments.push_back(std::move(make_unique<const SubtractExpr>(
-      make_unique<IntegerExpr>(25),
-      make_unique<IntegerExpr>(23))));
+      make_unique<IntegerExpr>(25), make_unique<IntegerExpr>(23))));
   arguments.push_back(std::move(make_unique<const MultiplyExpr>(
-      make_unique<IntegerExpr>(-3),
-      make_unique<IntegerExpr>(-1))));
+      make_unique<IntegerExpr>(-3), make_unique<IntegerExpr>(-1))));
   arguments.push_back(std::move(make_unique<const DivideExpr>(
-      make_unique<IntegerExpr>(120),
-      make_unique<IntegerExpr>(25))));
+      make_unique<IntegerExpr>(120), make_unique<IntegerExpr>(25))));
   arguments.push_back(std::move(make_unique<DivideExpr>(
       make_unique<AddExpr>(make_unique<IntegerExpr>(10),
                            make_unique<IntegerExpr>(5)),
       make_unique<SubtractExpr>(make_unique<IntegerExpr>(4),
                                 make_unique<IntegerExpr>(1)))));
   arguments.push_back(std::move(make_unique<const AddExpr>(
-      make_unique<VariableExpr>("x"),
-      make_unique<IntegerExpr>(-4))));
+      make_unique<VariableExpr>("x"), make_unique<IntegerExpr>(-4))));
   arguments.push_back(std::move(make_unique<const SubtractExpr>(
-      make_unique<VariableExpr>("x"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("x"), make_unique<IntegerExpr>(3))));
   arguments.push_back(std::move(make_unique<DivideExpr>(
       make_unique<AddExpr>(make_unique<VariableExpr>("x"),
                            make_unique<IntegerExpr>(14)),
@@ -272,10 +256,8 @@ TEST_F(CodeGenTestV4, BasicFunctionCallWithMoreComplexArithExprAsArguments) {
 
   Statement::Block statements;
 
-  statements.push_back(std::move(
-      make_unique<const AssignmentFromArithExp>(
-          make_unique<VariableExpr>("x"),
-          make_unique<IntegerExpr>(10))));
+  statements.push_back(std::move(make_unique<const AssignmentFromArithExp>(
+      make_unique<VariableExpr>("x"), make_unique<IntegerExpr>(10))));
   statements.push_back(std::move(make_unique<const FunctionCall>(
       make_unique<const VariableExpr>("foo_retval"), "foo",
       std::move(arguments))));
@@ -293,7 +275,8 @@ TEST_F(CodeGenTestV4, BasicFunctionCallWithMoreComplexArithExprAsArguments) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "Variable x is equal to: 10\n"
+  EXPECT_EQ(result,
+            "Variable x is equal to: 10\n"
             "The function returned: 55\n"
             "The program returned: 55\n");
 }
@@ -309,9 +292,8 @@ TEST_F(CodeGenTestV4, AssignmentsWithAdditionWorksInFunctions) {
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("x"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(10),
-          make_unique<IntegerExpr>(10)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(10),
+                           make_unique<IntegerExpr>(10)))));
 
   auto foo_retval = make_unique<const VariableExpr>("x");
 
@@ -345,7 +327,8 @@ TEST_F(CodeGenTestV4, AssignmentsWithAdditionWorksInFunctions) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The function returned: 20\n"
+  EXPECT_EQ(result,
+            "The function returned: 20\n"
             "The program returned: 20\n");
 }
 
@@ -360,9 +343,8 @@ TEST_F(CodeGenTestV4, AssignmentsWithSubtractionWorksInFunctions) {
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("x"),
-      make_unique<SubtractExpr>(
-          make_unique<IntegerExpr>(20),
-          make_unique<IntegerExpr>(10)))));
+      make_unique<SubtractExpr>(make_unique<IntegerExpr>(20),
+                                make_unique<IntegerExpr>(10)))));
 
   auto foo_retval = make_unique<const VariableExpr>("x");
 
@@ -396,7 +378,8 @@ TEST_F(CodeGenTestV4, AssignmentsWithSubtractionWorksInFunctions) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The function returned: 10\n"
+  EXPECT_EQ(result,
+            "The function returned: 10\n"
             "The program returned: 10\n");
 }
 
@@ -411,9 +394,8 @@ TEST_F(CodeGenTestV4, AssignmentsWithMultiplicationWorksInFunctions) {
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("x"),
-      make_unique<MultiplyExpr>(
-          make_unique<IntegerExpr>(20),
-          make_unique<IntegerExpr>(10)))));
+      make_unique<MultiplyExpr>(make_unique<IntegerExpr>(20),
+                                make_unique<IntegerExpr>(10)))));
 
   auto foo_retval = make_unique<const VariableExpr>("x");
 
@@ -447,7 +429,8 @@ TEST_F(CodeGenTestV4, AssignmentsWithMultiplicationWorksInFunctions) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The function returned: 200\n"
+  EXPECT_EQ(result,
+            "The function returned: 200\n"
             "The program returned: 200\n");
 }
 
@@ -462,9 +445,8 @@ TEST_F(CodeGenTestV4, AssignmentsWithDivisionWorksInFunctions) {
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("x"),
-      make_unique<DivideExpr>(
-          make_unique<IntegerExpr>(20),
-          make_unique<IntegerExpr>(10)))));
+      make_unique<DivideExpr>(make_unique<IntegerExpr>(20),
+                              make_unique<IntegerExpr>(10)))));
 
   auto foo_retval = make_unique<const VariableExpr>("x");
 
@@ -498,7 +480,8 @@ TEST_F(CodeGenTestV4, AssignmentsWithDivisionWorksInFunctions) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The function returned: 2\n"
+  EXPECT_EQ(result,
+            "The function returned: 2\n"
             "The program returned: 2\n");
 }
 
@@ -514,9 +497,8 @@ TEST_F(CodeGenTestV4,
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("x"),
-      make_unique<DivideExpr>(
-          make_unique<IntegerExpr>(20),
-          make_unique<IntegerExpr>(0)))));
+      make_unique<DivideExpr>(make_unique<IntegerExpr>(20),
+                              make_unique<IntegerExpr>(0)))));
 
   auto foo_retval = make_unique<const VariableExpr>("x");
 
@@ -570,33 +552,27 @@ TEST_F(CodeGenTestV4, ConditionalThatEvalsToTrueWorksInFunctions) {
 
   trueblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("x"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(5),
-          make_unique<IntegerExpr>(10)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(5),
+                           make_unique<IntegerExpr>(10)))));
 
   falseblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("x"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(10),
-          make_unique<IntegerExpr>(10)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(10),
+                           make_unique<IntegerExpr>(10)))));
 
   foo_statements.push_back(std::move(make_unique<const Conditional>(
-      make_unique<LogicalNotExpr>(
+      make_unique<LogicalNotExpr>(make_unique<LogicalOrExpr>(
+          make_unique<LogicalAndExpr>(
+              make_unique<LessThanExpr>(make_unique<IntegerExpr>(5),
+                                        make_unique<IntegerExpr>(10)),
+              make_unique<GreaterThanExpr>(make_unique<IntegerExpr>(-10),
+                                           make_unique<IntegerExpr>(10))),
           make_unique<LogicalOrExpr>(
-              make_unique<LogicalAndExpr>(
-                  make_unique<LessThanExpr>(
-                      make_unique<IntegerExpr>(5),
-                      make_unique<IntegerExpr>(10)),
-                  make_unique<GreaterThanExpr>(
-                      make_unique<IntegerExpr>(-10),
-                      make_unique<IntegerExpr>(10))),
-              make_unique<LogicalOrExpr>(
-                  make_unique<EqualToExpr>(
-                      make_unique<IntegerExpr>(-500),
-                      make_unique<IntegerExpr>(500)),
-                  make_unique<GreaterThanEqualToExpr>(
-                      make_unique<IntegerExpr>(-10000),
-                      make_unique<IntegerExpr>(100000))))),
+              make_unique<EqualToExpr>(make_unique<IntegerExpr>(-500),
+                                       make_unique<IntegerExpr>(500)),
+              make_unique<GreaterThanEqualToExpr>(
+                  make_unique<IntegerExpr>(-10000),
+                  make_unique<IntegerExpr>(100000))))),
       std::move(trueblock), std::move(falseblock))));
 
   auto foo_retval = make_unique<const VariableExpr>("x");
@@ -631,8 +607,9 @@ TEST_F(CodeGenTestV4, ConditionalThatEvalsToTrueWorksInFunctions) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The function returned: 15\n"
-           "The program returned: 15\n");
+  EXPECT_EQ(result,
+            "The function returned: 15\n"
+            "The program returned: 15\n");
 }
 
 // int foo() {
@@ -652,33 +629,27 @@ TEST_F(CodeGenTestV4, ConditionalThatEvalsToFalseWorksInFunctions) {
 
   trueblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("x"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(5),
-          make_unique<IntegerExpr>(10)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(5),
+                           make_unique<IntegerExpr>(10)))));
 
   falseblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("x"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(10),
-          make_unique<IntegerExpr>(10)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(10),
+                           make_unique<IntegerExpr>(10)))));
 
   foo_statements.push_back(std::move(make_unique<const Conditional>(
-      make_unique<LogicalNotExpr>(
+      make_unique<LogicalNotExpr>(make_unique<LogicalOrExpr>(
+          make_unique<LogicalAndExpr>(
+              make_unique<LessThanExpr>(make_unique<IntegerExpr>(5),
+                                        make_unique<IntegerExpr>(10)),
+              make_unique<GreaterThanExpr>(make_unique<IntegerExpr>(-10),
+                                           make_unique<IntegerExpr>(10))),
           make_unique<LogicalOrExpr>(
-              make_unique<LogicalAndExpr>(
-                  make_unique<LessThanExpr>(
-                      make_unique<IntegerExpr>(5),
-                      make_unique<IntegerExpr>(10)),
-                  make_unique<GreaterThanExpr>(
-                      make_unique<IntegerExpr>(-10),
-                      make_unique<IntegerExpr>(10))),
-              make_unique<LogicalOrExpr>(
-                  make_unique<EqualToExpr>(
-                      make_unique<IntegerExpr>(500),
-                      make_unique<IntegerExpr>(500)),
-                  make_unique<GreaterThanEqualToExpr>(
-                      make_unique<IntegerExpr>(-10000),
-                      make_unique<IntegerExpr>(100000))))),
+              make_unique<EqualToExpr>(make_unique<IntegerExpr>(500),
+                                       make_unique<IntegerExpr>(500)),
+              make_unique<GreaterThanEqualToExpr>(
+                  make_unique<IntegerExpr>(-10000),
+                  make_unique<IntegerExpr>(100000))))),
       std::move(trueblock), std::move(falseblock))));
 
   auto foo_retval = make_unique<const VariableExpr>("x");
@@ -713,8 +684,9 @@ TEST_F(CodeGenTestV4, ConditionalThatEvalsToFalseWorksInFunctions) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The function returned: 20\n"
-           "The program returned: 20\n");
+  EXPECT_EQ(result,
+            "The function returned: 20\n"
+            "The program returned: 20\n");
 }
 
 // int foo() {
@@ -752,57 +724,48 @@ TEST_F(CodeGenTestV4, NestedConditionalThatEvalsTrueThenTrueFunction) {
 
   truebranchinnerblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("z"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(10),
-          make_unique<IntegerExpr>(10)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(10),
+                           make_unique<IntegerExpr>(10)))));
 
   truebranchinnerblock2.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("z"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(-10),
-          make_unique<IntegerExpr>(-10)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(-10),
+                           make_unique<IntegerExpr>(-10)))));
 
   falsebranchinnerblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("z"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(-50),
-          make_unique<IntegerExpr>(-50)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(-50),
+                           make_unique<IntegerExpr>(-50)))));
 
-  falsebranchinnerblock2.push_back(std::move(
-      make_unique<AssignmentFromArithExp>(
+  falsebranchinnerblock2.push_back(
+      std::move(make_unique<AssignmentFromArithExp>(
           make_unique<VariableExpr>("z"),
-          make_unique<AddExpr>(
-              make_unique<IntegerExpr>(-100),
-              make_unique<IntegerExpr>(100)))));
+          make_unique<AddExpr>(make_unique<IntegerExpr>(-100),
+                               make_unique<IntegerExpr>(100)))));
 
   trueouterblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("z"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(5),
-          make_unique<IntegerExpr>(10)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(5),
+                           make_unique<IntegerExpr>(10)))));
 
   trueouterblock.push_back(std::move(make_unique<const Conditional>(
-      make_unique<LessThanEqualToExpr>(
-          make_unique<VariableExpr>("z"),
-          make_unique<IntegerExpr>(15)),
+      make_unique<LessThanEqualToExpr>(make_unique<VariableExpr>("z"),
+                                       make_unique<IntegerExpr>(15)),
       std::move(truebranchinnerblock), std::move(truebranchinnerblock2))));
 
   falseouterblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("z"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(10),
-          make_unique<IntegerExpr>(10)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(10),
+                           make_unique<IntegerExpr>(10)))));
 
   falseouterblock.push_back(std::move(make_unique<const Conditional>(
-      make_unique<LessThanEqualToExpr>(
-          make_unique<VariableExpr>("z"),
-          make_unique<IntegerExpr>(15)),
+      make_unique<LessThanEqualToExpr>(make_unique<VariableExpr>("z"),
+                                       make_unique<IntegerExpr>(15)),
       std::move(falsebranchinnerblock), std::move(falsebranchinnerblock2))));
 
   foo_statements.push_back(std::move(make_unique<const Conditional>(
-      make_unique<LessThanEqualToExpr>(
-          make_unique<VariableExpr>("z"),
-          make_unique<IntegerExpr>(10)),
+      make_unique<LessThanEqualToExpr>(make_unique<VariableExpr>("z"),
+                                       make_unique<IntegerExpr>(10)),
       std::move(trueouterblock), std::move(falseouterblock))));
 
   auto foo_retval = make_unique<const VariableExpr>("z");
@@ -837,8 +800,9 @@ TEST_F(CodeGenTestV4, NestedConditionalThatEvalsTrueThenTrueFunction) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The function returned: 20\n"
-           "The program returned: 20\n");
+  EXPECT_EQ(result,
+            "The function returned: 20\n"
+            "The program returned: 20\n");
 }
 
 // int foo() {
@@ -876,57 +840,48 @@ TEST_F(CodeGenTestV4, NestedConditionalThatEvalsTrueThenFalseFunction) {
 
   truebranchinnerblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("z"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(10),
-          make_unique<IntegerExpr>(10)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(10),
+                           make_unique<IntegerExpr>(10)))));
 
   truebranchinnerblock2.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("z"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(-10),
-          make_unique<IntegerExpr>(-10)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(-10),
+                           make_unique<IntegerExpr>(-10)))));
 
   falsebranchinnerblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("z"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(-50),
-          make_unique<IntegerExpr>(-50)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(-50),
+                           make_unique<IntegerExpr>(-50)))));
 
-  falsebranchinnerblock2.push_back(std::move(
-      make_unique<AssignmentFromArithExp>(
+  falsebranchinnerblock2.push_back(
+      std::move(make_unique<AssignmentFromArithExp>(
           make_unique<VariableExpr>("z"),
-          make_unique<AddExpr>(
-              make_unique<IntegerExpr>(-100),
-              make_unique<IntegerExpr>(100)))));
+          make_unique<AddExpr>(make_unique<IntegerExpr>(-100),
+                               make_unique<IntegerExpr>(100)))));
 
   trueouterblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("z"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(5),
-          make_unique<IntegerExpr>(10)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(5),
+                           make_unique<IntegerExpr>(10)))));
 
   trueouterblock.push_back(std::move(make_unique<const Conditional>(
-      make_unique<LessThanExpr>(
-          make_unique<VariableExpr>("z"),
-          make_unique<IntegerExpr>(15)),
+      make_unique<LessThanExpr>(make_unique<VariableExpr>("z"),
+                                make_unique<IntegerExpr>(15)),
       std::move(truebranchinnerblock), std::move(truebranchinnerblock2))));
 
   falseouterblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("z"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(10),
-          make_unique<IntegerExpr>(10)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(10),
+                           make_unique<IntegerExpr>(10)))));
 
   falseouterblock.push_back(std::move(make_unique<const Conditional>(
-      make_unique<LessThanEqualToExpr>(
-          make_unique<VariableExpr>("z"),
-          make_unique<IntegerExpr>(15)),
+      make_unique<LessThanEqualToExpr>(make_unique<VariableExpr>("z"),
+                                       make_unique<IntegerExpr>(15)),
       std::move(falsebranchinnerblock), std::move(falsebranchinnerblock2))));
 
   foo_statements.push_back(std::move(make_unique<const Conditional>(
-      make_unique<LessThanEqualToExpr>(
-          make_unique<VariableExpr>("z"),
-          make_unique<IntegerExpr>(10)),
+      make_unique<LessThanEqualToExpr>(make_unique<VariableExpr>("z"),
+                                       make_unique<IntegerExpr>(10)),
       std::move(trueouterblock), std::move(falseouterblock))));
 
   auto foo_retval = make_unique<const VariableExpr>("z");
@@ -961,8 +916,9 @@ TEST_F(CodeGenTestV4, NestedConditionalThatEvalsTrueThenFalseFunction) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The function returned: -20\n"
-           "The program returned: -20\n");
+  EXPECT_EQ(result,
+            "The function returned: -20\n"
+            "The program returned: -20\n");
 }
 
 // int foo() {
@@ -1000,57 +956,48 @@ TEST_F(CodeGenTestV4, NestedConditionalThatEvalsFalseThenTrueFunction) {
 
   truebranchinnerblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("z"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(10),
-          make_unique<IntegerExpr>(10)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(10),
+                           make_unique<IntegerExpr>(10)))));
 
   truebranchinnerblock2.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("z"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(-10),
-          make_unique<IntegerExpr>(-10)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(-10),
+                           make_unique<IntegerExpr>(-10)))));
 
   falsebranchinnerblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("z"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(-50),
-          make_unique<IntegerExpr>(-50)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(-50),
+                           make_unique<IntegerExpr>(-50)))));
 
-  falsebranchinnerblock2.push_back(std::move(
-      make_unique<AssignmentFromArithExp>(
+  falsebranchinnerblock2.push_back(
+      std::move(make_unique<AssignmentFromArithExp>(
           make_unique<VariableExpr>("z"),
-          make_unique<AddExpr>(
-              make_unique<IntegerExpr>(-100),
-              make_unique<IntegerExpr>(100)))));
+          make_unique<AddExpr>(make_unique<IntegerExpr>(-100),
+                               make_unique<IntegerExpr>(100)))));
 
   trueouterblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("z"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(5),
-          make_unique<IntegerExpr>(10)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(5),
+                           make_unique<IntegerExpr>(10)))));
 
   trueouterblock.push_back(std::move(make_unique<const Conditional>(
-      make_unique<LessThanEqualToExpr>(
-          make_unique<VariableExpr>("z"),
-          make_unique<IntegerExpr>(15)),
+      make_unique<LessThanEqualToExpr>(make_unique<VariableExpr>("z"),
+                                       make_unique<IntegerExpr>(15)),
       std::move(truebranchinnerblock), std::move(truebranchinnerblock2))));
 
   falseouterblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("z"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(10),
-          make_unique<IntegerExpr>(10)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(10),
+                           make_unique<IntegerExpr>(10)))));
 
   falseouterblock.push_back(std::move(make_unique<const Conditional>(
-      make_unique<LessThanEqualToExpr>(
-          make_unique<VariableExpr>("z"),
-          make_unique<IntegerExpr>(20)),
+      make_unique<LessThanEqualToExpr>(make_unique<VariableExpr>("z"),
+                                       make_unique<IntegerExpr>(20)),
       std::move(falsebranchinnerblock), std::move(falsebranchinnerblock2))));
 
   foo_statements.push_back(std::move(make_unique<const Conditional>(
-      make_unique<LessThanEqualToExpr>(
-          make_unique<VariableExpr>("z"),
-          make_unique<IntegerExpr>(10)),
+      make_unique<LessThanEqualToExpr>(make_unique<VariableExpr>("z"),
+                                       make_unique<IntegerExpr>(10)),
       std::move(trueouterblock), std::move(falseouterblock))));
 
   auto foo_retval = make_unique<const VariableExpr>("z");
@@ -1085,8 +1032,9 @@ TEST_F(CodeGenTestV4, NestedConditionalThatEvalsFalseThenTrueFunction) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The function returned: -100\n"
-           "The program returned: -100\n");
+  EXPECT_EQ(result,
+            "The function returned: -100\n"
+            "The program returned: -100\n");
 }
 
 // int foo() {
@@ -1124,57 +1072,48 @@ TEST_F(CodeGenTestV4, NestedConditionalThatEvalsFalseThenFalseFunction) {
 
   truebranchinnerblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("z"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(10),
-          make_unique<IntegerExpr>(10)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(10),
+                           make_unique<IntegerExpr>(10)))));
 
   truebranchinnerblock2.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("z"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(-10),
-          make_unique<IntegerExpr>(-10)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(-10),
+                           make_unique<IntegerExpr>(-10)))));
 
   falsebranchinnerblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("z"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(-50),
-          make_unique<IntegerExpr>(-50)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(-50),
+                           make_unique<IntegerExpr>(-50)))));
 
-  falsebranchinnerblock2.push_back(std::move(
-      make_unique<AssignmentFromArithExp>(
+  falsebranchinnerblock2.push_back(
+      std::move(make_unique<AssignmentFromArithExp>(
           make_unique<VariableExpr>("z"),
-          make_unique<AddExpr>(
-              make_unique<IntegerExpr>(-100),
-              make_unique<IntegerExpr>(-100)))));
+          make_unique<AddExpr>(make_unique<IntegerExpr>(-100),
+                               make_unique<IntegerExpr>(-100)))));
 
   trueouterblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("z"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(5),
-          make_unique<IntegerExpr>(10)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(5),
+                           make_unique<IntegerExpr>(10)))));
 
   trueouterblock.push_back(std::move(make_unique<const Conditional>(
-      make_unique<LessThanEqualToExpr>(
-          make_unique<VariableExpr>("z"),
-          make_unique<IntegerExpr>(15)),
+      make_unique<LessThanEqualToExpr>(make_unique<VariableExpr>("z"),
+                                       make_unique<IntegerExpr>(15)),
       std::move(truebranchinnerblock), std::move(truebranchinnerblock2))));
 
   falseouterblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("z"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(10),
-          make_unique<IntegerExpr>(10)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(10),
+                           make_unique<IntegerExpr>(10)))));
 
   falseouterblock.push_back(std::move(make_unique<const Conditional>(
-      make_unique<LessThanExpr>(
-          make_unique<VariableExpr>("z"),
-          make_unique<IntegerExpr>(20)),
+      make_unique<LessThanExpr>(make_unique<VariableExpr>("z"),
+                                make_unique<IntegerExpr>(20)),
       std::move(falsebranchinnerblock), std::move(falsebranchinnerblock2))));
 
   foo_statements.push_back(std::move(make_unique<const Conditional>(
-      make_unique<LessThanEqualToExpr>(
-          make_unique<VariableExpr>("z"),
-          make_unique<IntegerExpr>(10)),
+      make_unique<LessThanEqualToExpr>(make_unique<VariableExpr>("z"),
+                                       make_unique<IntegerExpr>(10)),
       std::move(trueouterblock), std::move(falseouterblock))));
 
   auto foo_retval = make_unique<const VariableExpr>("z");
@@ -1209,8 +1148,9 @@ TEST_F(CodeGenTestV4, NestedConditionalThatEvalsFalseThenFalseFunction) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The function returned: -200\n"
-           "The program returned: -200\n");
+  EXPECT_EQ(result,
+            "The function returned: -200\n"
+            "The program returned: -200\n");
 }
 
 // int foo() {
@@ -1227,19 +1167,16 @@ TEST_F(CodeGenTestV4, SimpleLoopThatIsEnteredInFunction) {
   Statement::Block loop_body;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("x"),
-      make_unique<IntegerExpr>(0))));
+      make_unique<VariableExpr>("x"), make_unique<IntegerExpr>(0))));
   auto loopbody = make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("x"),
-      make_unique<AddExpr>(
-          make_unique<VariableExpr>("x"),
-          make_unique<IntegerExpr>(1)));
+      make_unique<AddExpr>(make_unique<VariableExpr>("x"),
+                           make_unique<IntegerExpr>(1)));
   loop_body.push_back(std::move(loopbody));
 
   foo_statements.push_back(std::move(make_unique<const Loop>(
-      make_unique<LessThanExpr>(
-          make_unique<VariableExpr>("x"),
-          make_unique<IntegerExpr>(5)),
+      make_unique<LessThanExpr>(make_unique<VariableExpr>("x"),
+                                make_unique<IntegerExpr>(5)),
       std::move(loop_body))));
 
   auto foo_retval = make_unique<const VariableExpr>("x");
@@ -1270,8 +1207,9 @@ TEST_F(CodeGenTestV4, SimpleLoopThatIsEnteredInFunction) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The function returned: 5\n"
-           "The program returned: 5\n");
+  EXPECT_EQ(result,
+            "The function returned: 5\n"
+            "The program returned: 5\n");
 }
 
 // int foo() {
@@ -1288,19 +1226,16 @@ TEST_F(CodeGenTestV4, SimpleLoopThatIsNotEnteredInFunction) {
   Statement::Block loop_body;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("x"),
-      make_unique<IntegerExpr>(10))));
+      make_unique<VariableExpr>("x"), make_unique<IntegerExpr>(10))));
   auto loopbody = make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("x"),
-      make_unique<AddExpr>(
-          make_unique<VariableExpr>("x"),
-          make_unique<IntegerExpr>(1)));
+      make_unique<AddExpr>(make_unique<VariableExpr>("x"),
+                           make_unique<IntegerExpr>(1)));
   loop_body.push_back(std::move(loopbody));
 
   foo_statements.push_back(std::move(make_unique<const Loop>(
-      make_unique<LessThanExpr>(
-          make_unique<VariableExpr>("x"),
-          make_unique<IntegerExpr>(5)),
+      make_unique<LessThanExpr>(make_unique<VariableExpr>("x"),
+                                make_unique<IntegerExpr>(5)),
       std::move(loop_body))));
 
   auto foo_retval = make_unique<const VariableExpr>("x");
@@ -1331,8 +1266,9 @@ TEST_F(CodeGenTestV4, SimpleLoopThatIsNotEnteredInFunction) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The function returned: 10\n"
-           "The program returned: 10\n");
+  EXPECT_EQ(result,
+            "The function returned: 10\n"
+            "The program returned: 10\n");
 }
 
 // int foo() {
@@ -1357,54 +1293,45 @@ TEST_F(CodeGenTestV4, NestedLoopsInAFunction) {
   Statement::Block nested_loop_body;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("x"),
-      make_unique<IntegerExpr>(0))));
+      make_unique<VariableExpr>("x"), make_unique<IntegerExpr>(0))));
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("y"),
-      make_unique<IntegerExpr>(0))));
+      make_unique<VariableExpr>("y"), make_unique<IntegerExpr>(0))));
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("z"),
-      make_unique<IntegerExpr>(0))));
+      make_unique<VariableExpr>("z"), make_unique<IntegerExpr>(0))));
 
   auto nestedloopbody = make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("y"),
-      make_unique<AddExpr>(
-          make_unique<VariableExpr>("y"),
-          make_unique<IntegerExpr>(2)));
+      make_unique<AddExpr>(make_unique<VariableExpr>("y"),
+                           make_unique<IntegerExpr>(2)));
   auto nestedloopbody2 = make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("z"),
-      make_unique<AddExpr>(
-          make_unique<VariableExpr>("z"),
-          make_unique<IntegerExpr>(1)));
+      make_unique<AddExpr>(make_unique<VariableExpr>("z"),
+                           make_unique<IntegerExpr>(1)));
   nested_loop_body.push_back(std::move(nestedloopbody));
   nested_loop_body.push_back(std::move(nestedloopbody2));
 
   auto loop = make_unique<const Loop>(
-    make_unique<LessThanExpr>(
-        make_unique<VariableExpr>("y"),
-        make_unique<IntegerExpr>(4)),
-    std::move(nested_loop_body));
+      make_unique<LessThanExpr>(make_unique<VariableExpr>("y"),
+                                make_unique<IntegerExpr>(4)),
+      std::move(nested_loop_body));
 
   auto loopbody = make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("x"),
-      make_unique<AddExpr>(
-          make_unique<VariableExpr>("x"),
-          make_unique<IntegerExpr>(1)));
+      make_unique<AddExpr>(make_unique<VariableExpr>("x"),
+                           make_unique<IntegerExpr>(1)));
 
   auto loopbody2 = make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("y"),
-      make_unique<IntegerExpr>(0));
+      make_unique<VariableExpr>("y"), make_unique<IntegerExpr>(0));
 
   loop_body.push_back(std::move(loop));
   loop_body.push_back(std::move(loopbody));
   loop_body.push_back(std::move(loopbody2));
 
   foo_statements.push_back(std::move(make_unique<const Loop>(
-      make_unique<LessThanExpr>(
-          make_unique<VariableExpr>("x"),
-          make_unique<IntegerExpr>(3)),
+      make_unique<LessThanExpr>(make_unique<VariableExpr>("x"),
+                                make_unique<IntegerExpr>(3)),
       std::move(loop_body))));
 
   auto foo_retval = make_unique<const VariableExpr>("z");
@@ -1435,8 +1362,9 @@ TEST_F(CodeGenTestV4, NestedLoopsInAFunction) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The function returned: 6\n"
-           "The program returned: 6\n");
+  EXPECT_EQ(result,
+            "The function returned: 6\n"
+            "The program returned: 6\n");
 }
 
 // def fibo(int x) {
@@ -1473,40 +1401,32 @@ TEST_F(CodeGenTestV4, RecursiveFibonacciFunctionWorks) {
 
   auto arguments1 = std::vector<std::unique_ptr<const ArithmeticExpr>>();
   arguments1.push_back(std::move(make_unique<const SubtractExpr>(
-      make_unique<VariableExpr>("x"),
-      make_unique<IntegerExpr>(1))));
+      make_unique<VariableExpr>("x"), make_unique<IntegerExpr>(1))));
 
   auto arguments2 = std::vector<std::unique_ptr<const ArithmeticExpr>>();
   arguments2.push_back(std::move(make_unique<const SubtractExpr>(
-      make_unique<VariableExpr>("x"),
-      make_unique<IntegerExpr>(2))));
+      make_unique<VariableExpr>("x"), make_unique<IntegerExpr>(2))));
 
   true_fibo.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("foo_retval"),
-      make_unique<IntegerExpr>(1))));
+      make_unique<VariableExpr>("foo_retval"), make_unique<IntegerExpr>(1))));
 
   false_fibo.push_back(std::move(make_unique<const FunctionCall>(
-      make_unique<const VariableExpr>("y"), "fibo",
-      std::move(arguments1))));
+      make_unique<const VariableExpr>("y"), "fibo", std::move(arguments1))));
 
   false_fibo.push_back(std::move(make_unique<const FunctionCall>(
-      make_unique<const VariableExpr>("z"), "fibo",
-      std::move(arguments2))));
+      make_unique<const VariableExpr>("z"), "fibo", std::move(arguments2))));
 
   false_fibo.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("foo_retval"),
-      make_unique<AddExpr>(
-          make_unique<VariableExpr>("y"),
-          make_unique<VariableExpr>("z")))));
+      make_unique<AddExpr>(make_unique<VariableExpr>("y"),
+                           make_unique<VariableExpr>("z")))));
 
   fibo_body.push_back(std::move(make_unique<Conditional>(
       make_unique<LogicalOrExpr>(
-          make_unique<EqualToExpr>(
-              make_unique<VariableExpr>("x"),
-              make_unique<IntegerExpr>(1)),
-          make_unique<EqualToExpr>(
-              make_unique<VariableExpr>("x"),
-              make_unique<IntegerExpr>(2))),
+          make_unique<EqualToExpr>(make_unique<VariableExpr>("x"),
+                                   make_unique<IntegerExpr>(1)),
+          make_unique<EqualToExpr>(make_unique<VariableExpr>("x"),
+                                   make_unique<IntegerExpr>(2))),
       std::move(true_fibo), std::move(false_fibo))));
 
   auto ae = make_unique<const VariableExpr>("foo_retval");
@@ -1518,9 +1438,8 @@ TEST_F(CodeGenTestV4, RecursiveFibonacciFunctionWorks) {
   FunctionDef::Block function_defs;
   function_defs.push_back(std::move(foo_def));
 
-  auto ast = make_unique<const Program>(
-      std::move(function_defs),
-      std::move(statements), std::move(ae));
+  auto ast = make_unique<const Program>(std::move(function_defs),
+                                        std::move(statements), std::move(ae));
 
   ast->Visit(&lowerer_);
 
@@ -1532,7 +1451,6 @@ TEST_F(CodeGenTestV4, RecursiveFibonacciFunctionWorks) {
   std::string result = exec("gcc -g -static test.s -o run && ./run");
   EXPECT_EQ(result, "The program returned: 34\n");
 }
-
 
 // def fact(int bob) {
 //  if(bob >1)
@@ -1547,10 +1465,9 @@ TEST_F(CodeGenTestV4, RecursiveFibonacciFunctionWorks) {
 // ret_val = fact(bob)
 TEST_F(CodeGenTestV4, RecursiveFactorialFunctionWorks) {
   Statement::Block statements;
-  statements.push_back(std::move(
-      make_unique<const AssignmentFromArithExp>(
-          make_unique<const VariableExpr>("bob"),
-          make_unique<const IntegerExpr>(10))));
+  statements.push_back(std::move(make_unique<const AssignmentFromArithExp>(
+      make_unique<const VariableExpr>("bob"),
+      make_unique<const IntegerExpr>(10))));
 
   auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
   arguments.push_back(std::move(make_unique<const VariableExpr>("bob")));
@@ -1568,40 +1485,34 @@ TEST_F(CodeGenTestV4, RecursiveFactorialFunctionWorks) {
 
   auto arguments1 = std::vector<std::unique_ptr<const ArithmeticExpr>>();
   arguments1.push_back(std::move(make_unique<const SubtractExpr>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(1))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(1))));
 
   false_fact.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("ret_val"),
-      make_unique<IntegerExpr>(1))));
+      make_unique<VariableExpr>("ret_val"), make_unique<IntegerExpr>(1))));
 
   true_fact.push_back(std::move(make_unique<const FunctionCall>(
-      make_unique<const VariableExpr>("rob"), "fact",
-      std::move(arguments1))));
+      make_unique<const VariableExpr>("rob"), "fact", std::move(arguments1))));
 
   true_fact.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("ret_val"),
-      make_unique<MultiplyExpr>(
-          make_unique<VariableExpr>("rob"),
-          make_unique<VariableExpr>("bob")))));
+      make_unique<MultiplyExpr>(make_unique<VariableExpr>("rob"),
+                                make_unique<VariableExpr>("bob")))));
 
   fact_body.push_back(std::move(make_unique<Conditional>(
-      make_unique<GreaterThanExpr>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<GreaterThanExpr>(make_unique<VariableExpr>("bob"),
+                                   make_unique<IntegerExpr>(1)),
       std::move(true_fact), std::move(false_fact))));
 
   auto ae = make_unique<const VariableExpr>("ret_val");
   auto fact_retval = make_unique<const VariableExpr>("ret_val");
   auto fact_def = make_unique<const FunctionDef>("fact", std::move(fact_params),
-                                                std::move(fact_body),
-                                                std::move(fact_retval));
+                                                 std::move(fact_body),
+                                                 std::move(fact_retval));
 
   FunctionDef::Block function_defs;
   function_defs.push_back(std::move(fact_def));
-  auto ast = make_unique<const Program>(
-    std::move(function_defs),
-    std::move(statements), std::move(ae));
+  auto ast = make_unique<const Program>(std::move(function_defs),
+                                        std::move(statements), std::move(ae));
 
   ast->Visit(&lowerer_);
   std::ofstream file = std::ofstream("test.s");

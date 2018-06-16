@@ -55,38 +55,17 @@ enum PrintFlag {
   PRINT_PROGRAM
 };
 
-enum OperandType {
-  OP_REGISTER,
-  OP_INT
-};
+enum OperandType { OP_REGISTER, OP_INT };
 
+enum TargetType { TARGET_REGISTER, TARGET_LABEL };
 
-enum TargetType {
-  TARGET_REGISTER,
-  TARGET_LABEL
-};
-
-enum RegisterType {
-  VIRTUAL_REG,
-  VARIABLE_REG,
-  DEREF_REG,
-  NO_REG
-};
+enum RegisterType { VIRTUAL_REG, VARIABLE_REG, DEREF_REG, NO_REG };
 
 enum Scope { GLOBAL, FUNCTION };
 
-enum FlagType {
-  TYPE_FLAG,
-  EXISTENCE_FLAG,
-  SIZE_FLAG,
-  OBJECT_FLAG,
-  NO_FLAG
-};
+enum FlagType { TYPE_FLAG, EXISTENCE_FLAG, SIZE_FLAG, OBJECT_FLAG, NO_FLAG };
 
-enum VariableType {
-  LEFT_HAND_VAR,
-  RIGHT_HAND_VAR
-};
+enum VariableType { LEFT_HAND_VAR, RIGHT_HAND_VAR };
 
 class Label {
  public:
@@ -101,9 +80,9 @@ class Register {
  public:
   Register(std::string name, RegisterType type) : name_(name), type_(type) {}
   Register() : name_(""), type_(NO_REG) {}
-  std::string name() const {return name_;}
-  RegisterType type() const {return type_;}
-  void ChangeRegisterName(std::string newname) {name_ = newname;}
+  std::string name() const { return name_; }
+  RegisterType type() const { return type_; }
+  void ChangeRegisterName(std::string newname) { name_ = newname; }
 
  private:
   std::string name_;
@@ -117,8 +96,8 @@ class Operand {
   explicit Operand(Register reg) : reg_(reg), value_(0), optype_(OP_REGISTER) {
     // ASSERT (Registers can't have values )
   }
-  explicit Operand(int value) : reg_(Register()), value_(value),
-    optype_(OP_INT) {
+  explicit Operand(int value)
+      : reg_(Register()), value_(value), optype_(OP_INT) {
     // ASSERT (only ints can have values)
   }
   // explicit Operand(VariableOperand var) : reg_(Register("")),
