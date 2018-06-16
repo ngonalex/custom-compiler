@@ -62,7 +62,7 @@ V1 does two things
 
 V2 is an extension of V1 except now it needs to handle LeftHandSide variable/Dereferences present in ArithmeticExprs
 
-All V2 really is is differentiating between a LHS and a RHS variable. If it's a LHS variable signal to codegen that it needs to pop the address of the variable and load something into it.
+All V2 really is, is differentiating between a LHS and a RHS variable. If it's a LHS variable signal to codegen that it needs to pop the address of the variable and load something into it.
 If it's a RHS variable signal to codegen to load from memory and use that value in resulting calculations.
 
 **V3**
