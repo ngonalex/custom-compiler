@@ -97,6 +97,17 @@ cc_library(
         visibility = ["//visibility:public"],
 )
 
+cc_library(
+        name = "print_visitor_v5",
+        copts = ["-Wall -g"],
+        hdrs = ["print_visitor_v5.h"],
+        deps = [
+             ":abstract_syntax_tree_v5",
+             "//utility"
+        ],
+        visibility = ["//visibility:public"],
+)
+
 
 cc_test(
         name = "abstract_syntax_tree_v1_test",

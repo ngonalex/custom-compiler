@@ -4,11 +4,11 @@
 #include <sstream>
 #include <string>
 
-#include "abstract_syntax/abstract_syntax_tree_v4.h"
+#include "abstract_syntax/abstract_syntax_tree_v5.h"
 
 namespace cs160 {
 namespace abstract_syntax {
-namespace version_4 {
+namespace version_5 {
 
 class PrintVisitor : public AstVisitor {
  public:
@@ -119,10 +119,19 @@ class PrintVisitor : public AstVisitor {
     output_ << ")";
   }
 
-  void VisitAssignment(const Assignment& assignment) override {
+  void VisitAssignmentFromArithExp(
+      const AssignmentFromArithExp& assignment) override {
     assignment.lhs().Visit(this);
     output_ << " = ";
     assignment.rhs().Visit(this);
+  }
+
+  void VisitAssignmentFromNewTuple(
+      const AssignmentFromNewTuple& assignment) override {
+    assignment.lhs().Visit(this);
+    output_ << "[";
+    assignment.rhs().Visit(this);
+    output_ << "]";
   }
 
   // Might be incorrect
@@ -178,6 +187,13 @@ class PrintVisitor : public AstVisitor {
     output_ << " ); ";
   }
 
+  void VisitDereference(const Dereference& deref) override {
+    deref.lhs().Visit(this);
+    output_ << "[";
+    deref.rhs().Visit(this);
+    output_ << "]";
+  }
+
   // Might be incorrect
   void VisitProgram(const Program& program) override {
     for (auto& functions : program.function_defs()) {
@@ -195,7 +211,7 @@ class PrintVisitor : public AstVisitor {
   std::stringstream output_;
 };
 
-}  // namespace version_4
+}  // namespace version_5
 }  // namespace abstract_syntax
 }  // namespace cs160
 

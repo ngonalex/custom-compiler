@@ -12,7 +12,7 @@
 namespace cs160 {
 namespace abstract_syntax {
 
-namespace frontend = version_4;
+namespace frontend = version_5;
 namespace backend = version_5;
 
 }  // namespace abstract_syntax
