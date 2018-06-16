@@ -72,6 +72,8 @@ Refer to "missing" section.
 
 **Non-trivial (recursive) handling of arithmetic expression and relations**
 
+Arithmetic expressions and relations are both handled non-trivially using a recursive descent algorithm implemented using combinators. Add/Multiply and Or/And operations are implemented recursively such that the order of operations is preserved while also allowing the AST to be generated fairly easily with data passed through the And, Or and One-or-more combinators.
+
 
 With more time, we'd like to clean up our code such that we can handle longer sequences instead of our hacky solution of having multiple "and combinators", build our parsestatus out such that every combinator/parser would get its own parse status subclass whenever there is a need for it instead of putting everything into one ParseStatus class, and we would also like to do a more efficient version of Packrat parsing that isn't memory intensive (our workaround with unique pointers). Additionally, we'd would've loved to include some non trivial error handling, and added templating in our ParseStatus. 
 
