@@ -61,6 +61,15 @@ parse status (results to all our combinators/parser) = parsestatus.h
 
 
 
+Combinator Library
+
+Basic Combinators
+
+Cacheing
+
+Non-trivial handling of arithmetic expression and relations
+
+
 With more time, we'd like to clean up our code such that we can handle longer sequences instead of our hacky solution of having multiple "and combinators", build our parsestatus out such that every combinator/parser would get its own parse status subclass whenever there is a need for it instead of putting everything into one ParseStatus class, and we would also like to do a more efficient version of Packrat parsing that isn't memory intensive (our workaround with unique pointers). Additionally, we'd would've loved to include some non trivial error handling, and added templating in our ParseStatus.
 
 
