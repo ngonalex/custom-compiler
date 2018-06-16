@@ -30,7 +30,7 @@ TEST(FunctionHelpers, failComma) {
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 0);
-  EXPECT_EQ(result.errorType, "Expected character: ,");
+  EXPECT_EQ(result.errorType, "Expecting character: ,");
 }
 
 TEST(FunctionHelpers, SuccessfuncKeyword) {
@@ -61,20 +61,20 @@ TEST(FunctionHelpers, successReturnType) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
-  EXPECT_EQ(result.endCharacter, 1);
+  EXPECT_EQ(result.endCharacter, 2);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "->");
 }
 
 
 TEST(FunctionHelpers, failReturnType) {
-  CommaOp parser;
+  ReturnTypeOp parser;
   ParseStatus result = parser.do_parse("not ->", 0);
 
   EXPECT_EQ(result.status, false);
   EXPECT_EQ(result.startCharacter, 0);
   EXPECT_EQ(result.endCharacter, 0);
-  EXPECT_EQ(result.errorType, "Expected '->'");
+  EXPECT_EQ(result.errorType, "Expecting '->'");
 }
 
 TEST(FunctionHelpers, successFunctionVariable) {
@@ -83,7 +83,7 @@ TEST(FunctionHelpers, successFunctionVariable) {
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
-  EXPECT_EQ(result.endCharacter, 20);
+  EXPECT_EQ(result.endCharacter, 33);
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "victor:Integer,prabal:String");
 }
