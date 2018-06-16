@@ -12,6 +12,9 @@ class AndCombinator : public NullParser {
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
   NullParser* firstParser;
   NullParser* secondParser;
+
+  bool noBackwardsCompat =
+      false;  // XXX: Toggle bug fix required for v4 (but breaks v1 if enabled)
 };
 
 }  // namespace frontend

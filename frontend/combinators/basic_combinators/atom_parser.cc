@@ -3,7 +3,6 @@
 namespace cs160 {
 namespace frontend {
 
-
 ParseStatus AtomParser::do_parse(std::string inputProgram, int startCharacter) {
   std::string errorMessage = "Expecting character: ";
   errorMessage += char_to_parse;

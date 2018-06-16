@@ -1,7 +1,7 @@
 #ifndef NULL_PARSER_H
 #define NULL_PARSER_H
 
-#include <map> // std::map
+#include <map>  // std::map
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/parsestatus.h"
 

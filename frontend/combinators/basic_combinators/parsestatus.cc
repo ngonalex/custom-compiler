@@ -20,6 +20,7 @@ ParseStatus::ParseStatus(ParseStatus &&other)
   this->endCharacter = other.endCharacter;
   this->parsedCharactersArray.erase(std::begin(this->parsedCharactersArray),
                                     std::end(this->parsedCharactersArray));
+
   this->parsedCharactersArray.insert(std::end(this->parsedCharactersArray),
                                      std::begin(other.parsedCharactersArray),
                                      std::end(other.parsedCharactersArray));
