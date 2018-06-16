@@ -1,5 +1,5 @@
 
-The Really Cool Compiler for INFLUX
+Totally not a Swift Compiler
 =======================================
 
 ## Building
@@ -18,7 +18,7 @@ To run a certain subproject, you can use `bazel run` with the path and name of t
 =======================================
 Documentation
 
-We've proud to have completed and tested up to v5 with packrat parsing working. We've also added additional error handling (character number and error messages that tell you where you've failed and how to fix it sometimes).
+We've proud to have completed and tested up to v5. We've also added additional error handling (character number and error messages that tell you where you've failed and how to fix it sometimes).
 
 Here is a link to our language specification
 https://github.ucsb.edu/CS160-S18/team-influx/issues/21
