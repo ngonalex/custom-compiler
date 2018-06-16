@@ -1,8 +1,8 @@
 #include "abstract_syntax/abstract_syntax.h"
 #include "abstract_syntax/print_visitor_v5.h"
 #include "frontend/combinators/v1_to_v5_combinators/helpers/tuple_helpers.h"
-#include "frontend/combinators/v1_to_v5_combinators/main/tuple_creation_parser.h"
 #include "frontend/combinators/v1_to_v5_combinators/main/dereference_parser.h"
+#include "frontend/combinators/v1_to_v5_combinators/main/tuple_creation_parser.h"
 
 #include "gtest/gtest.h"
 
@@ -75,7 +75,8 @@ TEST(FunctionHelpers, FailRightBracket) {
 
 // TEST(FunctionHelpers, successFunctionVariable) {
 //   FunctionVariableParsers parser;
-//   ParseStatus result = parser.do_parse("victor : Integer, prabal : String", 0);
+//   ParseStatus result = parser.do_parse("victor : Integer, prabal : String",
+//   0);
 
 //   EXPECT_EQ(result.status, true);
 //   EXPECT_EQ(result.startCharacter, 0);
@@ -122,9 +123,8 @@ TEST(FunctionHelpers, FailRightBracket) {
 // TEST(FunctionDeclParser, successFunctionDec1) {
 //   FunctionDeclParser parser;
 //   ParseStatus result = parser.do_parse(
-//       "func victor(prabal :Integer, Jason : String) -> String {if(x == 2){e = "
-//       "2;} else {f = 3;}}",
-//       0);
+//       "func victor(prabal :Integer, Jason : String) -> String {if(x == 2){e =
+//       " "2;} else {f = 3;}}", 0);
 
 //   EXPECT_EQ(result.status, true);
 //   EXPECT_EQ(result.startCharacter, 0);
@@ -190,13 +190,15 @@ TEST(FunctionHelpers, FailRightBracket) {
 //   EXPECT_EQ(result.startCharacter, 0);
 //   EXPECT_EQ(result.endCharacter, 42);
 //   EXPECT_EQ(result.remainingCharacters, "");
-//   EXPECT_EQ(result.parsedCharacters, "return_val=victor(2+3*(2)+victor,jason)");
-//   EXPECT_EQ(result.errorType, "");
+//   EXPECT_EQ(result.parsedCharacters,
+//   "return_val=victor(2+3*(2)+victor,jason)"); EXPECT_EQ(result.errorType,
+//   "");
 
 //   PrintVisitor *a = new PrintVisitor();
 //   result.ast->Visit(a);
 //   std::string output = a->GetOutput();
-//   EXPECT_EQ(output, "return_val = victor ( ((2 + (3 * 2)) + victor)jason ); ");
+//   EXPECT_EQ(output, "return_val = victor ( ((2 + (3 * 2)) + victor)jason );
+//   ");
 // }
 
 // TEST(FunctionDeclParser, successFunctionCall2) {
