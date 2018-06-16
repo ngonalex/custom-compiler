@@ -1,11 +1,11 @@
 #include "abstract_syntax/abstract_syntax.h"
-#include "abstract_syntax/print_visitor_v3.h"
-#include "frontend/combinators/v1_combinators/ae.h"
-#include "frontend/combinators/v2_combinators/helpers/var_helper.h"
-#include "frontend/combinators/v2_combinators/main/assignment_parser.h"
-#include "frontend/combinators/v2_combinators/main/program_parser.h"
-#include "frontend/combinators/v2_combinators/main/variable_parser.h"
-#include "frontend/combinators/v2_combinators/main/word_parser.h"
+#include "abstract_syntax/print_visitor_v4.h"
+#include "frontend/combinators/v3_combinators/main/ae.h"
+#include "frontend/combinators/v3_combinators/helpers/var_helper.h"
+#include "frontend/combinators/v3_combinators/main/assignment_parser.h"
+#include "frontend/combinators/v3_combinators/main/program_parser.h"
+#include "frontend/combinators/v3_combinators/main/variable_parser.h"
+#include "frontend/combinators/v3_combinators/main/word_parser.h"
 #include "gtest/gtest.h"
 
 using namespace cs160::frontend;

@@ -1,4 +1,4 @@
-#include "frontend/combinators/v1_combinators/single_char.h"
+#include "frontend/combinators/v3_combinators/main/single_char.h"
 
 #define super NullParser
 

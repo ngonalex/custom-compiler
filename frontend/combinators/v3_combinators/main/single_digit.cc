@@ -1,4 +1,4 @@
-#include "frontend/combinators/v1_combinators/single_digit.h"
+#include "frontend/combinators/v3_combinators/main/single_digit.h"
 
 #define super NullParser
 

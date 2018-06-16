@@ -2,11 +2,11 @@
 
 #include "frontend/combinators/v3_combinators/main/statement_parser.h"  // cs160::frontend::StatementParser
 
-#include "frontend/combinators/v2_combinators/main/assignment_parser.h"  // cs160::frontend::AssignmentParser
+#include "frontend/combinators/v3_combinators/main/assignment_parser.h"  // cs160::frontend::AssignmentParser
 #include "frontend/combinators/v3_combinators/main/conditional_parser.h"  // cs160::frontend::ConditionalParser
 #include "frontend/combinators/v3_combinators/main/loop_parser.h"  // cs160::frontend::LoopParser
 
-#include "frontend/combinators/v4_combinators/main/function_call_parser.h" // cs160::frontend::FunctionCallParser
+#include "frontend/combinators/v3_combinators/main/function_call_parser.h" // cs160::frontend::FunctionCallParser
 
 #include <iostream>
 #include <string>  // std::string, std::stoi

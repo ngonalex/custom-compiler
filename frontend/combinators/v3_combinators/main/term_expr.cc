@@ -1,11 +1,11 @@
-#include "frontend/combinators/v1_combinators/term_expr.h"
+#include "frontend/combinators/v3_combinators/main/term_expr.h"
 #include "frontend/combinators/basic_combinators/and_combinator.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
-#include "frontend/combinators/v2_combinators/main/word_parser.h"
+#include "frontend/combinators/v3_combinators/main/word_parser.h"
 
-#include "frontend/combinators/v1_combinators/add_sub_expr.h"
-#include "frontend/combinators/v1_combinators/helpers/v1_helpers.h"
-#include "frontend/combinators/v1_combinators/num_parser.h"
+#include "frontend/combinators/v3_combinators/main/add_sub_expr.h"
+#include "frontend/combinators/v3_combinators/helpers/v1_helpers.h"
+#include "frontend/combinators/v3_combinators/main/num_parser.h"
 
 #define super NullParser
 

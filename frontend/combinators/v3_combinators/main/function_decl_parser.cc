@@ -1,11 +1,11 @@
-#include "frontend/combinators/v4_combinators/main/function_decl_parser.h"
+#include "frontend/combinators/v3_combinators/main/function_decl_parser.h"
 #include "frontend/combinators/basic_combinators/and_combinator.h"
-#include "frontend/combinators/v1_combinators/helpers/v1_helpers.h"
-#include "frontend/combinators/v2_combinators/helpers/var_helper.h"
-#include "frontend/combinators/v2_combinators/main/word_parser.h"
+#include "frontend/combinators/v3_combinators/helpers/v1_helpers.h"
+#include "frontend/combinators/v3_combinators/helpers/var_helper.h"
+#include "frontend/combinators/v3_combinators/main/word_parser.h"
 #include "frontend/combinators/v3_combinators/helpers/relational_helper.h"
 #include "frontend/combinators/v3_combinators/main/block_parser.h"
-#include "frontend/combinators/v4_combinators/helpers/function_helpers.h"
+#include "frontend/combinators/v3_combinators/helpers/function_helpers.h"
 
 #define super NullParser
 

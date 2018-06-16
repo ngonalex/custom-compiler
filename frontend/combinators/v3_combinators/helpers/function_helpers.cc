@@ -1,12 +1,12 @@
-#include "frontend/combinators/v4_combinators/helpers/function_helpers.h"
+#include "frontend/combinators/v3_combinators/helpers/function_helpers.h"
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/and_combinator.h"
 #include "frontend/combinators/basic_combinators/atom_parser.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 #include "frontend/combinators/basic_combinators/zero_or_more_combinator.h"
-#include "frontend/combinators/v1_combinators/ae.h"
-#include "frontend/combinators/v2_combinators/helpers/var_helper.h"
-#include "frontend/combinators/v2_combinators/main/word_parser.h"
+#include "frontend/combinators/v3_combinators/main/ae.h"
+#include "frontend/combinators/v3_combinators/helpers/var_helper.h"
+#include "frontend/combinators/v3_combinators/main/word_parser.h"
 
 #define super NullParser
 

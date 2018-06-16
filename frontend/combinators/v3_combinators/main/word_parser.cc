@@ -1,10 +1,10 @@
-#include "frontend/combinators/v2_combinators/main/word_parser.h"
+#include "frontend/combinators/v3_combinators/main/word_parser.h"
 #include <string>  // std::string, std::stoi
 #include "frontend/combinators/basic_combinators/and_combinator.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 #include "frontend/combinators/basic_combinators/zero_or_more_combinator.h"
-#include "frontend/combinators/v1_combinators/single_char.h"
-#include "frontend/combinators/v1_combinators/single_digit.h"
+#include "frontend/combinators/v3_combinators/main/single_char.h"
+#include "frontend/combinators/v3_combinators/main/single_digit.h"
 
 #define super NullParser
 
