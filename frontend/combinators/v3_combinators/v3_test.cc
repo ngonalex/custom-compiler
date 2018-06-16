@@ -629,8 +629,8 @@ TEST(StatementParser, sucessWhileLoop2) {
 
 TEST(ProgramParser, sucessProgramParser1) {
   ProgramParser parser;
-  ParseStatus result = parser.do_parse("var z : Integer = 0; if (z == 0) { z = 100;} x;",
-0);
+  ParseStatus result =
+      parser.do_parse("var z : Integer = 0; if (z == 0) { z = 100;} x;", 0);
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);
@@ -665,8 +665,8 @@ TEST(ProgramParser, sucessProgramParser2) {
 
 TEST(ProgramParser, sucessProgramParser3) {
   ProgramParser parser;
-  ParseStatus result = parser.do_parse("var z : Integer = 0; if (z == 0) { z = 100;} z;",
-0);
+  ParseStatus result =
+      parser.do_parse("var z : Integer = 0; if (z == 0) { z = 100;} z;", 0);
 
   EXPECT_EQ(result.status, true);
   EXPECT_EQ(result.startCharacter, 0);

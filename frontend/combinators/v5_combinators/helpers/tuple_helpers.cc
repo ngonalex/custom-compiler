@@ -5,7 +5,8 @@
 
 using namespace cs160::frontend;
 
-ParseStatus LeftBracketOp::do_parse(std::string inputProgram, int startCharacter) {
+ParseStatus LeftBracketOp::do_parse(std::string inputProgram,
+                                    int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
@@ -18,7 +19,8 @@ ParseStatus LeftBracketOp::do_parse(std::string inputProgram, int startCharacter
   return opParser.do_parse(inputProgram, endCharacter);
 }
 
-ParseStatus RightBracketOp::do_parse(std::string inputProgram, int startCharacter) {
+ParseStatus RightBracketOp::do_parse(std::string inputProgram,
+                                     int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 

@@ -28,13 +28,13 @@ ParseStatus AssignmentParser::do_parse(std::string inputProgram,
   DereferenceParser dereferenceParser;
   WordParser wordParser;
   OrCombinator varOrTuple;  // Left of equal can be variable instantiation or
-                           // variable_name
+                            // variable_name
   varOrTuple.firstParser = reinterpret_cast<NullParser *>(&varParser);
   varOrTuple.secondParser = reinterpret_cast<NullParser *>(&dereferenceParser);
-    
-    OrCombinator varOrTupleOrWord;
-    varOrTupleOrWord.firstParser = &varOrTuple;
-    varOrTupleOrWord.secondParser = &wordParser;
+
+  OrCombinator varOrTupleOrWord;
+  varOrTupleOrWord.firstParser = &varOrTuple;
+  varOrTupleOrWord.secondParser = &wordParser;
 
   EqualSignParser equalSignParser;
 

@@ -2,8 +2,8 @@
 #include "frontend/combinators/basic_combinators/and_combinator.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 #include "frontend/combinators/v1_combinators/ae.h"
-#include "frontend/combinators/v5_combinators/helpers/tuple_helpers.h"
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
+#include "frontend/combinators/v5_combinators/helpers/tuple_helpers.h"
 
 #include <stdio.h>
 #include <string>  // std::string, std::stoi
@@ -14,7 +14,7 @@ using namespace cs160::frontend;
 using namespace std;
 
 ParseStatus TupleAssignmentParser::do_parse(std::string inputProgram,
-                                       int startCharacter) {
+                                            int startCharacter) {
   int endCharacter = startCharacter;
   endCharacter += trim(inputProgram);
 
@@ -48,17 +48,17 @@ ParseStatus TupleAssignmentParser::do_parse(std::string inputProgram,
   AndCombinator secondAnd;
   secondAnd.firstParser = &firstAnd;
   secondAnd.secondParser = &arithExprParser;
-    
+
   ParseStatus secondResult = secondAnd.do_parse(
-    inputProgram, endCharacter);  // Will be used as cache result for third
+      inputProgram, endCharacter);  // Will be used as cache result for third
 
   AndCombinator thirdAnd;
   thirdAnd.firstParser = &secondAnd;
   thirdAnd.secondParser = &rightBracketOp;
-    
-    AndCombinator fourthAnd;
-    fourthAnd.firstParser = &thirdAnd;
-    fourthAnd.secondParser = &semiColon;
+
+  AndCombinator fourthAnd;
+  fourthAnd.firstParser = &thirdAnd;
+  fourthAnd.secondParser = &semiColon;
 
   ParseStatus result = fourthAnd.do_parse(inputProgram, endCharacter);
 

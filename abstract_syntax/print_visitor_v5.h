@@ -119,13 +119,15 @@ class PrintVisitor : public AstVisitor {
     output_ << ")";
   }
 
-  void VisitAssignmentFromArithExp(const AssignmentFromArithExp& assignment) override {
+  void VisitAssignmentFromArithExp(
+      const AssignmentFromArithExp& assignment) override {
     assignment.lhs().Visit(this);
     output_ << " = ";
     assignment.rhs().Visit(this);
   }
 
-  void VisitAssignmentFromNewTuple(const AssignmentFromNewTuple& assignment) override {
+  void VisitAssignmentFromNewTuple(
+      const AssignmentFromNewTuple& assignment) override {
     assignment.lhs().Visit(this);
     output_ << "[";
     assignment.rhs().Visit(this);
@@ -185,13 +187,12 @@ class PrintVisitor : public AstVisitor {
     output_ << " ); ";
   }
 
-  void VisitDereference(const VisitDereference &deref) override {
+  void VisitDereference(const VisitDereference& deref) override {
     call.lhs().Visit(this);
     output_ << "[";
     call.rhs().Visit(this);
     output_ << "]";
   }
-
 
   // Might be incorrect
   void VisitProgram(const Program& program) override {

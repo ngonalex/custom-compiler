@@ -6,8 +6,8 @@
 #include "frontend/combinators/v3_combinators/main/conditional_parser.h"  // cs160::frontend::ConditionalParser
 #include "frontend/combinators/v3_combinators/main/loop_parser.h"  // cs160::frontend::LoopParser
 
-#include "frontend/combinators/v4_combinators/main/function_call_parser.h" // cs160::frontend::FunctionCallParser
-#include "frontend/combinators/v5_combinators/main/tuple_creation_parser.h" // cs160::frontend::TupleAssignmentParser
+#include "frontend/combinators/v4_combinators/main/function_call_parser.h"  // cs160::frontend::FunctionCallParser
+#include "frontend/combinators/v5_combinators/main/tuple_creation_parser.h"  // cs160::frontend::TupleAssignmentParser
 
 #include <iostream>
 #include <string>  // std::string, std::stoi
@@ -37,29 +37,29 @@ ParseStatus StatementParser::do_parse(std::string inputProgram,
     return super::fail(inputProgram, endCharacter, "");
   }
 
-    FunctionCallParser functionCallParser;
-  
-    TupleAssignmentParser tupleAssignParser;
-    
+  FunctionCallParser functionCallParser;
+
+  TupleAssignmentParser tupleAssignParser;
+
   AssignmentParser assignParser;
   ConditionalParser conditionalParser;
   LoopParser loopParser;
 
   // func call | create tuple | assign | cond | loop
-    OrCombinator createTupleOrAssign;
-    OrCombinator funcCallOrAssign;
+  OrCombinator createTupleOrAssign;
+  OrCombinator funcCallOrAssign;
   OrCombinator assignOrConditional;
   OrCombinator allStatement;
-    
-    createTupleOrAssign.firstParser = &tupleAssignParser;
-    createTupleOrAssign.secondParser = &assignParser;
 
-    funcCallOrAssign.firstParser = &functionCallParser;
-    funcCallOrAssign.secondParser = &createTupleOrAssign;
-    
-    assignOrConditional.firstParser = &funcCallOrAssign;
-    assignOrConditional.secondParser = &conditionalParser;
-    
+  createTupleOrAssign.firstParser = &tupleAssignParser;
+  createTupleOrAssign.secondParser = &assignParser;
+
+  funcCallOrAssign.firstParser = &functionCallParser;
+  funcCallOrAssign.secondParser = &createTupleOrAssign;
+
+  assignOrConditional.firstParser = &funcCallOrAssign;
+  assignOrConditional.secondParser = &conditionalParser;
+
   allStatement.firstParser = &assignOrConditional;
   allStatement.secondParser = &loopParser;
 

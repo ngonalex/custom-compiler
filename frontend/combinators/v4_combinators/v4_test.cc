@@ -10,7 +10,6 @@
 
 using namespace cs160::frontend;
 
-
 TEST(FunctionHelpers, successComma) {
   CommaOp parser;
   ParseStatus result = parser.do_parse(",", 0);
@@ -21,7 +20,6 @@ TEST(FunctionHelpers, successComma) {
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, ",");
 }
-
 
 TEST(FunctionHelpers, failComma) {
   CommaOp parser;
@@ -39,7 +37,6 @@ Continue with funciton_helpers.cc ...
 
 */
 
-
 TEST(FunctionDeclParser, successFunction) {
   FunctionDeclParser parser;
   ParseStatus result = parser.do_parse("", 0);
@@ -50,11 +47,9 @@ TEST(FunctionDeclParser, successFunction) {
   EXPECT_EQ(result.remainingCharacters, "");
   EXPECT_EQ(result.parsedCharacters, "varz:Integer=0;if(z==0){z=100;}z;");
   EXPECT_EQ(result.errorType, "");
-/*
-  PrintVisitor *a = new PrintVisitor();
-  result.ast->Visit(a);
-  std::string output = a->GetOutput();
-  EXPECT_EQ(output, "z = 0; if (z == 0) {z = 100} else {}; z");*/
+  /*
+    PrintVisitor *a = new PrintVisitor();
+    result.ast->Visit(a);
+    std::string output = a->GetOutput();
+    EXPECT_EQ(output, "z = 0; if (z == 0) {z = 100} else {}; z");*/
 }
-
-
