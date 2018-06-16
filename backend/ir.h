@@ -7,62 +7,65 @@
 namespace cs160 {
 namespace backend {
 
-// Somewhat unwieldy and long is there a better way to do this?
-enum Type {
-  INTLOAD,
-  VARLOAD,
-  VARASSIGNLOAD,
-  FUNARGLOAD,
-  FUNRETLOAD,
+enum OpcodeType {
+  INT_LOAD,
+  VAR_LOAD,
+  VAR_ASSIGN_LOAD,
+  FUN_ARG_LOAD,
+  FUN_RET_LOAD,
   ADD,
   SUB,
   MULT,
   DIV,
-  LESSTHAN,
-  LESSTHANEQ,
-  GREATERTHAN,
-  GREATERTHANEQ,
+  LESS_THAN,
+  LESS_THAN_EQ,
+  GREATER_THAN,
+  GREATER_THAN_EQ,
   EQUAL,
-  LOGAND,
-  LOGOR,
-  LOGNOT,
+  LOG_AND,
+  LOG_OR,
+  LOG_NOT,
   LOOP,
   CONDITIONAL,
   JUMP,
-  JEQUAL,
-  JNOTEQUAL,
-  JGREATER,
-  JGREATEREQ,
-  JLESS,
-  JLESSEQ,
+  JMP_EQUAL,
+  JMP_NOT_EQUAL,
+  JMP_GREATER_THAN,
+  JMP_GREATER_THAN_EQ,
+  JMP_LESS_THAN,
+  JMP_LESS_THAN_EQ,
   LABEL,
-  FUNCALL,
-  FUNRETEP,
-  FUNDEF,
-  FUNPROLOGUE,
-  FUNEPILOGUE,
-  PRINTARITH,
-  NOTYPE,
-  LHSDEREFERENCE,
-  RHSINTDEFERENCE,
-  RHSTUPLEDEREFENCE,
-  NEWTUPLE,
-  VARCHILDTUPLE,  // change this later
+  FUN_CALL,
+  FUN_RET_EP,
+  FUN_DEF,
+  FUN_PROLOGUE,
+  FUN_EPILOGUE,
+  PRINT_ARITH,
+  NO_TYPE,
+  LHS_DEREFERENCE,
+  RHS_DEREFERENCE,
+  NEW_TUPLE,
+  VAR_CHILD_TUPLE
 };
 
-enum OperandType { OPREGISTER, INT };
+enum PrintFlag {
+  PRINT_ONLY_RESULT,
+  PRINT_LAST_ARITHMETIC_EXPR,
+  PRINT_DEBUG,
+  PRINT_PROGRAM
+};
 
-enum TargetType { TARGETREGISTER, TARGETLABEL };
+enum OperandType { OP_REGISTER, OP_INT };
 
-enum RegisterType { VIRTUALREG, VARIABLEREG, NOREG };
+enum TargetType { TARGET_REGISTER, TARGET_LABEL };
 
-// Maybe unneeded
+enum RegisterType { VIRTUAL_REG, VARIABLE_REG, DEREF_REG, NO_REG };
+
 enum Scope { GLOBAL, FUNCTION };
 
-enum VariableType {
-  LEFTHAND,
-  RIGHTHAND,
-};
+enum FlagType { TYPE_FLAG, EXISTENCE_FLAG, SIZE_FLAG, OBJECT_FLAG, NO_FLAG };
+
+enum VariableType { LEFT_HAND_VAR, RIGHT_HAND_VAR };
 
 class Label {
  public:
@@ -76,9 +79,10 @@ class Label {
 class Register {
  public:
   Register(std::string name, RegisterType type) : name_(name), type_(type) {}
-  Register() : name_(""), type_(NOREG) {}
+  Register() : name_(""), type_(NO_REG) {}
   std::string name() const { return name_; }
   RegisterType type() const { return type_; }
+  void ChangeRegisterName(std::string newname) { name_ = newname; }
 
  private:
   std::string name_;
@@ -89,10 +93,11 @@ class Register {
 // Look at this later, this probably can be designed much better
 class Operand {
  public:
-  explicit Operand(Register reg) : reg_(reg), value_(0), optype_(OPREGISTER) {
+  explicit Operand(Register reg) : reg_(reg), value_(0), optype_(OP_REGISTER) {
     // ASSERT (Registers can't have values )
   }
-  explicit Operand(int value) : reg_(Register()), value_(value), optype_(INT) {
+  explicit Operand(int value)
+      : reg_(Register()), value_(value), optype_(OP_INT) {
     // ASSERT (only ints can have values)
   }
   // explicit Operand(VariableOperand var) : reg_(Register("")),
@@ -114,25 +119,25 @@ class Operand {
 
 class Opcode {
  public:
-  explicit Opcode(Type type) : opcode_(type) {}
+  explicit Opcode(OpcodeType type) : opcode_(type) {}
 
-  void ChangeOpCode(Type type) { opcode_ = type; }
-  Type opcode() const { return opcode_; }
+  void ChangeOpCode(OpcodeType type) { opcode_ = type; }
+  OpcodeType opcode() const { return opcode_; }
 
   bool operator!=(const Opcode& a) const {
     return !(this->opcode() == a.opcode());
   }
 
  private:
-  Type opcode_;
+  OpcodeType opcode_;
 };
 
 class Target {
  public:
   explicit Target(Register reg)
-      : reg_(reg), label_(Label("")), type_(TARGETREGISTER) {}
+      : reg_(reg), label_(Label("")), type_(TARGET_REGISTER) {}
   explicit Target(Label label)
-      : reg_(Register()), label_(label), type_(TARGETLABEL) {}
+      : reg_(Register()), label_(label), type_(TARGET_LABEL) {}
 
   Register reg() const { return reg_; }
   Label label() const { return label_; }
@@ -152,10 +157,8 @@ struct ThreeAddressCode {
   Operand arg1;
   Operand arg2;
 
-  struct ThreeAddressCode* next;
-  struct ThreeAddressCode* prev;
   ThreeAddressCode()
-      : target(Register()), op(NOTYPE), arg1(Operand(0)), arg2(Operand(0)) {}
+      : target(Register()), op(NO_TYPE), arg1(Operand(0)), arg2(Operand(0)) {}
 };
 
 }  // namespace backend
