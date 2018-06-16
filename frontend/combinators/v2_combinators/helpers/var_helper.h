@@ -1,7 +1,5 @@
-#ifndef FRONTEND_COMBINATORS_V2_COMBINATORS_HELPERS_VAR_HELPER_H_
-#define FRONTEND_COMBINATORS_V2_COMBINATORS_HELPERS_VAR_HELPER_H_
-
-#include <string>
+#ifndef VAR_HELPER_H_
+#define VAR_HELPER_H_
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
@@ -33,13 +31,13 @@ class HelperVariableParser : public NullParser {
  public:
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
-/*
-class BOExpr : public NullParser {
+
+class SemiColonParser : public NullParser {
  public:
-   virtual ParseStatus do_parse(std::string inputProgram);
-};*/
+  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
+};
 
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // FRONTEND_COMBINATORS_V2_COMBINATORS_HELPERS_VAR_HELPER_H_
+#endif  // VAR_HELPER_H_

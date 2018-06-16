@@ -1,7 +1,5 @@
-#ifndef FRONTEND_COMBINATORS_V2_COMBINATORS_MAIN_WORD_PARSER_H_
-#define FRONTEND_COMBINATORS_V2_COMBINATORS_MAIN_WORD_PARSER_H_
-
-#include <string>
+#ifndef WORD_PARSER_H_
+#define WORD_PARSER_H_
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
@@ -17,4 +15,4 @@ class WordParser : public NullParser {
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // FRONTEND_COMBINATORS_V2_COMBINATORS_MAIN_WORD_PARSER_H_
+#endif  // WORD_PARSER_H_

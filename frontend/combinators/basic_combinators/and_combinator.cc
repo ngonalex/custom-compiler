@@ -2,7 +2,8 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus AndCombinator::do_parse(std::string inputProgram,
                                     int startCharacter) {
@@ -23,15 +24,15 @@ ParseStatus AndCombinator::do_parse(std::string inputProgram,
 
   /*
     ParseStatus both::success(secondStatus.remainingCharacters,
-          firstStatus.parsedCharacters + secondStatus.parsedCharacters,
+      firstStatus.parsedCharacters + secondStatus.parsedCharacters,
     std::move(firstStatus.ast), std::move(secondStatus.ast),
     firstStatus.characterStart + secondStatus.characterStart);*/
   ParseStatus both;
   both.status = true;
   both.parsedCharacters =
       firstStatus.parsedCharacters + secondStatus.parsedCharacters;
-  int parsedCharacterCount = firstStatus.parsedCharactersArray.size() +
-                             secondStatus.parsedCharactersArray.size();
+  size_t parsedCharacterCount = firstStatus.parsedCharactersArray.size() +
+                                secondStatus.parsedCharactersArray.size();
   if (parsedCharacterCount > 0) {
     if (firstStatus.parsedCharactersArray.size() > 0)
       both.parsedCharactersArray.insert(
@@ -47,6 +48,9 @@ ParseStatus AndCombinator::do_parse(std::string inputProgram,
           std::end(secondStatus.parsedCharactersArray));
     else if (secondStatus.parsedCharacters.size() > 0)
       both.parsedCharactersArray.push_back(secondStatus.parsedCharacters);
+  } else {
+    both.firstParsedCharacters = firstStatus.parsedCharacters;
+    both.secondParsedCharacters = secondStatus.parsedCharacters;
   }
   both.remainingCharacters = secondStatus.remainingCharacters;
   both.startCharacter = startCharacter;
@@ -61,29 +65,45 @@ ParseStatus AndCombinator::do_parse(std::string inputProgram,
     else
       both.second_ast = std::move(secondStatus.ast);
   */
-  int nodeCount = firstStatus.astNodes.size() + secondStatus.astNodes.size();
+  size_t nodeCount = firstStatus.astNodes.size() + secondStatus.astNodes.size();
   if (nodeCount > 0) {
     if (firstStatus.astNodes.size() > 0) {
       for (int i = 0; i < firstStatus.astNodes.size(); i++) {
         both.astNodes.push_back(std::move(firstStatus.astNodes[i]));
       }
-    } else if (firstStatus.ast != NULL) {
-      both.astNodes.push_back(std::move(firstStatus.ast));
+    } else {
+      if (firstStatus.ast != NULL) {
+        both.astNodes.push_back(std::move(firstStatus.ast));
+      }
+      if (firstStatus.second_ast != NULL) {
+        both.astNodes.push_back(std::move(firstStatus.second_ast));
+      }
     }
     if (secondStatus.astNodes.size() > 0) {
-      for (int i = 0; i < firstStatus.astNodes.size(); i++) {
+      for (int i = 0; i < secondStatus.astNodes.size(); i++) {
         both.astNodes.push_back(std::move(secondStatus.astNodes[i]));
       }
-    } else if (secondStatus.ast != NULL) {
-      both.astNodes.push_back(std::move(secondStatus.ast));
+    } else {
+      if (secondStatus.ast != NULL) {
+        both.astNodes.push_back(std::move(secondStatus.ast));
+      }
+      if (secondStatus.second_ast != NULL) {
+        both.astNodes.push_back(std::move(secondStatus.second_ast));
+      }
     }
   } else {
-    if (firstStatus.ast != NULL) both.ast = std::move(firstStatus.ast);
-    if (secondStatus.ast != NULL) both.second_ast = std::move(secondStatus.ast);
+    if (firstStatus.ast != NULL)
+      both.ast = std::move(firstStatus.ast);
+    else if (firstStatus.second_ast != NULL)
+      both.ast = std::move(firstStatus.second_ast);
+    if (secondStatus.ast != NULL)
+      both.second_ast = std::move(secondStatus.ast);
+    else if (secondStatus.second_ast != NULL)
+      both.ast = std::move(secondStatus.second_ast);
   }
 
   return both;
 }
 
-// NUM and Operator
-//
+}  // namespace frontend
+}  // namespace cs160

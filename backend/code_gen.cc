@@ -76,7 +76,7 @@ void CodeGen::GeneratePrinter() {
   // printtupleascii
   outfile_ << "printtupleascii:" << std::endl;
   outfile_ << "\t.asciz \"The program returned a "
-   << "tuple with indices:\\n\"" << std::endl;
+           << "tuple with indices:\\n\"" << std::endl;
 
   // printunassignedtupleascii
   outfile_ << "printunassignedtupleascii:" << std::endl;
@@ -96,7 +96,7 @@ void CodeGen::GeneratePrinter() {
 
   // printnewline
   outfile_ << "printnewline:" << std::endl;
-  outfile_ << "\t.asciz \"\\n\""  << std::endl;
+  outfile_ << "\t.asciz \"\\n\"" << std::endl;
 
   // printstring
   outfile_ << "printstring:" << std::endl;
@@ -104,7 +104,7 @@ void CodeGen::GeneratePrinter() {
 
   // printint
   outfile_ << "printint:" << std::endl;
-  outfile_ << "\t.asciz \"%d\\n\""  << std::endl;
+  outfile_ << "\t.asciz \"%d\\n\"" << std::endl;
 
   // printintnonewline
   outfile_ << "printintnonewline:" << std::endl;
@@ -116,8 +116,7 @@ void CodeGen::GeneratePrinter() {
 
   // existenceerrorasciz
   outfile_ << "existenceerrorasciz:" << std::endl;
-  outfile_ << "\t.asciz \"Value does not exist in the tuple\\n\""
-    << std::endl;
+  outfile_ << "\t.asciz \"Value does not exist in the tuple\\n\"" << std::endl;
 
   // tupletypeascii
   outfile_ << "tupletypeasciz:" << std::endl;
@@ -126,7 +125,7 @@ void CodeGen::GeneratePrinter() {
   // tuplesizeerrorascii
   outfile_ << "tuplesizeerrorascii:" << std::endl;
   outfile_ << "\t.asciz \"Invalid size, tuple size "
-    << "must be greater than zero\\n\"" << std::endl;
+           << "must be greater than zero\\n\"" << std::endl;
 
   // inttypeascii
   outfile_ << "inttypeasciz:" << std::endl;
@@ -179,7 +178,7 @@ void CodeGen::TestPrint(std::string label) {
 void CodeGen::GeneratePrintAssignment(std::string variablename) {
   outfile_ << variablename + "ascii:" << std::endl;
   outfile_ << "\t.asciz \"Variable " + variablename + " is equal to: \""
-    << std::endl;
+           << std::endl;
 }
 
 // This needs to change
@@ -194,14 +193,12 @@ void CodeGen::GenerateData(std::set<std::string> variableset) {
   }
 }
 
-void CodeGen::GenerateEpilogue() {
-  outfile_ << "\tcall exit\n";
-}
+void CodeGen::GenerateEpilogue() { outfile_ << "\tcall exit\n"; }
 
 void CodeGen::GenerateBoiler() {
   outfile_ << "\t.global main" << std::endl;
   outfile_ << "\t.text" << std::endl;
-    outfile_ << "main:" << std::endl;
+  outfile_ << "main:" << std::endl;
 }
 
 void CodeGen::ClearRegister(std::string reg) {
@@ -217,23 +214,23 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
   switch (loadtype) {
     case INT_LOAD:  // 2 pushes
       outfile_ << "\t# Loading in an integer" << std::endl;
-      outfile_ << "\tmov $" + std::to_string(tac->arg1.value())
-        + ", %rax" << std::endl;
+      outfile_ << "\tmov $" + std::to_string(tac->arg1.value()) + ", %rax"
+               << std::endl;
       outfile_ << "\tmov $0x100, %rbx" << std::endl;
       outfile_ << "\tpush %rbx" << std::endl;
       outfile_ << "\tpush %rax\n" << std::endl;
       break;
     case VAR_LOAD:  // 2 pushes
       outfile_ << "\t# Loading from " << tac->arg1.reg().name() << std::endl;
-      outfile_ << "\tmov " <<
-        VariableNameHelper(tac->arg1.reg().name(), NO_FLAG)
-        << ", %rbx" << std::endl;
+      outfile_ << "\tmov "
+               << VariableNameHelper(tac->arg1.reg().name(), NO_FLAG)
+               << ", %rbx" << std::endl;
 
       // Then load it into register
       outfile_ << "\tpush " << FlagHelper() << std::endl;
       outfile_ << "\tmov "
-        << VariableNameHelper(tac->arg1.reg().name(), OBJECT_FLAG)
-        << ", %rbx" << std::endl;
+               << VariableNameHelper(tac->arg1.reg().name(), OBJECT_FLAG)
+               << ", %rbx" << std::endl;
       outfile_ << "\tpush %rbx\n" << std::endl;
       break;
     case VAR_ASSIGN_LOAD:  // Always pop 3 things
@@ -247,27 +244,30 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
         if (symbollocations_.count(tac->target.reg().name()) == 0) {
           // Add it to the map if its new
           symbollocations_.insert(std::pair<std::string, int>(
-          tac->target.reg().name(), -16+-16*(symbollocations_.size()+1)));
+              tac->target.reg().name(),
+              -16 + -16 * (symbollocations_.size() + 1)));
         }
 
-        outfile_ << "\t# Loading a value into variable "
-          + tac->target.reg().name() << std::endl;
+        outfile_ << "\t# Loading a value into variable " +
+                        tac->target.reg().name()
+                 << std::endl;
         ClearRegister("rcx");
         outfile_ << "\tpop %rcx" << std::endl;  // VALUE
         outfile_ << "\tpop %rax" << std::endl;  // This is the FLAG
 
         if (currscope_ == GLOBAL) {
           outfile_ << "\tmov "
-            << VariableNameHelper(tac->target.reg().name(), NO_FLAG)
-            << ", %rbx" << std::endl;
+                   << VariableNameHelper(tac->target.reg().name(), NO_FLAG)
+                   << ", %rbx" << std::endl;
         }
 
         outfile_ << "\tmov %rax,"
-          << VariableNameHelper(tac->target.reg().name(), TYPE_FLAG)
-          << std::endl;
+                 << VariableNameHelper(tac->target.reg().name(), TYPE_FLAG)
+                 << std::endl;
         outfile_ << "\tmovq %rcx, "
-          << VariableNameHelper(tac->target.reg().name(), OBJECT_FLAG)
-          << "\n" << std::endl;
+                 << VariableNameHelper(tac->target.reg().name(), OBJECT_FLAG)
+                 << "\n"
+                 << std::endl;
 
         // Add it to the set, then call the print function
         // Needs to be changed
@@ -278,17 +278,17 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
             outfile_ << "\tmov %rcx, %rax\n" << std::endl;
             // Call on correct print function
             outfile_ << "\t# Going to print " << tac->target.reg().name()
-              << std::endl;
-            GeneratePrintCall(tac->target.reg().name()+"ascii");
+                     << std::endl;
+            GeneratePrintCall(tac->target.reg().name() + "ascii");
             outfile_ << "\t# Returning from printing "
-              << tac->target.reg().name() << std::endl;
+                     << tac->target.reg().name() << std::endl;
             outfile_ << std::endl;
           }
         }
       } else {
         // Handle Derefs
         outfile_ << "\t# Loading an int into " << tac->target.reg().name()
-          << std::endl;
+                 << std::endl;
         // Rewrite flags
         // RCX is the RHS value to be assigned
         // RAX is the flag of RHS
@@ -307,20 +307,21 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
       argumentnum = tac->arg1.value() + 1;
       varname = tac->target.reg().name();
       outfile_ << "\t# Moving argument " << std::to_string(argumentnum)
-        << " into the stack" << std::endl;
-      outfile_ << "\tmov " << std::to_string(16*argumentnum)
-        << "(%rbp), %rax" << std::endl;
-      outfile_ << "\tmov %rax, " << std::to_string(-8 + argumentnum*-16)
-        << "(%rbp)" << std::endl;
+               << " into the stack" << std::endl;
+      outfile_ << "\tmov " << std::to_string(16 * argumentnum) << "(%rbp), %rax"
+               << std::endl;
+      outfile_ << "\tmov %rax, " << std::to_string(-8 + argumentnum * -16)
+               << "(%rbp)" << std::endl;
       // Remake the objects flags
-      outfile_ << "\tmov " << std::to_string(16*argumentnum+8)
-        << "(%rbp), %rax" << std::endl;
-      outfile_ << "\tmov %rax, " << std::to_string(-16 + argumentnum*-16)
-        << "(%rbp)\n" << std::endl;
+      outfile_ << "\tmov " << std::to_string(16 * argumentnum + 8)
+               << "(%rbp), %rax" << std::endl;
+      outfile_ << "\tmov %rax, " << std::to_string(-16 + argumentnum * -16)
+               << "(%rbp)\n"
+               << std::endl;
       // Include it in the symbol table
       if (symbollocations_.count(varname) == 0) {
         symbollocations_.insert(
-            std::pair<std::string, int>(varname, -16+-16*argumentnum));
+            std::pair<std::string, int>(varname, -16 + -16 * argumentnum));
       } else {
         std::cerr << "FUN_ARG_LOAD VARIABLE ASSIGNMENT PROBLEM\n";
         exit(1);
@@ -331,29 +332,30 @@ void CodeGen::GenerateLoadInstructions(std::unique_ptr<ThreeAddressCode> tac) {
       // variable
       if (symbollocations_.count(tac->target.reg().name()) == 0) {
         // Add it to the map then create a spot for it (if its a function)
-        symbollocations_.insert(
-            std::pair<std::string, int>(
-                tac->target.reg().name(), -16+-16*(symbollocations_.size()+1)));
+        symbollocations_.insert(std::pair<std::string, int>(
+            tac->target.reg().name(),
+            -16 + -16 * (symbollocations_.size() + 1)));
       }
       outfile_ << "\t# Returning from function and loading value into "
-        << tac->target.reg().name() << std::endl;
+               << tac->target.reg().name() << std::endl;
       outfile_ << "\tmov (%rax), %rcx" << std::endl;
 
       if (currscope_ == GLOBAL) {
         outfile_ << "\tmov "
-          << VariableNameHelper(tac->target.reg().name(), NO_FLAG)
-          << ", %rbx" << std::endl;
+                 << VariableNameHelper(tac->target.reg().name(), NO_FLAG)
+                 << ", %rbx" << std::endl;
       }
 
       // Update the whole structure with the correct type
       outfile_ << "\tmov %rcx,"
-        << VariableNameHelper(tac->target.reg().name(), TYPE_FLAG)
-        << std::endl;
+               << VariableNameHelper(tac->target.reg().name(), TYPE_FLAG)
+               << std::endl;
       // now load the value of rax in
       outfile_ << "\tmov 8(%rax), %rax" << std::endl;
       outfile_ << "\tmovq %rax, "
-        << VariableNameHelper(tac->target.reg().name(), OBJECT_FLAG)
-        << "\n" << std::endl;
+               << VariableNameHelper(tac->target.reg().name(), OBJECT_FLAG)
+               << "\n"
+               << std::endl;
       break;
     default:
       break;
@@ -412,7 +414,7 @@ void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
       outfile_ << "\t# LESS_THAN Comparision\n";
       GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\tpush %rdx\n" << std::endl;
-      outfile_ << "\tcmp %rbx, %rax" << std:: endl;
+      outfile_ << "\tcmp %rbx, %rax" << std::endl;
       outfile_ << "\tsetl %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
       outfile_ << "\tpush %rcx\n" << std::endl;
@@ -421,7 +423,7 @@ void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
       outfile_ << "\t# LESS_THAN_EQ Comparision\n";
       GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\tpush %rdx\n" << std::endl;
-      outfile_ << "\tcmp %rbx, %rax" << std:: endl;
+      outfile_ << "\tcmp %rbx, %rax" << std::endl;
       outfile_ << "\tsetle %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
       outfile_ << "\tpush %rcx\n" << std::endl;
@@ -430,7 +432,7 @@ void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
       outfile_ << "\t# GREATER_THAN Comparision\n";
       GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\tpush %rdx\n" << std::endl;
-      outfile_ << "\tcmp %rbx, %rax" << std:: endl;
+      outfile_ << "\tcmp %rbx, %rax" << std::endl;
       outfile_ << "\tsetg %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
       outfile_ << "\tpush %rcx\n" << std::endl;
@@ -439,7 +441,7 @@ void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
       outfile_ << "\t# GREATER_THAN_EQ Comparision\n";
       GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\tpush %rdx\n" << std::endl;
-      outfile_ << "\tcmp %rbx, %rax" << std:: endl;
+      outfile_ << "\tcmp %rbx, %rax" << std::endl;
       outfile_ << "\tsetge %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
       outfile_ << "\tpush %rcx\n" << std::endl;
@@ -448,7 +450,7 @@ void CodeGen::GenerateRelationalExpr(std::unique_ptr<ThreeAddressCode> tac,
       outfile_ << "\t# Equals Comparision\n";
       GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\tpush %rdx\n" << std::endl;
-      outfile_ << "\tcmp %rbx, %rax" << std:: endl;
+      outfile_ << "\tcmp %rbx, %rax" << std::endl;
       outfile_ << "\tsete %dl" << std::endl;
       outfile_ << "\tmovzx %dl, %rcx" << std::endl;
       outfile_ << "\tpush %rcx\n" << std::endl;
@@ -466,16 +468,16 @@ void CodeGen::GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
     case LOG_AND:
       outfile_ << "\t# LogicalAnd\n";
       GenerateBinaryExprHelper(std::move(tac));
-      outfile_ << "\tand %rbx, %rax" << std:: endl;
+      outfile_ << "\tand %rbx, %rax" << std::endl;
       outfile_ << "\tpush %rdx\n" << std::endl;
-      outfile_ << "\tpush %rax\n" << std:: endl;
+      outfile_ << "\tpush %rax\n" << std::endl;
       break;
     case LOG_OR:
       outfile_ << "\t# LogicalOr\n";
       GenerateBinaryExprHelper(std::move(tac));
       outfile_ << "\tor %rbx, %rax" << std::endl;
       outfile_ << "\tpush %rdx\n" << std::endl;
-      outfile_ << "\tpush %rax\n" << std:: endl;
+      outfile_ << "\tpush %rax\n" << std::endl;
       break;
     case LOG_NOT:
       outfile_ << "\t# LogicalNot\n";
@@ -492,10 +494,9 @@ void CodeGen::GenerateLogicalExpr(std::unique_ptr<ThreeAddressCode> tac,
   }
 }
 
-void CodeGen::GenerateBinaryExprHelper(
-    std::unique_ptr<ThreeAddressCode> tac) {
-  outfile_ << "\tpop %r8" << std::endl;  // rbx = right value
-  outfile_ << "\tpop %r9" << std::endl;  // rcx = right flag
+void CodeGen::GenerateBinaryExprHelper(std::unique_ptr<ThreeAddressCode> tac) {
+  outfile_ << "\tpop %r8" << std::endl;   // rbx = right value
+  outfile_ << "\tpop %r9" << std::endl;   // rcx = right flag
   outfile_ << "\tpop %r10" << std::endl;  // rax = left value
   outfile_ << "\tpop %r11" << std::endl;  // rdx = left flag
 
@@ -508,8 +509,8 @@ void CodeGen::GenerateBinaryExprHelper(
 
   outfile_ << "\tmovzbl %r11b, %rdi" << std::endl;
   outfile_ << "\tcall integerflagcheck" << std::endl;
-  outfile_ << "\tmov %r8, %rbx" << std::endl;  // rbx = right value
-  outfile_ << "\tmov %r9, %rcx" << std::endl;  // rcx = right flag
+  outfile_ << "\tmov %r8, %rbx" << std::endl;   // rbx = right value
+  outfile_ << "\tmov %r9, %rcx" << std::endl;   // rcx = right flag
   outfile_ << "\tmov %r10, %rax" << std::endl;  // rax = left value
   outfile_ << "\tmov %r11, %rdx" << std::endl;  // rdx = left flag
 }
@@ -540,7 +541,7 @@ std::string CodeGen::VariableNameHelper(std::string variablename,
         return "8(%rbx)";
         break;
       default:
-        return "$"+variablename;
+        return "$" + variablename;
         break;
     }
   } else {
@@ -559,15 +560,15 @@ std::string CodeGen::VariableNameHelper(std::string variablename,
         return mappedname;
         break;
       case EXISTENCE_FLAG:
-        mappedname = std::to_string(index+1) + "(%rbp)";
+        mappedname = std::to_string(index + 1) + "(%rbp)";
         return mappedname;
         break;
       case SIZE_FLAG:
-        mappedname = std::to_string(index+2) + "(%rbp)";
+        mappedname = std::to_string(index + 2) + "(%rbp)";
         return mappedname;
         break;
       case OBJECT_FLAG:
-        mappedname = std::to_string(index+8) + "(%rbp)";
+        mappedname = std::to_string(index + 8) + "(%rbp)";
         return mappedname;
         break;
       default:
@@ -673,7 +674,7 @@ void CodeGen::GeneratePrintIntTuple() {
   outfile_ << "\tcall printf" << std::endl;
 
   outfile_ << "\tpop %r10" << std::endl;
-  outfile_ << "\tmovl 8(%r10), %esi"<< std::endl;
+  outfile_ << "\tmovl 8(%r10), %esi" << std::endl;
   outfile_ << "\tmov $printint, %rdi" << std::endl;
   outfile_ << "\tmov $0, %rax" << std::endl;
   outfile_ << "\tcall printf" << std::endl;
@@ -703,7 +704,7 @@ void CodeGen::GeneratePrintNestedTuple() {
   outfile_ << "\tcall printf" << std::endl;
 
   outfile_ << "\tpop %r10" << std::endl;
-  outfile_ << "\tmovl 2(%r10), %esi"<< std::endl;
+  outfile_ << "\tmovl 2(%r10), %esi" << std::endl;
   outfile_ << "\tmov $printint, %rdi" << std::endl;
   outfile_ << "\tmov $0, %rax" << std::endl;
   outfile_ << "\tcall printf" << std::endl;
@@ -836,25 +837,22 @@ void CodeGen::GenerateNestedDeref() {
 }
 
 void CodeGen::GenerateBaseDeref(std::string variablename) {
-  outfile_ << "\tmovb "
-    << VariableNameHelper(variablename, EXISTENCE_FLAG)
-    << ", %al" << std::endl;
+  outfile_ << "\tmovb " << VariableNameHelper(variablename, EXISTENCE_FLAG)
+           << ", %al" << std::endl;
   outfile_ << "\tmovzx %al, %rdi" << std::endl;
   outfile_ << "\tpush %rbx" << std::endl;
   outfile_ << "\tcall existencecheck" << std::endl;
   outfile_ << "\tpop %rbx" << std::endl;
 
-  outfile_ << "\tmovb "
-    << VariableNameHelper(variablename, TYPE_FLAG)
-    << ", %al" << std::endl;
+  outfile_ << "\tmovb " << VariableNameHelper(variablename, TYPE_FLAG)
+           << ", %al" << std::endl;
   outfile_ << "\tmovzx %al, %rdi" << std::endl;
   outfile_ << "\tpush %rbx" << std::endl;
   outfile_ << "\tcall tupleflagcheck" << std::endl;
   outfile_ << "\tpop %rbx\n" << std::endl;
 
-  outfile_ << "\tmovl "
-    << VariableNameHelper(variablename, SIZE_FLAG)
-    << ", %eax" << std::endl;
+  outfile_ << "\tmovl " << VariableNameHelper(variablename, SIZE_FLAG)
+           << ", %eax" << std::endl;
   outfile_ << "\tmovslq %eax, %rdi" << std::endl;
   outfile_ << "\tpop %rsi" << std::endl;
   outfile_ << "\tpush %rsi" << std::endl;
@@ -863,9 +861,8 @@ void CodeGen::GenerateBaseDeref(std::string variablename) {
   outfile_ << "\tpop %rbx" << std::endl;
 
   // Get the actual object
-  outfile_ << "\tmovq "
-    << VariableNameHelper(variablename, OBJECT_FLAG)
-    << ", %rbx" << std::endl;
+  outfile_ << "\tmovq " << VariableNameHelper(variablename, OBJECT_FLAG)
+           << ", %rbx" << std::endl;
 
   // Get the correct index of the object
   outfile_ << "\tpop %rax" << std::endl;
@@ -962,14 +959,15 @@ void CodeGen::Generate(
         outfile_ << "\t# LOOP\n";
         outfile_ << "\tpop %rax" << std::endl;
         outfile_ << "\tcmp $" << std::to_string(code->arg1.value())
-          << ", %rax\n" << std::endl;
+                 << ", %rax\n"
+                 << std::endl;
         break;
       case CONDITIONAL:
         outfile_ << "\t# CONDITIONAL\n";
         outfile_ << "\tpop %rax" << std::endl;
         outfile_ << "\tcmp $" << std::to_string(code->arg1.value())
-          << ", %rax\n"
-          << std::endl;
+                 << ", %rax\n"
+                 << std::endl;
         break;
       case JUMP:
         outfile_ << "\t# JUMP\n";
@@ -1023,7 +1021,7 @@ void CodeGen::Generate(
         outfile_ << "\tpush %rbp" << std::endl;
         outfile_ << "\tmov %rsp, %rbp" << std::endl;
         outfile_ << "\tpush %rbx" << std::endl;
-        outfile_ << "\tsub $" << 16+code->arg1.value()*16 << ", %rsp\n\n";
+        outfile_ << "\tsub $" << 16 + code->arg1.value() * 16 << ", %rsp\n\n";
         break;
       case FUN_EPILOGUE:
         outfile_ << "\t# Function Epilogue " << std::endl;
@@ -1059,12 +1057,12 @@ void CodeGen::Generate(
       case LHS_DEREFERENCE:
         parsedstring = DereferenceParserHelper(code->target.reg().name());
         outfile_ << "\t# LHS_DEREFERENCE of variable "
-          << code->target.reg().name() << std::endl;
+                 << code->target.reg().name() << std::endl;
         if (parsedstring.size() == 2) {
           if (currscope_ == GLOBAL) {
             outfile_ << "\tmov "
-              << VariableNameHelper(code->arg1.reg().name(), NO_FLAG)
-              << ", %rbx" << std::endl;
+                     << VariableNameHelper(code->arg1.reg().name(), NO_FLAG)
+                     << ", %rbx" << std::endl;
           }
           // Error Handling here to check the size
           // and if it's actually a tuple
@@ -1076,13 +1074,13 @@ void CodeGen::Generate(
         break;
       case RHS_DEREFERENCE:  // Needs to handle functions
         parsedstring = DereferenceParserHelper(code->target.reg().name());
-        outfile_ << "\t#Dereference of variable "
-          << code->target.reg().name() << std::endl;
+        outfile_ << "\t#Dereference of variable " << code->target.reg().name()
+                 << std::endl;
         if (parsedstring.size() == 2) {
           if (currscope_ == GLOBAL) {
             outfile_ << "\tmov "
-              << VariableNameHelper(code->arg1.reg().name(), NO_FLAG)
-              << ", %rbx" << std::endl;
+                     << VariableNameHelper(code->arg1.reg().name(), NO_FLAG)
+                     << ", %rbx" << std::endl;
           }
 
           // Error Handling here to check the size
@@ -1097,7 +1095,7 @@ void CodeGen::Generate(
         break;
       case NEW_TUPLE:
         outfile_ << "\t# Making a tuple for variable: "
-          << code->target.reg().name() << std::endl;
+                 << code->target.reg().name() << std::endl;
         outfile_ << "\tpop %rcx" << std::endl;
         outfile_ << "\tpop %rdx" << std::endl;
         outfile_ << "\tpush %rcx" << std::endl;
@@ -1121,21 +1119,23 @@ void CodeGen::Generate(
         outfile_ << "\tpop %rcx" << std::endl;
         outfile_ << "\tpop %rbx" << std::endl;
 
-        if (DereferenceParserHelper(code->target.reg().name()).size() == 1
-          && currscope_ == FUNCTION) {
+        if (DereferenceParserHelper(code->target.reg().name()).size() == 1 &&
+            currscope_ == FUNCTION) {
           // Rewrite flags
           outfile_ << "\tmovb $1,"
-            << VariableNameHelper(code->target.reg().name(), TYPE_FLAG)
-            << std::endl;
+                   << VariableNameHelper(code->target.reg().name(), TYPE_FLAG)
+                   << std::endl;
           outfile_ << "\tmovb $1, "
-            << VariableNameHelper(code->target.reg().name(), EXISTENCE_FLAG)
-            << std::endl;
+                   << VariableNameHelper(code->target.reg().name(),
+                                         EXISTENCE_FLAG)
+                   << std::endl;
           outfile_ << "\tmovl %ecx, "
-            << VariableNameHelper(code->target.reg().name(), SIZE_FLAG)
-            << std::endl;
+                   << VariableNameHelper(code->target.reg().name(), SIZE_FLAG)
+                   << std::endl;
           outfile_ << "\tmovq %rax, "
-            << VariableNameHelper(code->target.reg().name(), OBJECT_FLAG)
-            << "\n" << std::endl;
+                   << VariableNameHelper(code->target.reg().name(), OBJECT_FLAG)
+                   << "\n"
+                   << std::endl;
         } else {
           // Rewrite flags
           outfile_ << "\tmovb $1, (%rbx)" << std::endl;
@@ -1148,14 +1148,14 @@ void CodeGen::Generate(
       case VAR_CHILD_TUPLE:
         if (symbollocations_.count(code->target.reg().name()) == 0) {
           // Add it to the map then create a spot for it (if its a function)
-          symbollocations_.insert(
-              std::pair<std::string, int>(
-                  code->target.reg().name(),
-                  -16+-16*(symbollocations_.size()+1)));
+          symbollocations_.insert(std::pair<std::string, int>(
+              code->target.reg().name(),
+              -16 + -16 * (symbollocations_.size() + 1)));
         }
-        outfile_ <<"\t#Getting value of "<< code->target.reg().name() << "\n";
-        outfile_ << "\tmov " <<
-          VariableNameHelper(code->target.reg().name(), NO_FLAG) << ", %rbx\n";
+        outfile_ << "\t#Getting value of " << code->target.reg().name() << "\n";
+        outfile_ << "\tmov "
+                 << VariableNameHelper(code->target.reg().name(), NO_FLAG)
+                 << ", %rbx\n";
         outfile_ << "\tpush %rbx\n" << std::endl;
         break;
       default:

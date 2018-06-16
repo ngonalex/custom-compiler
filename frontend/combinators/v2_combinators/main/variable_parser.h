@@ -1,7 +1,5 @@
-#ifndef FRONTEND_COMBINATORS_V2_COMBINATORS_MAIN_VARIABLE_PARSER_H_
-#define FRONTEND_COMBINATORS_V2_COMBINATORS_MAIN_VARIABLE_PARSER_H_
-
-#include <string>
+#ifndef VARIABLE_PARSER_H_
+#define VARIABLE_PARSER_H_
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
@@ -17,4 +15,4 @@ class VariableParser : public NullParser {
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // FRONTEND_COMBINATORS_V2_COMBINATORS_MAIN_VARIABLE_PARSER_H_
+#endif  // VARIABLE_PARSER_H_

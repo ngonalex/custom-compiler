@@ -1,6 +1,5 @@
-#include <string>  // std::string, std::stoi
-
 #include "frontend/combinators/v2_combinators/main/word_parser.h"
+#include <string>  // std::string, std::stoi
 #include "frontend/combinators/basic_combinators/and_combinator.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 #include "frontend/combinators/basic_combinators/zero_or_more_combinator.h"
@@ -9,8 +8,8 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus WordParser::do_parse(std::string inputProgram, int startCharacter) {
   int endCharacter = startCharacter;
@@ -39,11 +38,18 @@ ParseStatus WordParser::do_parse(std::string inputProgram, int startCharacter) {
 
   ParseStatus result = firstAnd.do_parse(inputProgram, endCharacter);
 
+  // Can't have these keywords b/c of backend
+  // https://github.ucsb.edu/CS160-S18/team-influx/issues/36
+  if (result.parsedCharacters == "heap" ||
+      result.parsedCharacters == "bumpptr" ||
+      result.parsedCharacters == "returnobj") {
+    return super::fail(inputProgram, endCharacter);
+  }
+
   if (result.status) {
     result.ast =
         std::move(make_unique<const VariableExpr>(result.parsedCharacters));
   } else {
-    // Error type returned to user
     result.errorType = errorMessage;
   }
 
@@ -52,3 +58,6 @@ ParseStatus WordParser::do_parse(std::string inputProgram, int startCharacter) {
 
   return result;
 }
+
+}  // namespace frontend
+}  // namespace cs160

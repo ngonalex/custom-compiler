@@ -15,9 +15,7 @@ Test in the same way, by using `bazel test`. Make sure to include the library/bi
 ## Running
 
 To run a certain subproject, you can use `bazel run` with the path and name of the task.
-
 =======================================
-
 Documentation
 
 We've proud to have completed and tested up to v4 with packrat parsing working. We've also added additional error handling (character number and error messages that tell you where you've failed and how to fix it sometimes).
@@ -59,6 +57,7 @@ parse status (results to all our combinators/parser) = parsestatus.h
 
 2) /v1_combinators:
 ...
+
 
 
 

@@ -1,12 +1,11 @@
-#ifndef FRONTEND_COMBINATORS_V1_COMBINATORS_HELPERS_V1_HELPERS_H_
-#define FRONTEND_COMBINATORS_V1_COMBINATORS_HELPERS_V1_HELPERS_H_
-
-#include <iostream>
-#include <map>
-#include <string>
+#ifndef V1_HELPERS_H_
+#define V1_HELPERS_H_
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
+
+#include <iostream>
+#include <map>
 
 namespace cs160 {
 namespace frontend {
@@ -36,12 +35,7 @@ class MulDivOpParser : public NullParser {
   virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
 };
 
-class SemiColonParser : public NullParser {
- public:
-  virtual ParseStatus do_parse(std::string inputProgram, int startCharacter);
-};
-
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // FRONTEND_COMBINATORS_V1_COMBINATORS_HELPERS_V1_HELPERS_H_
+#endif  // V1_HELPERS_H_

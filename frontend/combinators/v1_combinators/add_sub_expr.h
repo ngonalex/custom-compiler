@@ -1,7 +1,5 @@
-#ifndef FRONTEND_COMBINATORS_V1_COMBINATORS_ADD_SUB_EXPR_H_
-#define FRONTEND_COMBINATORS_V1_COMBINATORS_ADD_SUB_EXPR_H_
-
-#include <string>
+#ifndef ADD_SUB_EXPR_H_
+#define ADD_SUB_EXPR_H_
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
@@ -20,4 +18,4 @@ class AddSubExprParser : public NullParser {
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // FRONTEND_COMBINATORS_V1_COMBINATORS_ADD_SUB_EXPR_H_
+#endif  // ADD_SUB_EXPR_H_

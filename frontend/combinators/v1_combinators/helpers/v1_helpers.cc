@@ -1,15 +1,14 @@
-#include <iostream>
-#include <string>  // std::string, std::stoi
-
 #include "frontend/combinators/v1_combinators/helpers/v1_helpers.h"
 #include "frontend/combinators/basic_combinators/atom_parser.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
 
+#include <iostream>
+#include <string>  // std::string, std::stoi
+
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
-
+namespace cs160 {
+namespace frontend {
 // )
 ParseStatus CloseParenParser::do_parse(std::string inputProgram,
                                        int startCharacter) {
@@ -106,18 +105,6 @@ ParseStatus MulDivOpParser::do_parse(std::string inputProgram,
   return result;
 }
 
-// ;
-ParseStatus SemiColonParser::do_parse(std::string inputProgram,
-                                      int startCharacter) {
-  int endCharacter = startCharacter;
-  endCharacter += trim(inputProgram);
-  std::string errorMessage = "Expecting ;";
 
-  if (inputProgram.size() == 0) {
-    return super::fail(inputProgram, endCharacter, errorMessage);
-  }
-
-  auto atomParser = AtomParser(';');
-  auto result = atomParser.do_parse(inputProgram, endCharacter);
-  return result;
-}
+}  // namespace frontend
+}  // namespace cs160

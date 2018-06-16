@@ -1,11 +1,11 @@
-#ifndef FRONTEND_COMBINATORS_BASIC_COMBINATORS_ATOM_PARSER_H_
-#define FRONTEND_COMBINATORS_BASIC_COMBINATORS_ATOM_PARSER_H_
-
-#include <string>
+#ifndef ATOM_PARSER_H_
+#define ATOM_PARSER_H_
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
 #include "frontend/combinators/basic_combinators/parsestatus.h"
+
+#include <string>
 
 #define super NullParser
 
@@ -28,4 +28,4 @@ class AtomParser : public NullParser {
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // FRONTEND_COMBINATORS_BASIC_COMBINATORS_ATOM_PARSER_H_
+#endif  // ATOM_PARSER_H_

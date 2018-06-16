@@ -1,11 +1,11 @@
-#ifndef FRONTEND_COMBINATORS_BASIC_COMBINATORS_PARSESTATUS_H_
-#define FRONTEND_COMBINATORS_BASIC_COMBINATORS_PARSESTATUS_H_
-
-#include <string>
-#include <vector>
+#ifndef PARSESTATUS_H_
+#define PARSESTATUS_H_
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "utility/memory.h"
+
+#include <string>
+#include <vector>
 
 using namespace cs160::abstract_syntax::frontend;
 
@@ -28,6 +28,15 @@ class ParseStatus {  // Super class
 
   // Only for And Combinator
   std::unique_ptr<const AstNode> second_ast;
+
+  // Only for And Combinator (used for ast construction when grabbing relation
+  // operator)
+  std::string firstParsedCharacters;
+  std::string secondParsedCharacters;
+
+  // Only for Or Combinator True = firstParser passed, False = secondParser
+  // passed
+  bool firstOrSecond;
 
   // Only for zero_or_more and one_or_more case when returning multiple ast
   // nodes
@@ -162,4 +171,4 @@ secondStatus){ this->ast = firstStatus.ast; this->second_ast = secondStatus.ast;
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // FRONTEND_COMBINATORS_BASIC_COMBINATORS_PARSESTATUS_H_
+#endif  // PARSESTATUS_H_

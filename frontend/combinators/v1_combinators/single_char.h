@@ -1,7 +1,5 @@
-#ifndef FRONTEND_COMBINATORS_V1_COMBINATORS_SINGLE_CHAR_H_
-#define FRONTEND_COMBINATORS_V1_COMBINATORS_SINGLE_CHAR_H_
-
-#include <string>
+#ifndef SINGLE_CHAR_H_
+#define SINGLE_CHAR_H_
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
@@ -22,4 +20,4 @@ class SingleVarCharParser : public NullParser {
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // FRONTEND_COMBINATORS_V1_COMBINATORS_SINGLE_CHAR_H_
+#endif  // SINGLE_CHAR_H_

@@ -1,7 +1,5 @@
-#ifndef FRONTEND_COMBINATORS_BASIC_COMBINATORS_OR_COMBINATOR_H_
-#define FRONTEND_COMBINATORS_BASIC_COMBINATORS_OR_COMBINATOR_H_
-
-#include <string>
+#ifndef OR_COMBINATOR_H_
+#define OR_COMBINATOR_H_
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "frontend/combinators/basic_combinators/null.h"
@@ -20,4 +18,4 @@ class OrCombinator : public NullParser {
 }  // namespace frontend
 }  // namespace cs160
 
-#endif  // FRONTEND_COMBINATORS_BASIC_COMBINATORS_OR_COMBINATOR_H_
+#endif  // OR_COMBINATOR_H_

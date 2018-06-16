@@ -2,12 +2,12 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus SingleDigitParser::do_parse(std::string inputProgram,
                                         int startCharacter) {
   int endCharacter = startCharacter;
-  endCharacter += trim(inputProgram);
   std::string errorMessage = "Digit should be between 0 and 9";
 
   if (inputProgram.size() == 0) {
@@ -26,3 +26,8 @@ ParseStatus SingleDigitParser::do_parse(std::string inputProgram,
   }
   return status;
 }
+
+
+
+}  // namespace frontend
+}  // namespace cs160

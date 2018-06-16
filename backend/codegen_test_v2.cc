@@ -1,34 +1,34 @@
 #include <stdio.h>
 
+#include <array>
 #include <cstdio>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
 #include <string>
-#include <array>
 
-#include "backend/code_gen.h"
 #include "abstract_syntax/abstract_syntax.h"
-#include "backend/lowerer_visitor.h"
+#include "backend/code_gen.h"
 #include "backend/ir.h"
-#include "utility/memory.h"
+#include "backend/lowerer_visitor.h"
 #include "gtest/gtest.h"
+#include "utility/memory.h"
 
-using cs160::abstract_syntax::backend::AstVisitor;
-using cs160::abstract_syntax::backend::IntegerExpr;
+using cs160::make_unique;
 using cs160::abstract_syntax::backend::AddExpr;
-using cs160::abstract_syntax::backend::SubtractExpr;
-using cs160::abstract_syntax::backend::MultiplyExpr;
-using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::ArithmeticExpr;
+using cs160::abstract_syntax::backend::AstVisitor;
+using cs160::abstract_syntax::backend::DivideExpr;
+using cs160::abstract_syntax::backend::IntegerExpr;
+using cs160::abstract_syntax::backend::MultiplyExpr;
+using cs160::abstract_syntax::backend::SubtractExpr;
+using cs160::abstract_syntax::version_5::Statement;
+using cs160::backend::CodeGen;
 using cs160::backend::LowererVisitor;
 using cs160::backend::ThreeAddressCode;
-using cs160::backend::CodeGen;
 using cs160::backend::PrintFlag::PRINT_DEBUG;
 using cs160::backend::PrintFlag::PRINT_LAST_ARITHMETIC_EXPR;
 using cs160::backend::PrintFlag::PRINT_ONLY_RESULT;
-using cs160::abstract_syntax::version_5::Statement;
-using cs160::make_unique;
 
 class CodeGenTestV2 : public ::testing::Test {
  public:
@@ -42,9 +42,10 @@ class CodeGenTestV2 : public ::testing::Test {
     while (!feof(pipe.get())) {
       if (fgets(buffer.data(), 128, pipe.get()) != nullptr)
         result += buffer.data();
-      }
+    }
     return result;
   }
+
  protected:
   LowererVisitor lowerer_;
 };
@@ -53,8 +54,7 @@ class CodeGenTestV2 : public ::testing::Test {
 // x = 5
 TEST_F(CodeGenTestV2, SimplePositiveAssignmentTest) {
   auto expr = make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("x"),
-      make_unique<IntegerExpr>(5));
+      make_unique<VariableExpr>("x"), make_unique<IntegerExpr>(5));
 
   expr->Visit(&lowerer_);
 
@@ -70,8 +70,7 @@ TEST_F(CodeGenTestV2, SimplePositiveAssignmentTest) {
 // x = -5
 TEST_F(CodeGenTestV2, SimpleNegativeAssignmentTest) {
   auto expr = make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("x"),
-      make_unique<IntegerExpr>(-5));
+      make_unique<VariableExpr>("x"), make_unique<IntegerExpr>(-5));
 
   expr->Visit(&lowerer_);
 
@@ -88,9 +87,8 @@ TEST_F(CodeGenTestV2, SimpleNegativeAssignmentTest) {
 TEST_F(CodeGenTestV2, ArithmeticExprOnRHSAssignmentTest) {
   auto expr = make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("x"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(5),
-          make_unique<IntegerExpr>(10)));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(5),
+                           make_unique<IntegerExpr>(10)));
 
   expr->Visit(&lowerer_);
 
@@ -110,15 +108,13 @@ TEST_F(CodeGenTestV2, VariabletoVariableAssignmentTest) {
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("x"),
-      make_unique<AddExpr>(
-          make_unique<IntegerExpr>(5),
-          make_unique<IntegerExpr>(10)))));
+      make_unique<AddExpr>(make_unique<IntegerExpr>(5),
+                           make_unique<IntegerExpr>(10)))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("y"),
-      make_unique<SubtractExpr>(
-          make_unique<VariableExpr>("x"),
-          make_unique<IntegerExpr>(10)))));
+      make_unique<SubtractExpr>(make_unique<VariableExpr>("x"),
+                                make_unique<IntegerExpr>(10)))));
 
   for (auto& statement : statements) {
     statement->Visit(&lowerer_);

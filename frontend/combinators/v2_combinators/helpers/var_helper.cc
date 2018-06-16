@@ -1,5 +1,3 @@
-#include <string>  // std::string, std::stoi
-
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
 #include "frontend/combinators/basic_combinators/and_combinator.h"
 #include "frontend/combinators/basic_combinators/atom_parser.h"
@@ -9,10 +7,12 @@
 #include "frontend/combinators/v1_combinators/single_char.h"
 #include "frontend/combinators/v2_combinators/main/word_parser.h"
 
+#include <string>  // std::string, std::stoi
+
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus VarKeywordParser::do_parse(std::string inputProgram,
                                        int startCharacter) {
@@ -131,3 +131,22 @@ ParseStatus HelperVariableParser::do_parse(std::string inputProgram,
 
   return result;
 }
+
+// ;
+ParseStatus SemiColonParser::do_parse(std::string inputProgram,
+                                      int startCharacter) {
+  int endCharacter = startCharacter;
+  endCharacter += trim(inputProgram);
+  std::string errorMessage = "Expecting ;";
+
+  if (inputProgram.size() == 0) {
+    return super::fail(inputProgram, endCharacter, errorMessage);
+  }
+
+  auto atomParser = AtomParser(';');
+  auto result = atomParser.do_parse(inputProgram, endCharacter);
+  return result;
+}
+
+}  // namespace frontend
+}  // namespace cs160

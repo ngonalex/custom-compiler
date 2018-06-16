@@ -6,13 +6,13 @@
 #include "gtest/gtest.h"
 #include "utility/memory.h"
 
-using cs160::abstract_syntax::backend::AstVisitor;
-using cs160::abstract_syntax::backend::IntegerExpr;
+using cs160::abstract_syntax::backend::AddExpr;
 using cs160::abstract_syntax::backend::ArithmeticExpr;
 using cs160::abstract_syntax::backend::AssignmentFromArithExp;
-using cs160::backend::LowererVisitor;
-using cs160::abstract_syntax::backend::AddExpr;
+using cs160::abstract_syntax::backend::AstVisitor;
+using cs160::abstract_syntax::backend::IntegerExpr;
 using cs160::abstract_syntax::backend::Statement;
+using cs160::backend::LowererVisitor;
 
 class LowererTestV4 : public ::testing::Test {
  public:
@@ -33,9 +33,11 @@ class LowererTestV4 : public ::testing::Test {
   }
 
   std::string GenerateFuncDefOutPut(int blocksize) {
-    return  " <-  PRINT_ARITH \n <-  FUNCTIONDEF \nMkLabel func\n <-"
-    "FUN_PROLOGUE \nt_" + std::to_string(blocksize) + " <- 0\n <-"
-    "  FUN_EPILOGUE \n";
+    return " <-  PRINT_ARITH \n <-  FUNCTIONDEF \nMkLabel func\n <-"
+           "FUN_PROLOGUE \nt_" +
+           std::to_string(blocksize) +
+           " <- 0\n <-"
+           "  FUN_EPILOGUE \n";
   }
 
  protected:
@@ -50,19 +52,18 @@ TEST_F(LowererTestV4, FunctionDefTest) {
 
   // return value
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(1),
-      make_unique<const IntegerExpr>(0));
+      make_unique<const IntegerExpr>(1), make_unique<const IntegerExpr>(0));
 
   auto foo_def = make_unique<const FunctionDef>("func", std::move(foo_params),
                                                 std::move(fact_body),
                                                 std::move(foo_retval));
 
   foo_def->Visit(&lowerer_);
-  EXPECT_EQ(lowerer_.GetOutput(), " <-  FUNCTIONDEF \nMkLabel func\n"
+  EXPECT_EQ(lowerer_.GetOutput(),
+            " <-  FUNCTIONDEF \nMkLabel func\n"
             " <-  FUN_PROLOGUE \nt_0 <- 1\nt_1 <- 0\n"
             "t_2 <- t_0 + t_1\n <-  FUN_EPILOGUE \n");
 }
-
 
 TEST_F(LowererTestV4, FunctionCallTest) {
   Statement::Block statements;
@@ -88,9 +89,9 @@ TEST_F(LowererTestV4, FunctionCallTest) {
   // getting the return value
   auto ae = make_unique<const VariableExpr>("foo_retval");
 
-  auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const VariableExpr>("foo_retval"),
-      make_unique<const IntegerExpr>(0));
+  auto foo_retval =
+      make_unique<const AddExpr>(make_unique<const VariableExpr>("foo_retval"),
+                                 make_unique<const IntegerExpr>(0));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
   foo_params.push_back(std::move(make_unique<const VariableExpr>("bob")));
@@ -98,8 +99,7 @@ TEST_F(LowererTestV4, FunctionCallTest) {
   Statement::Block fact_body;
 
   fact_body.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("foo_retval"),
-      make_unique<IntegerExpr>(1))));
+      make_unique<VariableExpr>("foo_retval"), make_unique<IntegerExpr>(1))));
 
   // fact_body.push_back(std::move(make_unique<const AddExpr>(
   //  make_unique<const VariableExpr>("foo_reval"),
@@ -113,12 +113,12 @@ TEST_F(LowererTestV4, FunctionCallTest) {
   function_defs.push_back(std::move(foo_def));
 
   auto ast = make_unique<const Program>(std::move(function_defs),
-                                        std::move(statements),
-                                        std::move(ae));
+                                        std::move(statements), std::move(ae));
 
   ast->Visit(&lowerer_);
 
-  EXPECT_EQ(lowerer_.GetOutput(), "t_0 <- 10\nbob <- t_0\n"
+  EXPECT_EQ(lowerer_.GetOutput(),
+            "t_0 <- 10\nbob <- t_0\n"
             "t_1 <- bob VAR_LOAD \n <-  FUNCTIONCALL \n"
             "foo_retval <- FUN_RET_LOAD FUN_RET_LOAD \n"
             " <-  FUNRETURNEPILOGUE \nt_2 <- foo_retval VAR_LOAD \n"
@@ -156,9 +156,9 @@ TEST_F(LowererTestV4, UndefinedFunctionCallTest) {
   // getting the return value
   auto ae = make_unique<const VariableExpr>("foo_retval");
 
-  auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const VariableExpr>("foo_retval"),
-      make_unique<const IntegerExpr>(0));
+  auto foo_retval =
+      make_unique<const AddExpr>(make_unique<const VariableExpr>("foo_retval"),
+                                 make_unique<const IntegerExpr>(0));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
   foo_params.push_back(std::move(make_unique<const VariableExpr>("bob")));
@@ -166,8 +166,7 @@ TEST_F(LowererTestV4, UndefinedFunctionCallTest) {
   Statement::Block fact_body;
 
   fact_body.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("foo_retval"),
-      make_unique<IntegerExpr>(1))));
+      make_unique<VariableExpr>("foo_retval"), make_unique<IntegerExpr>(1))));
 
   // fact_body.push_back(std::move(make_unique<const AddExpr>(
   //  make_unique<const VariableExpr>("foo_reval"),

@@ -1,6 +1,3 @@
-#include <string>  // std::string, std::stoi
-#include <vector>
-
 #include "frontend/combinators/v2_combinators/main/program_parser.h"
 #include "frontend/combinators/basic_combinators/and_combinator.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
@@ -9,11 +6,14 @@
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
 #include "frontend/combinators/v2_combinators/main/assignment_parser.h"
 #include "frontend/combinators/v2_combinators/main/word_parser.h"
+#include "frontend/combinators/v3_combinators/main/statement_parser.h"
+
+#include <string>  // std::string, std::stoi
 
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus ProgramParser::do_parse(std::string inputProgram,
                                     int startCharacter) {
@@ -25,26 +25,32 @@ ParseStatus ProgramParser::do_parse(std::string inputProgram,
   }
 
   ArithExprParser arithExprParser;
-  AssignmentParser assignParser;
+  SemiColonParser semiColon;
+
+  AndCombinator aeSemi;
+  aeSemi.firstParser = reinterpret_cast<NullParser *>(&arithExprParser);
+  aeSemi.secondParser = reinterpret_cast<NullParser *>(&semiColon);
+
+  StatementParser statementParser;
   ZeroOrMoreCombinator zeroOrMore;
 
-  zeroOrMore.parser = reinterpret_cast<NullParser *>(&assignParser);
+  zeroOrMore.parser = reinterpret_cast<NullParser *>(&statementParser);
 
   ParseStatus intermediateResult =
       zeroOrMore.do_parse(inputProgram, endCharacter);
 
   AndCombinator firstAnd;
   firstAnd.firstParser = reinterpret_cast<NullParser *>(&zeroOrMore);
-  firstAnd.secondParser = reinterpret_cast<NullParser *>(&arithExprParser);
+  firstAnd.secondParser = reinterpret_cast<NullParser *>(&aeSemi);
 
   ParseStatus result = firstAnd.do_parse(inputProgram, endCharacter);
 
   if (result.status) {
-    std::vector<std::unique_ptr<const Assignment>> temporaryAssign;
+    std::vector<std::unique_ptr<const Statement>> temporaryAssign;
 
     for (auto i = intermediateResult.astNodes.begin();
          i != intermediateResult.astNodes.end(); ++i) {
-      temporaryAssign.push_back(unique_cast<const Assignment>(std::move(*i)));
+      temporaryAssign.push_back(unique_cast<const Statement>(std::move(*i)));
     }
 
     result.ast = make_unique<const Program>(
@@ -59,3 +65,6 @@ ParseStatus ProgramParser::do_parse(std::string inputProgram,
 
   return result;
 }
+
+}  // namespace frontend
+}  // namespace cs160

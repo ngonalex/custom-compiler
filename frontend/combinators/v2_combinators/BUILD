@@ -24,7 +24,8 @@ cc_library(
 	"//frontend/combinators/basic_combinators",
 	"//frontend/combinators/v1_combinators", 
 	"//abstract_syntax:abstract_syntax",
-	"//abstract_syntax:print_visitor_v2"
+	"//abstract_syntax:print_visitor_v3",
+	"//frontend/combinators/v3_combinators:statement_parser"
 	],
 
 	visibility = ["//visibility:public"],
@@ -39,6 +40,15 @@ cc_library(
 	visibility = ["//visibility:public"],
 )
 
+cc_library(
+	name = "assignment_parser",
+	copts = ["-Wall -g"],
+	hdrs = ["main/assignment_parser.h","helpers/var_helper.h" ],
+	srcs = ["main/assignment_parser.cc", "helpers/var_helper.cc"],
+	deps = ["//utility", "//frontend/combinators/v1_combinators"],
+	visibility = ["//visibility:public"],
+)
+
 cc_test(
 	name = "combinators_test",
 
@@ -46,7 +56,7 @@ cc_test(
 	"@gtest//:main", 
 	":v2_combinators", 
 	"//abstract_syntax:abstract_syntax",
-	"//abstract_syntax:print_visitor_v2"
+	"//abstract_syntax:print_visitor_v3"
 	],
 
 	srcs = ["v2_test.cc"],

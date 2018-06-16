@@ -1,34 +1,34 @@
 #include <stdio.h>
 
+#include <array>
 #include <cstdio>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
 #include <string>
-#include <array>
 
-#include "backend/code_gen.h"
 #include "abstract_syntax/abstract_syntax.h"
-#include "backend/lowerer_visitor.h"
+#include "backend/code_gen.h"
 #include "backend/ir.h"
-#include "utility/memory.h"
+#include "backend/lowerer_visitor.h"
 #include "gtest/gtest.h"
+#include "utility/memory.h"
 
-using cs160::abstract_syntax::backend::AstVisitor;
-using cs160::abstract_syntax::backend::IntegerExpr;
+using cs160::make_unique;
 using cs160::abstract_syntax::backend::AddExpr;
-using cs160::abstract_syntax::backend::SubtractExpr;
-using cs160::abstract_syntax::backend::MultiplyExpr;
-using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::ArithmeticExpr;
+using cs160::abstract_syntax::backend::AstVisitor;
+using cs160::abstract_syntax::backend::DivideExpr;
+using cs160::abstract_syntax::backend::IntegerExpr;
+using cs160::abstract_syntax::backend::MultiplyExpr;
+using cs160::abstract_syntax::backend::SubtractExpr;
+using cs160::abstract_syntax::version_5::Statement;
+using cs160::backend::CodeGen;
 using cs160::backend::LowererVisitor;
 using cs160::backend::ThreeAddressCode;
-using cs160::backend::CodeGen;
 using cs160::backend::PrintFlag::PRINT_DEBUG;
 using cs160::backend::PrintFlag::PRINT_LAST_ARITHMETIC_EXPR;
 using cs160::backend::PrintFlag::PRINT_ONLY_RESULT;
-using cs160::abstract_syntax::version_5::Statement;
-using cs160::make_unique;
 
 class CodeGenTestV5 : public ::testing::Test {
  public:
@@ -42,9 +42,10 @@ class CodeGenTestV5 : public ::testing::Test {
     while (!feof(pipe.get())) {
       if (fgets(buffer.data(), 128, pipe.get()) != nullptr)
         result += buffer.data();
-      }
+    }
     return result;
   }
+
  protected:
   LowererVisitor lowerer_;
 };
@@ -57,8 +58,7 @@ TEST_F(CodeGenTestV5, CanCreateEmptyTuple) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(5),
-      make_unique<const IntegerExpr>(10));
+      make_unique<const IntegerExpr>(5), make_unique<const IntegerExpr>(10));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -73,8 +73,7 @@ TEST_F(CodeGenTestV5, CanCreateEmptyTuple) {
 
   Statement::Block statements;
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
 
   auto ae = make_unique<const VariableExpr>("bob");
   auto ast = make_unique<const Program>(std::move(function_defs),
@@ -87,7 +86,8 @@ TEST_F(CodeGenTestV5, CanCreateEmptyTuple) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The program returned a tuple with indices:\n"
+  EXPECT_EQ(result,
+            "The program returned a tuple with indices:\n"
             "1: Unassigned\n"
             "2: Unassigned\n"
             "3: Unassigned\n");
@@ -100,8 +100,7 @@ TEST_F(CodeGenTestV5, CanCreateTupleWithOneIntegerAssignment) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(5),
-      make_unique<const IntegerExpr>(10));
+      make_unique<const IntegerExpr>(5), make_unique<const IntegerExpr>(10));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -116,13 +115,11 @@ TEST_F(CodeGenTestV5, CanCreateTupleWithOneIntegerAssignment) {
 
   Statement::Block statements;
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(2)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(10))));
 
   auto ae = make_unique<const VariableExpr>("bob");
@@ -136,7 +133,8 @@ TEST_F(CodeGenTestV5, CanCreateTupleWithOneIntegerAssignment) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The program returned a tuple with indices:\n"
+  EXPECT_EQ(result,
+            "The program returned a tuple with indices:\n"
             "1: Unassigned\n"
             "2: Integer with value: 10\n"
             "3: Unassigned\n");
@@ -149,8 +147,7 @@ TEST_F(CodeGenTestV5, CanCreateTupleWithOneTupleAssignment) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(5),
-      make_unique<const IntegerExpr>(10));
+      make_unique<const IntegerExpr>(5), make_unique<const IntegerExpr>(10));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -165,13 +162,11 @@ TEST_F(CodeGenTestV5, CanCreateTupleWithOneTupleAssignment) {
 
   Statement::Block statements;
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
 
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(3)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(3)),
       make_unique<IntegerExpr>(20))));
 
   auto ae = make_unique<const VariableExpr>("bob");
@@ -185,7 +180,8 @@ TEST_F(CodeGenTestV5, CanCreateTupleWithOneTupleAssignment) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The program returned a tuple with indices:\n"
+  EXPECT_EQ(result,
+            "The program returned a tuple with indices:\n"
             "1: Unassigned\n"
             "2: Unassigned\n"
             "3: Tuple with size: 20\n");
@@ -199,8 +195,7 @@ TEST_F(CodeGenTestV5, CanCreateTupleWithMixedTypes) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(5),
-      make_unique<const IntegerExpr>(10));
+      make_unique<const IntegerExpr>(5), make_unique<const IntegerExpr>(10));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -215,19 +210,16 @@ TEST_F(CodeGenTestV5, CanCreateTupleWithMixedTypes) {
 
   Statement::Block statements;
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(2)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(-500))));
 
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(3)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(3)),
       make_unique<IntegerExpr>(20))));
 
   auto ae = make_unique<const VariableExpr>("bob");
@@ -241,7 +233,8 @@ TEST_F(CodeGenTestV5, CanCreateTupleWithMixedTypes) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The program returned a tuple with indices:\n"
+  EXPECT_EQ(result,
+            "The program returned a tuple with indices:\n"
             "1: Unassigned\n"
             "2: Integer with value: -500\n"
             "3: Tuple with size: 20\n");
@@ -253,8 +246,7 @@ TEST_F(CodeGenTestV5, TupleCreationErrorsOutWhenArgumentSuppliedisZero) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(5),
-      make_unique<const IntegerExpr>(10));
+      make_unique<const IntegerExpr>(5), make_unique<const IntegerExpr>(10));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -269,8 +261,7 @@ TEST_F(CodeGenTestV5, TupleCreationErrorsOutWhenArgumentSuppliedisZero) {
 
   Statement::Block statements;
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(0))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(0))));
 
   auto ae = make_unique<const VariableExpr>("bob");
   auto ast = make_unique<const Program>(std::move(function_defs),
@@ -292,8 +283,7 @@ TEST_F(CodeGenTestV5, TupleCreationErrorsOutWhenArgumentSuppliedisNeg) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(5),
-      make_unique<const IntegerExpr>(10));
+      make_unique<const IntegerExpr>(5), make_unique<const IntegerExpr>(10));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -308,8 +298,7 @@ TEST_F(CodeGenTestV5, TupleCreationErrorsOutWhenArgumentSuppliedisNeg) {
 
   Statement::Block statements;
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(-10))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(-10))));
 
   auto ae = make_unique<const VariableExpr>("bob");
   auto ast = make_unique<const Program>(std::move(function_defs),
@@ -332,8 +321,7 @@ TEST_F(CodeGenTestV5, DereferenceAccessErrorsOutWhenArgumentIsAboveMaxSize) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(5),
-      make_unique<const IntegerExpr>(10));
+      make_unique<const IntegerExpr>(5), make_unique<const IntegerExpr>(10));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -348,13 +336,11 @@ TEST_F(CodeGenTestV5, DereferenceAccessErrorsOutWhenArgumentIsAboveMaxSize) {
 
   Statement::Block statements;
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
 
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(4)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(4)),
       make_unique<IntegerExpr>(20))));
 
   auto ae = make_unique<const VariableExpr>("bob");
@@ -378,8 +364,7 @@ TEST_F(CodeGenTestV5, DereferenceAccessErrorsOutWhenArgumentIsZero) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(5),
-      make_unique<const IntegerExpr>(10));
+      make_unique<const IntegerExpr>(5), make_unique<const IntegerExpr>(10));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -394,13 +379,11 @@ TEST_F(CodeGenTestV5, DereferenceAccessErrorsOutWhenArgumentIsZero) {
 
   Statement::Block statements;
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
 
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(0)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(0)),
       make_unique<IntegerExpr>(20))));
 
   auto ae = make_unique<const VariableExpr>("bob");
@@ -424,8 +407,7 @@ TEST_F(CodeGenTestV5, DereferenceAccessErrorsOutWhenArgumentIsNegative) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(5),
-      make_unique<const IntegerExpr>(10));
+      make_unique<const IntegerExpr>(5), make_unique<const IntegerExpr>(10));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -440,13 +422,11 @@ TEST_F(CodeGenTestV5, DereferenceAccessErrorsOutWhenArgumentIsNegative) {
 
   Statement::Block statements;
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
 
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(-1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(-1)),
       make_unique<IntegerExpr>(20))));
 
   auto ae = make_unique<const VariableExpr>("bob");
@@ -471,8 +451,7 @@ TEST_F(CodeGenTestV5, TupleCreationErrorsOutCorrectlyWhenTheRHSIsATuple) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(5),
-      make_unique<const IntegerExpr>(10));
+      make_unique<const IntegerExpr>(5), make_unique<const IntegerExpr>(10));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -487,15 +466,12 @@ TEST_F(CodeGenTestV5, TupleCreationErrorsOutCorrectlyWhenTheRHSIsATuple) {
 
   Statement::Block statements;
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("rob"),
-      make_unique<IntegerExpr>(2))));
+      make_unique<VariableExpr>("rob"), make_unique<IntegerExpr>(2))));
 
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<VariableExpr>("rob"))));
+      make_unique<VariableExpr>("bob"), make_unique<VariableExpr>("rob"))));
 
   auto ae = make_unique<const VariableExpr>("bob");
   auto ast = make_unique<const Program>(std::move(function_defs),
@@ -519,8 +495,7 @@ TEST_F(CodeGenTestV5, TupleCanBeAssignedCorrectlyWhenTheRHSIsATuple) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(5),
-      make_unique<const IntegerExpr>(10));
+      make_unique<const IntegerExpr>(5), make_unique<const IntegerExpr>(10));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -535,20 +510,16 @@ TEST_F(CodeGenTestV5, TupleCanBeAssignedCorrectlyWhenTheRHSIsATuple) {
 
   Statement::Block statements;
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("rob"),
-      make_unique<IntegerExpr>(2))));
+      make_unique<VariableExpr>("rob"), make_unique<IntegerExpr>(2))));
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("rob"),
-          make_unique<IntegerExpr>(2)),
+      make_unique<Dereference>(make_unique<VariableExpr>("rob"),
+                               make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(10))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<VariableExpr>("rob"))));
+      make_unique<VariableExpr>("bob"), make_unique<VariableExpr>("rob"))));
 
   auto ae = make_unique<const VariableExpr>("bob");
   auto ast = make_unique<const Program>(std::move(function_defs),
@@ -561,7 +532,8 @@ TEST_F(CodeGenTestV5, TupleCanBeAssignedCorrectlyWhenTheRHSIsATuple) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The program returned a tuple with indices:\n"
+  EXPECT_EQ(result,
+            "The program returned a tuple with indices:\n"
             "1: Unassigned\n"
             "2: Integer with value: 10\n");
 }
@@ -574,8 +546,7 @@ TEST_F(CodeGenTestV5, NestedTupleCreationErrorsOutCorrectlyWhenTheRHSIsATuple) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(5),
-      make_unique<const IntegerExpr>(10));
+      make_unique<const IntegerExpr>(5), make_unique<const IntegerExpr>(10));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -590,16 +561,13 @@ TEST_F(CodeGenTestV5, NestedTupleCreationErrorsOutCorrectlyWhenTheRHSIsATuple) {
 
   Statement::Block statements;
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("rob"),
-      make_unique<IntegerExpr>(2))));
+      make_unique<VariableExpr>("rob"), make_unique<IntegerExpr>(2))));
 
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(1)),
       make_unique<VariableExpr>("rob"))));
 
   auto ae = make_unique<const VariableExpr>("bob");
@@ -624,8 +592,7 @@ TEST_F(CodeGenTestV5, NestedTupleAssignedCorrectlyWhenTheRHSIsATuple) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(5),
-      make_unique<const IntegerExpr>(10));
+      make_unique<const IntegerExpr>(5), make_unique<const IntegerExpr>(10));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -640,22 +607,18 @@ TEST_F(CodeGenTestV5, NestedTupleAssignedCorrectlyWhenTheRHSIsATuple) {
 
   Statement::Block statements;
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("rob"),
-      make_unique<IntegerExpr>(2))));
+      make_unique<VariableExpr>("rob"), make_unique<IntegerExpr>(2))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("rob"),
-          make_unique<IntegerExpr>(2)),
+      make_unique<Dereference>(make_unique<VariableExpr>("rob"),
+                               make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(10))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(1)),
       make_unique<VariableExpr>("rob"))));
 
   auto ae = make_unique<const VariableExpr>("bob");
@@ -669,7 +632,8 @@ TEST_F(CodeGenTestV5, NestedTupleAssignedCorrectlyWhenTheRHSIsATuple) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The program returned a tuple with indices:\n"
+  EXPECT_EQ(result,
+            "The program returned a tuple with indices:\n"
             "1: Tuple with size: 2\n"
             "2: Unassigned\n"
             "3: Unassigned\n");
@@ -684,8 +648,7 @@ TEST_F(CodeGenTestV5, DanglingPointersDoNotOccurWhenReassigningATuple) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(5),
-      make_unique<const IntegerExpr>(10));
+      make_unique<const IntegerExpr>(5), make_unique<const IntegerExpr>(10));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -700,27 +663,22 @@ TEST_F(CodeGenTestV5, DanglingPointersDoNotOccurWhenReassigningATuple) {
 
   Statement::Block statements;
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("rob"),
-      make_unique<IntegerExpr>(2))));
+      make_unique<VariableExpr>("rob"), make_unique<IntegerExpr>(2))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("rob"),
-          make_unique<IntegerExpr>(2)),
+      make_unique<Dereference>(make_unique<VariableExpr>("rob"),
+                               make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(10))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(1)),
       make_unique<VariableExpr>("rob"))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("rob"),
-      make_unique<IntegerExpr>(10))));
+      make_unique<VariableExpr>("rob"), make_unique<IntegerExpr>(10))));
 
   auto ae = make_unique<const VariableExpr>("bob");
   auto ast = make_unique<const Program>(std::move(function_defs),
@@ -733,7 +691,8 @@ TEST_F(CodeGenTestV5, DanglingPointersDoNotOccurWhenReassigningATuple) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The program returned a tuple with indices:\n"
+  EXPECT_EQ(result,
+            "The program returned a tuple with indices:\n"
             "1: Tuple with size: 2\n"
             "2: Unassigned\n"
             "3: Unassigned\n");
@@ -749,8 +708,7 @@ TEST_F(CodeGenTestV5, DoubleNestedDereferencesAreAssignedCorrectly) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(5),
-      make_unique<const IntegerExpr>(10));
+      make_unique<const IntegerExpr>(5), make_unique<const IntegerExpr>(10));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -765,34 +723,29 @@ TEST_F(CodeGenTestV5, DoubleNestedDereferencesAreAssignedCorrectly) {
 
   Statement::Block statements;
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
 
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(1)),
       make_unique<IntegerExpr>(4))));
 
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
       make_unique<Dereference>(
-          make_unique<Dereference>(
-              make_unique<VariableExpr>("bob"),
-              make_unique<IntegerExpr>(1)),
+          make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                   make_unique<IntegerExpr>(1)),
           make_unique<IntegerExpr>(1)),
       make_unique<IntegerExpr>(1))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<Dereference>(
-          make_unique<Dereference>(
-              make_unique<VariableExpr>("bob"),
-              make_unique<IntegerExpr>(1)),
+          make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                   make_unique<IntegerExpr>(1)),
           make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(-100))));
 
-  auto ae = make_unique<const Dereference>(
-        make_unique<VariableExpr>("bob"),
-        make_unique<IntegerExpr>(1));
+  auto ae = make_unique<const Dereference>(make_unique<VariableExpr>("bob"),
+                                           make_unique<IntegerExpr>(1));
   auto ast = make_unique<const Program>(std::move(function_defs),
                                         std::move(statements), std::move(ae));
 
@@ -803,7 +756,8 @@ TEST_F(CodeGenTestV5, DoubleNestedDereferencesAreAssignedCorrectly) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The program returned a tuple with indices:\n"
+  EXPECT_EQ(result,
+            "The program returned a tuple with indices:\n"
             "1: Tuple with size: 1\n"
             "2: Integer with value: -100\n"
             "3: Unassigned\n"
@@ -821,8 +775,7 @@ TEST_F(CodeGenTestV5, RHSDoubleNestedDereferencesCanBeAccessedCorrectly) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(5),
-      make_unique<const IntegerExpr>(10));
+      make_unique<const IntegerExpr>(5), make_unique<const IntegerExpr>(10));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -837,37 +790,32 @@ TEST_F(CodeGenTestV5, RHSDoubleNestedDereferencesCanBeAccessedCorrectly) {
 
   Statement::Block statements;
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
 
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(1)),
       make_unique<IntegerExpr>(4))));
 
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
       make_unique<Dereference>(
-          make_unique<Dereference>(
-              make_unique<VariableExpr>("bob"),
-              make_unique<IntegerExpr>(1)),
+          make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                   make_unique<IntegerExpr>(1)),
           make_unique<IntegerExpr>(1)),
       make_unique<IntegerExpr>(2))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<Dereference>(
-          make_unique<Dereference>(
-              make_unique<VariableExpr>("bob"),
-              make_unique<IntegerExpr>(1)),
+          make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                   make_unique<IntegerExpr>(1)),
           make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(-100))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("rob"),
       make_unique<Dereference>(
-          make_unique<Dereference>(
-              make_unique<VariableExpr>("bob"),
-              make_unique<IntegerExpr>(1)),
+          make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                   make_unique<IntegerExpr>(1)),
           make_unique<IntegerExpr>(1)))));
 
   auto ae = make_unique<const VariableExpr>("rob");
@@ -881,7 +829,8 @@ TEST_F(CodeGenTestV5, RHSDoubleNestedDereferencesCanBeAccessedCorrectly) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The program returned a tuple with indices:\n"
+  EXPECT_EQ(result,
+            "The program returned a tuple with indices:\n"
             "1: Unassigned\n"
             "2: Unassigned\n");
 }
@@ -898,8 +847,7 @@ TEST_F(CodeGenTestV5, NestedDereferencesErrorOutIfObjectAccessedIsNotTuple) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(5),
-      make_unique<const IntegerExpr>(10));
+      make_unique<const IntegerExpr>(5), make_unique<const IntegerExpr>(10));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -914,43 +862,37 @@ TEST_F(CodeGenTestV5, NestedDereferencesErrorOutIfObjectAccessedIsNotTuple) {
 
   Statement::Block statements;
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
 
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(1)),
       make_unique<IntegerExpr>(4))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(2)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(4))));
 
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
       make_unique<Dereference>(
-          make_unique<Dereference>(
-              make_unique<VariableExpr>("bob"),
-              make_unique<IntegerExpr>(1)),
+          make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                   make_unique<IntegerExpr>(1)),
           make_unique<IntegerExpr>(1)),
       make_unique<IntegerExpr>(2))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<Dereference>(
-          make_unique<Dereference>(
-              make_unique<VariableExpr>("bob"),
-              make_unique<IntegerExpr>(1)),
+          make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                   make_unique<IntegerExpr>(1)),
           make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(-100))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("rob"),
       make_unique<Dereference>(
-          make_unique<Dereference>(
-              make_unique<VariableExpr>("bob"),
-              make_unique<IntegerExpr>(2)),
+          make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                   make_unique<IntegerExpr>(2)),
           make_unique<IntegerExpr>(1)))));
 
   auto ae = make_unique<const VariableExpr>("rob");
@@ -976,8 +918,7 @@ TEST_F(CodeGenTestV5, CannotAccessAnIndexThatDoesNotExist) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(5),
-      make_unique<const IntegerExpr>(10));
+      make_unique<const IntegerExpr>(5), make_unique<const IntegerExpr>(10));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -992,21 +933,18 @@ TEST_F(CodeGenTestV5, CannotAccessAnIndexThatDoesNotExist) {
 
   Statement::Block statements;
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
 
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(1)),
       make_unique<IntegerExpr>(4))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("rob"),
       make_unique<Dereference>(
-          make_unique<Dereference>(
-              make_unique<VariableExpr>("bob"),
-              make_unique<IntegerExpr>(2)),
+          make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                   make_unique<IntegerExpr>(2)),
           make_unique<IntegerExpr>(1)))));
 
   auto ae = make_unique<const VariableExpr>("rob");
@@ -1036,8 +974,7 @@ TEST_F(CodeGenTestV5, ArithmeticExprWorksOnTuplesIndicesIfTheyAreInts) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(5),
-      make_unique<const IntegerExpr>(10));
+      make_unique<const IntegerExpr>(5), make_unique<const IntegerExpr>(10));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -1052,53 +989,43 @@ TEST_F(CodeGenTestV5, ArithmeticExprWorksOnTuplesIndicesIfTheyAreInts) {
 
   Statement::Block statements;
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(4))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(4))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(1)),
       make_unique<IntegerExpr>(1))));
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(2)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(4))));
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(3)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(3)),
       make_unique<IntegerExpr>(5))));
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(4)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(4)),
       make_unique<IntegerExpr>(10))));
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("rob"),
       make_unique<AddExpr>(
           make_unique<DivideExpr>(
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(4)),
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(3))),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(4)),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(3))),
           make_unique<MultiplyExpr>(
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(2)),
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(1)))))));
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(2)),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(1)))))));
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("rob"),
       make_unique<SubtractExpr>(
           make_unique<VariableExpr>("rob"),
-          make_unique<Dereference>(
-              make_unique<VariableExpr>("bob"),
-              make_unique<IntegerExpr>(4))))));
+          make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                   make_unique<IntegerExpr>(4))))));
 
   auto ae = make_unique<const VariableExpr>("rob");
   auto ast = make_unique<const Program>(std::move(function_defs),
@@ -1129,8 +1056,7 @@ TEST_F(CodeGenTestV5, GreaterThanLessThanWorksOnTuplesIndicesIfTheyAreInts) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(5),
-      make_unique<const IntegerExpr>(10));
+      make_unique<const IntegerExpr>(5), make_unique<const IntegerExpr>(10));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -1145,56 +1071,45 @@ TEST_F(CodeGenTestV5, GreaterThanLessThanWorksOnTuplesIndicesIfTheyAreInts) {
 
   Statement::Block statements;
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(4))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(4))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(1)),
       make_unique<IntegerExpr>(1))));
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(2)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(4))));
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(3)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(3)),
       make_unique<IntegerExpr>(5))));
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(4)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(4)),
       make_unique<IntegerExpr>(10))));
 
   Statement::Block trueblock;
   Statement::Block falseblock;
 
   trueblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("rob"),
-      make_unique<IntegerExpr>(1))));
+      make_unique<VariableExpr>("rob"), make_unique<IntegerExpr>(1))));
   falseblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("rob"),
-      make_unique<IntegerExpr>(0))));
+      make_unique<VariableExpr>("rob"), make_unique<IntegerExpr>(0))));
 
   statements.push_back(make_unique<Conditional>(
       make_unique<LogicalOrExpr>(
           make_unique<LessThanExpr>(
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(1)),
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(2))),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(1)),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(2))),
           make_unique<GreaterThanExpr>(
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(3)),
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(4)))),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(3)),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(4)))),
       std::move(trueblock), std::move(falseblock)));
 
   auto ae = make_unique<const VariableExpr>("rob");
@@ -1227,8 +1142,7 @@ TEST_F(CodeGenTestV5,
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(5),
-      make_unique<const IntegerExpr>(10));
+      make_unique<const IntegerExpr>(5), make_unique<const IntegerExpr>(10));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -1243,56 +1157,45 @@ TEST_F(CodeGenTestV5,
 
   Statement::Block statements;
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(4))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(4))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(1)),
       make_unique<IntegerExpr>(1))));
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(2)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(4))));
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(3)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(3)),
       make_unique<IntegerExpr>(5))));
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(4)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(4)),
       make_unique<IntegerExpr>(10))));
 
   Statement::Block trueblock;
   Statement::Block falseblock;
 
   trueblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("rob"),
-      make_unique<IntegerExpr>(1))));
+      make_unique<VariableExpr>("rob"), make_unique<IntegerExpr>(1))));
   falseblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("rob"),
-      make_unique<IntegerExpr>(0))));
+      make_unique<VariableExpr>("rob"), make_unique<IntegerExpr>(0))));
 
   statements.push_back(make_unique<Conditional>(
       make_unique<LogicalAndExpr>(
           make_unique<LessThanEqualToExpr>(
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(1)),
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(2))),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(1)),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(2))),
           make_unique<GreaterThanEqualToExpr>(
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(3)),
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(4)))),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(3)),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(4)))),
       std::move(trueblock), std::move(falseblock)));
 
   auto ae = make_unique<const VariableExpr>("rob");
@@ -1324,8 +1227,7 @@ TEST_F(CodeGenTestV5, CannotUseATupleAsAnArgumentForRelationals) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(5),
-      make_unique<const IntegerExpr>(10));
+      make_unique<const IntegerExpr>(5), make_unique<const IntegerExpr>(10));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -1340,56 +1242,45 @@ TEST_F(CodeGenTestV5, CannotUseATupleAsAnArgumentForRelationals) {
 
   Statement::Block statements;
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(4))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(4))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(1)),
       make_unique<IntegerExpr>(1))));
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(2)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(4))));
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(3)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(3)),
       make_unique<IntegerExpr>(5))));
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(4)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(4)),
       make_unique<IntegerExpr>(10))));
 
   Statement::Block trueblock;
   Statement::Block falseblock;
 
   trueblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("rob"),
-      make_unique<IntegerExpr>(1))));
+      make_unique<VariableExpr>("rob"), make_unique<IntegerExpr>(1))));
   falseblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("rob"),
-      make_unique<IntegerExpr>(0))));
+      make_unique<VariableExpr>("rob"), make_unique<IntegerExpr>(0))));
 
   statements.push_back(make_unique<Conditional>(
       make_unique<LogicalAndExpr>(
           make_unique<LessThanEqualToExpr>(
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(1)),
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(2))),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(1)),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(2))),
           make_unique<GreaterThanEqualToExpr>(
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(3)),
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(4)))),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(3)),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(4)))),
       std::move(trueblock), std::move(falseblock)));
 
   auto ae = make_unique<const VariableExpr>("rob");
@@ -1419,8 +1310,7 @@ TEST_F(CodeGenTestV5, ArithExprFailsIfArgumentIsTuple) {
   Statement::Block foo_statements;
 
   auto foo_retval = make_unique<const AddExpr>(
-      make_unique<const IntegerExpr>(5),
-      make_unique<const IntegerExpr>(10));
+      make_unique<const IntegerExpr>(5), make_unique<const IntegerExpr>(10));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -1435,53 +1325,43 @@ TEST_F(CodeGenTestV5, ArithExprFailsIfArgumentIsTuple) {
 
   Statement::Block statements;
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(4))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(4))));
 
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(1)),
       make_unique<IntegerExpr>(1))));
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(2)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(4))));
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(3)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(3)),
       make_unique<IntegerExpr>(5))));
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(4)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(4)),
       make_unique<IntegerExpr>(10))));
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("rob"),
       make_unique<AddExpr>(
           make_unique<DivideExpr>(
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(4)),
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(3))),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(4)),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(3))),
           make_unique<MultiplyExpr>(
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(2)),
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(1)))))));
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(2)),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(1)))))));
   statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("rob"),
       make_unique<SubtractExpr>(
           make_unique<VariableExpr>("rob"),
-          make_unique<Dereference>(
-              make_unique<VariableExpr>("bob"),
-              make_unique<IntegerExpr>(4))))));
+          make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                   make_unique<IntegerExpr>(4))))));
 
   auto ae = make_unique<const VariableExpr>("rob");
   auto ast = make_unique<const Program>(std::move(function_defs),
@@ -1519,8 +1399,7 @@ TEST_F(CodeGenTestV5, UseTuplesAsArguments) {
 
   auto arguments = std::vector<std::unique_ptr<const ArithmeticExpr>>();
   statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
   arguments.push_back(std::move(make_unique<VariableExpr>("bob")));
   statements.push_back(std::move(make_unique<const FunctionCall>(
       make_unique<const VariableExpr>("foo_retval"), "foo",
@@ -1537,7 +1416,8 @@ TEST_F(CodeGenTestV5, UseTuplesAsArguments) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The program returned a tuple with indices:\n"
+  EXPECT_EQ(result,
+            "The program returned a tuple with indices:\n"
             "1: Unassigned\n"
             "2: Unassigned\n"
             "3: Unassigned\n");
@@ -1552,8 +1432,7 @@ TEST_F(CodeGenTestV5, CanCreateEmptyTupleAndReturnItFunction) {
   Statement::Block statements;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
 
   auto foo_retval = make_unique<VariableExpr>("bob");
 
@@ -1582,7 +1461,8 @@ TEST_F(CodeGenTestV5, CanCreateEmptyTupleAndReturnItFunction) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The program returned a tuple with indices:\n"
+  EXPECT_EQ(result,
+            "The program returned a tuple with indices:\n"
             "1: Unassigned\n"
             "2: Unassigned\n"
             "3: Unassigned\n");
@@ -1598,12 +1478,10 @@ TEST_F(CodeGenTestV5, CanCreateTupleWithOneIntegerAssignmentFunction) {
   Statement::Block statements;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(2)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(10))));
 
   auto foo_retval = make_unique<VariableExpr>("bob");
@@ -1631,7 +1509,8 @@ TEST_F(CodeGenTestV5, CanCreateTupleWithOneIntegerAssignmentFunction) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The program returned a tuple with indices:\n"
+  EXPECT_EQ(result,
+            "The program returned a tuple with indices:\n"
             "1: Unassigned\n"
             "2: Integer with value: 10\n"
             "3: Unassigned\n");
@@ -1648,17 +1527,14 @@ TEST_F(CodeGenTestV5, CanCreateTupleWithMixedTypesFunction) {
   Statement::Block statements;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(2)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(-500))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(3)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(3)),
       make_unique<IntegerExpr>(10))));
 
   auto foo_retval = make_unique<VariableExpr>("bob");
@@ -1687,7 +1563,8 @@ TEST_F(CodeGenTestV5, CanCreateTupleWithMixedTypesFunction) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The program returned a tuple with indices:\n"
+  EXPECT_EQ(result,
+            "The program returned a tuple with indices:\n"
             "1: Unassigned\n"
             "2: Integer with value: -500\n"
             "3: Tuple with size: 10\n");
@@ -1703,8 +1580,7 @@ TEST_F(CodeGenTestV5,
   Statement::Block statements;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(0))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(0))));
 
   auto foo_retval = make_unique<VariableExpr>("bob");
 
@@ -1744,8 +1620,7 @@ TEST_F(CodeGenTestV5, TupleCreationErrorsOutWhenArgumentSuppliedisNegFunc) {
   Statement::Block statements;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(-10))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(-10))));
 
   auto foo_retval = make_unique<VariableExpr>("bob");
 
@@ -1787,12 +1662,10 @@ TEST_F(CodeGenTestV5,
   Statement::Block statements;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(4)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(4)),
       make_unique<IntegerExpr>(50))));
 
   auto foo_retval = make_unique<VariableExpr>("bob");
@@ -1834,12 +1707,10 @@ TEST_F(CodeGenTestV5, DereferenceAccessErrorsOutWhenArgumentIsZeroFunc) {
   Statement::Block statements;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(0)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(0)),
       make_unique<IntegerExpr>(50))));
 
   auto foo_retval = make_unique<VariableExpr>("bob");
@@ -1881,12 +1752,10 @@ TEST_F(CodeGenTestV5, DereferenceAccessErrorsOutWhenArgumentIsNegFunc) {
   Statement::Block statements;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(-1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(-1)),
       make_unique<IntegerExpr>(50))));
 
   auto foo_retval = make_unique<VariableExpr>("bob");
@@ -1929,14 +1798,11 @@ TEST_F(CodeGenTestV5, TupleCanBeAssignedCorrectlyWhenTheRHSIsATupleFunc) {
   Statement::Block statements;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("rob"),
-      make_unique<IntegerExpr>(2))));
+      make_unique<VariableExpr>("rob"), make_unique<IntegerExpr>(2))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<VariableExpr>("rob"))));
+      make_unique<VariableExpr>("bob"), make_unique<VariableExpr>("rob"))));
 
   auto foo_retval = make_unique<VariableExpr>("bob");
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
@@ -1976,14 +1842,11 @@ TEST_F(CodeGenTestV5, ArithAssignedCorrectlyWhenTheRHSIsATupleFunc) {
   Statement::Block statements;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("rob"),
-      make_unique<IntegerExpr>(2))));
+      make_unique<VariableExpr>("rob"), make_unique<IntegerExpr>(2))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<VariableExpr>("rob"))));
+      make_unique<VariableExpr>("bob"), make_unique<VariableExpr>("rob"))));
 
   auto foo_retval = make_unique<VariableExpr>("bob");
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
@@ -2009,7 +1872,8 @@ TEST_F(CodeGenTestV5, ArithAssignedCorrectlyWhenTheRHSIsATupleFunc) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The program returned a tuple with indices:\n"
+  EXPECT_EQ(result,
+            "The program returned a tuple with indices:\n"
             "1: Unassigned\n"
             "2: Unassigned\n");
 }
@@ -2026,15 +1890,12 @@ TEST_F(CodeGenTestV5,
   Statement::Block statements;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("rob"),
-      make_unique<IntegerExpr>(2))));
+      make_unique<VariableExpr>("rob"), make_unique<IntegerExpr>(2))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(1)),
       make_unique<VariableExpr>("rob"))));
 
   auto foo_retval = make_unique<VariableExpr>("bob");
@@ -2075,15 +1936,12 @@ TEST_F(CodeGenTestV5, NestedTupleAssignedCorrectlyWhenTheRHSIsATupleFunc) {
   Statement::Block statements;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("rob"),
-      make_unique<IntegerExpr>(2))));
+      make_unique<VariableExpr>("rob"), make_unique<IntegerExpr>(2))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(1)),
       make_unique<VariableExpr>("rob"))));
 
   auto foo_retval = make_unique<VariableExpr>("bob");
@@ -2110,7 +1968,8 @@ TEST_F(CodeGenTestV5, NestedTupleAssignedCorrectlyWhenTheRHSIsATupleFunc) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The program returned a tuple with indices:\n"
+  EXPECT_EQ(result,
+            "The program returned a tuple with indices:\n"
             "1: Tuple with size: 2\n"
             "2: Unassigned\n"
             "3: Unassigned\n");
@@ -2128,19 +1987,15 @@ TEST_F(CodeGenTestV5, DanglingPointersDoNotOccurWhenReassigningATupleFunc) {
   Statement::Block statements;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("rob"),
-      make_unique<IntegerExpr>(2))));
+      make_unique<VariableExpr>("rob"), make_unique<IntegerExpr>(2))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(1)),
       make_unique<VariableExpr>("rob"))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("rob"),
-      make_unique<IntegerExpr>(10))));
+      make_unique<VariableExpr>("rob"), make_unique<IntegerExpr>(10))));
   auto foo_retval = make_unique<VariableExpr>("bob");
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
   auto foo_def = make_unique<const FunctionDef>("foo", std::move(foo_params),
@@ -2165,7 +2020,8 @@ TEST_F(CodeGenTestV5, DanglingPointersDoNotOccurWhenReassigningATupleFunc) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The program returned a tuple with indices:\n"
+  EXPECT_EQ(result,
+            "The program returned a tuple with indices:\n"
             "1: Tuple with size: 2\n"
             "2: Unassigned\n"
             "3: Unassigned\n");
@@ -2183,31 +2039,27 @@ TEST_F(CodeGenTestV5, DoubleNestedDereferencesAreAssignedCorrectlyFunc) {
   Statement::Block statements;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(1)),
       make_unique<IntegerExpr>(4))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
       make_unique<Dereference>(
-          make_unique<Dereference>(
-              make_unique<VariableExpr>("bob"),
-              make_unique<IntegerExpr>(1)),
+          make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                   make_unique<IntegerExpr>(1)),
           make_unique<IntegerExpr>(1)),
       make_unique<IntegerExpr>(1))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<Dereference>(
-          make_unique<Dereference>(
-              make_unique<VariableExpr>("bob"),
-              make_unique<IntegerExpr>(1)),
+          make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                   make_unique<IntegerExpr>(1)),
           make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(-100))));
 
-  auto foo_retval = make_unique<const Dereference>(
-      make_unique<const VariableExpr>("bob"),
-      make_unique<const IntegerExpr>(1));
+  auto foo_retval =
+      make_unique<const Dereference>(make_unique<const VariableExpr>("bob"),
+                                     make_unique<const IntegerExpr>(1));
 
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
 
@@ -2233,7 +2085,8 @@ TEST_F(CodeGenTestV5, DoubleNestedDereferencesAreAssignedCorrectlyFunc) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The program returned a tuple with indices:\n"
+  EXPECT_EQ(result,
+            "The program returned a tuple with indices:\n"
             "1: Tuple with size: 1\n"
             "2: Integer with value: -100\n"
             "3: Unassigned\n"
@@ -2253,33 +2106,28 @@ TEST_F(CodeGenTestV5, RHSDoubleNestedDereferencesCanBeAccessedCorrectlyFunc) {
   Statement::Block statements;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(1)),
       make_unique<IntegerExpr>(4))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
       make_unique<Dereference>(
-          make_unique<Dereference>(
-              make_unique<VariableExpr>("bob"),
-              make_unique<IntegerExpr>(1)),
+          make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                   make_unique<IntegerExpr>(1)),
           make_unique<IntegerExpr>(1)),
       make_unique<IntegerExpr>(2))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<Dereference>(
-          make_unique<Dereference>(
-              make_unique<VariableExpr>("bob"),
-              make_unique<IntegerExpr>(1)),
+          make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                   make_unique<IntegerExpr>(1)),
           make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(-100))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("rob"),
       make_unique<Dereference>(
-          make_unique<Dereference>(
-              make_unique<VariableExpr>("bob"),
-              make_unique<IntegerExpr>(1)),
+          make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                   make_unique<IntegerExpr>(1)),
           make_unique<IntegerExpr>(1)))));
 
   auto foo_retval = make_unique<const VariableExpr>("rob");
@@ -2307,7 +2155,8 @@ TEST_F(CodeGenTestV5, RHSDoubleNestedDereferencesCanBeAccessedCorrectlyFunc) {
   runner.GenerateData(lowerer_.totalset());
   runner.Generate(std::move(test));
   std::string result = exec("gcc -g -static test.s -o run && ./run");
-  EXPECT_EQ(result, "The program returned a tuple with indices:\n"
+  EXPECT_EQ(result,
+            "The program returned a tuple with indices:\n"
             "1: Unassigned\n"
             "2: Unassigned\n");
 }
@@ -2326,38 +2175,32 @@ TEST_F(CodeGenTestV5,
   Statement::Block foo_statements;
   Statement::Block statements;
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(1)),
       make_unique<IntegerExpr>(4))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(2)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(4))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
       make_unique<Dereference>(
-          make_unique<Dereference>(
-              make_unique<VariableExpr>("bob"),
-              make_unique<IntegerExpr>(1)),
+          make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                   make_unique<IntegerExpr>(1)),
           make_unique<IntegerExpr>(1)),
       make_unique<IntegerExpr>(2))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<Dereference>(
-          make_unique<Dereference>(
-              make_unique<VariableExpr>("bob"),
-              make_unique<IntegerExpr>(1)),
+          make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                   make_unique<IntegerExpr>(1)),
           make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(-100))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("rob"),
       make_unique<Dereference>(
-          make_unique<Dereference>(
-              make_unique<VariableExpr>("bob"),
-              make_unique<IntegerExpr>(2)),
+          make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                   make_unique<IntegerExpr>(2)),
           make_unique<IntegerExpr>(1)))));
 
   auto foo_retval = make_unique<const VariableExpr>("rob");
@@ -2398,19 +2241,16 @@ TEST_F(CodeGenTestV5, CannotAccessAnIndexThatDoesNotExistFunc) {
   Statement::Block statements;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(3))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(3))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(1)),
       make_unique<IntegerExpr>(4))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("rob"),
       make_unique<Dereference>(
-          make_unique<Dereference>(
-              make_unique<VariableExpr>("bob"),
-              make_unique<IntegerExpr>(2)),
+          make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                   make_unique<IntegerExpr>(2)),
           make_unique<IntegerExpr>(1)))));
 
   auto foo_retval = make_unique<const VariableExpr>("rob");
@@ -2455,52 +2295,42 @@ TEST_F(CodeGenTestV5, ArithmeticExprWorksOnTuplesIndicesIfTheyAreIntsFunc) {
   Statement::Block statements;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(4))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(4))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(1)),
       make_unique<IntegerExpr>(1))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(2)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(4))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(3)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(3)),
       make_unique<IntegerExpr>(5))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(4)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(4)),
       make_unique<IntegerExpr>(10))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("rob"),
       make_unique<AddExpr>(
           make_unique<DivideExpr>(
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(4)),
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(3))),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(4)),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(3))),
           make_unique<MultiplyExpr>(
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(2)),
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(1)))))));
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(2)),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(1)))))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("rob"),
       make_unique<SubtractExpr>(
           make_unique<VariableExpr>("rob"),
-          make_unique<Dereference>(
-              make_unique<VariableExpr>("bob"),
-              make_unique<IntegerExpr>(4))))));
+          make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                   make_unique<IntegerExpr>(4))))));
 
   auto foo_retval = make_unique<const VariableExpr>("rob");
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();
@@ -2547,55 +2377,44 @@ TEST_F(CodeGenTestV5,
   Statement::Block statements;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(4))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(4))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(1)),
       make_unique<IntegerExpr>(1))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(2)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(4))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(3)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(3)),
       make_unique<IntegerExpr>(5))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(4)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(4)),
       make_unique<IntegerExpr>(10))));
 
   Statement::Block trueblock;
   Statement::Block falseblock;
 
   trueblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("rob"),
-      make_unique<IntegerExpr>(1))));
+      make_unique<VariableExpr>("rob"), make_unique<IntegerExpr>(1))));
   falseblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("rob"),
-      make_unique<IntegerExpr>(0))));
+      make_unique<VariableExpr>("rob"), make_unique<IntegerExpr>(0))));
 
   foo_statements.push_back(make_unique<Conditional>(
       make_unique<LogicalOrExpr>(
           make_unique<LessThanExpr>(
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(1)),
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(2))),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(1)),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(2))),
           make_unique<GreaterThanExpr>(
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(3)),
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(4)))),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(3)),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(4)))),
       std::move(trueblock), std::move(falseblock)));
 
   auto foo_retval = make_unique<const VariableExpr>("rob");
@@ -2643,55 +2462,44 @@ TEST_F(CodeGenTestV5,
   Statement::Block statements;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(4))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(4))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(1)),
       make_unique<IntegerExpr>(1))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(2)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(4))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(3)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(3)),
       make_unique<IntegerExpr>(5))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(4)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(4)),
       make_unique<IntegerExpr>(10))));
 
   Statement::Block trueblock;
   Statement::Block falseblock;
 
   trueblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("rob"),
-      make_unique<IntegerExpr>(1))));
+      make_unique<VariableExpr>("rob"), make_unique<IntegerExpr>(1))));
   falseblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("rob"),
-      make_unique<IntegerExpr>(0))));
+      make_unique<VariableExpr>("rob"), make_unique<IntegerExpr>(0))));
 
   foo_statements.push_back(make_unique<Conditional>(
       make_unique<LogicalAndExpr>(
           make_unique<LessThanEqualToExpr>(
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(1)),
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(2))),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(1)),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(2))),
           make_unique<GreaterThanEqualToExpr>(
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(3)),
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(4)))),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(3)),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(4)))),
       std::move(trueblock), std::move(falseblock)));
 
   auto foo_retval = make_unique<const VariableExpr>("rob");
@@ -2738,55 +2546,44 @@ TEST_F(CodeGenTestV5, CannotUseATupleAsAnArgumentForRelationalsFunc) {
   Statement::Block statements;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(4))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(4))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(1)),
       make_unique<IntegerExpr>(1))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(2)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(4))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(3)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(3)),
       make_unique<IntegerExpr>(5))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(4)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(4)),
       make_unique<IntegerExpr>(10))));
 
   Statement::Block trueblock;
   Statement::Block falseblock;
 
   trueblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("rob"),
-      make_unique<IntegerExpr>(1))));
+      make_unique<VariableExpr>("rob"), make_unique<IntegerExpr>(1))));
   falseblock.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<VariableExpr>("rob"),
-      make_unique<IntegerExpr>(0))));
+      make_unique<VariableExpr>("rob"), make_unique<IntegerExpr>(0))));
 
   foo_statements.push_back(make_unique<Conditional>(
       make_unique<LogicalAndExpr>(
           make_unique<LessThanEqualToExpr>(
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(1)),
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(2))),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(1)),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(2))),
           make_unique<GreaterThanEqualToExpr>(
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(3)),
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(4)))),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(3)),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(4)))),
       std::move(trueblock), std::move(falseblock)));
 
   auto foo_retval = make_unique<const VariableExpr>("rob");
@@ -2831,52 +2628,42 @@ TEST_F(CodeGenTestV5, ArithExprFailsIfArgumentIsTupleFunc) {
   Statement::Block statements;
 
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<VariableExpr>("bob"),
-      make_unique<IntegerExpr>(4))));
+      make_unique<VariableExpr>("bob"), make_unique<IntegerExpr>(4))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(1)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(1)),
       make_unique<IntegerExpr>(1))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromNewTuple>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(2)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(2)),
       make_unique<IntegerExpr>(4))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(3)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(3)),
       make_unique<IntegerExpr>(5))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
-      make_unique<Dereference>(
-          make_unique<VariableExpr>("bob"),
-          make_unique<IntegerExpr>(4)),
+      make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                               make_unique<IntegerExpr>(4)),
       make_unique<IntegerExpr>(10))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("rob"),
       make_unique<AddExpr>(
           make_unique<DivideExpr>(
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(4)),
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(3))),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(4)),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(3))),
           make_unique<MultiplyExpr>(
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(2)),
-              make_unique<Dereference>(
-                  make_unique<VariableExpr>("bob"),
-                  make_unique<IntegerExpr>(1)))))));
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(2)),
+              make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                       make_unique<IntegerExpr>(1)))))));
   foo_statements.push_back(std::move(make_unique<AssignmentFromArithExp>(
       make_unique<VariableExpr>("rob"),
       make_unique<SubtractExpr>(
           make_unique<VariableExpr>("rob"),
-          make_unique<Dereference>(
-              make_unique<VariableExpr>("bob"),
-              make_unique<IntegerExpr>(4))))));
+          make_unique<Dereference>(make_unique<VariableExpr>("bob"),
+                                   make_unique<IntegerExpr>(4))))));
 
   auto foo_retval = make_unique<const VariableExpr>("rob");
   auto foo_params = std::vector<std::unique_ptr<const VariableExpr>>();

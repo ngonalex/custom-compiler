@@ -2,12 +2,12 @@
 
 #define super NullParser
 
-using namespace cs160::frontend;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus SingleCharParser::do_parse(std::string inputProgram,
                                        int startCharacter) {
   int endCharacter = startCharacter;
-  endCharacter += trim(inputProgram);
   std::string errorMessage = "Char should only have alphabetical character";
 
   if (inputProgram.size() == 0) {
@@ -33,8 +33,6 @@ ParseStatus SingleVarCharParser::do_parse(std::string inputProgram,
   std::string errorMessage = "Char should be alphabetical or underscore";
 
   int endCharacter = startCharacter;
-  trim(inputProgram);
-
   if (inputProgram.size() == 0) {
     return super::fail(inputProgram, endCharacter, errorMessage);
   }
@@ -53,3 +51,6 @@ ParseStatus SingleVarCharParser::do_parse(std::string inputProgram,
   }
   return status;
 }
+
+}  // namespace frontend
+}  // namespace cs160

@@ -3,12 +3,12 @@
 
 #include <algorithm>
 #include <iostream>
+#include <map>
 #include <set>
 #include <stack>
 #include <string>
-#include <vector>
-#include <map>
 #include <utility>
+#include <vector>
 
 #include "abstract_syntax/abstract_syntax.h"
 #include "backend/helper_struct.h"
@@ -18,13 +18,12 @@
 
 using cs160::make_unique;
 using cs160::abstract_syntax::backend::AddExpr;
-using cs160::abstract_syntax::backend::SubtractExpr;
 using cs160::abstract_syntax::backend::Assignment;
-using cs160::abstract_syntax::backend::Program;
+using cs160::abstract_syntax::backend::AssignmentFromArithExp;
+using cs160::abstract_syntax::backend::AssignmentFromNewTuple;
 using cs160::abstract_syntax::backend::AstVisitor;
 using cs160::abstract_syntax::backend::Conditional;
-using cs160::abstract_syntax::backend::MultiplyExpr;
-using cs160::abstract_syntax::backend::VariableExpr;
+using cs160::abstract_syntax::backend::Dereference;
 using cs160::abstract_syntax::backend::DivideExpr;
 using cs160::abstract_syntax::backend::EqualToExpr;
 using cs160::abstract_syntax::backend::FunctionCall;
@@ -39,28 +38,22 @@ using cs160::abstract_syntax::backend::LogicalBinaryOperator;
 using cs160::abstract_syntax::backend::LogicalNotExpr;
 using cs160::abstract_syntax::backend::LogicalOrExpr;
 using cs160::abstract_syntax::backend::Loop;
-using cs160::abstract_syntax::backend::Conditional;
-using cs160::abstract_syntax::backend::FunctionCall;
-using cs160::abstract_syntax::backend::FunctionDef;
-using cs160::abstract_syntax::backend::Dereference;
-using cs160::abstract_syntax::backend::AssignmentFromArithExp;
-using cs160::abstract_syntax::backend::AssignmentFromNewTuple;
+using cs160::abstract_syntax::backend::MultiplyExpr;
+using cs160::abstract_syntax::backend::Program;
+using cs160::abstract_syntax::backend::SubtractExpr;
+using cs160::abstract_syntax::backend::VariableExpr;
 
 namespace cs160 {
 namespace backend {
 
-enum ChildType {
-  INTCHILD,
-  VARCHILD,
-  DEREFCHILD,
-  BINOPCHILD,
-  NOCHILD
-};
+enum ChildType { INTCHILD, VARCHILD, DEREFCHILD, BINOPCHILD, NOCHILD };
 
 class LowererVisitor : public AstVisitor {
  public:
-  LowererVisitor() : counter_(), currvariabletype_(RIGHT_HAND_VAR),
-    currdereferencetype_(RHS_DEREFERENCE) {}
+  LowererVisitor()
+      : counter_(),
+        currvariabletype_(RIGHT_HAND_VAR),
+        currdereferencetype_(RHS_DEREFERENCE) {}
 
   std::string GetOutput();
 
@@ -109,7 +102,7 @@ class LowererVisitor : public AstVisitor {
   void CreateLabelBlock(std::string labelname);
   void CreateJumpBlock(std::string jumpname, OpcodeType type);
   void CreateDereference(std::string basevariable, std::string targetvariable,
-    int indexofchild);
+                         int indexofchild);
   void CreateTupleAssignment(std::string target, Operand operand);
   void CreateArithmeticAssignment(std::string target, Operand operand);
 
@@ -124,9 +117,9 @@ class LowererVisitor : public AstVisitor {
 
   // Two functions that help us identify unassigned variables
   std::set<std::string> GetSetDifference(std::set<std::string> set1,
-    std::set<std::string> set2);
+                                         std::set<std::string> set2);
   std::set<std::string> GetSetIntersection(std::set<std::string> set1,
-    std::set<std::string> set2);
+                                           std::set<std::string> set2);
 
   std::vector<std::unique_ptr<ThreeAddressCode>> GetIR() {
     return std::move(blocks_);

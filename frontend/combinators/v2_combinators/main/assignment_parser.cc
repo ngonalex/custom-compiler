@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <string>  // std::string, std::stoi
-
 #include "frontend/combinators/v2_combinators/main/assignment_parser.h"
 #include "frontend/combinators/basic_combinators/and_combinator.h"
 #include "frontend/combinators/basic_combinators/or_combinator.h"
@@ -8,10 +5,13 @@
 #include "frontend/combinators/v2_combinators/helpers/var_helper.h"
 #include "frontend/combinators/v2_combinators/main/word_parser.h"
 
+#include <stdio.h>
+#include <string>  // std::string, std::stoi
+
 #define super NullParser
 
-using namespace cs160::frontend;
-using namespace std;
+namespace cs160 {
+namespace frontend {
 
 ParseStatus AssignmentParser::do_parse(std::string inputProgram,
                                        int startCharacter) {
@@ -31,7 +31,13 @@ ParseStatus AssignmentParser::do_parse(std::string inputProgram,
   varOrWord.secondParser = reinterpret_cast<NullParser *>(&wordParser);
 
   EqualSignParser equalSignParser;
+
   ArithExprParser arithExprParser;
+  SemiColonParser semiColon;
+
+  AndCombinator aeSemi;
+  aeSemi.firstParser = reinterpret_cast<NullParser *>(&arithExprParser);
+  aeSemi.secondParser = reinterpret_cast<NullParser *>(&semiColon);
 
   // Grammar declaration
   AndCombinator firstAnd;
@@ -43,15 +49,30 @@ ParseStatus AssignmentParser::do_parse(std::string inputProgram,
 
   AndCombinator secondAnd;
   secondAnd.firstParser = reinterpret_cast<NullParser *>(&firstAnd);
-  secondAnd.secondParser = reinterpret_cast<NullParser *>(&arithExprParser);
+  secondAnd.secondParser = reinterpret_cast<NullParser *>(&aeSemi);
 
   ParseStatus result = secondAnd.do_parse(inputProgram, endCharacter);
 
   if (result.status) {
+    /*
+    if (firstResult.firstOrSecond) {
+        std::string temp = firstResult.parsedCharacters.erase(0,3);
+         std::unique_ptr<const AstNode> temp_ast =
+          std::move(make_unique<const VariableExpr>(temp));
+
+      result.ast = std::move(make_unique<const Assignment>(
+        unique_cast<const VariableExpr>(std::move(temp_ast)),
+        unique_cast<const ArithmeticExpr>(std::move(result.second_ast))));
+    }
+    else {*/
     result.ast = std::move(make_unique<const Assignment>(
         unique_cast<const VariableExpr>(std::move(firstResult.ast)),
         unique_cast<const ArithmeticExpr>(std::move(result.second_ast))));
+    //}
   }
 
   return result;
 }
+
+}  // namespace frontend
+}  // namespace cs160
