@@ -20,6 +20,7 @@ ParseStatus NullParser::fail(std::string inputProgram, int startCharacter,
   }
   // cache.insert(std::pair<int, ParseStatus>(startCharacter,
   // std::move(status)));
+
   return status;
 }
 

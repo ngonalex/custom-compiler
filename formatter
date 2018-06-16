@@ -1,4 +1,8 @@
 #!/bin/bash
 
 find ./ -type f -name "*.h" -exec clang-format -i -style=google *.h "{}" \;
+<<<<<<< HEAD
 find ./ -type f -name "*.cc" -exec clang-format -i -style=google *.cc "{}" \;
+=======
+find ./ -type f -name "*.cc" -exec clang-format -i -style=google *.cc "{}" \;
+>>>>>>> master

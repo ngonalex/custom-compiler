@@ -13,6 +13,7 @@ ParseStatus::ParseStatus(ParseStatus &&other)
   this->firstParsedCharacters = other.firstParsedCharacters;
   this->secondParsedCharacters = other.secondParsedCharacters;
   this->firstOrSecond = other.firstOrSecond;
+
   this->errorType = other.errorType;
   this->startCharacter = other.startCharacter;
   this->endCharacter = other.endCharacter;
