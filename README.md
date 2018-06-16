@@ -23,7 +23,7 @@ We've proud to have completed and tested up to v5. We've also added additional e
 
 Missing: Getting cache to work for v2 to v5. Cache works for basic combinators and v1 because they don't return ASTs. One solution would be to duplicate the AST nodes as they're being created, but we felt this would be too hacky of a solution and inefficient.
 
-Here is a link to our language specification
+Here is a link to our language specification (syntax based on Swift)
 https://github.ucsb.edu/CS160-S18/team-influx/issues/21
 
 
