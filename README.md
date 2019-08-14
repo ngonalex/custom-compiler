@@ -17,7 +17,7 @@ Test in the same way, by using `bazel test`. Make sure to include the library/bi
 To run a certain subproject, you can use `bazel run` with the path and name of the task.
 =======================================
 
-Frontend Documentation
+Frontend Documentation (For backend see backend folder)
 
 We've proud to have completed and tested up to v5. We've also added additional error handling (character number and error messages that tell you where you've failed and how to fix it sometimes) and got cacheing to work for basic_combinators and v1_combinators.
 
@@ -85,6 +85,3 @@ Responsibilities:
 Victor helped with basic combinators, v1, finished v2, v3, and v4.
 Prabal rewrote v1 and v3 to get them working using a recursive manner, and implemented v4 and v5.
 Chandler wrote many of the tests for v4 and v5
-
-**Backend** 
-See the readme in the backend folder
