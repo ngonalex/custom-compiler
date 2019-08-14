@@ -113,7 +113,7 @@ If the variable "x" is never used again then our program will continue. However 
 If the number of arguments supplied into a function call != to the number of arguments a function call expects, we throw an error. This is done by counting the number of arguments for a function call and storing it in a map of function_name -> # of arguments. Then when we see a function call anywhere in the program we consult the map if the number of arguments provided in the function call is equal to the number of arguments that the map tells us.
 
 4) Redefining Functions  
-Using the map we created as described in number 3) when we're creating the function definitions for Codegen, we check if the function already exists in the map as our language has no notion of overloading functions. The AAST notes that function names should be unique, but it's not enforced in anyway, so this is our way of doing it.
+Using the map we created as described in number 3) when we're creating the function definitions for Codegen, we check if the function already exists in the map as our language has no notion of overloading functions. The AST notes that function names should be unique, but it's not enforced in anyway, so this is our way of doing it.
 
 5) Undeclared Functions  
 If the function name that is being referred to in a function call does not exist in our map we throw an error.
@@ -124,11 +124,11 @@ Files: code_gen.cc, code_gen.h
 Files it depends on: ir.h, helper_struct.h, lowerer_visitor.cc, lowerer_visitor.h  
 Tests: codegen_test.cc  
 
-The way our codegen works is it's dynamically typed so it figures out the types at runtime. The way objects are stored in our language is each object is that each object is 16 bytes where byte 0 is the type flag (0 for int, 1 for tuple/pointer), byte 1 is the existence flag (0 if there is no object, 1 if there is one), byte 2-5 is the size flag (0 for ints, 1 -> 2^4-1 for tuples depending on the size asked for by AssignmentFromNewTuple), and bytes 8-15 being either the valued of the integer (64 bit signed integer) or the address of the tuple in the heap (64 bit address).
+The way our codegen works is it's dynamically typed so it figures out the types at runtime. The way objects are stored in our language is each object is that each object is 16 bytes where byte 0 is the type flag (0 for int, 1 for tuple/pointer), byte 1 is the existence flag (0 if there is no object, 1 if there is one), byte 2-5 is the size flag (0 for ints, 1 -> 2^4-1 for tuples depending on the size asked for by AssignmentFromNewTuple), and bytes 8-15 being either the value of the integer (64 bit signed integer) or the address of the tuple in the heap (64 bit address).
 
 Some other things to note:
 Our language will type check meaning that things like x->1 + 1 (if x->1 is a tuple) are not valid. In any Arithmetic/Relational/Logical Expr, if any of the arguments are not integers we throw a type error and exit. Our language will protect against tuple of out of bounds errors. Anytime a dereference is accessed we check if the argument provided is within range of 1 -> size (stored as metadata in the first 8 bytes of the object). Also we catch things like accessing a tuple that doesn't exist, so if x->1->1 has not been assigned or x->1 is actually an integer, we throw an error by checking first if it exists (existence flag) then if it's a tuple (if type flag is 1 for tuple).  
-We also guard against using tuple creation with bogus arguments (cannot create a tuple of size 0 or less). Because we never garbare collect our program doesn't have dangling pointers, so things like x = tuple (2), y = x, x = 5 is totally valid as y will just point to the origin tuple that x contained after x is reassigned to the variable 5.  
+We also guard against using tuple creation with bogus arguments (cannot create a tuple of size 0 or less). Because we never garbage collect our program doesn't have dangling pointers, so things like x = tuple (2), y = x, x = 5 is totally valid as y will just point to the origin tuple that x contained after x is reassigned to the variable 5.  
 
 Also this is important to note that there are reserved keywords in our language. There's an issue up on github that details this, but it's not handled in backend. So if a user were to use any of the reserved keywords like heap, bumpptr, returnobj, their program would crash or have undefined behavior.  
 
