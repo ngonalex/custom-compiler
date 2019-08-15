@@ -1,7 +1,7 @@
 
-Totally not a Swift Compiler
+Totally not a Swift Compiler 
 =======================================
-
+*Backend docs in backend folder
 ## Building
 
 Compile subprojects by giving their paths and task names defined in the respective BUILD files to `bazel build`.
